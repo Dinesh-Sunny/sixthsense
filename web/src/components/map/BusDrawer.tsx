@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { alertsOptions, queryKeys, sendAlert } from "@/lib/api/queries";
 import type { Incident, Pairing, Vehicle } from "@/lib/api/types";
 import { BUS_COPY, BUS_STATE, VERDICT, busState, etaText, riskLabel, riskTone } from "@/lib/copy";
-import { incidentTitle } from "@/lib/incident";
+import { incidentTitle, viewOf } from "@/lib/incident";
+import { StandInNote, ViewLabel } from "@/components/ViewLabel";
 import { cn } from "@/lib/utils";
 
 /** Selected bus: details scroll, actions stay pinned at the bottom. */
@@ -93,9 +94,12 @@ export function BusDrawer({
                 controls
                 label="Stand-in clip for this bus"
                 fallbackLabel={BUS_COPY.standIn}
-                overlay={<StatusPill tone="sample">{BUS_COPY.standIn}</StatusPill>}
+                overlay={
+                  viewOf(incident) ? <ViewLabel incident={incident} /> : <StatusPill tone="sample">{BUS_COPY.standIn}</StatusPill>
+                }
               />
             </div>
+            <StandInNote incident={incident} />
             <p className="font-serif text-xl leading-[1.2] text-balance">{incidentTitle(incident, pairing)}</p>
             <div className="text-eye">Next</div>
             <p className="text-body-sm text-ink">{incident.what_next}</p>

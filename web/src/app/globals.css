@@ -326,10 +326,12 @@
 /* Images zoom slightly inside their frame on hover. */
 @utility zoom-img {
   overflow: hidden;
-  & img {
+  & img,
+  & video {
     transition: transform 200ms ease-out;
   }
-  &:hover img {
+  &:hover img,
+  &:hover video {
     transform: scale(1.03);
   }
 }

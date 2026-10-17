@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { allIncidentsOptions, pairingsOptions } from "@/lib/api/queries";
 import type { Incident, Pairing } from "@/lib/api/types";
 import { COACHING_COPY, REPORT_COPY, plural, riskLabel, riskTone } from "@/lib/copy";
-import { hazardOf, inMode, useDataMode } from "@/lib/incident";
+import { hazardOf, inModes, useDataModes } from "@/lib/incident";
 import { useSignedOff } from "@/lib/signoff";
 
 interface RouteGroup {
@@ -175,8 +175,8 @@ export function CoachingView() {
   const pairings = useQuery(pairingsOptions());
   const incidents = useQuery(allIncidentsOptions());
   const byId = new Map((incidents.data ?? []).map((i) => [i.id, i]));
-  const dataMode = useDataMode();
-  const groups = groupByRoute(inMode(pairings.data, dataMode), byId);
+  const dataModes = useDataModes();
+  const groups = groupByRoute(inModes(pairings.data, dataModes), byId);
 
   return (
     <Atmosphere variant="soft">

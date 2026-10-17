@@ -14,3 +14,7 @@
 
 ## v3 bus mode
 - [x] mode "bus" (city+street cameras, 8 hazard queries, round-robin + near-dup skip), FORESEE_BUS prompt with fixed type set (snapped via difflib), pairings add stop_name/towards and prefer latest bus run then city. 77 tests.
+
+## v3 bus views
+- [x] modes bus_front (pie_cam-3) / bus_nearside (nyc_bike_gopro-1), verify="ego": tracking.closing_on_us (ByteTrack per class group, lane zone per view, height growth >=1.35x in <=2 s or TTC proxy dt/(s-1) <=3 s over >=0.5 s), plain verify_note; per-view prompts + hazard sets; Incident.camera_view (+ web types.ts field only); CLI --limit <=60 (API stays 10); pairings prefer bus_front+bus_nearside > bus > city; metrics ordered bus views first. 85 tests.
+- Ego gap_series is empty (no car-length gap to chart).

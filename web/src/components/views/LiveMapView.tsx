@@ -27,7 +27,7 @@ import {
   weatherOptions,
 } from "@/lib/api/queries";
 import { BUS_COPY, BUS_STATE, busState, pairingPill, riskLabel, riskTone } from "@/lib/copy";
-import { inMode, incidentTitle, shortLine, useDataMode } from "@/lib/incident";
+import { inModes, incidentTitle, shortLine, useDataModes } from "@/lib/incident";
 import { cn } from "@/lib/utils";
 
 const panel = "glass-map rounded-panel shadow-float";
@@ -93,8 +93,8 @@ export function LiveMapView() {
     hadBuses.current = has;
   }, [vehicles.length, refetchPairings]);
 
-  const dataMode = useDataMode();
-  const modePairings = useMemo(() => inMode(pairings.data, dataMode), [pairings.data, dataMode]);
+  const dataModes = useDataModes();
+  const modePairings = useMemo(() => inModes(pairings.data, dataModes), [pairings.data, dataModes]);
   const pairByBus = useMemo(() => new Map(modePairings.map((p) => [p.vehicle_id, p])), [modePairings]);
   const vehicleById = useMemo(() => new Map(vehicles.map((v) => [v.id, v])), [vehicles]);
   const needsLook = useMemo(() => rankPairings(modePairings), [modePairings]);

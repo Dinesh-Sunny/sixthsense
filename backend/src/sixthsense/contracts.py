@@ -4,7 +4,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from .modes import ASK_MAX_CHARS, RUN_LIMIT_MAX, Mode
+from .modes import ASK_MAX_CHARS, RUN_LIMIT_MAX, CameraView, Mode
 
 CameTrue = Literal["yes", "partly", "no", "unknown"]
 StepState = Literal["pending", "running", "done", "error"]
@@ -54,6 +54,7 @@ class Incident(_Out):
     gap_series: list[GapPoint] = Field(default_factory=list)
     run_id: str | None = None
     trace_url: str | None = None
+    camera_view: CameraView | None = None  # vehicle-mounted modes only (stand-in footage)
 
 
 class ModeMetrics(_Out):

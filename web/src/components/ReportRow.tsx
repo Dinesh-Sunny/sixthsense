@@ -8,11 +8,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { clipUrl } from "@/lib/api/client";
 import { incidentOptions } from "@/lib/api/queries";
 import type { Incident, Pairing } from "@/lib/api/types";
-import { incidentTitle, shortLine } from "@/lib/incident";
+import { VIEW_LABEL, incidentTitle, shortLine, viewOf } from "@/lib/incident";
 import { REPORT_COPY, SAMPLE, VERDICT, reportId, routeLine } from "@/lib/copy";
 
 /** First frame of the clip, muted and inert: the row's overlay link takes every click. */
-function Thumb({ source }: { source: string | null }) {
+function Thumb({ source, view }: { source: string | null; view: string | null }) {
   const [failed, setFailed] = useState(false);
   return (
     <div aria-hidden className="relative aspect-video w-24 shrink-0 overflow-hidden rounded-md bg-surface-sunk sm:w-36">
@@ -26,6 +26,11 @@ function Thumb({ source }: { source: string | null }) {
           tabIndex={-1}
           onError={() => setFailed(true)}
         />
+      )}
+      {view && (
+        <span className="absolute bottom-1 left-1 rounded-full bg-scrim px-1.5 py-0.5 text-[10px] leading-none font-medium text-on-sky">
+          {view}
+        </span>
       )}
     </div>
   );
@@ -51,7 +56,7 @@ export function ReportRow({
   const verdict = VERDICT[i.came_true];
   return (
     <li className="group relative flex items-center gap-4 rounded-lg border border-hairline bg-surface p-3 transition-colors duration-150 hover:border-ink-muted has-[a:focus-visible]:ring-[3px] has-[a:focus-visible]:ring-ring/50 sm:gap-5 sm:p-4">
-      <Thumb source={i.source} />
+      <Thumb source={i.source} view={viewOf(i) ? VIEW_LABEL[viewOf(i)!] : null} />
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-data text-ink-muted">
           <span className="font-medium text-ink">{reportId(i.id)}</span>

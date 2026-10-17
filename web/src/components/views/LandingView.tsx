@@ -6,6 +6,7 @@ import { BuiltWith } from "@/components/landing/BuiltWith";
 import { CheckTimeline } from "@/components/landing/CheckTimeline";
 import { MapTile, ReportStack } from "@/components/landing/AudienceCreatives";
 import { CoachFan } from "@/components/landing/CoachFan";
+import { ClipFrame } from "@/components/landing/ClipFrame";
 import { GapCreative } from "@/components/landing/GapCreative";
 import { HeroStage } from "@/components/landing/HeroStage";
 import { LiveLines } from "@/components/landing/LiveLines";
@@ -18,8 +19,8 @@ import { WeatherPill } from "@/components/WeatherPill";
 import { Button } from "@/components/ui/button";
 import { incidentsOptions, metricsOptions, readyOptions, weatherOptions } from "@/lib/api/queries";
 import type { Incident, ModeMetrics } from "@/lib/api/types";
-import { BUS_COPY, COPY, MODE_INFO, STORE_LABEL, gapLine, gapSummary, riskLabel, riskTone, scoreLine } from "@/lib/copy";
-import { hazardOf } from "@/lib/incident";
+import { BUS_COPY, COPY, MODE_INFO, STORE_LABEL, riskLabel, riskTone, scoreLine } from "@/lib/copy";
+import { hazardOf, useDataModes } from "@/lib/incident";
 import { assetUrl, cn } from "@/lib/utils";
 
 const GITHUB_URL = "https://github.com/Dinesh-Sunny/sixthsense";
@@ -62,10 +63,6 @@ const AUDIENCES = [
   { title: "Driver coaches", body: "One card per route with the moments and fixes to talk through with drivers.", href: "/coaching", cta: "Open coaching" },
 ] as const;
 
-function Frame({ frame, className }: { frame: { src: string; alt: string }; className?: string }) {
-  return <img src={assetUrl(frame.src)} alt={frame.alt} className={cn("block size-full object-cover", className)} />;
-}
-
 function WordmarkLarge({ className }: { className?: string }) {
   return (
     <span className={cn("font-serif leading-[0.95] text-ink", className)}>
@@ -89,11 +86,26 @@ function reportCta(label: string, i: Incident | undefined): { href: Href; label:
   return { href: i ? { pathname: "/incident", query: { id: i.id } } : "/reports", label };
 }
 
-function topIncident(lists: (Incident[] | undefined)[]): Incident | undefined {
-  return lists
-    .flatMap((l) => l ?? [])
-    .filter((i) => !i.fixture)
-    .sort((a, b) => b.risk - a.risk || Number(b.came_true === "yes") - Number(a.came_true === "yes"))[0];
+/** One summary row over the bus camera views (front + nearside), labelled as the bus safety run. */
+function mergeRuns(rows: ModeMetrics[]): ModeMetrics | undefined {
+  if (rows.length === 0) return undefined;
+  if (rows.length === 1 && rows[0].mode !== "bus_front" && rows[0].mode !== "bus_nearside") return rows[0];
+  const sum = (k: "candidates" | "ruled_out" | "verified" | "checked" | "came_true_yes" | "came_true_partly") =>
+    rows.reduce((a, r) => a + r[k], 0);
+  const checked = sum("checked");
+  return {
+    ...rows[0],
+    mode: "bus",
+    run_id: null,
+    candidates: sum("candidates"),
+    ruled_out: sum("ruled_out"),
+    verified: sum("verified"),
+    checked,
+    came_true_yes: sum("came_true_yes"),
+    came_true_partly: sum("came_true_partly"),
+    accuracy: checked > 0 ? sum("came_true_yes") / checked : null,
+    eval_url: null,
+  };
 }
 
 function bestScore(metrics: ModeMetrics[] | undefined): ModeMetrics | undefined {
@@ -155,25 +167,34 @@ export function LandingView() {
   const weather = useQuery(weatherOptions());
   const metrics = useQuery(metricsOptions());
   const ready = useQuery(readyOptions());
+  const front = useQuery(incidentsOptions("bus_front"));
+  const nearside = useQuery(incidentsOptions("bus_nearside"));
   const bus = useQuery(incidentsOptions("bus"));
   const city = useQuery(incidentsOptions("city"));
-  const road = useQuery(incidentsOptions("road"));
-  const street = useQuery(incidentsOptions("street"));
+  const dataModes = useDataModes();
 
   const wx = weather.data?.wx ?? "clear";
   const m = metrics.isSuccess ? metrics.data : undefined;
   // Different real incidents per section (hero, step 3, step 2) so no sentence repeats on the page.
-  const pool = rankDistinct([bus.data, city.data, road.data, street.data]);
+  // Bus camera views only: front for the hero and forecast, nearside for false alarms and coaching.
+  // Until those runs exist, fall back to the bus run, then city (static frames then stay as fallbacks).
+  const frontPool = rankDistinct([front.data]);
+  const nearPool = rankDistinct([nearside.data]);
+  const fallbackPool = rankDistinct([bus.data, city.data]);
+  const pool = frontPool.length ? frontPool : nearPool.length ? nearPool : fallbackPool;
   const top = pool[0];
   const foresee = pool.find((i) => i.id !== top?.id && i.what_next !== top?.what_next) ?? top;
-  // City footage only (the frame is a city crossing): riskiest live city moment that has a measured gap.
-  const withGap = (city.data ?? []).filter((i) => !i.fixture && gapSummary(i.gap_series) !== null);
-  const gap = withGap.find((i) => i.id !== top?.id && i.id !== foresee?.id) ?? topIncident([withGap]);
-  const score = bestScore(m);
-  const ran = m?.filter((x) => x.candidates > 0) ?? [];
+  const nearPick = nearPool.length ? nearPool : fallbackPool;
+  const gap = nearPick.find((i) => i.id !== top?.id && i.id !== foresee?.id) ?? nearPick[0];
+  const coachClips = (nearPool.length ? nearPool : []).slice(0, 3);
+  // Numbers only from the modes inside pages show (bus views; fallback bus, then city).
+  const ran = m?.filter((x) => x.candidates > 0 && (dataModes ?? []).includes(x.mode)) ?? [];
+  const score = bestScore(ran);
   // Live results come from the bus safety run, or the city run until the bus run exists.
-  const resultRun = ran.find((x) => x.mode === "bus") ?? ran.find((x) => x.mode === "city");
-  const resultIncidents = ((resultRun?.mode === "bus" ? bus.data : city.data) ?? []).filter((i) => !i.fixture);
+  const resultRun = mergeRuns(ran);
+  const resultIncidents = (frontPool.length || nearPool.length ? [...frontPool, ...nearPool] : fallbackPool).filter(
+    (i) => (dataModes ?? []).includes(i.mode),
+  );
   const totalWatched = ran.reduce((a, x) => a + x.candidates, 0);
   const totalRuledOut = ran.reduce((a, x) => a + x.ruled_out, 0);
   const stored = ready.data?.store ? STORE_LABEL[ready.data.store] : null;
@@ -253,8 +274,7 @@ export function LandingView() {
           wash="lav-card"
           visual={
             <div className={floatCard}>
-              <GapCreative series={gap?.gap_series} frame={FRAMES.ruleOut} />
-              {gap && <div className="text-data text-ink-muted">{gapLine(gapSummary(gap.gap_series)!)}</div>}
+              <GapCreative incident={gap} fallback={FRAMES.ruleOut} />
               {/* Live: sum of ruled_out / candidates over each mode's latest run. */}
               {totalWatched > 0 && (
                 <div className="text-body-sm text-ink">
@@ -270,7 +290,9 @@ export function LandingView() {
           wash="dusk-card"
           visual={
             <Reveal className="lift zoom-img w-full max-w-[340px] overflow-hidden rounded-[18px] bg-surface shadow-float">
-              <Frame frame={FRAMES.predict} className="aspect-video" />
+              <div className="aspect-video">
+                <ClipFrame incident={foresee} fallback={FRAMES.predict} />
+              </div>
               {foresee && (
                 <div className="flex flex-col gap-1.5 px-[18px] py-3.5">
                   <div className={cn("text-title", rise)} style={stagger(1)}>{hazardOf(foresee)}</div>
@@ -348,7 +370,7 @@ export function LandingView() {
               <p className="text-body-sm text-ink-muted">{a.body}</p>
               {n === 0 && <ReportStack />}
               {n === 1 && <MapTile />}
-              {n === 2 && <CoachFan />}
+              {n === 2 && <CoachFan incidents={coachClips} />}
               <span className="mt-auto pt-2 text-body-sm font-medium text-ink">
                 <span className="link-grow pb-0.5 group-hover/aud:[background-size:100%_1px]">{a.cta}</span> <span aria-hidden>→</span>
               </span>

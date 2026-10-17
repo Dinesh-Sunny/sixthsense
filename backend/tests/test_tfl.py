@@ -90,6 +90,12 @@ async def test_fleet_poll_route_detail_and_user_agent(settings):
         await store.save_run(ModeMetrics(mode="bus", run_id="r2", generated_at="2"),
                              [Incident(id="b1", mode="bus", run_id="r2", risk=3, type="Blocked lane")])
         assert [p.incident_id for p in await fleet.pairings()] == ["b1"]  # latest bus run wins
+        await store.save_run(ModeMetrics(mode="bus_front", run_id="r3", generated_at="3"),
+                             [Incident(id="f1", mode="bus_front", run_id="r3", risk=2, camera_view="front")])
+        await store.save_run(ModeMetrics(mode="bus_nearside", run_id="r4", generated_at="3"),
+                             [Incident(id="n1", mode="bus_nearside", run_id="r4", risk=4, camera_view="nearside")])
+        assert [p.incident_id for p in await fleet.pairings()] == ["n1", "f1"]  # bus views beat bus
+        assert [m.mode for m in await store.metrics()][:3] == ["bus_front", "bus_nearside", "bus"]
     for r in fake.requests:
         assert r.headers["user-agent"] == TFL_USER_AGENT and r.url.params["app_key"] == "k-secret"
 

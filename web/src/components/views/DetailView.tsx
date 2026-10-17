@@ -36,7 +36,8 @@ import {
   timeOfDay,
 } from "@/lib/copy";
 import { useSignOff } from "@/lib/signoff";
-import { incidentTitle } from "@/lib/incident";
+import { incidentTitle, viewOf } from "@/lib/incident";
+import { StandInNote, ViewLabel } from "@/components/ViewLabel";
 import { cn } from "@/lib/utils";
 
 function Breadcrumb({ id }: { id: string }) {
@@ -246,9 +247,13 @@ function DetailBody({ incident: i }: { incident: Incident }) {
                 <StatusPill tone="sample">{SAMPLE.label}</StatusPill>
               ) : (
                 <span className="flex gap-2">
-                  <StatusPill tone="unk" className="bg-surface">
-                    {BUS_COPY.standIn}
-                  </StatusPill>
+                  {viewOf(i) ? (
+                    <ViewLabel incident={i} />
+                  ) : (
+                    <StatusPill tone="unk" className="bg-surface">
+                      {BUS_COPY.standIn}
+                    </StatusPill>
+                  )}
                   <StatusPill tone={riskTone(i.risk)} className="bg-surface">
                     {riskLabel(i.risk)}
                   </StatusPill>
@@ -257,6 +262,7 @@ function DetailBody({ incident: i }: { incident: Incident }) {
             }
           />
         </div>
+        <StandInNote incident={i} />
         <div className="lg:hidden">
           <Report incident={i} pairing={pairing} signedOff={signedOff} />
         </div>

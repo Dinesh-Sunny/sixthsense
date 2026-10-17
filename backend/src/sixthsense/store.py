@@ -16,7 +16,7 @@ import anyio.to_thread
 from pydantic import TypeAdapter
 
 from .contracts import Alert, Incident, ModeMetrics
-from .modes import ALERTS_MAX
+from .modes import ALERTS_MAX, METRICS_ORDER
 from .settings import Settings
 
 log = logging.getLogger("sixthsense.store")
@@ -101,7 +101,8 @@ class _Base:
 
     async def metrics(self) -> list[ModeMetrics]:
         latest = await self._sync(self._latest_runs)
-        return sorted(latest.values(), key=lambda m: m.mode)
+        # Bus views first (what every screen defaults to), then the fixed-camera fallbacks.
+        return sorted(latest.values(), key=lambda m: (METRICS_ORDER.index(m.mode), m.mode))
 
     async def close(self) -> None:
         return None

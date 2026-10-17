@@ -1,57 +1,50 @@
 "use client";
 
-import { GapChart } from "@/components/GapChart";
+import { ClipFrame, type StaticFrame } from "@/components/landing/ClipFrame";
 import { useInView } from "@/components/landing/reveal";
 import { useTween } from "@/components/landing/useTween";
-import type { GapPoint } from "@/lib/api/types";
-import { gapSummary } from "@/lib/copy";
-import { assetUrl, cn } from "@/lib/utils";
+import type { Incident } from "@/lib/api/types";
+import { cn } from "@/lib/utils";
+
+/** Real growth from the ego check's plain note, e.g. "a pedestrian ahead grew 1.8x in 1.2 s". */
+function growthOf(note: string | undefined): { factor: number; seconds: number } | null {
+  const m = note?.match(/(\d+(?:\.\d+)?)\s*x\s+in\s+(\d+(?:\.\d+)?)\s*s/i);
+  if (!m) return null;
+  return { factor: Number(m[1]), seconds: Number(m[2]) };
+}
 
 /**
- * Two boxes on a real frame close in while the gap counter ticks down. The counter and chart use the
- * real gap series of the riskiest live moment; without one, only the frame and boxes show (no numbers).
+ * "Closing on us": one box ahead grows toward the bottom of a real clip frame, the way a road user looks
+ * as the bus closes in. The counter shows the real growth from the incident's check; without one, no numbers.
  */
-export function GapCreative({ series, frame }: { series: GapPoint[] | undefined; frame: { src: string; alt: string } }) {
+export function GapCreative({ incident, fallback }: { incident: Incident | undefined; fallback: StaticFrame }) {
   const [ref, inView] = useInView<HTMLDivElement>(0.4);
   const t = useTween(inView, 1600, 200);
-  const g = gapSummary(series);
-  const value = g ? g.from + (g.to - g.from) * t : null;
+  const g = growthOf(incident?.verify_note);
+  const factor = g ? 1 + (g.factor - 1) * t : null;
+  const scale = 0.55 + 0.7 * t;
 
   return (
     <div ref={ref} className="flex flex-col gap-3">
-      <div className="relative overflow-hidden rounded-sm">
-        <img src={assetUrl(frame.src)} alt={frame.alt} className="block aspect-video w-full object-cover" />
-        {/* Illustration boxes: they move together as the counter falls. */}
-        <span
-          aria-hidden
-          className="absolute top-[42%] left-[18%] h-[26%] w-[16%] rounded-[3px] border-2 border-on-sky shadow-[0_0_0_1px_rgb(0_0_0/0.25)]"
-          style={{ transform: `translateX(${t * 70}%)` }}
-        />
+      <div className="relative aspect-video overflow-hidden rounded-sm">
+        <ClipFrame incident={incident} fallback={fallback} />
+        {/* Illustration box, anchored at the bottom centre lane zone, growing as it closes in. */}
         <span
           aria-hidden
           className={cn(
-            "absolute top-[46%] right-[18%] h-[24%] w-[18%] rounded-[3px] border-2 shadow-[0_0_0_1px_rgb(0_0_0/0.25)] transition-colors duration-300",
-            t > 0.85 ? "border-risk-high" : "border-on-sky",
+            "absolute bottom-[14%] left-1/2 h-[34%] w-[16%] origin-bottom rounded-[3px] border-2 shadow-[0_0_0_1px_rgb(0_0_0/0.25)] transition-colors duration-300",
+            t > 0.8 ? "border-risk-high" : "border-on-sky",
           )}
-          style={{ transform: `translateX(${-t * 70}%)` }}
+          style={{ transform: `translateX(-50%) scale(${scale})` }}
         />
-        {value !== null && (
-          <span className="absolute bottom-2 left-2 rounded-full bg-scrim px-2.5 py-1 font-mono text-xs text-on-sky tabular-nums">
-            gap {value.toFixed(1)} cl
+        {factor !== null && (
+          <span className="absolute right-2 bottom-2 rounded-full bg-scrim px-2.5 py-1 font-mono text-xs text-on-sky tabular-nums">
+            grew {factor.toFixed(1)}x in {g!.seconds.toFixed(1)} s
           </span>
         )}
       </div>
-      {g && series && (
-        <div
-          className={cn(
-            "[&_polyline]:transition-[stroke-dashoffset] [&_polyline]:duration-[1400ms] [&_polyline]:ease-out [&_polyline]:[stroke-dasharray:1400]",
-            inView ? "[&_polyline]:[stroke-dashoffset:0]" : "[&_polyline]:[stroke-dashoffset:1400]",
-          )}
-        >
-          <GapChart series={series} />
-        </div>
-      )}
-      <p className="text-data text-ink-muted">Boxes drawn for illustration on a real frame.</p>
+      {incident?.verify_note && g && <p className="text-body-sm text-ink">{incident.verify_note}</p>}
+      <p className="text-data text-ink-muted">Box drawn for illustration on a real clip frame.</p>
     </div>
   );
 }

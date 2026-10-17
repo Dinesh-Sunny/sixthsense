@@ -1,11 +1,12 @@
 "use client";
 
 import { StatusPill } from "@/components/StatusPill";
+import { ClipFrame } from "@/components/landing/ClipFrame";
 import { useInView } from "@/components/landing/reveal";
 import type { Incident } from "@/lib/api/types";
 import { COPY, VERDICT, cameraLine, riskLabel, riskTone } from "@/lib/copy";
 import { hazardOf } from "@/lib/incident";
-import { assetUrl, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 /** Original flat illustration of a generic red double-decker (no roundel, no operator, no livery text). */
 function Bus({ cone }: { cone: boolean }) {
@@ -62,7 +63,8 @@ export function HeroStage({ top, frame }: { top: Incident | undefined; frame: { 
         <Bus cone={inView} />
       </div>
       <div className="zoom-img aspect-[16/9] overflow-hidden rounded-xl bg-surface-sunk shadow-float md:aspect-[16/8]">
-        <img src={assetUrl(frame.src)} alt={frame.alt} className="block size-full object-cover" />
+        {/* A still from the forecast's own clip (front camera), static frame only as a fallback. */}
+        <ClipFrame incident={top} fallback={frame} />
       </div>
       {top && (
         <div

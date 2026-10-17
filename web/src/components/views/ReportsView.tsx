@@ -10,9 +10,9 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { LostPanel } from "@/components/StatePanels";
 import { Button } from "@/components/ui/button";
 import { allIncidentsOptions, metricsOptions, pairingsOptions } from "@/lib/api/queries";
-import { MODES, type Mode } from "@/lib/api/types";
-import { MODE_INFO, REPORT_COPY, REPORT_FILTERS, type ReportFilter, matchesFilter, plural, scoreSummary } from "@/lib/copy";
-import { useDataMode } from "@/lib/incident";
+import type { Incident } from "@/lib/api/types";
+import { REPORT_COPY, REPORT_FILTERS, type ReportFilter, matchesFilter, plural, scoreSummary } from "@/lib/copy";
+import { type CameraView, VIEW_LABEL, useDataModes, viewOf } from "@/lib/incident";
 import { useSignedOff } from "@/lib/signoff";
 import { cn } from "@/lib/utils";
 
@@ -23,17 +23,18 @@ export function ReportsView() {
   const signed = useSignedOff();
   const [filter, setFilter] = useState<ReportFilter>("all");
   // Default to the bus safety run (city until the bus run exists); the select overrides it.
-  const dataMode = useDataMode();
-  const [picked, setSource] = useState<Mode | "all" | null>(null);
-  const source: Mode | "all" = picked ?? dataMode ?? "all";
+  // Only the bus camera views (fallback: bus run, then city run); the select narrows to one view.
+  const dataModes = useDataModes();
+  const [view, setView] = useState<CameraView | "all">("all");
+  const inScope = (i: Incident) => (!dataModes || dataModes.includes(i.mode)) && (view === "all" || viewOf(i) === view);
 
   const pairFor = new Map((pairings.data ?? []).map((p) => [p.incident_id, p]));
   const all = incidents.data ?? [];
   // To review first, then riskiest first.
   const list = all
-    .filter((i) => matchesFilter(i.came_true, filter) && (source === "all" || i.mode === source))
+    .filter((i) => matchesFilter(i.came_true, filter) && inScope(i))
     .sort((a, b) => Number(signed.has(a.id)) - Number(signed.has(b.id)) || b.risk - a.risk);
-  const toReview = all.filter((i) => !i.fixture && !signed.has(i.id) && (source === "all" || i.mode === source)).length;
+  const toReview = all.filter((i) => !i.fixture && !signed.has(i.id) && inScope(i)).length;
   const score = scoreSummary(metrics.data);
 
   return (
@@ -74,18 +75,15 @@ export function ReportsView() {
           </div>
           <div className="flex-1" />
           <label className="flex w-full min-w-0 items-center gap-2 text-[13px] text-ink-muted sm:w-auto">
-            <span className="sr-only">{REPORT_COPY.cameraSource}</span>
+            <span className="sr-only">Camera view</span>
             <select
-              value={source}
-              onChange={(e) => setSource(e.target.value as Mode | "all")}
+              value={view}
+              onChange={(e) => setView(e.target.value as CameraView | "all")}
               className="h-8 w-full min-w-0 cursor-pointer rounded-full border border-hairline bg-surface px-3 text-[13px] font-medium text-ink outline-none transition-colors duration-150 hover:border-ink-muted focus-visible:ring-[3px] focus-visible:ring-ring/50"
             >
-              <option value="all">{REPORT_COPY.allCameras}</option>
-              {MODES.map((m) => (
-                <option key={m} value={m}>
-                  {MODE_INFO[m].name} · {MODE_INFO[m].place}
-                </option>
-              ))}
+              <option value="all">All views</option>
+              <option value="front">{VIEW_LABEL.front}</option>
+              <option value="nearside">{VIEW_LABEL.nearside}</option>
             </select>
           </label>
         </div>

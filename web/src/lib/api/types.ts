@@ -43,6 +43,8 @@ export interface Incident {
   gap_series: GapPoint[];
   run_id: string | null;
   trace_url: string | null;
+  /** vehicle-mounted modes only (stand-in footage) */
+  camera_view: "front" | "nearside" | null;
 }
 
 export interface ModeMetrics {

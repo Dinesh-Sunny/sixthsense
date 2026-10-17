@@ -237,5 +237,10 @@ export function BusMap({
     map.easeTo({ center: [tLon, tLat], zoom: Math.max(map.getZoom(), followId ? 15 : 13), duration: 900 });
   }, [tLon, tLat, followId]);
 
-  return <div ref={box} className="absolute inset-0" aria-label="Live map of London buses" role="region" />;
+  // mapbox-gl.css sets .mapboxgl-map{position:relative}, which beats `absolute`, so size an outer box and fill it.
+  return (
+    <div className="absolute inset-0">
+      <div ref={box} className="h-full w-full" aria-label="Live map of London buses" role="region" />
+    </div>
+  );
 }

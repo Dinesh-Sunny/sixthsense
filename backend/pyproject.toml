@@ -1,0 +1,87 @@
+[project]
+name = "sixthsense"
+version = "1.0.0"
+description = "Video agent that predicts what happens next on CCTV, verifies it with tracked boxes, and grades itself."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "anyio>=4",
+    "fastapi==0.143.3",
+    "httpx==0.28.1",
+    "ibis-framework>=10.8.0",
+    "numpy>=2.0.2",
+    "openai==3.33.0",
+    "opencv-python-headless>=4.8,<6",
+    "pyarrow>=23.0.1",
+    "pydantic==2.14.1",
+    "pydantic-settings==2.16.0",
+    "supervision==0.31.0",
+    "tenacity==9.2.1",
+    "trackers==2.6.1",
+    "uvicorn==0.54.0",
+    "vastdb==2.1.0",
+    "weave==0.53.12",
+]
+
+[project.scripts]
+sixthsense = "sixthsense.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.11.30,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv]
+# trackers hard-requires opencv-python (needs libGL, absent on python:3.12-slim); the
+# headless wheel ships the same cv2 module. matplotlib/av are unused supervision deps (~180 MB).
+exclude-dependencies = ["opencv-python", "matplotlib", "av"]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "ruff==0.16.10",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ASYNC", "TID", "BLE"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"urllib.request".msg = "Use the shared httpx clients in sixthsense.clients.http."
+"http.server".msg = "The app is FastAPI (sixthsense.main)."
+"requests".msg = "Use the shared httpx clients in sixthsense.clients.http."
+"httpx.AsyncClient".msg = "Build clients only in sixthsense.clients.http (lifespan-owned)."
+"httpx.Client".msg = "Build clients only in sixthsense.clients.http (lifespan-owned)."
+"openai".msg = "Model calls go through sixthsense.clients.models."
+"httpx2".msg = "Pass timeout=float to the openai SDK instead."
+"weave".msg = "Tracing goes through sixthsense.tracing."
+"vastdb".msg = "Storage goes through sixthsense.store."
+"pyarrow".msg = "Storage goes through sixthsense.store."
+"ibis".msg = "Storage goes through sixthsense.store."
+"supervision".msg = "Tracking lives in sixthsense.tracking."
+"trackers".msg = "Tracking lives in sixthsense.tracking."
+"cv2".msg = "Tracking lives in sixthsense.tracking."
+"supervision.ByteTrack".msg = "Removed in supervision 0.27+: use trackers.ByteTrackTracker."
+"os.environ".msg = "Read config through sixthsense.settings.Settings."
+"os.getenv".msg = "Read config through sixthsense.settings.Settings."
+
+[tool.ruff.lint.per-file-ignores]
+# Each sanctioned importer may use exactly its own library (TID251 is all-or-nothing per file).
+"src/sixthsense/clients/http.py" = ["TID251"]
+"src/sixthsense/clients/models.py" = ["TID251"]
+"src/sixthsense/store.py" = ["TID251"]
+"src/sixthsense/tracking.py" = ["TID251"]
+"src/sixthsense/settings.py" = ["TID251"]
+# tracing.py: weave + the WANDB_API_KEY env bridge (weave reads the key from env/netrc only).
+"src/sixthsense/tracing.py" = ["TID251"]
+"tests/**" = ["TID251"]
+# Model prompts are kept verbatim from the original pipeline.
+"src/sixthsense/pipeline.py" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+anyio_mode = "auto"
+filterwarnings = ["ignore::DeprecationWarning"]

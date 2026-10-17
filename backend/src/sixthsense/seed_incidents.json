@@ -1,0 +1,22 @@
+[
+ {"id":"fixture-1","fixture":true,"mode":"road","camera_id":"i24_cam-1","source":null,"start_s":41,"end_s":46,
+  "query":"truck cutting in close in front of a car","type":"close cut-in","verified":true,"verify_score":0.48,
+  "verify_note":"FIXTURE - gap shrank 48% in 2 s","verify_by":"yolo boxes",
+  "what_happens":"A white truck moves into the middle lane with little space in front of a sedan.",
+  "what_next":"The sedan brakes hard within 3 seconds and the car behind it closes in.",
+  "why":"The truck changes lane without a gap, at the same speed as the sedan.",
+  "fix":"Lane-change warning sign before the merge; enforce a following-distance camera here.",
+  "risk":4,"came_true":"yes","came_true_evidence":"FIXTURE - the sedan slows sharply and brake lights show."},
+ {"id":"fixture-2","fixture":true,"mode":"road","camera_id":"i24_cam-1","source":null,"start_s":12,"end_s":17,
+  "query":"tailgating at highway speed","type":"tailgating","verified":true,"verify_score":0.36,
+  "verify_note":"FIXTURE - closest gap 3.1% of frame width","verify_by":"yolo boxes",
+  "what_happens":"Two cars travel very close together in the left lane.","what_next":"The rear car changes lanes to overtake.",
+  "why":"Following distance under one car length at speed.","fix":"Chevron spacing markings on this stretch.",
+  "risk":3,"came_true":"partly","came_true_evidence":"FIXTURE - the rear car drifts toward the next lane."},
+ {"id":"fixture-3","fixture":true,"mode":"street","camera_id":"neighborhood_cam-1","source":null,"start_s":300,"end_s":305,
+  "query":"same vehicle driving past slowly","type":"repeat vehicle","verified":true,"verify_score":1,
+  "verify_note":"FIXTURE - a dark van matching this seen 4 times","verify_by":"cosmos",
+  "what_happens":"A dark van drives slowly past the houses and slows near number 12.","what_next":"The van returns later the same day.",
+  "why":"Repeated slow passes with no stop or delivery.","fix":"Flag the pattern to residents; check the next pass.",
+  "risk":3,"came_true":"unknown","came_true_evidence":""}
+]

@@ -29,6 +29,7 @@ from .contracts import (
     RouteSummary,
     Vehicle,
 )
+from .modes import PAIRING_MODE_GROUPS
 from .settings import Settings
 from .store import IncidentStore
 
@@ -44,7 +45,6 @@ PAIRING_TTL_S = 30 * 60
 RETRY_AFTER_ERROR_S = 15.0
 ROUTE_ID_RE = re.compile(r"^[a-z0-9-]{1,12}$")
 DIRECTIONS = ("inbound", "outbound")
-PAIRING_MODES = ("bus", "city")
 
 StopCoords = dict[str, tuple[float, float, str]]  # naptanId -> (lon, lat, name)
 SnapshotFn = Callable[[FleetSnapshot], Awaitable[None]]
@@ -255,11 +255,11 @@ class Fleet:
     async def pairings(self) -> list[Pairing]:
         """Stand-in: pair real incidents with live buses, stable for 30 min.
 
-        Prefers the latest bus-mode run, falling back to the latest city run.
+        Prefers the latest bus_front + bus_nearside runs, then bus, then city.
         """
         incidents: list = []
-        for mode in PAIRING_MODES:
-            incidents = [i for i in await self.store.list_incidents(mode) if not i.fixture]
+        for group in PAIRING_MODE_GROUPS:
+            incidents = [i for m in group for i in await self.store.list_incidents(m) if not i.fixture]
             if incidents:
                 break
         live = {v.id: v for v in self.snapshot.vehicles}

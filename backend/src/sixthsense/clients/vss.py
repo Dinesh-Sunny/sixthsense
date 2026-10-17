@@ -98,6 +98,7 @@ class DetectionsResp(_Up):
     source: str | None = None
     fps: float | None = None
     frame_count: int | None = None
+    video_shape: list[int] | None = None  # [height, width]
     frames: list[Frame] = Field(default_factory=list)
 
     @model_validator(mode="before")

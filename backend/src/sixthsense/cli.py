@@ -13,7 +13,7 @@ from typing import Any
 
 from . import tracing
 from .main import Resources, open_resources
-from .modes import MODE_NAMES, MODES, RUN_LIMIT_MAX
+from .modes import CLI_LIMIT_MAX, MODE_NAMES, MODES
 from .pipeline import Forecast, execute_run
 from .settings import get_settings
 from .store import VastStore
@@ -112,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run", help="watch -> verify -> foresee -> self-check -> store")
     r.add_argument("--mode", default="road", choices=MODE_NAMES)
-    r.add_argument("--limit", type=int, default=3, choices=range(1, RUN_LIMIT_MAX + 1), metavar="N")
+    r.add_argument("--limit", type=int, default=3, choices=range(1, CLI_LIMIT_MAX + 1), metavar="N")
     sub.add_parser("probe", help="check every upstream; prints shapes and ok/fail, never values")
     a = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")

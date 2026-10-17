@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, field_validator
 
 from . import tracing
 from .clients.models import ModelClients, UpstreamError
-from .clients.vss import Segment, VSSClient
+from .clients.vss import DetectionsResp, Segment, VSSClient
 from .contracts import CameTrue, GapPoint, Incident, ModeMetrics, RunSteps
 from .modes import (
     BUS_HAZARD_TYPES,
@@ -35,10 +35,11 @@ from .modes import (
     VERIFY_MIN,
     YES_NO_MAX_TOKENS,
     Mode,
+    ModeConfig,
 )
 from .settings import Settings
 from .store import IncidentStore
-from .tracking import closing_gap
+from .tracking import GapResult, closing_gap, closing_on_us
 
 log = logging.getLogger("sixthsense.pipeline")
 op = tracing.op
@@ -122,18 +123,48 @@ JUDGE_VIDEO = (
     'Reply JSON only: {{"came_true": "yes|partly|no", "evidence": "<what you see, one short line>"}}'
 )
 
-FORESEE_BUS = """You are a London bus safety analyst. Treat this camera as the front camera of a London bus driving
-through this scene. Describe only what is really visible in this clip: never invent people, vehicles or events.
+FORESEE_BUS = """You are a London bus safety analyst. {camera_line}
+Describe only what is really visible in this clip: never invent people, vehicles or events.
 Answer in JSON only:
 {{"type": "<exactly one of: {types}>",
  "what_happens": "<one sentence naming the specific road users and where they are: colour, side, distance>",
  "what_next": "<the most likely thing in {horizon}, one sentence, checkable on camera>",
  "why": "<one sentence: the visible cause>",
- "fix": "<one sentence of advice to the bus driver, e.g. Hold back at the stop until the cyclist clears>",
+ "fix": "<one sentence of advice to the bus driver, e.g. {fix_example}>",
  "risk": <integer 1-5>}}
 Pick the type that best fits what you see. Use your own fresh wording for this clip; do not reuse stock phrases
 like "continues driving". If nothing risky is happening, set risk to 1 and what_next to "nothing notable"."""
 
+# How the bus prompt frames the camera, per view (None = fixed street/city camera read as a bus view).
+BUS_CAMERA_LINES: dict[str | None, tuple[str, str]] = {
+    None: (
+        "Treat this camera as the front camera of a London bus driving through this scene.",
+        "Hold back at the stop until the cyclist clears",
+    ),
+    "front": (
+        "This is the bus's front camera, behind the windscreen: the bonnet at the bottom of the frame is the "
+        "front of the bus and the road ahead is the bus's lane.",
+        "Ease off and cover the brake until the pedestrian is back on the pavement",
+    ),
+    "nearside": (
+        "This is the bus's nearside camera, low on the kerb side: road users beside the camera are alongside "
+        "the bus on its nearside.",
+        "Check the nearside mirror and hold at the stop until the cyclist has passed",
+    ),
+}
+
+
+def bus_prompt(cfg: ModeConfig) -> str:
+    camera_line, fix_example = BUS_CAMERA_LINES[cfg.get("view")]
+    return FORESEE_BUS.format(
+        camera_line=camera_line,
+        fix_example=fix_example,
+        types=", ".join(cfg.get("hazard_types", BUS_HAZARD_TYPES)),
+        horizon=cfg["horizon"],
+    )
+
+
+VERIFY_EGO_Q = "Answer only yes or no. Is a person, bike or vehicle close to this camera and getting closer?"
 VERIFY_BOXES_Q = (
     "Answer only yes or no. Are two vehicles within about one car length of each other and getting closer?"
 )
@@ -217,30 +248,36 @@ def round_robin(cands: list[Candidate], queries: list[str]) -> list[Candidate]:
 async def verify(deps: Deps, cand: Candidate, mode: Mode, clip: _Clip) -> Verification:
     cfg = MODES[mode]
     src = cand.hit.source
-    if deps.settings.verify_mode == "boxes" and cfg["verify"] == "boxes":
+    ego = cfg["verify"] == "ego"
+    if deps.settings.verify_mode == "boxes" and cfg["verify"] in ("boxes", "ego"):
+
+        def check(d: DetectionsResp | None) -> GapResult | None:
+            # Vehicle-mounted cameras have no box for themselves: score "closing on us" instead.
+            return closing_on_us(d, cfg["classes"], cfg["view"]) if ego else closing_gap(d, cfg["classes"])
+
         try:
             det = await deps.vss.detections(src)
         except httpx.HTTPError as e:
             log.warning("detections failed (%s)", type(e).__name__)
             det = None
-        gap = closing_gap(det, cfg["classes"])
-        by = "yolo boxes"
+        gap = check(det)
+        by = "yolo boxes (closing on us)" if ego else "yolo boxes"
         if gap is None and deps.settings.yolo_fallback:
             try:
-                gap = closing_gap(await deps.models.yolo(await clip.get()), cfg["classes"])
-                by = "yolo boxes (live)"
+                gap = check(await deps.models.yolo(await clip.get()))
+                by += " (live)"
             except httpx.HTTPError as e:
                 log.warning("yolo failed (%s)", type(e).__name__)
         if gap is not None:
             return Verification(
-                verified=gap.score >= VERIFY_MIN,
+                verified=gap.passed if gap.passed is not None else gap.score >= VERIFY_MIN,
                 verify_score=gap.score,
                 verify_note=gap.note,
                 verify_by=by,
                 gap_series=gap.gap_series,
             )
     # Street mode, or no boxes at all: a strict yes/no asked of Cosmos on the clip.
-    q = VERIFY_BOXES_Q if cfg["verify"] == "boxes" else VERIFY_STREET_Q
+    q = {"boxes": VERIFY_BOXES_Q, "ego": VERIFY_EGO_Q}.get(cfg["verify"], VERIFY_STREET_Q)
     try:
         ans = (await deps.models.cosmos(q, await clip.get(), YES_NO_MAX_TOKENS)).strip().lower()
     except (UpstreamError, httpx.HTTPError) as e:
@@ -256,7 +293,7 @@ async def verify(deps: Deps, cand: Candidate, mode: Mode, clip: _Clip) -> Verifi
 async def foresee(deps: Deps, cand: Candidate, mode: Mode, clip: _Clip) -> tuple[Forecast | None, str | None]:
     cfg = MODES[mode]
     if cfg.get("prompt") == "bus":
-        prompt = FORESEE_BUS.format(types=", ".join(BUS_HAZARD_TYPES), horizon=cfg["horizon"])
+        prompt = bus_prompt(cfg)
     else:
         prompt = FORESEE.format(role=cfg["role"], horizon=cfg["horizon"])
     if deps.settings.foresee_via == "direct":
@@ -266,13 +303,13 @@ async def foresee(deps: Deps, cand: Candidate, mode: Mode, clip: _Clip) -> tuple
             prompt + "\n\nClip description: " + cand.hit.description, Forecast, FORESEE_MAX_TOKENS
         )
     if fc is not None and cfg.get("prompt") == "bus":
-        fc.type = bus_hazard_type(fc.type)
+        fc.type = bus_hazard_type(fc.type, cfg.get("hazard_types", BUS_HAZARD_TYPES))
     return fc, tracing.current_call_url()
 
 
-def bus_hazard_type(raw: str) -> str:
+def bus_hazard_type(raw: str, types: tuple[str, ...] = BUS_HAZARD_TYPES) -> str:
     """Snap the model's label onto the fixed hazard set (case/spacing tolerant); keep it if no match."""
-    by_key = {t.lower(): t for t in BUS_HAZARD_TYPES}
+    by_key = {t.lower(): t for t in types}
     key = " ".join(raw.lower().split()).strip(" .\"'")
     if key in by_key:
         return by_key[key]
@@ -400,6 +437,7 @@ async def run_mode(
             **fc.model_dump(),
             **sc.model_dump(),
             fixture=False,
+            camera_view=MODES[mode].get("view"),
             run_id=run_id,
             trace_url=trace_url,
         )

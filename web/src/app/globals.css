@@ -37,6 +37,7 @@
   --scrim: rgba(20, 20, 20, 0.72);
   --bus: #2f6db5;
   --glass-strong: rgba(255, 255, 255, 0.86);
+  --glass-map: rgba(255, 255, 255, 0.9);
   --wordmark-accent: #4a5a78;
 
   /* Default sky = clear; .wx-* on the Atmosphere wrapper overrides these. */
@@ -241,6 +242,14 @@
 /* Frosted panel floating on the atmosphere. */
 @utility glass {
   background: var(--glass);
+  border: 1px solid var(--glass-line);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* Panels over the live map: more opaque so text stays readable over streets. */
+@utility glass-map {
+  background: var(--glass-map);
   border: 1px solid var(--glass-line);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);

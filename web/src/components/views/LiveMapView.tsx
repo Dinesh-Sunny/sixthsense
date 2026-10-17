@@ -4,7 +4,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { ClipPlayer } from "@/components/ClipPlayer";
 import { BusMap, type Layers, type Scene, type Theme } from "@/components/map/BusMap";
@@ -24,7 +24,7 @@ import {
   weatherOptions,
 } from "@/lib/api/queries";
 import type { Incident, Pairing, Vehicle } from "@/lib/api/types";
-import { BUS_COPY, BUS_STATE, VERDICT, busState, etaText, riskLabel, type BusState } from "@/lib/copy";
+import { BUS_COPY, BUS_STATE, VERDICT, busState, etaText, pairingPill, riskLabel, type BusState } from "@/lib/copy";
 import { cn } from "@/lib/utils";
 
 const SCENES: { id: Scene; label: string }[] = [
@@ -39,7 +39,7 @@ const THEMES: { id: Theme; label: string }[] = [
   { id: "night", label: "Night" },
 ];
 
-const panel = "glass rounded-panel shadow-float";
+const panel = "glass-map rounded-panel shadow-float";
 
 function Segmented<T extends string>({
   label,
@@ -53,7 +53,7 @@ function Segmented<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className="glass flex gap-0.5 rounded-full p-1 shadow-float">
+    <div role="radiogroup" aria-label={label} className="glass-map flex gap-0.5 rounded-full p-1 shadow-float">
       {options.map((o) => (
         <button
           key={o.id}
@@ -81,7 +81,7 @@ function Toggle({ on, label, onClick }: { on: boolean; label: string; onClick: (
       onClick={onClick}
       className={cn(
         "h-9 rounded-full px-3.5 text-xs font-medium shadow-float transition-colors duration-150",
-        on ? "border border-transparent bg-pill text-on-ink" : "glass text-ink-muted hover:text-ink",
+        on ? "border border-transparent bg-pill text-on-ink" : "glass-map text-ink-muted hover:text-ink",
       )}
     >
       {label}
@@ -137,7 +137,8 @@ function BusDrawer({
   const checked = pairing ? pairing.came_true !== "unknown" : false;
   const done = [Boolean(pairing), nudged, Boolean(pairing), checked, checked];
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4">
       <button type="button" onClick={onClose} className="self-start text-data text-slate hover:underline">
         ← {BUS_COPY.needsLook}
       </button>
@@ -193,7 +194,8 @@ function BusDrawer({
           </ol>
         </>
       )}
-      <div className="flex flex-wrap gap-2 pt-1">
+      </div>
+      <div className="flex flex-wrap gap-2 border-t border-hairline px-4 py-3">
         {pairing && (
           <Button asChild size="sm">
             <Link href={{ pathname: "/incident", query: { id: pairing.incident_id } }}>{BUS_COPY.openReport}</Link>
@@ -253,6 +255,14 @@ export function LiveMapView() {
   }, [chosenRoutes, selectedId, params, pathname, router]);
 
   const vehicles = useMemo(() => snapshot.data?.vehicles ?? [], [snapshot.data]);
+  // After a pod restart the fleet starts empty and pairings come back empty; refetch once buses appear.
+  const hadBuses = useRef(false);
+  const refetchPairings = pairings.refetch;
+  useEffect(() => {
+    const has = vehicles.length > 0;
+    if (has && !hadBuses.current) void refetchPairings();
+    hadBuses.current = has;
+  }, [vehicles.length, refetchPairings]);
   const pairByBus = useMemo(() => new Map((pairings.data ?? []).map((p) => [p.vehicle_id, p])), [pairings.data]);
   const states = useMemo(() => {
     const m = new Map<string, BusState>();
@@ -273,9 +283,7 @@ export function LiveMapView() {
 
   const needsLook = useMemo(
     () =>
-      [...(pairings.data ?? [])]
-        .filter((p) => p.came_true === "unknown" || p.risk >= 4)
-        .sort((a, b) => b.risk - a.risk),
+      [...(pairings.data ?? [])].sort((a, b) => b.risk - a.risk),
     [pairings.data],
   );
 
@@ -407,7 +415,7 @@ export function LiveMapView() {
       <aside
         className={cn(
           panel,
-          "z-10 mx-4 mb-4 flex max-h-none flex-col gap-3 overflow-y-auto p-4 md:absolute md:top-[76px] md:right-4 md:bottom-16 md:m-0 md:max-h-[calc(100dvh-150px)] md:w-[340px] md:self-start",
+          "z-10 mx-4 mb-4 flex max-h-[80dvh] flex-col overflow-hidden md:absolute md:top-[76px] md:right-4 md:m-0 md:max-h-[calc(100dvh-160px)] md:w-[340px]",
         )}
         aria-label={selectedId ? "Selected bus" : BUS_COPY.needsLook}
       >
@@ -426,9 +434,9 @@ export function LiveMapView() {
             }}
           />
         ) : (
-          <>
+          <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-4">
             <h2 className="text-[13px] leading-none font-medium tracking-[0.06em] text-ink-muted uppercase">
-              {BUS_COPY.needsLook}
+              {BUS_COPY.needsLook} <span className="font-mono text-ink-muted">{needsLook.length}</span>
             </h2>
             {needsLook.length === 0 ? (
               <p className="text-body-sm text-ink-muted">{BUS_COPY.needsLookNone}</p>
@@ -437,7 +445,7 @@ export function LiveMapView() {
                 {needsLook.map((p, n) => {
                   const inc = incidentById.get(p.incident_id);
                   const live = vehicles.some((v) => v.id === p.vehicle_id);
-                  const st = busState(p);
+                  const pill = pairingPill(p);
                   return (
                     <li key={`${p.vehicle_id}-${p.incident_id}`} className={cn(n > 0 && "border-t border-hairline")}>
                       <button
@@ -446,9 +454,12 @@ export function LiveMapView() {
                         className="flex w-full flex-col gap-1.5 py-3 text-left"
                       >
                         <span className="flex items-center gap-2">
-                          <StatusPill tone={BUS_STATE[st].tone}>{riskLabel(p.risk)}</StatusPill>
+                          <StatusPill tone={riskTone(p.risk)}>{riskLabel(p.risk)}</StatusPill>
                           <span className="text-body-sm font-medium">Route {p.route}</span>
-                          <span className="text-data text-ink-muted">{p.vehicle_id}</span>
+                          <span className="truncate text-data text-ink-muted">{p.vehicle_id}</span>
+                        </span>
+                        <span>
+                          <StatusPill tone={pill.tone}>{pill.label}</StatusPill>
                         </span>
                         {inc && <span className="line-clamp-2 text-body-sm text-ink-muted">{inc.what_next}</span>}
                         {!live && <span className="text-data text-ink-muted">Not on the road right now</span>}
@@ -458,7 +469,7 @@ export function LiveMapView() {
                 })}
               </ul>
             )}
-          </>
+          </div>
         )}
       </aside>
 
@@ -471,7 +482,7 @@ export function LiveMapView() {
       </div>
 
       {/* Bottom bar */}
-      <div className="glass z-10 mx-4 mb-4 flex flex-wrap items-center gap-3 rounded-full px-4 py-2 shadow-float md:absolute md:bottom-4 md:left-4 md:m-0">
+      <div className="glass-map z-10 mx-4 mb-4 flex flex-wrap items-center gap-3 rounded-full px-4 py-2 shadow-float md:absolute md:bottom-4 md:left-4 md:m-0">
         <Clock />
         <WeatherPill />
         <a

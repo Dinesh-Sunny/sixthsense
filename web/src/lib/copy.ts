@@ -269,3 +269,17 @@ export function etaText(s: number): string {
   if (s < 60) return "due";
   return `${Math.round(s / 60)} min`;
 }
+
+/** Pill for a paired bus in "Needs a look": Watching until checked, then the verdict. */
+export function pairingPill(p: Pairing): { label: string; tone: Tone } {
+  switch (p.came_true) {
+    case "yes":
+      return { label: "Report filed", tone: "ok" };
+    case "partly":
+      return { label: "Partly", tone: "mid" };
+    case "no":
+      return { label: "Didn't happen", tone: "hi" };
+    default:
+      return { label: "Watching", tone: "mid" };
+  }
+}

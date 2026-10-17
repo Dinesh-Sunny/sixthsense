@@ -14,7 +14,7 @@ export function AppNav({ right, className, onSky = false }: { right?: React.Reac
       <Link href="/" aria-label="SixthSense home">
         <Wordmark onSky={onSky} />
       </Link>
-      <nav aria-label="Main" className="glass flex max-w-full gap-0.5 overflow-x-auto rounded-full p-1 shadow-float">
+      <nav aria-label="Main" className="glass-map flex max-w-full gap-0.5 overflow-x-auto rounded-full p-1 shadow-float">
         {NAV.map((n) => {
           const here = path?.replace(/\/$/, "") || "/";
           const active = !("hash" in n) && (here === n.path || (n.path === "/reports" && here.startsWith("/incident")));

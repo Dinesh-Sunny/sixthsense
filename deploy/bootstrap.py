@@ -96,7 +96,7 @@ def serve() -> None:
     port = os.environ.get("PORT", "8080")
     args = [
         str(VENV / "bin" / "uvicorn"),
-        "--factory", "sixthsense.main:create_app",
+        "--factory", "sixthsense.main:create_asgi",
         "--host", "0.0.0.0",
         "--port", port,
         "--proxy-headers",

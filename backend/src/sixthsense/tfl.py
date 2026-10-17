@@ -264,7 +264,8 @@ class Fleet:
             vid, expires = self._pairs.get(inc.id, ("", 0.0))
             if vid not in live or expires < now or vid in used:
                 start = int(hashlib.sha1(inc.id.encode()).hexdigest(), 16) % len(ids)
-                vid = next((ids[(start + k) % len(ids)] for k in range(len(ids)) if ids[(start + k) % len(ids)] not in used), "")
+                ring = ids[start:] + ids[:start]  # deterministic start, skip buses already paired
+                vid = next((x for x in ring if x not in used), "")
                 if not vid:
                     break
                 self._pairs[inc.id] = (vid, now + PAIRING_TTL_S)

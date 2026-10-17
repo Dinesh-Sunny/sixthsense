@@ -8,13 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { incidentOptions } from "@/lib/api/queries";
 import type { Incident } from "@/lib/api/types";
-import { COPY, SAMPLE, VERDICT, cameraLine, cameraName, gapLine, gapSummary, riskLabel, riskTone } from "@/lib/copy";
+import { BUS_COPY, COPY, SAMPLE, VERDICT, cameraLine, cameraName, gapLine, gapSummary, riskLabel, riskTone } from "@/lib/copy";
 
 export function incidentHref(id: string) {
   return { pathname: "/incident" as const, query: { id } };
 }
 
-export function IncidentCard({ incident: i }: { incident: Incident }) {
+export function IncidentCard({ incident: i, busId }: { incident: Incident; busId?: string }) {
   const queryClient = useQueryClient();
   const prefetch = () => {
     void queryClient.query(incidentOptions(i.id)).catch(() => {});
@@ -61,7 +61,12 @@ export function IncidentCard({ incident: i }: { incident: Incident }) {
         ) : (
           <StatusPill tone={verdict.tone}>{verdict.label}</StatusPill>
         )}
-        <Button asChild size="sm" className="ml-auto">
+        {busId && (
+          <Button asChild size="sm" variant="glass" className="ml-auto">
+            <Link href={{ pathname: "/dashboard", query: { bus: busId } }}>{BUS_COPY.showOnMap}</Link>
+          </Button>
+        )}
+        <Button asChild size="sm" className={busId ? undefined : "ml-auto"}>
           <Link href={incidentHref(i.id)} onMouseEnter={prefetch} onFocus={prefetch}>
             {COPY.view}
           </Link>

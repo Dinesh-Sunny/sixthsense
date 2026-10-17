@@ -7,3 +7,7 @@
 - [x] deploy/bootstrap.py (codeload by SHA, uv via pip --target, uv sync --locked --no-dev --no-editable, uvicorn --factory), deploy.sh <sha> + --cutover/--rollback, deploy/legacy.sh (old script), scripts/release.sh (DRY_RUN=1 supported)
 - Verified locally: dist tree -> `uv sync --locked --no-dev --no-editable` with py3.12 -> imports cv2/trackers/vastdb/weave OK; uvicorn serves web/out + /api. Venv is ~770 MB (not 372).
 - Not done: golden check old vs new closing_gap on real road detections (needs VM data); EvaluationLogger (tier 2); OpenAPI snapshot (deferred, d2); VastStore has no unit test (probe covers it live); AGENTS.md dist-branch note; live probe/run on VM.
+
+## v2 buses (backend)
+- [x] tfl.py (TfL client w/ User-Agent + optional app_key, paced 40 req/min unkeyed, stop cache in data_dir, route geometry cache, stand-in pairings 30 min), fleet poller in lifespan, python-socketio 5.16.1 `vehicles` emit, /api/vehicles|routes|routes/{id}|fleet/pairings|map-config, uvicorn entry `sixthsense.main:create_asgi`, deploy.sh loads ~/.config/sixthsense.env + MAPBOX_TOKEN/TFL_APP_KEY. Tests: 73 passing.
+- Note: unkeyed full sweep of ~700 routes = ~35 batches at 1.5 s = ~55 s, so updates land every ~55 s without TFL_APP_KEY.

@@ -14,21 +14,39 @@ from datetime import datetime
 from typing import Annotated, Any
 
 import httpx
+import socketio
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.background import BackgroundTask
 
 from . import tracing
-from .clients.http import HttpClient, gpu_client, public_client, vss_client
+from .clients.http import HttpClient, gpu_client, public_client, tfl_client, vss_client
 from .clients.models import ModelClients, UpstreamError
 from .clients.vss import VSSClient
-from .contracts import Alert, AlertIn, AskIn, AskOut, Health, Incident, ModeMetrics, RunIn, RunStatus, Weather
+from .contracts import (
+    Alert,
+    AlertIn,
+    AskIn,
+    AskOut,
+    FleetSnapshot,
+    Health,
+    Incident,
+    MapConfig,
+    ModeMetrics,
+    Pairing,
+    RouteDetail,
+    RouteSummary,
+    RunIn,
+    RunStatus,
+    Weather,
+)
 from .modes import DISCORD_MAX_CHARS, Mode
 from .pipeline import Deps
 from .runner import RunManager, RunsDisabled
 from .settings import Settings, get_settings
 from .store import IncidentStore, open_store
+from .tfl import Fleet, valid_route_id
 from .weather import WeatherService
 
 log = logging.getLogger("sixthsense")
@@ -38,6 +56,8 @@ VSS_READY_TIMEOUT_S = 5.0
 PASS_THROUGH_STATUSES = {200, 206, 304, 404, 416}
 CLIP_HEADERS = ("content-type", "content-length", "content-range", "accept-ranges", "etag", "last-modified")
 UPSTREAM_MSG = "Upstream service unavailable"
+SNAPSHOT_EVENT = "vehicles"
+SOCKETIO_PATH = "socket.io"
 
 
 @dataclass
@@ -47,6 +67,7 @@ class Transports:
     vss: httpx.AsyncBaseTransport | None = None
     gpu: httpx.AsyncBaseTransport | None = None
     public: httpx.AsyncBaseTransport | None = None
+    tfl: httpx.AsyncBaseTransport | None = None
 
 
 @dataclass
@@ -58,6 +79,7 @@ class Resources:
     weather: WeatherService
     public: HttpClient
     deps: Deps
+    fleet: Fleet
 
 
 @asynccontextmanager
@@ -70,13 +92,23 @@ async def open_resources(
         vss_client(settings, t.vss) as vss_http,
         gpu_client(settings, t.gpu) as gpu_http,
         public_client(t.public) as public_http,
+        tfl_client(settings, t.tfl) as tfl_http,
     ):
         vss = VSSClient(vss_http)
         mc = models or ModelClients(settings, gpu_http)
         store = await open_store(settings)
         deps = Deps(settings, vss, mc, asyncio.Semaphore(settings.gpu_concurrency))
         try:
-            yield Resources(settings, vss, mc, store, WeatherService(settings, public_http), public_http, deps)
+            yield Resources(
+                settings,
+                vss,
+                mc,
+                store,
+                WeatherService(settings, public_http),
+                public_http,
+                deps,
+                Fleet(settings, tfl_http, store),
+            )
         finally:
             await mc.close()
             await store.close()
@@ -230,6 +262,41 @@ async def weather(res: ResDep, response: Response) -> Weather:
     return await res.weather.current()
 
 
+# ---------- v2: London buses ----------
+@api.get("/vehicles")
+async def vehicles(res: ResDep) -> FleetSnapshot:
+    return res.fleet.snapshot
+
+
+@api.get("/routes")
+async def routes(res: ResDep) -> list[RouteSummary]:
+    if not res.fleet.routes and res.settings.fleet_enabled:
+        await res.fleet.load_routes()
+    return res.fleet.routes
+
+
+@api.get("/routes/{route_id}")
+async def route_detail(route_id: str, res: ResDep) -> RouteDetail:
+    rid = route_id.lower()
+    if not valid_route_id(rid):
+        raise HTTPException(400, "Bad route id")
+    detail = await res.fleet.route_detail(rid)
+    if detail is None:
+        raise HTTPException(404, "Route not found")
+    return detail
+
+
+@api.get("/fleet/pairings")
+async def pairings(res: ResDep) -> list[Pairing]:
+    return await _store_call(res.fleet.pairings())
+
+
+@api.get("/map-config")
+async def map_config(res: ResDep) -> MapConfig:
+    # A Mapbox public (pk.) token is meant for browsers; it still stays out of git.
+    return MapConfig(mapbox_token=res.settings.mapbox_token.get_secret_value() or None)
+
+
 # ---------- health ----------
 health = APIRouter()
 
@@ -273,12 +340,27 @@ def create_app(
 ) -> FastAPI:
     settings = settings or get_settings()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
+    # Same-origin only (default cors). Behind Ingress the browser uses path /app/socket.io.
+    sio = socketio.AsyncServer(async_mode="asgi")
+    live: dict[str, Fleet] = {}
+
+    @sio.event
+    async def connect(sid: str, environ: dict[str, Any], auth: Any = None) -> None:
+        if fleet := live.get("fleet"):
+            await sio.emit(SNAPSHOT_EVENT, fleet.snapshot.model_dump(mode="json"), to=sid)
+
+    async def broadcast(snap: FleetSnapshot) -> None:
+        await sio.emit(SNAPSHOT_EVENT, snap.model_dump(mode="json"))
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[dict[str, Any]]:
         await tracing.init_tracing(settings)
         async with open_resources(settings, transports, models) as res:
             runs = RunManager(settings, res.deps, res.store)
+            live["fleet"] = res.fleet
+            poller: asyncio.Task[None] | None = None  # strong ref; cancelled on shutdown
+            if settings.fleet_enabled:
+                poller = asyncio.create_task(res.fleet.run(broadcast), name="fleet-poller")
             try:
                 yield {
                     "res": res,
@@ -288,10 +370,15 @@ def create_app(
                     "ready_cache": {},
                 }
             finally:
+                if poller is not None:
+                    poller.cancel()
+                    await asyncio.gather(poller, return_exceptions=True)
+                live.clear()
                 await runs.shutdown()
         await tracing.finish_tracing()
 
     app = FastAPI(title="SixthSense", version="1.0.0", lifespan=lifespan)
+    app.state.sio = sio
 
     @app.exception_handler(httpx.HTTPError)
     async def _upstream_http(_: Request, exc: httpx.HTTPError) -> JSONResponse:
@@ -311,3 +398,10 @@ def create_app(
     else:
         log.warning("web_dir %s not found; serving API only", settings.web_dir)
     return app
+
+
+def create_asgi(settings: Settings | None = None) -> socketio.ASGIApp:
+    """Production entry (`uvicorn --factory sixthsense.main:create_asgi`): Socket.IO at /socket.io,
+    everything else (and lifespan) goes to the FastAPI app."""
+    app = create_app(settings)
+    return socketio.ASGIApp(app.state.sio, other_asgi_app=app, socketio_path=SOCKETIO_PATH)

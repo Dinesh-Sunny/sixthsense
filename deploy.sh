@@ -32,6 +32,9 @@ esac
 SHA="$1"
 [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "need the full 40-hex dist commit SHA"; exit 1; }
 
+# Personal keys (MAPBOX_TOKEN, TFL_APP_KEY) live in a 0600 file on the VM, never in git or stdout.
+if [ -f "$HOME/.config/sixthsense.env" ]; then set -a; . "$HOME/.config/sixthsense.env"; set +a; fi
+
 # Secret from the team config. Values go through a 0600 temp file, never argv or stdout.
 ENVF=$(umask 077; mktemp); trap 'rm -f "$ENVF"' EXIT
 put(){ [ -n "$2" ] && printf '%s=%s\n' "$1" "$2" >> "$ENVF" || true; }
@@ -43,6 +46,7 @@ put WANDB_API_KEY "${WANDB_API_KEY:-$(get WANDB_API_KEY)}"; put WANDB_TEAM "${WA
 put WANDB_PROJECT "${WANDB_PROJECT:-$(get WANDB_PROJECT)}"
 put S3_ENDPOINT "$(get S3_ENDPOINT)"; put ACCESS_KEY "$(get ACCESS_KEY)"; put SECRET_KEY "$(get SECRET_KEY)"
 put VASTDB_BUCKET "$(get VASTDB_BUCKET)"; put DISCORD_WEBHOOK_URL "${DISCORD_WEBHOOK_URL:-}"
+put MAPBOX_TOKEN "${MAPBOX_TOKEN:-}"; put TFL_APP_KEY "${TFL_APP_KEY:-}"
 kubectl -n "$NS" create secret generic ${APP}-env --from-env-file="$ENVF" --dry-run=client -o yaml | kubectl apply -f -
 kubectl -n "$NS" create configmap ${APP}-boot --from-file=bootstrap.py=deploy/bootstrap.py \
   --dry-run=client -o yaml | kubectl apply -f -

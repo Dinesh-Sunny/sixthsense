@@ -38,4 +38,5 @@ def settings(tmp_path: Path) -> Settings:
         web_dir=tmp_path / "no-web",
         run_cooldown_s=0,
         cosmos_model="cosmos-test",
+        fleet_enabled=False,
     )

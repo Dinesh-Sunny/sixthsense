@@ -15,10 +15,10 @@ import { Panel, PanelHeading } from "@/components/Panel";
 import { SiteFooter } from "@/components/SiteFooter";
 import { CalmPanel, LostPanel } from "@/components/StatePanels";
 import { WeatherPill } from "@/components/WeatherPill";
-import { Wordmark } from "@/components/Wordmark";
+import { AppNav } from "@/components/AppNav";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { incidentsOptions, metricsOptions } from "@/lib/api/queries";
+import { incidentsOptions, metricsOptions, pairingsOptions } from "@/lib/api/queries";
 import { MODES, type Mode, type ModeMetrics } from "@/lib/api/types";
 import { COPY, MODE_INFO, calmBody, heroSubline, momentsHeadline } from "@/lib/copy";
 
@@ -34,12 +34,14 @@ function busiestMode(metrics: ModeMetrics[] | undefined): Mode {
   return best?.mode ?? FALLBACK_MODE;
 }
 
-export function MainView() {
+export function ReportsView() {
   const params = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const [, startTransition] = useTransition();
   const metrics = useQuery(metricsOptions());
+  const pairings = useQuery(pairingsOptions());
+  const busFor = new Map((pairings.data ?? []).map((p) => [p.incident_id, p.vehicle_id]));
   const asked = parseMode(params.get("mode"));
   // Wait for metrics before picking a default so the page doesn't jump between tabs.
   const modeKnown = asked !== null || !metrics.isPending;
@@ -56,18 +58,21 @@ export function MainView() {
 
   return (
     <Atmosphere variant="band">
-      <header className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-5 md:px-8">
-        <Link href="/" aria-label="SixthSense home">
-          <Wordmark onSky />
-        </Link>
-        <WeatherPill />
-        <div className="hidden flex-1 md:block" />
+      <AppNav
+        onSky
+        right={
+          <>
+            <WeatherPill />
+            <Button asChild variant="glass" size="sm">
+              <Link href="/run">{COPY.watchCamera}</Link>
+            </Button>
+          </>
+        }
+      />
+      <div className="flex flex-wrap items-center gap-3 px-4 pt-2 md:px-8">
+        <span className="text-[13px] font-medium text-on-sky-muted">Camera source</span>
         <ModeTabs mode={mode} metrics={metrics.data} onChange={setMode} />
-        <div className="flex-1" />
-        <Button asChild variant="glass" size="sm">
-          <Link href="/run">{COPY.watchCamera}</Link>
-        </Button>
-      </header>
+      </div>
 
       <section className="flex flex-wrap items-end gap-6 px-4 pt-7 pb-9 md:px-8">
         <div className="flex min-w-0 flex-col gap-2">
@@ -103,7 +108,7 @@ export function MainView() {
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               {list.map((i) => (
-                <IncidentCard key={i.id} incident={i} />
+                <IncidentCard key={i.id} incident={i} busId={busFor.get(i.id)} />
               ))}
             </div>
           )}

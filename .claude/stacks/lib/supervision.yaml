@@ -10,51 +10,51 @@ toc:
   match: '^https://github\.com/roboflow/supervision/releases/'
   why: release notes are the only authority on removed APIs; docs site pages lag behind
 groups:
-- title: AI tooling
+- title: 'AI tooling'
   sections:
   - id: sv-ai-tooling
-    title: Agent entry points
+    title: 'Agent entry points'
     level: basic
     requires: []
     ref: gh:/supervision/releases/tag/0.31.0
     entries:
     - id: sv-no-agent-tooling
-      name: Official MCP, skill, llms.txt
+      name: 'Official MCP, skill, llms.txt'
       summary: 'none checked; use the release notes and the docs pages listed below'
       lenses: [reuse]
       notes: ['pypi.org/pypi JSON is blocked for WebFetch (robots); read pypi.org/project/supervision instead']
       ref: gh:/supervision/releases/tag/0.31.0
-- title: Install and versions
+- title: 'Install and versions'
   sections:
   - id: sv-install
-    title: Version and removed APIs
+    title: 'Version and removed APIs'
     level: basic
     requires: []
     ref: gh:/supervision/releases/tag/0.31.0
     entries:
     - id: sv-version
-      name: Version 0.31.0 (16 Oct 2026)
+      name: 'Version 0.31.0 (16 Oct 2026)'
       summary: 'PyPI latest is 0.31.0, Python >=3.10; the GitHub releases index page still showed 0.29.1 as Latest, so trust PyPI plus the 0.31.0 tag'
       lenses: [reliability]
       notes: ['pin the version in the pod image; 0.31.0 removed APIs deprecated in 0.26-0.28', 'app/ is stdlib-only, so supervision belongs in pipeline/ and offline tooling only']
       ref: gh:/supervision/releases/tag/0.31.0
     - id: sv-bytetrack-removed
-      name: sv.ByteTrack removed in 0.31.0
+      name: 'sv.ByteTrack removed in 0.31.0'
       summary: 'tracking moved to the separate `trackers` package; `update_with_detections()` became `update()`'
       lenses: [reliability]
       deprecated: 'sv.ByteTrack (deprecated 0.28.0, removed 0.31.0); use trackers.ByteTrackTracker'
       notes: ['most supervision tutorials and the /trackers/ docs page still show the old sv.ByteTrack(track_thresh, track_buffer, match_thresh, frame_rate); do not copy them', 'on 0.29.x sv.ByteTrack still works with a DeprecationWarning']
       ref: gh:/supervision/releases/tag/0.31.0
-- title: Detections
+- title: 'Detections'
   sections:
   - id: sv-detections
-    title: Building and filtering Detections
+    title: 'Building and filtering Detections'
     level: basic
     requires: []
     ref: /detection/core/
     entries:
     - id: sv-detections-ctor
-      name: sv.Detections
+      name: 'sv.Detections'
       summary: 'container of `xyxy` (n,4), optional `confidence` (n,), `class_id` (n,), `tracker_id` (n,), and a `data` dict of per-box arrays'
       lenses: [typing-dx]
       import: supervision as sv
@@ -62,41 +62,41 @@ groups:
       notes: ['build from our JSON with np.array(..., dtype=float32) for xyxy/confidence and np.int64 for class_id', 'put label strings in data={"class_name": np.array(labels)} so they survive filtering and tracking', 'docs do not state dtype rules and mark `data` experimental; assert shapes in one builder function']
       ref: /detection/core/
     - id: sv-detections-empty
-      name: Detections.empty()
+      name: 'Detections.empty()'
       summary: 'zero-box Detections with xyxy (0,4) float32 and empty confidence and class_id'
       lenses: [reliability]
       signature: sv.Detections.empty()
       notes: ['a frame with no detections must still produce Detections.empty(); np.array([]) has shape (0,) and breaks the (n,4) contract', 'empty() has no `data` keys, so a later `detections["class_name"]` raises KeyError; guard with len(detections)']
       ref: /detection/core/
     - id: sv-filter-mask
-      name: Filter with boolean masks
+      name: 'Filter with boolean masks'
       summary: '`detections[detections.class_id == 2]` or `[detections.confidence > 0.5]` returns a new Detections and slices `data` too'
       lenses: [best-practice]
       notes: ['COCO ids: person 0, bicycle 1, car 2, motorcycle 3, bus 5, truck 7', 'map label to id once from the label string; our JSON has labels, not ids, so keep one label->id dict in pipeline/modes.py']
       ref: /detection/core/
     - id: sv-anchors
-      name: get_anchors_coordinates and Position
+      name: 'get_anchors_coordinates and Position'
       summary: 'returns (n,2) [x,y] per box for a chosen Position such as CENTER, BOTTOM_CENTER, TOP_LEFT'
       lenses: [best-practice]
       signature: 'detections.get_anchors_coordinates(anchor: sv.Position) -> np.ndarray'
       notes: ['use BOTTOM_CENTER for ground-plane distance between cars or people, CENTER for box-to-box closing gap', 'CENTER_OF_MASS needs a mask and raises otherwise; we have none']
       ref: /detection/core/
     - id: sv-pair-distance
-      name: Per-pair distance over time
+      name: 'Per-pair distance over time'
       summary: 'no built-in; index anchors by tracker_id per frame, then take np.linalg.norm of the difference for each id pair'
       lenses: [reuse]
       notes: ['tracker output order can differ from input order, so always join on tracker_id, never on row index', 'drop rows with tracker_id == -1 before pairing', 'pixel distance only; divide by frame_rate (150 frames / 5 s = 30 fps) for per-second closing speed, and label it pixels']
       ref: /detection/core/
-- title: Tracking
+- title: 'Tracking'
   sections:
   - id: sv-tracking
-    title: ByteTrackTracker (trackers package)
+    title: 'ByteTrackTracker (trackers package)'
     level: intermediate
     requires: [sv-bytetrack-removed]
     ref: trackers:/guides/track/
     entries:
     - id: sv-trackers-install
-      name: pip install trackers
+      name: 'pip install trackers'
       summary: 'separate package, latest 2.6.1 (25 Sep 2026), Python >=3.10, speaks sv.Detections natively'
       lenses: [reuse]
       import: trackers
@@ -104,63 +104,63 @@ groups:
       notes: ['not in the pod by default and app/ is stdlib-only; run tracking in pipeline/ and store tracker_id in incidents.json', 'whether supervision is a hard dependency of trackers was not stated; check pip metadata']
       ref: trackers:/guides/track/
     - id: sv-bytetrack-params
-      name: ByteTrackTracker constructor
+      name: 'ByteTrackTracker constructor'
       summary: 'defaults: lost_track_buffer 30, frame_rate 30.0, activation 0.7, min consecutive frames 2, min IoU 0.1, high-conf 0.6'
       lenses: [reliability]
       signature: ByteTrackTracker(lost_track_buffer=30, frame_rate=30.0, ...)
       notes: ['lost_track_buffer is in frames at 30 fps and is scaled by frame_rate; our 30 fps clips keep the default (1 s of memory)', 'activation 0.7 drops most low-confidence YOLO boxes; lower to ~0.4 for CCTV and re-check ID churn', 'the guide page spells the IoU argument min_iou_threshold, the API page minimum_iou_threshold; confirm with help(ByteTrackTracker)']
       ref: trackers:/api/trackers/
     - id: sv-bytetrack-update
-      name: tracker.update(detections)
+      name: 'tracker.update(detections)'
       summary: 'returns Detections with tracker_id set; order may differ from input; signature update(detections, frame=None, timestamp=None)'
       lenses: [best-practice]
       signature: tracked = tracker.update(detections)
       notes: ['unconfirmed or unmatched boxes come back with tracker_id == -1 and stay in the output, so filter tracked[tracked.tracker_id >= 0]', 'pass nothing for frame (non-None emits a UserWarning); call once per frame in time order, including empty frames', 'raises ValueError on NaN or inf in xyxy, before tracker state changes', 'confidence None means every box counts as 1.0; always pass confidence']
       ref: trackers:/api/trackers/
     - id: sv-tracker-reset
-      name: tracker.reset()
+      name: 'tracker.reset()'
       summary: 'clears all tracks and the id counter; call between clips or scenes'
       lenses: [reliability]
       signature: tracker.reset()
       notes: ['ids restart at the first id each clip, so key stored results by (clip_id, tracker_id), never tracker_id alone', 'or build a fresh ByteTrackTracker per clip; never share one tracker across clips']
       ref: trackers:/api/trackers/
-- title: Zones and annotation
+- title: 'Zones and annotation'
   sections:
   - id: sv-zone
-    title: PolygonZone
+    title: 'PolygonZone'
     level: intermediate
     requires: [sv-detections-ctor]
     ref: /detection/tools/polygon_zone/
     entries:
     - id: sv-polygonzone
-      name: sv.PolygonZone
+      name: 'sv.PolygonZone'
       summary: 'boolean in-zone test per detection; `trigger(detections)` returns a bool array and updates `current_count`'
       lenses: [best-practice]
       signature: sv.PolygonZone(polygon, frame_resolution_wh, triggering_position=sv.Position.BOTTOM_CENTER)
       notes: ['polygon is an (N,2) int array in pixel coords; the argument is triggering_position, not triggering_anchors', 'the 0.31.0 notes mention an optional coord_transform parameter; the docs page did not list it', 'frame_resolution_wh is (width, height) of the source frames']
       ref: /detection/tools/polygon_zone/
   - id: sv-annotators
-    title: Annotators for thumbnails
+    title: 'Annotators for thumbnails'
     level: basic
     requires: [sv-detections-ctor]
     ref: /detection/annotators/
     entries:
     - id: sv-box-annotator
-      name: sv.BoxAnnotator
+      name: 'sv.BoxAnnotator'
       summary: 'draws boxes on a BGR numpy frame; annotate(scene, detections) returns the frame'
       lenses: [reuse]
       signature: sv.BoxAnnotator(color=ColorPalette.DEFAULT, thickness=2, color_lookup=ColorLookup.CLASS)
       notes: ['the older /annotators/ page lists BoundingBoxAnnotator instead; /latest/detection/annotators/ lists BoxAnnotator, so verify with dir(sv)', 'annotate copies nothing: pass scene=frame.copy() to keep the original']
       ref: /detection/annotators/
     - id: sv-label-annotator
-      name: sv.LabelAnnotator
+      name: 'sv.LabelAnnotator'
       summary: 'text labels per box; `annotate(scene, detections, labels=[...])`, one string per detection'
       lenses: [best-practice]
       signature: sv.LabelAnnotator(text_position=sv.Position.TOP_LEFT, text_scale=0.5, ...)
       notes: ['build labels from data["class_name"] and tracker_id, e.g. "#7 car 0.82"', 'len(labels) must equal len(detections); filter first, then build labels']
       ref: /detection/annotators/
     - id: sv-trace-annotator
-      name: sv.TraceAnnotator
+      name: 'sv.TraceAnnotator'
       summary: 'draws each tracked object''s recent path; needs tracker_id and the same instance fed every frame in order'
       lenses: [best-practice]
       signature: sv.TraceAnnotator(position, trace_length, thickness, smooth, ...)

@@ -12,17 +12,17 @@ toc:
 - index: 'https://ui.shadcn.com/sitemap.xml'
   match: '^https://ui\.shadcn\.com/docs/(components/radix/|react/|helpers/|registry/|utils/|dark-mode/|new$|official$|legacy$)'
 groups:
-- title: AI tooling
+- title: 'AI tooling'
   sections:
   - id: sh-ai-tooling
-    title: Official agent entry points
+    title: 'Official agent entry points'
     level: basic
     requires: []
     ref: /docs/mcp
     entries:
     - id: sh-mcp
-      name: shadcn MCP server
-      summary: Lets an agent browse, search and install items from any components.json registry in natural language
+      name: 'shadcn MCP server'
+      summary: 'Lets an agent browse, search and install items from any components.json registry in natural language'
       lenses: [reuse, composability]
       import: shadcn
       signature: npx shadcn@latest mcp
@@ -35,21 +35,21 @@ groups:
       notes: [docs show shadcn@latest; pin the version in .mcp.json, 'standard shadcn registry needs no config']
       ref: /docs/mcp
     - id: sh-skill
-      name: shadcn skill
-      summary: Project-aware skill that injects `shadcn info --json` and enforces composition rules (FieldGroup, semantic colors)
+      name: 'shadcn skill'
+      summary: 'Project-aware skill that injects `shadcn info --json` and enforces composition rules (FieldGroup, semantic colors)'
       lenses: [best-practice, reuse]
       signature: npx skills add shadcn/ui
       notes: ['activates when components.json exists', also carries the Radix to Base UI migration guide]
       ref: /docs/skills
     - id: sh-llms-txt
-      name: llms.txt page index
-      summary: ToC of every docs page, each also served as `.md`
+      name: 'llms.txt page index'
+      summary: 'ToC of every docs page, each also served as `.md`'
       lenses: [reuse]
       notes: ['ToC lags changelog (no toast, chat components); llms-full.txt and AGENTS.md are 404', 'component pages: /docs/components/<base>/<name>.md (base = radix|base|aria)']
       ref: /llms.txt
     - id: sh-cli-agent
-      name: CLI for agents
-      summary: Read-only CLI commands (info, docs, search, view, add --dry-run/--diff) an agent runs before writing code
+      name: 'CLI for agents'
+      summary: 'Read-only CLI commands (info, docs, search, view, add --dry-run/--diff) an agent runs before writing code'
       lenses: [reuse, reliability]
       signature: shadcn info --json | docs <component> --json | search @ns -q <text> | view <item> | add --dry-run
       options:
@@ -68,17 +68,17 @@ groups:
       returns: info --json gives framework, Tailwind version, aliases, base, iconLibrary and installed components
       notes: [composition trees were added to every component page in 2026-04 so agents nest correctly]
       ref: /docs/cli
-- title: Project setup and configuration
+- title: 'Project setup and configuration'
   sections:
   - id: sh-setup
-    title: Init, config and CLI
+    title: 'Init, config and CLI'
     level: basic
     requires: []
     ref: /docs/cli
     entries:
     - id: sh-components-json
-      name: components.json
-      summary: Single config the CLI reads for style, Tailwind CSS path, aliases, icon library and registries
+      name: 'components.json'
+      summary: 'Single config the CLI reads for style, Tailwind CSS path, aliases, icon library and registries'
       lenses: [best-practice]
       signature: style, rsc, tsx, tailwind.{config,css,baseColor,cssVariables,prefix}, iconLibrary, aliases.{components,ui,lib,hooks,utils}, registries
       options:
@@ -113,8 +113,8 @@ groups:
       notes: ['docs say style and tailwind.baseColor are immutable, yet `migrate base-color` rewrites baseColor', '$schema https://ui.shadcn.com/schema.json', 'file is optional with copy-paste; required for CLI']
       ref: /docs/components-json
     - id: sh-init
-      name: init/create
-      summary: Sets up deps, cn util and CSS variables in an existing project, or scaffolds a new one with --name
+      name: 'init/create'
+      summary: 'Sets up deps, cn util and CSS variables in an existing project, or scaffolds a new one with --name'
       lenses: [reuse, reliability]
       signature: init [components...] -t <template> -b <base> -p <preset> -n <name>
       options:
@@ -149,15 +149,15 @@ groups:
       returns: configured project with components.json, utils and theme CSS; `create` is an alias
       ref: /docs/cli
     - id: sh-base-choice
-      name: Base library
+      name: 'Base library'
       summary: '`-b base|radix|aria`; Base UI default since 2026-07-02, Radix still supported, React Aria added 2026-07'
       lenses: [best-practice]
       signature: -b base|radix|aria
       notes: [component docs and APIs differ per base, e.g. Toast exists only for Base UI]
       ref: /docs/changelog/2026-07-base-ui-default
     - id: sh-add
-      name: add
-      summary: Copies registry items (name, URL, @ns/item, local path) into the project and installs their deps
+      name: 'add'
+      summary: 'Copies registry items (name, URL, @ns/item, local path) into the project and installs their deps'
       lenses: [reuse, security]
       signature: add [components...] -p <dir> -o --dry-run --diff [path] --view [path]
       options:
@@ -181,8 +181,8 @@ groups:
       notes: [run --dry-run/--diff first on already-customized files]
       ref: /docs/cli
     - id: sh-presets
-      name: Presets
-      summary: Preset codes capture theme, fonts and style; `apply` re-skins an existing project, `preset` inspects codes
+      name: 'Presets'
+      summary: 'Preset codes capture theme, fonts and style; `apply` re-skins an existing project, `preset` inspects codes'
       lenses: [reuse]
       signature: apply <code> --only theme|font; preset decode|resolve|info|url|open
       options:
@@ -196,8 +196,8 @@ groups:
         desc: "machine-readable output; resolve reads the current project preset"
       ref: /docs/cli
     - id: sh-migrate
-      name: migrate
-      summary: Codemods for cn, icons, base-color, radix imports and RTL
+      name: 'migrate'
+      summary: 'Codemods for cn, icons, base-color, radix imports and RTL'
       lenses: [reuse]
       signature: migrate [cn|icons|base-color|radix|rtl] [path] -f <from> -t <to> -y
       options:
@@ -212,30 +212,30 @@ groups:
       notes: ['scoped path runs do not update components.json', 'unmappable icons or tokens are reported, not changed']
       ref: /docs/cli
     - id: sh-eject
-      name: eject
+      name: 'eject'
       summary: '`shadcn eject` inlines shadcn/tailwind.css into global CSS and drops the shadcn dep (irreversible)'
       lenses: [reliability]
       signature: shadcn eject [-c <cwd>] [-y]
       ref: /docs/cli
     - id: sh-nextjs-install
-      name: Next.js installation
-      summary: create preset, CLI scaffold or manual setup in an existing project
+      name: 'Next.js installation'
+      summary: 'create preset, CLI scaffold or manual setup in an existing project'
       lenses: [best-practice]
       ref: /docs/installation/next
     - id: sh-react-19
-      name: React 19 notes
-      summary: peer-dep errors only under npm (`--force`/`--legacy-peer-deps`)
+      name: 'React 19 notes'
+      summary: 'peer-dep errors only under npm (`--force`/`--legacy-peer-deps`)'
       lenses: [reliability]
       ref: /docs/react-19
     - id: sh-monorepo
-      name: Monorepo
-      summary: Shared ui package plus per-app components.json; run CLI with -c per workspace
+      name: 'Monorepo'
+      summary: 'Shared ui package plus per-app components.json; run CLI with -c per workspace'
       lenses: [composability]
       signature: init --monorepo, -c <workspace>
       ref: /docs/monorepo
     - id: sh-package-imports
-      name: package.json#imports aliases
-      summary: Alternative to tsconfig paths using `#components/*` subpath imports for aliases
+      name: 'package.json#imports aliases'
+      summary: 'Alternative to tsconfig paths using `#components/*` subpath imports for aliases'
       lenses: [best-practice, typing-dx]
       options:
       - name: "resolvePackageJsonImports"
@@ -244,17 +244,17 @@ groups:
         desc: "tsconfig flag required, with moduleResolution bundler"
       notes: ['target `./src/components/*.tsx` strips extensions in generated imports', 'components.json aliases are still required']
       ref: /docs/components-json
-- title: Theming and styling
+- title: 'Theming and styling'
   sections:
   - id: sh-theming
-    title: CSS variables and Tailwind v4
+    title: 'CSS variables and Tailwind v4'
     level: basic
     requires: [sh-setup]
     ref: /docs/theming
     entries:
     - id: sh-css-variables
-      name: Semantic tokens
-      summary: Surface/-foreground token pairs under `:root` and `.dark` that every component styles against
+      name: 'Semantic tokens'
+      summary: 'Surface/-foreground token pairs under `:root` and `.dark` that every component styles against'
       lenses: [best-practice, ux-a11y]
       signature: :root, .dark, --background, --primary(-foreground), --border, --ring, --radius
       notes: [use pairs like `bg-primary text-primary-foreground`, 'sidebar-* and chart-1..5 token families also exist']
@@ -268,88 +268,88 @@ groups:
       notes: [one `--radius` drives the whole corner scale]
       ref: /docs/theming
     - id: sh-add-token
-      name: Adding a token
-      summary: define under `:root` and `.dark`, expose via `@theme inline`
+      name: 'Adding a token'
+      summary: 'define under `:root` and `.dark`, expose via `@theme inline`'
       lenses: [composability]
       notes: [docs example `--warning`/`--warning-foreground` gives bg-warning]
       ref: /docs/theming
     - id: sh-base-color
-      name: Base color
-      summary: neutral, stone, zinc, mauve, olive, mist, taupe; `migrate base-color --to`
+      name: 'Base color'
+      summary: 'neutral, stone, zinc, mauve, olive, mist, taupe; `migrate base-color --to`'
       lenses: [best-practice]
       signature: migrate base-color --to <color> -y
       ref: /docs/components-json
     - id: sh-dark-mode
-      name: Dark mode
-      summary: next-themes `ThemeProvider attribute="class"` toggles `.dark`; Tailwind variant via `@custom-variant`
+      name: 'Dark mode'
+      summary: 'next-themes `ThemeProvider attribute="class"` toggles `.dark`; Tailwind variant via `@custom-variant`'
       lenses: [ux-a11y]
       signature: '@custom-variant dark (&:is(.dark *)), ThemeProvider attribute="class", useTheme'
       ref: /docs/dark-mode/next
     - id: sh-shadcn-tailwind-css
-      name: shadcn/tailwind.css
-      summary: shared `data-open:` variants, accordion/collapsible keyframes, `no-scrollbar`, `scroll-fade`, `shimmer`
+      name: 'shadcn/tailwind.css'
+      summary: 'shared `data-open:` variants, accordion/collapsible keyframes, `no-scrollbar`, `scroll-fade`, `shimmer`'
       lenses: [reuse]
       notes: [added by init; `eject` would inline it]
       ref: /docs/cli
     - id: sh-shimmer
-      name: shimmer utility
-      summary: Pure-CSS text shimmer for live status ("Thinking..."); highlight derives from currentColor
+      name: 'shimmer utility'
+      summary: 'Pure-CSS text shimmer for live status ("Thinking..."); highlight derives from currentColor'
       lenses: [ux-a11y, reuse]
       signature: shimmer, shimmer-once, shimmer-reverse, shimmer-none, shimmer-duration-N, shimmer-color-*, shimmer-spread-N, shimmer-angle-N
       notes: [animation is disabled automatically under prefers-reduced-motion, 'needs relative color syntax and color-mix(); older browsers can render transparent text', 'duration is milliseconds (default 2000)', 'animation name is tw-shimmer']
       ref: /docs/utils/shimmer
     - id: sh-scroll-fade
-      name: scroll-fade utility
-      summary: Scroll-aware edge fades via mask-image and CSS scroll-driven animations, no JS listeners
+      name: 'scroll-fade utility'
+      summary: 'Scroll-aware edge fades via mask-image and CSS scroll-driven animations, no JS listeners'
       lenses: [ux-a11y, perf]
       signature: scroll-fade[-y|-x|-t|-b|-l|-r|-s|-e], scroll-fade-<n>, scroll-fade-none
       notes: ['put on the overflow element itself, not a wrapper', 'default depth 12% capped 40px; --scroll-fade-reveal default 96px', 'falls back to static fade without scroll-driven animations', 'pair with no-scrollbar to hide the bar']
       ref: /docs/utils/scroll-fade
     - id: sh-typeset
-      name: Typeset
-      summary: One CSS file you own for rendered markdown and streaming chat; container-scaled, theme-aware, append-stable
+      name: 'Typeset'
+      summary: 'One CSS file you own for rendered markdown and streaming chat; container-scaled, theme-aware, append-stable'
       lenses: [ux-a11y, reuse]
       signature: 'typeset typeset-<preset>; --typeset-size, --typeset-leading, --typeset-flow; not-typeset, typeset-scroll'
       notes: [built in the /typeset builder, import after Tailwind, layout owns max-width, 'no :last-child/:has() so streamed blocks do not restyle earlier ones', 'uses :where() so utilities win without !important']
       ref: /docs/typeset
     - id: sh-rtl
-      name: RTL
+      name: 'RTL'
       summary: '`rtl: true`, logical properties, `migrate rtl`'
       lenses: [ux-a11y]
       signature: 'rtl: true, migrate rtl'
       ref: /docs/rtl
     - id: sh-tailwind-v4
-      name: Tailwind v4 CSS-first
-      summary: Theme and plugins configured in CSS (`@theme`, `@utility`, `@custom-variant`) rather than tailwind.config
+      name: 'Tailwind v4 CSS-first'
+      summary: 'Theme and plugins configured in CSS (`@theme`, `@utility`, `@custom-variant`) rather than tailwind.config'
       lenses: [best-practice]
       signature: '@import "tailwindcss", @theme inline, @utility, @custom-variant, @source inline()'
       notes: ['`@utility` replaces `@layer utilities`']
       ref: https://tailwindcss.com/docs/theme
     - id: sh-tw-animate
-      name: tw-animate-css
-      summary: Animation utilities for Tailwind v4 (animate-in/out, fade, zoom, slide) used by overlay components
+      name: 'tw-animate-css'
+      summary: 'Animation utilities for Tailwind v4 (animate-in/out, fade, zoom, slide) used by overlay components'
       lenses: [reuse]
       signature: '@import "tw-animate-css", animate-in fade-in zoom-in, slide-in-from-*, duration-*'
       notes: ['replaces tailwindcss-animate, deprecated 2025-03-19']
       ref: /docs/tailwind-v4
     - id: sh-prettier-tailwind
-      name: prettier-plugin-tailwindcss
-      summary: Sorts Tailwind classes; v4 needs `tailwindStylesheet`, and `tailwindFunctions` for cn/cva calls
+      name: 'prettier-plugin-tailwindcss'
+      summary: 'Sorts Tailwind classes; v4 needs `tailwindStylesheet`, and `tailwindFunctions` for cn/cva calls'
       lenses: [best-practice, typing-dx]
       signature: tailwindStylesheet, tailwindFunctions
       notes: [tailwindEntryPoint deprecated]
       ref: https://github.com/tailwindlabs/prettier-plugin-tailwindcss
-- title: Components in use
+- title: 'Components in use'
   sections:
   - id: sh-components
-    title: Installed ui components (radix-maia)
+    title: 'Installed ui components (radix-maia)'
     level: basic
     requires: [sh-setup]
     ref: /docs/components/radix/button
     entries:
     - id: sh-button
-      name: Button
-      summary: Button with cva `variant`/`size` props; `asChild` renders a Link or other element with button styles
+      name: 'Button'
+      summary: 'Button with cva `variant`/`size` props; `asChild` renders a Link or other element with button styles'
       lenses: [composability, ux-a11y]
       import: '@/components/ui/button'
       signature: <Button variant size asChild />
@@ -369,8 +369,8 @@ groups:
       notes: ['buttonVariants exports the cva for non-button elements', 'Tailwind v4 default cursor is default; init --pointer restores pointer']
       ref: /docs/components/radix/button
     - id: sh-sidebar
-      name: Sidebar
-      summary: Composable collapsible app sidebar with a provider, cmd/ctrl+b shortcut and separate mobile open state
+      name: 'Sidebar'
+      summary: 'Composable collapsible app sidebar with a provider, cmd/ctrl+b shortcut and separate mobile open state'
       lenses: [composability, ux-a11y]
       import: '@/components/ui/sidebar'
       signature: <SidebarProvider><Sidebar side variant collapsible/><SidebarInset/></SidebarProvider>
@@ -399,8 +399,8 @@ groups:
       notes: ['multiple sidebars: set --sidebar-width/--sidebar-width-mobile on the provider style', 'SIDEBAR_KEYBOARD_SHORTCUT constant in sidebar.tsx', 'tokens: sidebar, sidebar-primary, sidebar-accent, sidebar-border, sidebar-ring']
       ref: /docs/components/radix/sidebar
     - id: sh-dialog
-      name: Dialog
-      summary: Modal dialog on Radix Dialog with Header, Title, Description and Footer parts
+      name: 'Dialog'
+      summary: 'Modal dialog on Radix Dialog with Header, Title, Description and Footer parts'
       lenses: [ux-a11y]
       import: '@/components/ui/dialog'
       signature: Dialog > DialogTrigger + DialogContent > DialogHeader(DialogTitle, DialogDescription) + DialogFooter
@@ -412,8 +412,8 @@ groups:
       notes: [use DialogClose asChild for a custom close, API otherwise equals Radix Dialog]
       ref: /docs/components/radix/dialog
     - id: sh-sheet
-      name: Sheet
-      summary: Edge-anchored panel extending Dialog; `side` picks top/right/bottom/left
+      name: 'Sheet'
+      summary: 'Edge-anchored panel extending Dialog; `side` picks top/right/bottom/left'
       lenses: [ux-a11y]
       import: '@/components/ui/sheet'
       signature: Sheet > SheetTrigger + SheetContent side > SheetHeader(SheetTitle, SheetDescription) + SheetFooter
@@ -428,16 +428,16 @@ groups:
         desc: "false hides the close button"
       ref: /docs/components/radix/sheet
     - id: sh-tooltip
-      name: Tooltip
-      summary: Hover/focus hint on Radix Tooltip; `side` positions the content
+      name: 'Tooltip'
+      summary: 'Hover/focus hint on Radix Tooltip; `side` positions the content'
       lenses: [ux-a11y]
       import: '@/components/ui/tooltip'
       signature: TooltipProvider > Tooltip > TooltipTrigger asChild + TooltipContent side
       notes: ['disabled buttons need a wrapping span as trigger']
       ref: /docs/components/radix/tooltip
     - id: sh-avatar
-      name: Avatar
-      summary: Avatar with image and fallback; also AvatarBadge, AvatarGroup and AvatarGroupCount
+      name: 'Avatar'
+      summary: 'Avatar with image and fallback; also AvatarBadge, AvatarGroup and AvatarGroupCount'
       lenses: [reuse]
       import: '@/components/ui/avatar'
       signature: Avatar size > AvatarImage + AvatarFallback (+ AvatarBadge)
@@ -448,29 +448,29 @@ groups:
         desc: "avatar size"
       ref: /docs/components/radix/avatar
     - id: sh-collapsible
-      name: Collapsible
-      summary: Expand/collapse region on Radix Collapsible
+      name: 'Collapsible'
+      summary: 'Expand/collapse region on Radix Collapsible'
       lenses: [ux-a11y]
       import: '@/components/ui/collapsible'
       signature: Collapsible > CollapsibleTrigger asChild + CollapsibleContent
       ref: /docs/components/radix/collapsible
     - id: sh-form-controls
-      name: Form basics
-      summary: Plain styled Input, Textarea, Skeleton and Separator primitives
+      name: 'Form basics'
+      summary: 'Plain styled Input, Textarea, Skeleton and Separator primitives'
       lenses: [reuse]
       signature: Input, Textarea, Skeleton, Separator
       ref: /docs/components/radix/input
-- title: Candidate components
+- title: 'Candidate components'
   sections:
   - id: sh-candidates
-    title: Components worth checking before hand-rolling
+    title: 'Components worth checking before hand-rolling'
     level: intermediate
     requires: [sh-components]
     ref: /llms.txt
     entries:
     - id: sh-field
-      name: Field
-      summary: Accessible form-field family; FieldGroup/FieldSet/FieldLabel/FieldError replace hand-built label+input markup
+      name: 'Field'
+      summary: 'Accessible form-field family; FieldGroup/FieldSet/FieldLabel/FieldError replace hand-built label+input markup'
       lenses: [ux-a11y, best-practice]
       import: '@/components/ui/field'
       signature: Field, FieldGroup, FieldSet, FieldLegend, FieldLabel, FieldDescription, FieldError, FieldSeparator, FieldContent
@@ -486,8 +486,8 @@ groups:
       notes: ['invalid: data-invalid on Field plus aria-invalid on the control, FieldError after it', 'works with React Hook Form, TanStack Form and Formisch']
       ref: /docs/components/radix/field
     - id: sh-input-group
-      name: Input Group
-      summary: Inputs with inline or block addons (icons, text, buttons, kbd, spinner)
+      name: 'Input Group'
+      summary: 'Inputs with inline or block addons (icons, text, buttons, kbd, spinner)'
       lenses: [composability]
       import: '@/components/ui/input-group'
       signature: InputGroup > InputGroupInput|InputGroupTextarea + InputGroupAddon align + InputGroupButton
@@ -503,8 +503,8 @@ groups:
       notes: ['place the addon after the input in the DOM for focus order', 'custom control needs data-slot="input-group-control"']
       ref: /docs/components/radix/input-group
     - id: sh-empty
-      name: Empty
-      summary: Empty-state layout with media, title, description and action slots
+      name: 'Empty'
+      summary: 'Empty-state layout with media, title, description and action slots'
       lenses: [ux-a11y, reuse]
       import: '@/components/ui/empty'
       signature: Empty > EmptyHeader(EmptyMedia variant, EmptyTitle, EmptyDescription) + EmptyContent
@@ -516,39 +516,39 @@ groups:
       notes: [fits empty-thread and no-result states]
       ref: /docs/components/radix/empty
     - id: sh-spinner
-      name: Spinner
-      summary: Loading indicator icon; sized with `size-*`, placed in buttons, badges and input groups
+      name: 'Spinner'
+      summary: 'Loading indicator icon; sized with `size-*`, placed in buttons, badges and input groups'
       lenses: [ux-a11y]
       import: '@/components/ui/spinner'
       signature: <Spinner className="size-4" />
       notes: ['in a Button use data-icon="inline-start|inline-end"']
       ref: /docs/components/radix/spinner
     - id: sh-sonner
-      name: Sonner
-      summary: Toast notifications; `Toaster` in the root layout and `toast()` from sonner, needs next-themes
+      name: 'Sonner'
+      summary: 'Toast notifications; `Toaster` in the root layout and `toast()` from sonner, needs next-themes'
       lenses: [ux-a11y, observability]
       import: '@/components/ui/sonner'
       signature: <Toaster position /> ; toast(message, { description })
       notes: [Radix style uses sonner, Base UI style has its own Toast since 2026-07-23, 'API reference lives at sonner.emilkowal.ski']
       ref: /docs/components/radix/sonner
     - id: sh-scroll-area
-      name: Scroll Area
-      summary: Cross-browser styled scrollbars on Radix Scroll Area; `ScrollBar orientation` for horizontal
+      name: 'Scroll Area'
+      summary: 'Cross-browser styled scrollbars on Radix Scroll Area; `ScrollBar orientation` for horizontal'
       lenses: [ux-a11y]
       import: '@/components/ui/scroll-area'
       signature: ScrollArea > content + ScrollBar orientation
       notes: [can take the scroll-fade utility on its viewport]
       ref: /docs/components/radix/scroll-area
     - id: sh-chat-components
-      name: Chat components
-      summary: MessageScroller, Message, Bubble, Attachment and Marker for chat UIs; scroller owns anchoring and auto-follow
+      name: 'Chat components'
+      summary: 'MessageScroller, Message, Bubble, Attachment and Marker for chat UIs; scroller owns anchoring and auto-follow'
       lenses: [composability, ux-a11y]
       signature: message-scroller, message, bubble, attachment, marker
       notes: ['MessageScroller is headless in @shadcn/react/message-scroller', 'owns scroll behavior only, not messages, state or transport', 'Marker fits status and tool-activity rows', 'assistant-ui owns thread scroll and messages; weigh overlap']
       ref: /docs/changelog/2026-06-chat-components
     - id: sh-questionnaire
-      name: Questionnaire
-      summary: Multi-step question flow with fixed, freeform, multiple and skippable answers; for agent clarification prompts
+      name: 'Questionnaire'
+      summary: 'Multi-step question flow with fixed, freeform, multiple and skippable answers; for agent clarification prompts'
       lenses: [ux-a11y, composability]
       signature: questionnaire (registry component)
       notes: ['available for Base UI, React Aria and Radix since 2026-08-05', 'native form serialization, keyboard shortcuts, standalone/Card/Dialog composition']
@@ -560,17 +560,17 @@ groups:
       signature: createChat(), useChat
       notes: [human-in-the-loop mocks via needsApproval since 2026-08-12]
       ref: /docs/changelog/2026-07-helpers
-- title: Utilities and primitives
+- title: 'Utilities and primitives'
   sections:
   - id: sh-utils
-    title: cn, cva and Radix
+    title: 'cn, cva and Radix'
     level: intermediate
     requires: [sh-setup]
     ref: https://github.com/shadcn-ui/cn
     entries:
     - id: sh-cn
-      name: cn package
-      summary: Zero-dependency engine replacing clsx + tailwind-merge; `cn()` joins and resolves Tailwind conflicts
+      name: 'cn package'
+      summary: 'Zero-dependency engine replacing clsx + tailwind-merge; `cn()` joins and resolves Tailwind conflicts'
       lenses: [perf, reuse]
       import: cn
       signature: cn(...inputs)
@@ -581,38 +581,38 @@ groups:
       - '`migrate cn` is the codemod; needs no components.json'
       ref: https://github.com/shadcn-ui/cn
     - id: sh-cva
-      name: class-variance-authority
-      summary: Typed variant maps (`variants`, `defaultVariants`) behind every ui component
+      name: 'class-variance-authority'
+      summary: 'Typed variant maps (`variants`, `defaultVariants`) behind every ui component'
       lenses: [typing-dx, composability]
       import: class-variance-authority
       signature: cva(base, { variants, defaultVariants }) ; VariantProps<typeof x>
       notes: [variant mechanism of every ui component]
       ref: /docs/components/radix/button
     - id: sh-radix-ui
-      name: radix-ui unified package
-      summary: One tree-shakeable package replacing per-primitive `@radix-ui/react-*` imports
+      name: 'radix-ui unified package'
+      summary: 'One tree-shakeable package replacing per-primitive `@radix-ui/react-*` imports'
       lenses: [reuse, ux-a11y]
       import: radix-ui
       signature: import { Dialog, Slot } from "radix-ui"
       notes: ['`migrate radix` rewrites old imports, then remove unused @radix-ui/react-* deps']
       ref: https://www.radix-ui.com/primitives/docs/overview/introduction
     - id: sh-radix-composition
-      name: asChild and forceMount
+      name: 'asChild and forceMount'
       summary: '`asChild` merges Radix props onto your child element; `forceMount` keeps content mounted for animation libraries'
       lenses: [composability]
       signature: asChild, forceMount
       notes: [pairs with Motion AnimatePresence (react-bits outline)]
       ref: https://www.radix-ui.com/primitives/docs/guides/composition
-- title: Registries
+- title: 'Registries'
   sections:
   - id: sh-registries
-    title: Namespaces, trust and authoring
+    title: 'Namespaces, trust and authoring'
     level: advanced
     requires: [sh-setup]
     ref: /docs/registry/namespace
     entries:
     - id: sh-namespaces
-      name: Namespaced registries
+      name: 'Namespaced registries'
       summary: '`@ns` aliases in components.json map to URL templates (optionally headers/params) for add and search'
       lenses: [reuse, composability]
       signature: 'registries: {"@ns": "https://host/{name}.json"}, add @ns/item, search @ns'
@@ -632,27 +632,27 @@ groups:
       notes: ['names start with @, only alphanumerics, hyphens, underscores', 'decentralized: no central authority, optional open-source registry index']
       ref: /docs/registry/namespace
     - id: sh-registry-trust
-      name: Registry trust model
-      summary: HTTPS only, data not code, token via env, `view` or `--dry-run` before install
+      name: 'Registry trust model'
+      summary: 'HTTPS only, data not code, token via env, `view` or `--dry-run` before install'
       lenses: [security]
       notes: [CLI never auto-adds registries, never commit tokens]
       ref: /docs/registry/namespace
     - id: sh-github-registries
-      name: GitHub registries
-      summary: Any GitHub repo with a root registry.json installs with `add <user>/<repo>/<item>`, no components.json entry
+      name: 'GitHub registries'
+      summary: 'Any GitHub repo with a root registry.json installs with `add <user>/<repo>/<item>`, no components.json entry'
       lenses: [reuse]
       signature: add <user>/<repo>/<item>, include
       notes: ['private repos work since 2026-08-24 via gh CLI login or GH_TOKEN/GITHUB_TOKEN (fine-grained, Contents read-only)']
       ref: /docs/changelog/2026-06-github-registries
     - id: sh-dynamic-search
-      name: Dynamic registry search
-      summary: Registries may answer `search` server-side with a pagination object instead of shipping the full catalog
+      name: 'Dynamic registry search'
+      summary: 'Registries may answer `search` server-side with a pagination object instead of shipping the full catalog'
       lenses: [perf]
       notes: [opt-in; static registries ignore the query params]
       ref: /docs/changelog/2026-07-dynamic-search
     - id: sh-registry-authoring
-      name: Registry authoring
-      summary: registry.json plus registry-item.json files built into static JSON with `shadcn build`
+      name: 'Registry authoring'
+      summary: 'registry.json plus registry-item.json files built into static JSON with `shadcn build`'
       lenses: [composability]
       signature: shadcn build [registry] -o <dir>
       options:
@@ -661,18 +661,18 @@ groups:
         default: "./public/r"
         desc: "destination for generated item JSON"
       ref: /docs/registry/registry-item-json
-- title: Component catalog (radix base)
+- title: 'Component catalog (radix base)'
   sections:
   - id: sh-cat-form
-    title: Form and input components
+    title: 'Form and input components'
     level: intermediate
     requires:
     - sh-components
     ref: /docs/components/radix/field
     entries:
     - id: sh-textarea
-      name: Textarea
-      summary: Styled textarea; pair with Field for label, description and invalid state
+      name: 'Textarea'
+      summary: 'Styled textarea; pair with Field for label, description and invalid state'
       lenses:
       - ux-a11y
       - composability
@@ -683,8 +683,8 @@ groups:
       - no deps
       ref: /docs/components/radix/textarea
     - id: sh-checkbox
-      name: Checkbox
-      summary: Radix checkbox; wrap in Field + FieldLabel, FieldContent/FieldDescription for helper text
+      name: 'Checkbox'
+      summary: 'Radix checkbox; wrap in Field + FieldLabel, FieldContent/FieldDescription for helper text'
       lenses:
       - ux-a11y
       - composability
@@ -696,8 +696,8 @@ groups:
       - installs the radix-ui package
       ref: /docs/components/radix/checkbox
     - id: sh-radio-group
-      name: Radio Group
-      summary: Single-choice group; FieldLabel around a whole Field gives clickable choice cards
+      name: 'Radio Group'
+      summary: 'Single-choice group; FieldLabel around a whole Field gives clickable choice cards'
       lenses:
       - ux-a11y
       - composability
@@ -708,8 +708,8 @@ groups:
       - data-invalid on Field and aria-invalid on the item
       ref: /docs/components/radix/radio-group
     - id: sh-select
-      name: Select
-      summary: Styled Radix select (trigger, content, group, label, separator); position item-aligned or popper
+      name: 'Select'
+      summary: 'Styled Radix select (trigger, content, group, label, separator); position item-aligned or popper'
       lenses:
       - ux-a11y
       - composability
@@ -720,8 +720,8 @@ groups:
       - 'invalid: data-invalid on Field and aria-invalid on SelectTrigger'
       ref: /docs/components/radix/select
     - id: sh-native-select
-      name: Native Select
-      summary: Styled native <select>; keeps browser and mobile behavior and performance
+      name: 'Native Select'
+      summary: 'Styled native <select>; keeps browser and mobile behavior and performance'
       lenses:
       - perf
       - ux-a11y
@@ -733,8 +733,8 @@ groups:
       - no deps
       ref: /docs/components/radix/native-select
     - id: sh-switch
-      name: Switch
-      summary: Two-state toggle with size prop; Field gives label and choice-card layouts
+      name: 'Switch'
+      summary: 'Two-state toggle with size prop; Field gives label and choice-card layouts'
       lenses:
       - ux-a11y
       - composability
@@ -745,8 +745,8 @@ groups:
       - 'invalid: aria-invalid on Switch and data-invalid on Field'
       ref: /docs/components/radix/switch
     - id: sh-slider
-      name: Slider
-      summary: Range input; a value array of length 1 or 2 gives a single or range thumb, supports vertical
+      name: 'Slider'
+      summary: 'Range input; a value array of length 1 or 2 gives a single or range thumb, supports vertical'
       lenses:
       - ux-a11y
       import: '@/components/ui/slider'
@@ -755,8 +755,8 @@ groups:
       - array with several values gives multiple thumbs
       ref: /docs/components/radix/slider
     - id: sh-label
-      name: Label
-      summary: Accessible Radix label; inside forms use FieldLabel from Field
+      name: 'Label'
+      summary: 'Accessible Radix label; inside forms use FieldLabel from Field'
       lenses:
       - ux-a11y
       import: '@/components/ui/label'
@@ -765,8 +765,8 @@ groups:
       - Field family already provides FieldLabel, FieldDescription and FieldError
       ref: /docs/components/radix/label
     - id: sh-input-otp
-      name: Input OTP
-      summary: One-time-code input with copy-paste, built on the input-otp package
+      name: 'Input OTP'
+      summary: 'One-time-code input with copy-paste, built on the input-otp package'
       lenses:
       - ux-a11y
       import: '@/components/ui/input-otp'
@@ -777,8 +777,8 @@ groups:
       - installs input-otp
       ref: /docs/components/radix/input-otp
     - id: sh-button-group
-      name: Button Group
-      summary: Groups related actions with shared borders; separator, text addon, orientation and nesting
+      name: 'Button Group'
+      summary: 'Groups related actions with shared borders; separator, text addon, orientation and nesting'
       lenses:
       - composability
       - ux-a11y
@@ -790,7 +790,7 @@ groups:
       - wraps Input, InputGroup, DropdownMenu, Select or Popover for split controls
       ref: /docs/components/radix/button-group
     - id: sh-calendar
-      name: Calendar
+      name: 'Calendar'
       summary: 'react-day-picker calendar: single, multiple and range modes, dropdown captions, week numbers'
       lenses:
       - ux-a11y
@@ -804,7 +804,7 @@ groups:
       - 'Persian calendar: switch the import to react-day-picker/persian'
       ref: /docs/components/radix/calendar
     - id: sh-date-picker
-      name: Date Picker
+      name: 'Date Picker'
       summary: 'Not a component: Popover + Button + Calendar composition with range, input, time and natural-language variants'
       lenses:
       - composability
@@ -815,23 +815,23 @@ groups:
       - date formatting via date-fns format()
       ref: /docs/components/radix/date-picker
     - id: sh-combobox
-      name: Combobox
-      summary: Autocomplete input with list, groups, chips and clear button, built on Base UI even in the radix base
+      name: 'Combobox'
+      summary: 'Autocomplete input with list, groups, chips and clear button, built on Base UI even in the radix base'
       lenses:
       - ux-a11y
       - composability
       import: '@/components/ui/combobox'
       signature: <Combobox items><ComboboxInput/><ComboboxContent><ComboboxEmpty/><ComboboxList><ComboboxItem value/></ComboboxList></ComboboxContent></Combobox>
       options:
-      - name: multiple
+      - name: 'multiple'
         type: boolean
         default: 'false'
         desc: multi-select with chips
-      - name: showClear
+      - name: 'showClear'
         type: boolean
         default: 'false'
         desc: clear button
-      - name: autoHighlight
+      - name: 'autoHighlight'
         type: boolean
         default: 'false'
         desc: highlight first match while filtering
@@ -842,15 +842,15 @@ groups:
       - popup trigger via the render prop
       ref: /docs/components/radix/combobox
   - id: sh-cat-layout
-    title: Layout and navigation components
+    title: 'Layout and navigation components'
     level: intermediate
     requires:
     - sh-components
     ref: /docs/components/radix/tabs
     entries:
     - id: sh-separator
-      name: Separator
-      summary: Horizontal or vertical divider; decorative by default
+      name: 'Separator'
+      summary: 'Horizontal or vertical divider; decorative by default'
       lenses:
       - ux-a11y
       import: '@/components/ui/separator'
@@ -859,8 +859,8 @@ groups:
       - built on the radix-ui Separator primitive
       ref: /docs/components/radix/separator
     - id: sh-tabs
-      name: Tabs
-      summary: Radix tabs with default or line variant, horizontal or vertical orientation
+      name: 'Tabs'
+      summary: 'Radix tabs with default or line variant, horizontal or vertical orientation'
       lenses:
       - ux-a11y
       - composability
@@ -870,8 +870,8 @@ groups:
       - TabsList variant="line" gives the underline style
       ref: /docs/components/radix/tabs
     - id: sh-accordion
-      name: Accordion
-      summary: Stacked collapsible sections; type single (collapsible) or multiple
+      name: 'Accordion'
+      summary: 'Stacked collapsible sections; type single (collapsible) or multiple'
       lenses:
       - ux-a11y
       - composability
@@ -881,8 +881,8 @@ groups:
       - disabled on AccordionItem disables one item
       ref: /docs/components/radix/accordion
     - id: sh-breadcrumb
-      name: Breadcrumb
-      summary: Path hierarchy with list, link, page, separator and ellipsis parts
+      name: 'Breadcrumb'
+      summary: 'Path hierarchy with list, link, page, separator and ellipsis parts'
       lenses:
       - ux-a11y
       import: '@/components/ui/breadcrumb'
@@ -893,8 +893,8 @@ groups:
       - no deps
       ref: /docs/components/radix/breadcrumb
     - id: sh-navigation-menu
-      name: Navigation Menu
-      summary: Radix navigation menu with trigger-opened content panels and optional indicator
+      name: 'Navigation Menu'
+      summary: 'Radix navigation menu with trigger-opened content panels and optional indicator'
       lenses:
       - ux-a11y
       import: '@/components/ui/navigation-menu'
@@ -903,8 +903,8 @@ groups:
       - NavigationMenuLink asChild composes Next.js Link
       ref: /docs/components/radix/navigation-menu
     - id: sh-resizable
-      name: Resizable
-      summary: Resizable panel groups with keyboard support, on react-resizable-panels
+      name: 'Resizable'
+      summary: 'Resizable panel groups with keyboard support, on react-resizable-panels'
       lenses:
       - ux-a11y
       import: '@/components/ui/resizable'
@@ -914,8 +914,8 @@ groups:
       - installs react-resizable-panels
       ref: /docs/components/radix/resizable
     - id: sh-pagination
-      name: Pagination
-      summary: Pagination links with previous, next, ellipsis; icon-only variant suits data tables
+      name: 'Pagination'
+      summary: 'Pagination links with previous, next, ellipsis; icon-only variant suits data tables'
       lenses:
       - ux-a11y
       import: '@/components/ui/pagination'
@@ -925,15 +925,15 @@ groups:
       - no deps
       ref: /docs/components/radix/pagination
   - id: sh-cat-overlays
-    title: Overlay, menu and command components
+    title: 'Overlay, menu and command components'
     level: intermediate
     requires:
     - sh-components
     ref: /docs/components/radix/dropdown-menu
     entries:
     - id: sh-alert-dialog
-      name: Alert Dialog
-      summary: Confirmation modal that needs a response; Cancel/Action buttons, small size and media slot
+      name: 'Alert Dialog'
+      summary: 'Confirmation modal that needs a response; Cancel/Action buttons, small size and media slot'
       lenses:
       - ux-a11y
       - security
@@ -945,8 +945,8 @@ groups:
       - use for destructive confirmation; Dialog for general modals
       ref: /docs/components/radix/alert-dialog
     - id: sh-drawer
-      name: Drawer
-      summary: Vaul drawer with direction top|right|bottom|left; pair with Dialog for a responsive modal
+      name: 'Drawer'
+      summary: 'Vaul drawer with direction top|right|bottom|left; pair with Dialog for a responsive modal'
       lenses:
       - ux-a11y
       import: '@/components/ui/drawer'
@@ -956,8 +956,8 @@ groups:
       - Dialog on desktop and Drawer on mobile via a media-query hook
       ref: /docs/components/radix/drawer
     - id: sh-popover
-      name: Popover
-      summary: Radix popover with header, title and description parts; align prop on the content
+      name: 'Popover'
+      summary: 'Radix popover with header, title and description parts; align prop on the content'
       lenses:
       - ux-a11y
       - composability
@@ -965,8 +965,8 @@ groups:
       signature: <Popover><PopoverTrigger asChild/><PopoverContent align><PopoverHeader/></PopoverContent></Popover>
       ref: /docs/components/radix/popover
     - id: sh-hover-card
-      name: Hover Card
-      summary: Hover-triggered preview card for sighted users; openDelay and closeDelay
+      name: 'Hover Card'
+      summary: 'Hover-triggered preview card for sighted users; openDelay and closeDelay'
       lenses:
       - ux-a11y
       import: '@/components/ui/hover-card'
@@ -975,8 +975,8 @@ groups:
       - 'not reachable by keyboard or touch: do not hide essential content in it'
       ref: /docs/components/radix/hover-card
     - id: sh-dropdown-menu
-      name: Dropdown Menu
-      summary: Button-triggered menu with groups, checkbox and radio items, submenus, shortcuts, destructive variant
+      name: 'Dropdown Menu'
+      summary: 'Button-triggered menu with groups, checkbox and radio items, submenus, shortcuts, destructive variant'
       lenses:
       - ux-a11y
       - composability
@@ -987,23 +987,23 @@ groups:
       - DropdownMenuSub for nested menus
       ref: /docs/components/radix/dropdown-menu
     - id: sh-context-menu
-      name: Context Menu
-      summary: Right-click menu; same item model as DropdownMenu (groups, checkbox, radio, submenu)
+      name: 'Context Menu'
+      summary: 'Right-click menu; same item model as DropdownMenu (groups, checkbox, radio, submenu)'
       lenses:
       - ux-a11y
       import: '@/components/ui/context-menu'
       signature: <ContextMenu><ContextMenuTrigger/><ContextMenuContent><ContextMenuItem/></ContextMenuContent></ContextMenu>
       ref: /docs/components/radix/context-menu
     - id: sh-menubar
-      name: Menubar
-      summary: Desktop-style persistent menu bar with menus, checkbox/radio items and submenus
+      name: 'Menubar'
+      summary: 'Desktop-style persistent menu bar with menus, checkbox/radio items and submenus'
       lenses:
       - ux-a11y
       import: '@/components/ui/menubar'
       signature: <Menubar><MenubarMenu><MenubarTrigger/><MenubarContent><MenubarItem/></MenubarContent></MenubarMenu></Menubar>
       ref: /docs/components/radix/menubar
     - id: sh-command
-      name: Command
+      name: 'Command'
       summary: 'cmdk command palette: inline or in CommandDialog, groups, shortcuts, empty state'
       lenses:
       - ux-a11y
@@ -1015,15 +1015,15 @@ groups:
       - typically opened with a cmd/ctrl+k handler you write
       ref: /docs/components/radix/command
   - id: sh-cat-feedback
-    title: Feedback and status components
+    title: 'Feedback and status components'
     level: intermediate
     requires:
     - sh-components
     ref: /docs/components/radix/alert
     entries:
     - id: sh-alert
-      name: Alert
-      summary: Callout with icon, title, description and optional AlertAction; destructive variant
+      name: 'Alert'
+      summary: 'Callout with icon, title, description and optional AlertAction; destructive variant'
       lenses:
       - ux-a11y
       import: '@/components/ui/alert'
@@ -1033,16 +1033,16 @@ groups:
       - no deps
       ref: /docs/components/radix/alert
     - id: sh-progress
-      name: Progress
-      summary: Radix progress bar driven by a value prop; label it with Field
+      name: 'Progress'
+      summary: 'Radix progress bar driven by a value prop; label it with Field'
       lenses:
       - ux-a11y
       import: '@/components/ui/progress'
       signature: <Progress value />
       ref: /docs/components/radix/progress
     - id: sh-skeleton
-      name: Skeleton
-      summary: Pulse placeholder block sized with utility classes for loading states
+      name: 'Skeleton'
+      summary: 'Pulse placeholder block sized with utility classes for loading states'
       lenses:
       - ux-a11y
       - perf
@@ -1052,8 +1052,8 @@ groups:
       - no deps
       ref: /docs/components/radix/skeleton
     - id: sh-badge
-      name: Badge
-      summary: Label/status pill with variants; icons via data-icon, asChild renders a link
+      name: 'Badge'
+      summary: 'Label/status pill with variants; icons via data-icon, asChild renders a link'
       lenses:
       - ux-a11y
       import: '@/components/ui/badge'
@@ -1063,23 +1063,23 @@ groups:
       - no deps
       ref: /docs/components/radix/badge
     - id: sh-toast
-      name: Toast
-      summary: Deprecated page; the toast component was replaced by Sonner
+      name: 'Toast'
+      summary: 'Deprecated page; the toast component was replaced by Sonner'
       lenses:
       - best-practice
       import: '@/components/ui/sonner'
       deprecated: use the sonner component (sh-sonner)
       ref: /docs/components/radix/toast
   - id: sh-cat-display
-    title: Display, data and content components
+    title: 'Display, data and content components'
     level: intermediate
     requires:
     - sh-components
     ref: /docs/components/radix/card
     entries:
     - id: sh-card
-      name: Card
-      summary: Container with header, title, description, action, content, footer; size sm and --card-spacing
+      name: 'Card'
+      summary: 'Container with header, title, description, action, content, footer; size sm and --card-spacing'
       lenses:
       - composability
       import: '@/components/ui/card'
@@ -1088,8 +1088,8 @@ groups:
       - no deps
       ref: /docs/components/radix/card
     - id: sh-table
-      name: Table
-      summary: Semantic styled table parts (header, body, footer, caption)
+      name: 'Table'
+      summary: 'Semantic styled table parts (header, body, footer, caption)'
       lenses:
       - ux-a11y
       import: '@/components/ui/table'
@@ -1099,7 +1099,7 @@ groups:
       - no deps
       ref: /docs/components/radix/table
     - id: sh-data-table
-      name: Data Table
+      name: 'Data Table'
       summary: 'Guide: build sorting, filtering, pagination, visibility and selection on Table with TanStack Table v9'
       lenses:
       - composability
@@ -1112,7 +1112,7 @@ groups:
       - no data-table component is installed; code is copy-pasted guide code
       ref: /docs/components/radix/data-table
     - id: sh-chart
-      name: Chart
+      name: 'Chart'
       summary: 'Recharts wrapper: ChartContainer + ChartConfig, themed tooltip and legend via CSS variables'
       lenses:
       - composability
@@ -1127,8 +1127,8 @@ groups:
       - 'ChartConfig holds labels, icons and colors separate from data; theme: light/dark overrides'
       ref: /docs/components/radix/chart
     - id: sh-carousel
-      name: Carousel
-      summary: Embla carousel with items, previous/next, orientation, opts, plugins and setApi
+      name: 'Carousel'
+      summary: 'Embla carousel with items, previous/next, orientation, opts, plugins and setApi'
       lenses:
       - ux-a11y
       import: '@/components/ui/carousel'
@@ -1138,16 +1138,16 @@ groups:
       - item size by basis-* classes; spacing by pl-* on items with -ml-* on content
       ref: /docs/components/radix/carousel
     - id: sh-aspect-ratio
-      name: Aspect Ratio
-      summary: Container locking children to a numeric ratio such as 16 / 9
+      name: 'Aspect Ratio'
+      summary: 'Container locking children to a numeric ratio such as 16 / 9'
       lenses:
       - ux-a11y
       import: '@/components/ui/aspect-ratio'
       signature: <AspectRatio ratio={16 / 9} />
       ref: /docs/components/radix/aspect-ratio
     - id: sh-typography
-      name: Typography
-      summary: Reference classes for headings, paragraphs, lists, blockquote, inline code, lead and muted text; not an installable component
+      name: 'Typography'
+      summary: 'Reference classes for headings, paragraphs, lists, blockquote, inline code, lead and muted text; not an installable component'
       lenses:
       - best-practice
       notes:
@@ -1155,8 +1155,8 @@ groups:
       - typeset (sh-typeset) is the CSS-file alternative for rendered markdown
       ref: /docs/components/radix/typography
     - id: sh-item
-      name: Item
-      summary: Generic list/row component with media, title, description, actions; variant, size, group and asChild
+      name: 'Item'
+      summary: 'Generic list/row component with media, title, description, actions; variant, size, group and asChild'
       lenses:
       - composability
       - reuse
@@ -1168,8 +1168,8 @@ groups:
       - no deps
       ref: /docs/components/radix/item
     - id: sh-kbd
-      name: Kbd
-      summary: Keyboard key display with KbdGroup; used inside Button, Tooltip and InputGroup
+      name: 'Kbd'
+      summary: 'Keyboard key display with KbdGroup; used inside Button, Tooltip and InputGroup'
       lenses:
       - ux-a11y
       import: '@/components/ui/kbd'
@@ -1178,8 +1178,8 @@ groups:
       - no deps
       ref: /docs/components/radix/kbd
     - id: sh-direction
-      name: Direction
-      summary: DirectionProvider plus useDirection hook for RTL text direction
+      name: 'Direction'
+      summary: 'DirectionProvider plus useDirection hook for RTL text direction'
       lenses:
       - ux-a11y
       import: '@/components/ui/direction'
@@ -1189,38 +1189,38 @@ groups:
       - see /docs/rtl for the config flag
       ref: /docs/components/radix/direction
     - id: sh-toggle
-      name: Toggle
-      summary: Two-state button; outline variant and sizes
+      name: 'Toggle'
+      summary: 'Two-state button; outline variant and sizes'
       lenses:
       - ux-a11y
       import: '@/components/ui/toggle'
       signature: <Toggle variant size pressed onPressedChange />
       ref: /docs/components/radix/toggle
     - id: sh-toggle-group
-      name: Toggle Group
-      summary: Group of toggles with single or multiple selection, variant, size, spacing, orientation
+      name: 'Toggle Group'
+      summary: 'Group of toggles with single or multiple selection, variant, size, spacing, orientation'
       lenses:
       - ux-a11y
       import: '@/components/ui/toggle-group'
       signature: <ToggleGroup type variant size spacing orientation><ToggleGroupItem value/></ToggleGroup>
       ref: /docs/components/radix/toggle-group
   - id: sh-cat-chat
-    title: Chat and conversation components
+    title: 'Chat and conversation components'
     level: intermediate
     requires:
     - sh-components
     ref: /docs/components/radix/message
     entries:
     - id: sh-message
-      name: Message
-      summary: Conversation row with avatar, header, footer and start/end alignment; MessageGroup stacks same-sender rows
+      name: 'Message'
+      summary: 'Conversation row with avatar, header, footer and start/end alignment; MessageGroup stacks same-sender rows'
       lenses:
       - composability
       - ux-a11y
       import: '@/components/ui/message'
       signature: <Message align><MessageAvatar/><MessageContent><MessageHeader/><Bubble/><MessageFooter/></MessageContent></Message>
       options:
-      - name: align
+      - name: 'align'
         type: start|end
         default: start
         desc: row side; avatar follows it
@@ -1230,23 +1230,23 @@ groups:
       - no deps
       ref: /docs/components/radix/message
     - id: sh-bubble
-      name: Bubble
-      summary: Message surface with seven variants, alignment, reactions, grouping and collapsible content
+      name: 'Bubble'
+      summary: 'Message surface with seven variants, alignment, reactions, grouping and collapsible content'
       lenses:
       - composability
       - ux-a11y
       import: '@/components/ui/bubble'
       signature: <Bubble variant align><BubbleContent asChild/><BubbleReactions side align/></Bubble>
       options:
-      - name: variant
+      - name: 'variant'
         type: default|secondary|muted|tinted|outline|ghost|destructive
         default: default
         desc: visual treatment
-      - name: align
+      - name: 'align'
         type: start|end
         default: start
         desc: inline alignment
-      - name: BubbleReactions side
+      - name: 'BubbleReactions side'
         type: top|bottom
         default: bottom
         desc: edge the reactions anchor to
@@ -1257,8 +1257,8 @@ groups:
       - no deps
       ref: /docs/components/radix/bubble
     - id: sh-marker
-      name: Marker
-      summary: Inline status, system note, bordered row or labeled separator inside a conversation
+      name: 'Marker'
+      summary: 'Inline status, system note, bordered row or labeled separator inside a conversation'
       lenses:
       - composability
       - ux-a11y
@@ -1272,19 +1272,19 @@ groups:
       - no deps
       ref: /docs/components/radix/marker
     - id: sh-attachment
-      name: Attachment
-      summary: File or image attachment card with media, metadata, upload states and actions
+      name: 'Attachment'
+      summary: 'File or image attachment card with media, metadata, upload states and actions'
       lenses:
       - composability
       - ux-a11y
       import: '@/components/ui/attachment'
       signature: <Attachment state size orientation><AttachmentMedia variant/><AttachmentContent><AttachmentTitle/><AttachmentDescription/></AttachmentContent><AttachmentActions><AttachmentAction/></AttachmentActions><AttachmentTrigger/></Attachment>
       options:
-      - name: state
+      - name: 'state'
         type: idle|uploading|processing|error|done
         default: done
         desc: upload lifecycle styling
-      - name: orientation
+      - name: 'orientation'
         type: horizontal|vertical
         default: horizontal
         desc: media beside or above content
@@ -1296,7 +1296,7 @@ groups:
       - no deps
       ref: /docs/components/radix/attachment
     - id: sh-message-scroller
-      name: Message Scroller
+      name: 'Message Scroller'
       summary: 'Styled chat transcript scroller: anchors turns, follows streaming, keeps place on history prepend, jumps to messages'
       lenses:
       - perf
@@ -1309,7 +1309,7 @@ groups:
       - viewport is a labelled keyboard-focusable region and content is role=log
       ref: /docs/components/radix/message-scroller
     - id: sh-message-scroller-headless
-      name: Message Scroller (headless)
+      name: 'Message Scroller (headless)'
       summary: '@shadcn/react MessageScroller namespace: Provider, Root, Viewport, Content, Item, Button plus imperative hooks'
       lenses:
       - perf
@@ -1318,35 +1318,35 @@ groups:
       import: '@shadcn/react/message-scroller'
       signature: MessageScroller.Provider autoScroll defaultScrollPosition; useMessageScroller().scrollToMessage(id, opts)
       options:
-      - name: autoScroll
+      - name: 'autoScroll'
         type: boolean
         default: 'false'
         desc: follow new content only while the reader is at the live edge
-      - name: defaultScrollPosition
+      - name: 'defaultScrollPosition'
         type: start|end|last-anchor
         default: end
         desc: opening position, applied once
-      - name: scrollEdgeThreshold
+      - name: 'scrollEdgeThreshold'
         type: number
         default: '8'
         desc: px from an edge that counts as at the edge
-      - name: scrollMargin
+      - name: 'scrollMargin'
         type: number
         default: '0'
         desc: margin on the aligned edge for programmatic targets
-      - name: scrollPreviousItemPeek
+      - name: 'scrollPreviousItemPeek'
         type: number
         default: '64'
         desc: extra margin so part of the previous item stays visible on a new anchor
-      - name: Viewport preserveScrollOnPrepend
+      - name: 'Viewport preserveScrollOnPrepend'
         type: boolean
         default: 'true'
         desc: keep the first visible item stable when older rows load
-      - name: Item scrollAnchor
+      - name: 'Item scrollAnchor'
         type: boolean
         default: 'false'
         desc: marks a turn boundary that can anchor appended turns
-      - name: scrollToMessage align
+      - name: 'scrollToMessage align'
         type: start|center|end|nearest
         default: start
         desc: alignment of the target in the viewport
@@ -1358,8 +1358,8 @@ groups:
       - scroll hot path stays outside React state
       ref: /docs/react/message-scroller
     - id: sh-questionnaire-styled
-      name: Questionnaire (styled)
-      summary: Multi-step question flow with single/multiple choice, freeform, skippable items, shortcuts and validation
+      name: 'Questionnaire (styled)'
+      summary: 'Multi-step question flow with single/multiple choice, freeform, skippable items, shortcuts and validation'
       lenses:
       - ux-a11y
       - composability
@@ -1372,7 +1372,7 @@ groups:
       - pass items to server-render the active item
       ref: /docs/components/radix/questionnaire
     - id: sh-questionnaire-headless
-      name: Questionnaire (headless)
+      name: 'Questionnaire (headless)'
       summary: '@shadcn/react Questionnaire namespace: Root, Item, Choice, Input, Error and navigation actions with data attributes'
       lenses:
       - ux-a11y
@@ -1381,23 +1381,23 @@ groups:
       import: '@shadcn/react/questionnaire'
       signature: Questionnaire.Root item defaultItem items shortcuts onItemChange onSubmit
       options:
-      - name: Root shortcuts
+      - name: 'Root shortcuts'
         type: letters|numbers
         default: null
         desc: assign scoped answer shortcut keys
-      - name: Item required
+      - name: 'Item required'
         type: boolean
         default: 'false'
         desc: needs an answer and hides Skip
-      - name: Item multiple
+      - name: 'Item multiple'
         type: boolean
         default: 'false'
         desc: renders fixed choices as checkboxes
-      - name: Item disabled
+      - name: 'Item disabled'
         type: boolean
         default: 'false'
         desc: removes the item from progress and navigation (conditional items)
-      - name: Input type
+      - name: 'Input type'
         type: text|email|number|date|...
         default: text
         desc: freeform answer input type
@@ -1408,18 +1408,18 @@ groups:
       - external validators mark an item with invalid; control navigation with item/onItemChange to return to it
       - onStatusChange reports unanswered, answered or skipped
       ref: /docs/react/questionnaire
-- title: Guides
+- title: 'Guides'
   sections:
   - id: sh-guides
-    title: Forms, installation and framework guides
+    title: 'Forms, installation and framework guides'
     level: intermediate
     requires:
     - sh-setup
     ref: /docs/forms
     entries:
     - id: sh-forms
-      name: Forms overview
-      summary: Pick a form library (React Hook Form, TanStack Form, Formisch) and build with Field; useActionState guide marked coming soon
+      name: 'Forms overview'
+      summary: 'Pick a form library (React Hook Form, TanStack Form, Formisch) and build with Field; useActionState guide marked coming soon'
       lenses:
       - best-practice
       - ux-a11y
@@ -1427,7 +1427,7 @@ groups:
       - Field, FieldGroup, FieldError are the shared building blocks across libraries
       ref: /docs/forms
     - id: sh-forms-next
-      name: Forms with Next.js Server Actions
+      name: 'Forms with Next.js Server Actions'
       summary: 'Guide: useActionState + Server Actions + Zod safeParse, Field/FieldError and pending states'
       lenses:
       - best-practice
@@ -1442,7 +1442,7 @@ groups:
       - any Standard Schema library works; the guide uses zod v3
       ref: /docs/forms/next
     - id: sh-forms-rhf
-      name: Forms with React Hook Form
+      name: 'Forms with React Hook Form'
       summary: 'Guide: useForm + zodResolver + Controller wired to Field, FieldError and validation modes'
       lenses:
       - best-practice
@@ -1453,7 +1453,7 @@ groups:
       - 'validation modes: onChange, onBlur, onSubmit, onTouched, all'
       ref: /docs/forms/react-hook-form
     - id: sh-manual-install
-      name: Manual installation
+      name: 'Manual installation'
       summary: 'Install without the CLI: Tailwind, shadcn + class-variance-authority + cn + lucide-react + tw-animate-css, aliases, CSS, components.json'
       lenses:
       - best-practice
@@ -1464,14 +1464,14 @@ groups:
       - components import cn from the cn package
       ref: /docs/installation/manual
     - id: sh-javascript
-      name: JavaScript (no TypeScript)
+      name: 'JavaScript (no TypeScript)'
       summary: 'Set `tsx: false` in components.json to install .jsx components; needs a jsconfig.json paths alias'
       lenses:
       - best-practice
       signature: 'components.json: "tsx": false'
       ref: /docs/javascript
     - id: sh-new-project
-      name: New project next steps
+      name: 'New project next steps'
       summary: 'Post-init checklist: add components, preset swap, add blocks, install from @registry, install the skill, init the MCP server'
       lenses:
       - reuse
@@ -1480,15 +1480,15 @@ groups:
       - add --all installs every component
       ref: /docs/new
     - id: sh-dark-mode-overview
-      name: Dark mode overview
-      summary: Index of per-framework dark mode guides (Next.js, Vite, Astro, Remix, TanStack Start)
+      name: 'Dark mode overview'
+      summary: 'Index of per-framework dark mode guides (Next.js, Vite, Astro, Remix, TanStack Start)'
       lenses:
       - ux-a11y
       notes:
       - Next.js uses next-themes with a ThemeProvider (see sh-dark-mode)
       ref: /docs/dark-mode
     - id: sh-rtl-next
-      name: RTL in Next.js
+      name: 'RTL in Next.js'
       summary: 'Create with `--rtl` (components.json rtl: true), wrap the app in DirectionProvider, set dir and lang on <html>'
       lenses:
       - ux-a11y
@@ -1507,7 +1507,7 @@ groups:
     ref: /docs/registry
     entries:
     - id: sh-registry-getting-started
-      name: Registry getting started
+      name: 'Registry getting started'
       summary: 'Build a registry: registry.json (or include files), items, `shadcn build`, serve static JSON or dynamic routes, test via URL or namespace'
       lenses:
       - reuse
@@ -1520,7 +1520,7 @@ groups:
       - publish by sharing namespace setup, optionally add to the registry index
       ref: /docs/registry/getting-started
     - id: sh-registry-json
-      name: registry.json schema
+      name: 'registry.json schema'
       summary: 'Root catalog: $schema, name, homepage, items, include (relative explicit registry.json paths)'
       lenses:
       - typing-dx
@@ -1530,7 +1530,7 @@ groups:
       - '`shadcn build` resolves item file paths relative to the included file'
       ref: /docs/registry/registry-json
     - id: sh-registry-examples
-      name: Registry item examples
+      name: 'Registry item examples'
       summary: 'Item recipes by type: style, theme, block, ui, lib, hook, font, base; cssVars, css, envVars, plugins, universal items'
       lenses:
       - reuse
@@ -1542,7 +1542,7 @@ groups:
       - cssVars.theme adds or overrides Tailwind theme variables
       ref: /docs/registry/examples
     - id: sh-registry-faq
-      name: Registry FAQ
+      name: 'Registry FAQ'
       summary: 'Answers: complex items, new Tailwind colors via cssVars, GitHub dependency addresses, pinning with #ref'
       lenses:
       - best-practice
@@ -1552,8 +1552,8 @@ groups:
       - pin to a tag or full commit SHA; GitHub addresses are public repos only
       ref: /docs/registry/faq
     - id: sh-registry-github
-      name: GitHub registries (docs)
-      summary: Turn a public repo into a registry with a root registry.json; add, list, search, view and `registry validate` by owner/repo
+      name: 'GitHub registries (docs)'
+      summary: 'Turn a public repo into a registry with a root registry.json; add, list, search, view and `registry validate` by owner/repo'
       lenses:
       - reuse
       - reliability
@@ -1564,8 +1564,8 @@ groups:
       - private repos work with GitHub credentials
       ref: /docs/registry/github
     - id: sh-registry-authentication
-      name: Registry authentication
-      summary: Private registries via headers (Bearer, API key) or params with ${ENV} expansion in components.json
+      name: 'Registry authentication'
+      summary: 'Private registries via headers (Bearer, API key) or params with ${ENV} expansion in components.json'
       lenses:
       - security
       signature: '"registries": {"@private": {"url": "https://host/{name}.json", "headers": {"Authorization": "Bearer ${TOKEN}"}}}'
@@ -1575,8 +1575,8 @@ groups:
       - team- or user-scoped content is chosen server-side from the token
       ref: /docs/registry/authentication
     - id: sh-registry-mcp
-      name: Registry MCP support
-      summary: A registry works with the shadcn MCP server with no extra work if `registry.json` is served at the registry root
+      name: 'Registry MCP support'
+      summary: 'A registry works with the shadcn MCP server with no extra work if `registry.json` is served at the registry root'
       lenses:
       - reuse
       signature: components.json registries + npx shadcn@latest mcp init --client <name>
@@ -1585,8 +1585,8 @@ groups:
       - good descriptions, accurate dependencies and registryDependencies, kebab-case names help assistants
       ref: /docs/registry/mcp
     - id: sh-registry-index
-      name: Registry directory (adding yours)
-      summary: Open-source registry index of `@ns` registries built into the CLI; submit via PR to directory.json
+      name: 'Registry directory (adding yours)'
+      summary: 'Open-source registry index of `@ns` registries built into the CLI; submit via PR to directory.json'
       lenses:
       - reuse
       notes:
@@ -1595,7 +1595,7 @@ groups:
       - GitHub owner/repo/item addresses need no directory entry
       ref: /docs/registry/registry-index
     - id: sh-registry-health
-      name: Registry health scoring
+      name: 'Registry health scoring'
       summary: 'Directory registries are scored out of 100: reliability 45, correctness 25, installability 20, setup 10'
       lenses:
       - reliability
@@ -1604,8 +1604,8 @@ groups:
       - 'statuses: observing, healthy, degraded, unavailable'
       ref: /docs/registry/health
     - id: sh-registry-open-in-v0
-      name: Open in v0
-      summary: Open a hosted registry item in v0 via the v0.dev/chat/api/open?url= endpoint
+      name: 'Open in v0'
+      summary: 'Open a hosted registry item in v0 via the v0.dev/chat/api/open?url= endpoint'
       lenses:
       - reuse
       notes:
@@ -1613,8 +1613,8 @@ groups:
       - only query-param token auth works
       ref: /docs/registry/open-in-v0
     - id: sh-registry-dynamic-search-docs
-      name: Dynamic search protocol
-      summary: CLI sends q, type, limit, offset to the catalog URL; a `pagination` object in the response marks server-side filtering
+      name: 'Dynamic search protocol'
+      summary: 'CLI sends q, type, limit, offset to the catalog URL; a `pagination` object in the response marks server-side filtering'
       lenses:
       - perf
       signature: GET /r/registry.json?q=button&limit=50&offset=0
@@ -1623,18 +1623,18 @@ groups:
       - 'no capability negotiation: static registries ignore the params'
       ref: /docs/registry/dynamic-search
     - id: sh-registry-api
-      name: Programmatic registry API
-      summary: shadcn/registry, shadcn/schema and shadcn/preset subpath imports for fetching, resolving, installing and validating
+      name: 'Programmatic registry API'
+      summary: 'shadcn/registry, shadcn/schema and shadcn/preset subpath imports for fetching, resolving, installing and validating'
       lenses:
       - typing-dx
       - reuse
       signature: import { getRegistryItems, resolveRegistryItems, addRegistryItems, searchRegistries, loadRegistry } from "shadcn/registry"
       options:
-      - name: config
+      - name: 'config'
         type: Partial<Config>
         default: built-in registries only
         desc: registry namespace map, loaded via getRegistriesConfig
-      - name: useCache
+      - name: 'useCache'
         type: boolean
         default: 'true'
         desc: in-memory response cache keyed by URL
@@ -1648,7 +1648,7 @@ groups:
       - shadcn/schema exports registrySchema, registryItemSchema, configSchema (Zod); shadcn/preset has encodePreset/decodePreset
       ref: /docs/registry/api-reference
     - id: sh-helpers-ai-sdk
-      name: Chat helpers for the AI SDK
+      name: 'Chat helpers for the AI SDK'
       summary: '@shadcn/helpers createChat(): scripted conversation streamed through useChat with no model, route or key'
       lenses:
       - typing-dx

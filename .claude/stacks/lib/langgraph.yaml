@@ -10,23 +10,23 @@ toc:
 - index: 'https://docs.langchain.com/_llms/agent-development-lifecycle/build/python.md'
   match: '^https://docs\.langchain\.com/oss/python/(langgraph/|migrate/langgraph)'
 groups:
-- title: AI tooling
+- title: 'AI tooling'
   sections:
   - id: lg-ai-tooling
-    title: Docs and agent entry points
+    title: 'Docs and agent entry points'
     level: basic
     requires: []
     ref: /use-these-docs.md
     entries:
     - id: lg-mcp-docs
-      name: docs-langchain MCP
+      name: 'docs-langchain MCP'
       summary: 'Search and read LangChain, LangGraph and LangSmith docs pages (guides, how-tos, concepts) over MCP'
       lenses: [reuse]
       signature: https://docs.langchain.com/mcp
       notes: ['connect with: claude mcp add --transport http docs-langchain https://docs.langchain.com/mcp (project scope by default)']
       ref: /use-these-docs.md
     - id: lg-mcp-reference
-      name: reference-langchain MCP
+      name: 'reference-langchain MCP'
       summary: 'API reference over MCP: `search_api` finds symbols, `get_symbol` returns signature, params, returns'
       lenses: [reuse, typing-dx]
       signature: https://reference.langchain.com/mcp
@@ -36,74 +36,74 @@ groups:
       - 'checkpoint and store classes live in separate packages: langgraph.checkpoint, langgraph.store; the SDK is langgraph_sdk'
       ref: /use-these-docs.md
     - id: lg-llms-txt
-      name: llms.txt
+      name: 'llms.txt'
       summary: 'Sharded page index; follow `/_llms/...md` shards down to pages, and append `.md` to any docs URL for markdown'
       lenses: [reuse]
       notes: [the Python build shard lists about 240 pages; grep it]
       ref: /llms.txt
     - id: lg-skills
-      name: langchain-ai/langchain-skills
+      name: 'langchain-ai/langchain-skills'
       summary: 'Official agent skills: LangGraph fundamentals, persistence, human-in-the-loop, CLI and API choice'
       lenses: [reuse, best-practice]
       notes: ['skill names: langgraph-fundamentals, -persistence, -human-in-the-loop, -cli, -decision-models']
       ref: /oss/python/langgraph/overview.md
     - id: lg-cli-tool
-      name: langgraph CLI
+      name: 'langgraph CLI'
       summary: 'Run, build and ship Agent Server apps; JS twin is `npx @langchain/langgraph-cli`'
       lenses: [reuse]
       signature: langgraph [dev|up|build|dockerfile|deploy] [OPTIONS]
       notes: ['`langgraph-cli[inmem]` is required for `dev`; the CLI needs Python 3.11 or later']
       ref: /langsmith/cli.md
     - id: lg-studio
-      name: LangSmith Studio
+      name: 'LangSmith Studio'
       summary: 'Visual UI that connects to `langgraph dev`: run, inspect state, fork and rerun nodes'
       lenses: [observability, testing]
       notes: ['with LANGSMITH_TRACING=false no data leaves the local server']
       ref: /oss/python/langgraph/studio.md
     - id: lg-chat-ui
-      name: Agent Chat UI
-      summary: prebuilt chat client for any Agent Server graph
+      name: 'Agent Chat UI'
+      summary: 'prebuilt chat client for any Agent Server graph'
       lenses: [reuse]
       ref: /oss/python/langgraph/ui.md
-- title: Mental model and API choice
+- title: 'Mental model and API choice'
   sections:
   - id: lg-model
-    title: Thinking in LangGraph
+    title: 'Thinking in LangGraph'
     level: basic
     requires: []
     ref: /oss/python/langgraph/thinking-in-langgraph.md
     entries:
     - id: lg-thinking
-      name: Design method
+      name: 'Design method'
       summary: 'Steps as nodes, raw state, prompts formatted on demand, errors handled by class'
       lenses: [best-practice]
       ref: /oss/python/langgraph/thinking-in-langgraph.md
     - id: lg-workflow-patterns
-      name: Workflow patterns
+      name: 'Workflow patterns'
       summary: 'Chaining, parallelization, routing, orchestrator-worker, evaluator-optimizer, `ToolNode`'
       lenses: [composability]
       ref: /oss/python/langgraph/workflows-agents.md
     - id: lg-choose-api
-      name: Graph API vs Functional API
+      name: 'Graph API vs Functional API'
       summary: 'Graph API for explicit topology and visualization; Functional API to add durability to existing code'
       lenses: [best-practice]
       ref: /oss/python/langgraph/choosing-apis.md
     - id: lg-create-react-agent
-      name: create_react_agent, AgentState*, ValidationNode, MessageGraph
+      name: 'create_react_agent, AgentState*, ValidationNode, MessageGraph'
       summary: 'Old prebuilt agent API; use `create_agent`, `AgentState`, `StateGraph` instead'
       lenses: [best-practice]
       signature: create_agent, AgentState, StateGraph
       deprecated: use create_agent
       ref: /oss/python/migrate/langgraph-v1.md
     - id: lg-hitl-types
-      name: HumanInterruptConfig, ActionRequest, HumanInterrupt
+      name: 'HumanInterruptConfig, ActionRequest, HumanInterrupt'
       summary: 'Old HITL types; use `InterruptOnConfig` / `HITLRequest` from the LangChain HITL middleware'
       lenses: [best-practice]
       signature: InterruptOnConfig, HITLRequest
       deprecated: use LangChain HITL middleware types
       ref: /oss/python/migrate/langgraph-v1.md
     - id: lg-migrate-supervisor
-      name: Migrate from langgraph-supervisor
+      name: 'Migrate from langgraph-supervisor'
       summary: 'langgraph-supervisor is unmaintained; wrap workers as tools of one create_agent supervisor'
       lenses: [best-practice, composability]
       signature: 'create_supervisor(...) -> create_agent(model, tools=[call_worker, ...], checkpointer=...) with @tool wrappers that call worker.invoke'
@@ -114,19 +114,19 @@ groups:
       - 'need static subgraph discovery, per-tier checkpoint namespaces, shared state keys or mixed deterministic/agentic steps: use a custom StateGraph with subgraph nodes instead'
       ref: /oss/python/migrate/langgraph-supervisor.md
   - id: lg-tutorials
-    title: Quickstart and custom-agent tutorials
+    title: 'Quickstart and custom-agent tutorials'
     level: basic
     requires: [lg-model]
     ref: /oss/python/langgraph/quickstart.md
     entries:
     - id: lg-install
-      name: Install
+      name: 'Install'
       summary: '`uv add langgraph` plus `langchain` (Python 3.10+) for models and tools; provider packages separately'
       lenses: [reuse]
       signature: uv add langgraph langchain
       ref: /oss/python/langgraph/install.md
     - id: lg-quickstart
-      name: Quickstart (calculator agent)
+      name: 'Quickstart (calculator agent)'
       summary: 'Hand-built tool loop: llm_call node, tool_node, should_continue conditional edge; also as @entrypoint'
       lenses: [best-practice]
       signature: 'StateGraph(MessagesState); add_node; add_edge(START, "llm_call"); add_conditional_edges("llm_call", should_continue, ["tool_node", END]); add_edge("tool_node", "llm_call")'
@@ -136,7 +136,7 @@ groups:
       - 'create_agent is the production form of this loop; hand-build it only for custom topology'
       ref: /oss/python/langgraph/quickstart.md
     - id: lg-agentic-rag
-      name: Custom RAG agent
+      name: 'Custom RAG agent'
       summary: 'Retriever tool, grade-documents router with structured output, rewrite loop, ToolNode retrieve step'
       lenses: [best-practice, composability]
       signature: 'add_conditional_edges("generate_query_or_respond", route_on_tool_calls, {"tools": "retrieve", END: END}); add_conditional_edges("retrieve", grade_documents)'
@@ -146,7 +146,7 @@ groups:
       - 'the loop rewrite_question -> generate_query_or_respond is bounded only by the recursion limit'
       ref: /oss/python/langgraph/agentic-rag.md
     - id: lg-sql-agent
-      name: Custom SQL agent
+      name: 'Custom SQL agent'
       summary: 'Fixed list_tables, get_schema prefix steps, then a generate/check/run query loop; interrupt() reviews the query'
       lenses: [security, reliability]
       signature: 'ToolNode([run_query_tool_with_interrupt], name="run_query"); interrupt([request]) with response type accept or edit'
@@ -154,16 +154,16 @@ groups:
       - 'wrap a read-only DB tool so interrupt() asks a human to accept, edit or reject the SQL before it runs; needs a checkpointer'
       - 'the final run streams with stream_events(version="v3"): iterate stream.messages, read stream.output'
       ref: /oss/python/langgraph/sql-agent.md
-- title: Graph API
+- title: 'Graph API'
   sections:
   - id: lg-graph-core
-    title: State, nodes, edges
+    title: 'State, nodes, edges'
     level: basic
     requires: [lg-model]
     ref: /oss/python/langgraph/graph-api.md
     entries:
     - id: lg-stategraph
-      name: StateGraph
+      name: 'StateGraph'
       summary: 'Builder for a graph of nodes sharing typed state; `.compile()` turns it into the runnable graph'
       lenses: [composability, typing-dx]
       import: langgraph.graph
@@ -179,7 +179,7 @@ groups:
       - 'edge helpers: add_edge, add_conditional_edges, add_sequence, set_entry_point, set_finish_point; START and END come from langgraph.graph'
       ref: reference:/python/langgraph/graph/state/StateGraph
     - id: lg-add-node
-      name: add_node
+      name: 'add_node'
       summary: 'Register a node and attach its per-node policies: retry, timeout, cache, error handler, deferral'
       lenses: [reliability, composability]
       signature: builder.add_node(node, action=None, *, defer=False, metadata=None, input_schema=None, retry_policy=None, cache_policy=None, error_handler=None, destinations=None, timeout=None, trace_policy=None)
@@ -198,7 +198,7 @@ groups:
       - 'nodes resume from the top of their function after a retry or interrupt, so keep side effects idempotent'
       ref: reference:/python/langgraph/graph/state/StateGraph/add_node
     - id: lg-compile
-      name: compile
+      name: 'compile'
       summary: 'Validate topology and bind runtime options: checkpointer, store, cache, static breakpoints, name, stream transformers'
       lenses: [composability, reliability]
       signature: builder.compile(checkpointer=None, *, cache=None, store=None, interrupt_before=None, interrupt_after=None, debug=False, name=None, transformers=None)
@@ -215,7 +215,7 @@ groups:
       - 'compiling is mandatory; it checks structure (orphan nodes) and fixes the checkpointer'
       ref: reference:/python/langgraph/graph/state/StateGraph/compile
     - id: lg-invoke
-      name: invoke / stream
+      name: 'invoke / stream'
       summary: 'Run a compiled graph once (`invoke`) or iterate its steps (`stream`); async twins `ainvoke`/`astream`'
       lenses: [composability, reliability]
       signature: graph.invoke(input, config=None, *, context=None, stream_mode="values", durability=None, control=None, version="v1")
@@ -232,7 +232,7 @@ groups:
       - 'Command(update=...) alone as input resumes from the latest checkpoint and looks stuck; send a plain input dict for follow-up turns'
       ref: reference:/python/langgraph/pregel/main/Pregel/invoke
     - id: lg-state-reducers
-      name: Reducers and schemas
+      name: 'Reducers and schemas'
       summary: 'Per-key merge functions via `Annotated`, `MessagesState`, `Overwrite`, untracked fields, input/output schemas'
       lenses: [typing-dx, best-practice]
       signature: 'Annotated[list, add_messages]; return {"key": Overwrite(value)} to bypass a reducer'
@@ -243,7 +243,7 @@ groups:
       - 'MessagesState is the ready-made schema with a messages key and the add_messages reducer'
       ref: /oss/python/langgraph/use-graph-api.md
     - id: lg-send-command
-      name: Dynamic routing
+      name: 'Dynamic routing'
       summary: '`Send(node, arg)` for map-reduce fan-out; `Command(update, goto, graph, resume)` for routing and resuming'
       lenses: [composability]
       import: langgraph.types
@@ -262,7 +262,7 @@ groups:
       - 'a parent-key update from a subgraph needs a reducer on that key in the parent schema'
       ref: /oss/python/langgraph/graph-api.md
     - id: lg-runtime-context
-      name: Runtime context
+      name: 'Runtime context'
       summary: 'Pass dependencies (model name, user id, db) per run via `context_schema` and read them from `Runtime` in nodes'
       lenses: [typing-dx, composability]
       import: langgraph.runtime
@@ -279,7 +279,7 @@ groups:
       - 'ToolRuntime (langgraph.prebuilt) is the tool-side subclass adding state and tool_call_id'
       ref: reference:/python/langgraph/runtime/Runtime
     - id: lg-recursion-limit
-      name: Recursion limit
+      name: 'Recursion limit'
       summary: 'Caps supersteps per run; exceeding it raises `GraphRecursionError`; the step counter is readable in nodes'
       lenses: [reliability, cost]
       signature: 'graph.invoke(x, config={"recursion_limit": n}); config["metadata"]["langgraph_step"]'
@@ -289,7 +289,7 @@ groups:
       - 'proactive pattern: read langgraph_step in a node and route to a graceful exit before the limit'
       ref: /oss/python/langgraph/graph-api.md
     - id: lg-node-cache
-      name: Node caching
+      name: 'Node caching'
       summary: 'Skip re-running a node for an input already seen; per-node `CachePolicy`, cache backend set at compile'
       lenses: [perf, cost]
       import: langgraph.types
@@ -300,13 +300,13 @@ groups:
       returns: 'Cache hits stream with {"__metadata__": {"cached": True}} in updates mode'
       ref: /oss/python/langgraph/graph-api.md
     - id: lg-visualize
-      name: Visualization
+      name: 'Visualization'
       summary: 'Render the compiled graph as Mermaid text or PNG to review topology'
       lenses: [observability]
       signature: graph.get_graph().draw_mermaid(); .draw_mermaid_png()
       ref: /oss/python/langgraph/use-graph-api.md
     - id: lg-conditional-edges
-      name: add_conditional_edges
+      name: 'add_conditional_edges'
       summary: 'Route at runtime with a function over state; return a node name, END, or a list for fan-out'
       lenses: [typing-dx, composability]
       signature: builder.add_conditional_edges(source, path, path_map=None)
@@ -319,7 +319,7 @@ groups:
       - 'without a Literal return annotation on path or a path_map, visualization assumes the edge can go to any node'
       ref: reference:/python/langgraph/graph/state/StateGraph/add_conditional_edges
     - id: lg-toolnode
-      name: ToolNode
+      name: 'ToolNode'
       summary: 'Prebuilt node that runs the tool calls of the last AIMessage in parallel; create_agent uses it internally'
       lenses: [reliability, reuse]
       import: langgraph.prebuilt
@@ -334,13 +334,13 @@ groups:
       - 'reference advises it only for custom workflows needing fine-grained control; standard ReAct agents use create_agent'
       ref: reference:/python/langgraph.prebuilt/tool_node/ToolNode
   - id: lg-fault-tolerance
-    title: Retries, timeouts, error handlers (langgraph>=1.2)
+    title: 'Retries, timeouts, error handlers (langgraph>=1.2)'
     level: intermediate
     requires: [lg-graph-core]
     ref: /oss/python/langgraph/fault-tolerance.md
     entries:
     - id: lg-retry-policy
-      name: RetryPolicy
+      name: 'RetryPolicy'
       summary: 'Re-run a failed node attempt with exponential backoff, filtered by exception type or predicate'
       lenses: [reliability]
       import: langgraph.types
@@ -359,7 +359,7 @@ groups:
       - 'extend the default with `lambda e: not isinstance(e, MyErr) and default_retry_on(e)`; runtime.execution_info.node_attempt shows the attempt'
       ref: /oss/python/langgraph/fault-tolerance.md
     - id: lg-node-timeout
-      name: Node timeouts
+      name: 'Node timeouts'
       summary: 'Cap one node attempt by wall-clock (`run_timeout`) and/or inactivity (`idle_timeout`); raises `NodeTimeoutError`'
       lenses: [reliability, cost]
       import: langgraph.types
@@ -374,7 +374,7 @@ groups:
       - 'works with retry_policy; the clock restarts each attempt; Send(..., timeout=) overrides it per push'
       ref: /oss/python/langgraph/fault-tolerance.md
     - id: lg-error-handler
-      name: Error handlers
+      name: 'Error handlers'
       summary: 'A fallback node function that runs after retries are exhausted and may update state or route with `Command`'
       lenses: [reliability]
       import: langgraph.errors
@@ -389,7 +389,7 @@ groups:
       - 'failure provenance is checkpointed, so a resumed run sees the same NodeError'
       ref: /oss/python/langgraph/fault-tolerance.md
     - id: lg-node-defaults
-      name: set_node_defaults
+      name: 'set_node_defaults'
       summary: 'Graph-wide default retry, timeout, cache and error handler; per-node arguments win'
       lenses: [reuse, best-practice]
       signature: builder.set_node_defaults(*, retry_policy=None, cache_policy=None, error_handler=None, timeout=None)
@@ -399,7 +399,7 @@ groups:
       - 'defaults are not inherited by subgraphs'
       ref: /oss/python/langgraph/fault-tolerance.md
     - id: lg-graceful-drain
-      name: Graceful shutdown
+      name: 'Graceful shutdown'
       summary: 'Stop a run cleanly at the next superstep and save a resumable checkpoint, e.g. on SIGTERM'
       lenses: [reliability]
       import: langgraph.runtime
@@ -410,16 +410,16 @@ groups:
       - 'create a fresh RunControl per run; a drained control stays drained'
       - 'does not cancel asyncio tasks or threads; pair with a hard timeout'
       ref: /oss/python/langgraph/fault-tolerance.md
-- title: Functional API
+- title: 'Functional API'
   sections:
   - id: lg-functional
-    title: Entrypoints and tasks
+    title: 'Entrypoints and tasks'
     level: intermediate
     requires: [lg-choose-api]
     ref: /oss/python/langgraph/functional-api.md
     entries:
     - id: lg-entrypoint
-      name: entrypoint
+      name: 'entrypoint'
       summary: 'Decorator turning one function into a durable workflow with checkpointer, store, retry and timeout'
       lenses: [composability]
       import: langgraph.func
@@ -433,7 +433,7 @@ groups:
       - 'takes one input param; injectable params: config, previous (last return on the thread), runtime'
       ref: reference:/python/langgraph/func/entrypoint
     - id: lg-task
-      name: task
+      name: 'task'
       summary: 'Checkpointed unit of work inside an entrypoint or node; calling it returns a future for parallel fan-out'
       lenses: [perf, reliability]
       import: langgraph.func
@@ -443,12 +443,12 @@ groups:
       - 'inputs and outputs must be serializable when a checkpointer is on; callable only inside an entrypoint or StateGraph node'
       ref: reference:/python/langgraph/func/task
     - id: lg-functional-pitfalls
-      name: Determinism and idempotency
+      name: 'Determinism and idempotency'
       summary: 'Wrap side effects in tasks; keep control flow deterministic across a resume'
       lenses: [reliability, best-practice]
       ref: /oss/python/langgraph/functional-api.md
     - id: lg-functional-compose
-      name: Compose entrypoints and graphs
+      name: 'Compose entrypoints and graphs'
       summary: 'An entrypoint can invoke Graph API graphs and other entrypoints; a nested one inherits the parent checkpointer'
       lenses: [composability, reuse]
       signature: 'result = some_graph.invoke(...); other_entrypoint.invoke(...) inside @entrypoint(checkpointer=cp)'
@@ -457,7 +457,7 @@ groups:
       - 'an entrypoint takes only its first argument as input: pass a dict for several values'
       ref: /oss/python/langgraph/use-functional-api.md
     - id: lg-functional-previous
-      name: previous and entrypoint.final
+      name: 'previous and entrypoint.final'
       summary: 'Short-term memory: `previous` holds the last return on the thread; `final(value=, save=)` splits return from saved'
       lenses: [best-practice]
       signature: 'def f(n: int, *, previous: int | None) -> entrypoint.final[int, int]: return entrypoint.final(value=previous or 0, save=n)'
@@ -465,7 +465,7 @@ groups:
       - 'needs a checkpointer and a thread_id; call get_state and get_state_history on the entrypoint like a graph'
       ref: /oss/python/langgraph/use-functional-api.md
     - id: lg-functional-hitl
-      name: interrupt inside tasks
+      name: 'interrupt inside tasks'
       summary: 'Pause for review inside a @task with interrupt(); resume with Command(resume=...) on the same thread'
       lenses: [reliability, security]
       signature: 'feedback = interrupt(payload) inside @task; entrypoint.stream_events(Command(resume=value), config, version="v3")'
@@ -474,7 +474,7 @@ groups:
       - 'review_tool_call pattern: interrupt per tool call, then accept, revise (edit args) or reject (append a ToolMessage)'
       ref: /oss/python/langgraph/use-functional-api.md
     - id: lg-functional-timeout-cache
-      name: Task timeouts and caching
+      name: 'Task timeouts and caching'
       summary: '`timeout=` on @task or @entrypoint raises NodeTimeoutError (async only); `cache_policy=CachePolicy(ttl=)` caches a task'
       lenses: [reliability, perf]
       signature: '@task(timeout=1.0, retry_policy=RetryPolicy(retry_on=NodeTimeoutError)); @task(cache_policy=CachePolicy(ttl=120)); @entrypoint(cache=InMemoryCache())'
@@ -482,16 +482,16 @@ groups:
       - 'timeout on a sync function raises when the task or entrypoint is declared; NodeTimeoutError subclasses TimeoutError'
       - 'the default RetryPolicy targets specific network errors; pass retry_on=ValueError (or similar) to retry your own'
       ref: /oss/python/langgraph/use-functional-api.md
-- title: Persistence and memory
+- title: 'Persistence and memory'
   sections:
   - id: lg-persistence
-    title: Checkpointers, threads, durability
+    title: 'Checkpointers, threads, durability'
     level: basic
     requires: [lg-graph-core]
     ref: /oss/python/langgraph/checkpointers.md
     entries:
     - id: lg-thread-state
-      name: Threads and state
+      name: 'Threads and state'
       summary: 'A thread_id keys the checkpoints; read, list and edit state through `StateSnapshot`s'
       lenses: [best-practice]
       signature: get_state(config, *, subgraphs=False); get_state_history(config, *, filter=None, before=None, limit=None); update_state(config, values, as_node=None)
@@ -502,7 +502,7 @@ groups:
       - 'checkpoints are written at superstep boundaries; per-task writes survive a sibling failure (pending writes)'
       ref: /oss/python/langgraph/checkpointers.md
     - id: lg-inmemory-saver
-      name: InMemorySaver
+      name: 'InMemorySaver'
       summary: 'In-process checkpointer for tests and debugging; lost on restart (`MemorySaver` is the older alias)'
       lenses: [testing]
       import: langgraph.checkpoint.memory
@@ -511,7 +511,7 @@ groups:
       - 'with LangSmith Deployment / Agent Server no checkpointer is passed; the managed one is used'
       ref: reference:/python/langgraph.checkpoint/memory/InMemorySaver
     - id: lg-saver-backends
-      name: Checkpointer libraries
+      name: 'Checkpointer libraries'
       summary: 'Base interface in langgraph-checkpoint; Sqlite, Postgres, MongoDB savers are separate installs'
       lenses: [reliability]
       import: langgraph.checkpoint.base
@@ -521,7 +521,7 @@ groups:
       - 'Postgres is the production choice; Sqlite suits local workflows'
       ref: /oss/python/langgraph/checkpointers.md
     - id: lg-durability
-      name: Durability modes
+      name: 'Durability modes'
       summary: 'Trade checkpoint write cost for crash safety per call: exit, async (default), sync'
       lenses: [perf, reliability]
       signature: invoke/stream(..., durability="exit" | "async" | "sync")
@@ -531,7 +531,7 @@ groups:
       - {name: sync, type: mode, default: null, desc: 'Persist before the next step starts; highest durability, some overhead.'}
       ref: /oss/python/langgraph/checkpointers.md
     - id: lg-delta-channel
-      name: DeltaChannel (beta, >=1.2)
+      name: 'DeltaChannel (beta, >=1.2)'
       summary: 'Store only per-step deltas for append-heavy channels so checkpoint size stops growing with thread length'
       lenses: [perf, cost]
       import: langgraph.channels
@@ -544,12 +544,12 @@ groups:
       - 'the reducer runs on reconstruction, not write: no uuid4 or clock reads; do not switch an existing thread delta to non-delta'
       ref: /oss/python/langgraph/pregel.md
     - id: lg-persistence-pitfalls
-      name: Troubleshooting
+      name: 'Troubleshooting'
       summary: 'Postgres `thread_id` too long, MemorySaver not durable, unbounded checkpoint growth'
       lenses: [reliability]
       ref: /oss/python/langgraph/persistence.md
     - id: lg-custom-checkpointer
-      name: Custom checkpointer
+      name: 'Custom checkpointer'
       summary: 'Implement `BaseCheckpointSaver` (put, put_writes, get_tuple, list, delete_thread) and validate with a conformance suite'
       lenses: [testing, reliability]
       signature: BaseCheckpointSaver
@@ -558,13 +558,13 @@ groups:
       - 'async graphs need the a* variants; delta channels need get_delta_channel_history (default provided)'
       ref: /oss/python/langgraph/checkpointers.md
   - id: lg-memory
-    title: Stores and message-history control
+    title: 'Stores and message-history control'
     level: intermediate
     requires: [lg-persistence]
     ref: /oss/python/langgraph/add-memory.md
     entries:
     - id: lg-store
-      name: Stores
+      name: 'Stores'
       summary: 'Cross-thread key-value memory by namespace tuple, with optional semantic search; `runtime.store` in nodes'
       lenses: [composability]
       import: langgraph.store.memory
@@ -579,7 +579,7 @@ groups:
       - 'the checkpointer is per-thread; the store spans threads; InMemoryStore is for dev, a database store for production'
       ref: /oss/python/langgraph/stores.md
     - id: lg-trim-summarize
-      name: Short-term memory
+      name: 'Short-term memory'
       summary: 'Keep history inside the context window: `trim_messages`, `RemoveMessage` deletes, or summarize old turns'
       lenses: [cost, perf]
       signature: trim_messages(messages, strategy="last", token_counter=count_tokens_approximately, max_tokens=..., start_on="human", end_on=("human","tool")); RemoveMessage(id=...)
@@ -587,21 +587,21 @@ groups:
       - 'RemoveMessage needs a state key using the add_messages reducer; trim inside the model-calling node to leave stored history intact'
       ref: /oss/python/langgraph/add-memory.md
     - id: lg-store-ttl
-      name: Thread and store TTL
+      name: 'Thread and store TTL'
       summary: 'Expire threads, checkpoints and store items automatically via langgraph.json, with per-thread overrides'
       lenses: [cost, security]
       signature: '"checkpointer": {"ttl": {...}}, "store": {"ttl": {...}}'
       ref: /langsmith/configure-ttl.md
-- title: Streaming
+- title: 'Streaming'
   sections:
   - id: lg-streaming
-    title: In-process streaming
+    title: 'In-process streaming'
     level: intermediate
     requires: [lg-graph-core]
     ref: /oss/python/langgraph/event-streaming.md
     entries:
     - id: lg-event-streaming
-      name: Event streaming (recommended)
+      name: 'Event streaming (recommended)'
       summary: 'Typed projections (messages, tool_calls, values, subagents, subgraphs, interrupts) from one run object'
       lenses: [best-practice, ux-a11y]
       signature: graph.stream_events(input, config=None, *, version="v3", interrupt_before=None, interrupt_after=None, control=None, transformers=None)
@@ -615,7 +615,7 @@ groups:
       - 'stream.subagents lists only named create_agent runs (name=); stream.subgraphs lists every nested graph (label with compile(name=))'
       ref: /oss/python/langgraph/event-streaming.md
     - id: lg-stream-modes
-      name: Stream modes
+      name: 'Stream modes'
       summary: 'Classic `stream_mode` API: values, updates, messages, custom, checkpoints, tasks, debug'
       lenses: [composability, typing-dx]
       signature: graph.stream(input, config, *, stream_mode=["updates","custom"], subgraphs=False, version="v2")
@@ -626,7 +626,7 @@ groups:
       - 'checkpoints and tasks modes need a checkpointer'
       ref: /oss/python/langgraph/streaming.md
     - id: lg-stream-v2-migrate
-      name: v2 output
+      name: 'v2 output'
       summary: '`invoke(version="v2")` returns `GraphOutput(.value, .interrupts)`; dict access and `__interrupt__` are deprecated'
       lenses: [best-practice]
       signature: invoke(..., version="v2") -> GraphOutput(value, interrupts)
@@ -635,7 +635,7 @@ groups:
       - 'result["key"] and result["__interrupt__"] still work but are deprecated; use .value and .interrupts'
       ref: /oss/python/langgraph/streaming.md
     - id: lg-custom-stream
-      name: Custom data
+      name: 'Custom data'
       summary: 'Emit progress from inside nodes with `get_stream_writer()`, or add projections with stream transformers'
       lenses: [observability, ux-a11y]
       import: langgraph.config
@@ -646,13 +646,13 @@ groups:
       - 'a middleware can declare `transformers = (Factory,)` (langchain>=1.3.2); built-in ToolCallTransformer runs first'
       ref: /oss/python/langgraph/event-streaming.md
     - id: lg-subgraph-stream
-      name: Subgraph streaming
+      name: 'Subgraph streaming'
       summary: 'Stream from nested graphs: `ns` namespace on StreamPart, `stream.subgraphs`, lifecycle channel'
       lenses: [observability]
       signature: stream(..., subgraphs=True); chunk["ns"]; stream.subgraphs
       ref: /oss/python/langgraph/streaming.md
     - id: lg-stream-transformer
-      name: StreamTransformer and StreamChannel
+      name: 'StreamTransformer and StreamChannel'
       summary: 'Custom stream projections: a transformer opens a named channel, pushes payloads, may mutate events in place'
       lenses: [observability, security]
       import: langgraph.stream
@@ -666,13 +666,13 @@ groups:
       - 'process can redact event["params"]["data"] in place (PII scrubbing) while publishing stats on a side channel'
       ref: /oss/python/langgraph/frontend/custom-stream-channels.md
   - id: lg-frontend
-    title: Frontend patterns for graphs
+    title: 'Frontend patterns for graphs'
     level: intermediate
     requires: [lg-streaming]
     ref: /oss/python/langgraph/frontend/overview.md
     entries:
     - id: lg-frontend-overview
-      name: Render graphs in the UI
+      name: 'Render graphs in the UI'
       summary: 'useStream exposes stream.subgraphs (per-node cards) and stream.values; same API for createAgent and custom StateGraph'
       lenses: [ux-a11y, observability]
       signature: 'const stream = useStream<typeof graph>({apiUrl, assistantId}); [...stream.subgraphs.values()]'
@@ -681,7 +681,7 @@ groups:
       - 'targets the v1 frontend SDK packages (@langchain/react, vue, svelte, angular); earlier versions need their migration guides'
       ref: /oss/python/langgraph/frontend/overview.md
     - id: lg-frontend-graph-execution
-      name: Graph execution cards
+      name: 'Graph execution cards'
       summary: 'Discover nodes via stream.subgraphs, route tokens with useMessages(stream, node), read node.status'
       lenses: [ux-a11y]
       signature: 'useMessages(stream, node: SubgraphDiscoverySnapshot); node.nodeName; node.status'
@@ -691,7 +691,7 @@ groups:
       - 'streamed markdown can be partial (unclosed **), so the renderer must tolerate incomplete syntax'
       ref: /oss/python/langgraph/frontend/graph-execution.md
     - id: lg-frontend-custom-channels
-      name: useExtension and useChannel
+      name: 'useExtension and useChannel'
       summary: 'Read a custom server channel: useExtension gives the latest typed payload, useChannel a bounded buffer of raw events'
       lenses: [observability, typing-dx]
       signature: 'useExtension<T>(stream, "name", target?); useChannel(stream, ["custom:name"], target?, {bufferSize, replay})'
@@ -702,16 +702,16 @@ groups:
       - 'useExtension takes the bare channel name, useChannel the full custom:<name> id and unwraps event.params.data itself'
       - 'prefer the typed selectors (useMessages, useToolCalls, useValues) for common cases'
       ref: /oss/python/langgraph/frontend/custom-stream-channels.md
-- title: Control flow
+- title: 'Control flow'
   sections:
   - id: lg-control
-    title: Interrupts, time travel, subgraphs
+    title: 'Interrupts, time travel, subgraphs'
     level: intermediate
     requires: [lg-persistence]
     ref: /oss/python/langgraph/interrupts.md
     entries:
     - id: lg-interrupt
-      name: interrupt
+      name: 'interrupt'
       summary: 'Pause inside a node and hand a JSON payload to the caller; `Command(resume=value)` continues on the same thread'
       lenses: [best-practice, reliability]
       import: langgraph.types
@@ -725,18 +725,18 @@ groups:
       - 'the node reruns from the top on resume; multiple interrupts in one node match resume values by order'
       ref: reference:/python/langgraph/types/interrupt
     - id: lg-interrupt-rules
-      name: Rules of interrupts
+      name: 'Rules of interrupts'
       summary: 'No bare try/except around it, stable call order, JSON payloads, idempotent side effects before it'
       lenses: [reliability, best-practice]
       ref: /oss/python/langgraph/interrupts.md
     - id: lg-static-interrupts
-      name: Static breakpoints
+      name: 'Static breakpoints'
       summary: 'Pause before or after named nodes without code changes; for debugging and tests'
       lenses: [testing]
       signature: compile(interrupt_before=[...], interrupt_after=[...]) or invoke(..., interrupt_after="node")
       ref: /oss/python/langgraph/interrupts.md
     - id: lg-time-travel
-      name: Replay and fork
+      name: 'Replay and fork'
       summary: 'Re-run from a past checkpoint, or branch it with edited state via `update_state`'
       lenses: [testing, observability]
       signature: graph.invoke(None, snapshot.config); fork = graph.update_state(snapshot.config, values, as_node=None); graph.invoke(None, fork)
@@ -745,7 +745,7 @@ groups:
       - 'give as_node for parallel branches, a fresh thread, or to skip nodes; update_state forks, it does not roll back'
       ref: /oss/python/langgraph/use-time-travel.md
     - id: lg-subgraphs
-      name: Subgraphs
+      name: 'Subgraphs'
       summary: 'Call a graph inside a node or `add_node(name, sub)`; `compile(checkpointer=None|True|False)` sets its persistence'
       lenses: [composability]
       signature: sub.compile(checkpointer=None | True | False)
@@ -757,16 +757,16 @@ groups:
       - 'calling the same per-thread subgraph repeatedly in one node, or several per-thread ones, clashes on checkpoint namespace; use per-invocation'
       - 'get_state(config, subgraphs=True) inspects subgraph state; the parent needs a checkpointer for any of this'
       ref: /oss/python/langgraph/use-subgraphs.md
-- title: Runtime internals, testing, production
+- title: 'Runtime internals, testing, production'
   sections:
   - id: lg-production
-    title: Testing and operating graphs
+    title: 'Testing and operating graphs'
     level: intermediate
     requires: [lg-graph-core]
     ref: /oss/python/langgraph/test.md
     entries:
     - id: lg-testing
-      name: Testing
+      name: 'Testing'
       summary: 'Build a fresh graph per test, compile with a new `InMemorySaver`, test nodes via `graph.nodes`, partial runs via `update_state`'
       lenses: [testing]
       signature: graph.compile(checkpointer=InMemorySaver()); graph.nodes["n"].invoke(state); update_state(cfg, values, as_node="prev"); invoke(None, cfg, interrupt_after="n")
@@ -774,7 +774,7 @@ groups:
       - 'graph.nodes["n"].invoke bypasses the checkpointer'
       ref: /oss/python/langgraph/test.md
     - id: lg-pregel
-      name: Pregel runtime
+      name: 'Pregel runtime'
       summary: 'Compiled graphs are `Pregel` instances over channels; the channel types decide how updates merge'
       lenses: [typing-dx]
       import: langgraph.pregel
@@ -783,17 +783,17 @@ groups:
       - 'LastValue keeps the latest write; Topic is a pub/sub queue; BinaryOperatorAggregate applies a reducer; DeltaChannel stores deltas'
       ref: /oss/python/langgraph/pregel.md
     - id: lg-backward-compat
-      name: Backward compatibility
+      name: 'Backward compatibility'
       summary: 'Changing nodes and state while threads are in flight; resume uses saved state with the graph you compile now'
       lenses: [reliability]
       ref: /oss/python/langgraph/backward-compatibility.md
     - id: lg-app-structure
-      name: Application structure
+      name: 'Application structure'
       summary: 'Project layout, `langgraph.json`, dependency files, env vars for an Agent Server app'
       lenses: [best-practice]
       ref: /oss/python/langgraph/application-structure.md
     - id: lg-observability
-      name: LangSmith tracing
+      name: 'LangSmith tracing'
       summary: 'Set `LANGSMITH_TRACING=true`; one graph run is one trace, with child runs per node'
       lenses: [observability]
       signature: LANGSMITH_TRACING=true
@@ -801,16 +801,16 @@ groups:
       - 'set thread_id on all runs in a conversation for thread filtering and evals'
       - 'LANGSMITH_TRACING=false sends no traces from a local dev Agent Server; Studio still connects (see /langsmith/faq)'
       ref: /oss/python/langgraph/observability.md
-- title: Agent Server (langgraph-api)
+- title: 'Agent Server (langgraph-api)'
   sections:
   - id: lg-server-config
-    title: langgraph.json and graph registration
+    title: 'langgraph.json and graph registration'
     level: basic
     requires: [lg-app-structure]
     ref: /langsmith/application-structure.md
     entries:
     - id: lg-json-config
-      name: langgraph.json
+      name: 'langgraph.json'
       summary: 'CLI config declaring dependencies, graphs, env, Python version, auth, store, checkpointer, http, webhooks'
       lenses: [best-practice, reuse]
       signature: '{"dependencies": ["."], "graphs": {"id": "./path.py:var"}, "env": ".env", "python_version": "3.13"}'
@@ -827,13 +827,13 @@ groups:
       - 'schema: https://langgra.ph/schema.json (add as "$schema")'
       ref: /langsmith/cli.md
     - id: lg-graph-export
-      name: Graph entry
+      name: 'Graph entry'
       summary: '`"graphs": {"id": "./path.py:var"}`; var is a `CompiledStateGraph` or a factory; the id is the assistant id'
       lenses: [best-practice]
       signature: '"graphs": {"id": "./path.py:var"}'
       ref: /langsmith/application-structure.md
     - id: lg-graph-factory
-      name: Rebuild per run
+      name: 'Rebuild per run'
       summary: 'Graph factory that rebuilds the graph for each run, with an optional `ServerRuntime` argument (user, store, access_context)'
       lenses: [composability, security]
       notes:
@@ -843,18 +843,18 @@ groups:
       - 'signature may take (config: RunnableConfig), (runtime: ServerRuntime) or both; the server injects by type annotation'
       ref: /langsmith/graph-rebuild.md
     - id: lg-server-persistence
-      name: Server persistence
+      name: 'Server persistence'
       summary: 'Postgres by default; `checkpointer.backend` can be `mongo` or `custom`; `langgraph dev` keeps state in memory and pickles it'
       lenses: [reliability]
       ref: /langsmith/configure-checkpointer.md
   - id: lg-server-api
-    title: Threads, runs, streaming over HTTP
+    title: 'Threads, runs, streaming over HTTP'
     level: intermediate
     requires: [lg-server-config]
     ref: /langsmith/agent-server.md
     entries:
     - id: lg-server-threads
-      name: Threads
+      name: 'Threads'
       summary: 'Create, get, update, delete, search, copy; read state and history; status idle, busy, interrupted, error'
       lenses: [best-practice, perf]
       signature: client.threads.search(*, metadata=None, values=None, ids=None, status=None, limit=10, offset=0, sort_by=None, sort_order=None, select=None, extract=None)
@@ -867,7 +867,7 @@ groups:
       returns: 'list[Thread]'
       ref: reference:/python/langgraph-sdk/_async/threads/ThreadsClient/search
     - id: lg-server-runs
-      name: Runs
+      name: 'Runs'
       summary: 'Create (background), stream, wait, join, cancel (interrupt or rollback); `on_disconnect="cancel"` frees abandoned runs'
       lenses: [reliability, cost]
       signature: client.runs.cancel(thread_id, run_id, *, wait=False, action="interrupt")
@@ -880,7 +880,7 @@ groups:
       - 'runs.stream also takes stream_resumable, multitask_strategy, if_not_exists, durability, on_completion, webhook, version'
       ref: /langsmith/cancel-run.md
     - id: lg-multitask
-      name: Double texting
+      name: 'Double texting'
       summary: 'What happens when a run starts on a busy thread: `multitask_strategy` enqueue (default), reject, interrupt, rollback'
       lenses: [reliability, ux-a11y]
       signature: runs.create/stream(..., multitask_strategy="enqueue" | "reject" | "interrupt" | "rollback")
@@ -894,36 +894,36 @@ groups:
       - 'interrupt can leave a tool call started but unanswered; the graph must tolerate or strip partial tool calls'
       ref: /langsmith/double-texting.md
     - id: lg-thread-stream
-      name: Thread stream
+      name: 'Thread stream'
       summary: '`GET /threads/{id}/stream`, modes `run_modes|lifecycle|state_update`, resumable with `Last-Event-ID` (`-` replays)'
       lenses: [reliability, ux-a11y]
       signature: GET /threads/{id}/stream, run_modes|lifecycle|state_update, Last-Event-ID, -
       ref: /langsmith/streaming.md
     - id: lg-run-streaming
-      name: Run streaming
+      name: 'Run streaming'
       summary: 'Server stream modes values, updates, messages-tuple, debug, custom, events; subgraphs; rejoin with `join_stream`'
       lenses: [ux-a11y]
       signature: runs.stream(thread_id, assistant_id, *, input, stream_mode="values", stream_subgraphs=False, stream_resumable=False, version="v1")
       returns: 'AsyncIterator of StreamPart (v1) or typed {type, ns, data} dicts (v2)'
       ref: /langsmith/streaming.md
     - id: lg-stateless-background
-      name: Stateless and background runs
+      name: 'Stateless and background runs'
       summary: '`/runs/stream` with `thread_id=None` makes a throwaway thread; `runs.create` then `join` for background work'
       lenses: [perf]
       signature: runs.stream(None, assistant_id, ..., on_completion="delete" | "keep"); runs.create(...); runs.join(thread_id, run_id)
       ref: /langsmith/stateless-runs.md
     - id: lg-crons
-      name: Cron jobs
+      name: 'Cron jobs'
       summary: 'Thread-bound or stateless schedules; delete threads left behind by stateless crons'
       lenses: [cost, reliability]
       ref: /langsmith/cron-jobs.md
     - id: lg-webhooks
-      name: Webhooks
+      name: 'Webhooks'
       summary: 'Run-completion callbacks; `LG_WEBHOOK_` header templates, `webhooks.url` `allowed_domains` and `require_https`'
       lenses: [security, composability]
       ref: /langsmith/use-webhooks.md
     - id: lg-remote-graph
-      name: RemoteGraph
+      name: 'RemoteGraph'
       summary: 'Use a deployed graph as a local graph, node or subgraph; same interface as a compiled graph'
       lenses: [composability]
       import: langgraph.pregel.remote
@@ -935,12 +935,12 @@ groups:
       returns: 'A PregelProtocol object: invoke, stream, get_state, update_state; add_node(remote_graph) makes it a node'
       ref: reference:/python/langgraph/pregel/remote/RemoteGraph
     - id: lg-server-mcp-a2a
-      name: MCP and A2A endpoints
+      name: 'MCP and A2A endpoints'
       summary: 'Graphs are exposed as MCP tools and A2A agents; `http.disable_mcp` and `disable_a2a` turn them off'
       lenses: [composability, security]
       ref: /langsmith/server-mcp.md
     - id: lg-python-sdk
-      name: langgraph_sdk
+      name: 'langgraph_sdk'
       summary: 'Async HTTP client for the Agent Server with assistants, threads, runs, crons and store sub-clients'
       lenses: [reuse]
       import: langgraph_sdk
@@ -954,13 +954,13 @@ groups:
       - 'the TS twin is @langchain/langgraph-sdk'
       ref: reference:/python/langgraph-sdk/_async/client/get_client
   - id: lg-server-extend
-    title: Auth and customization
+    title: 'Auth and customization'
     level: advanced
     requires: [lg-server-config]
     ref: /langsmith/auth.md
     entries:
     - id: lg-custom-auth
-      name: Custom auth
+      name: 'Custom auth'
       summary: 'Authenticate every request with `@auth.authenticate` on a `langgraph_sdk.Auth` instance named in `auth.path`'
       lenses: [security]
       import: langgraph_sdk
@@ -970,7 +970,7 @@ groups:
       - 'authentication runs on every request before authorization handlers'
       ref: /langsmith/custom-auth.md
     - id: lg-resource-auth
-      name: Resource authorization
+      name: 'Resource authorization'
       summary: '`@auth.on` handlers per resource and action; return a metadata filter or mutate the value to scope access'
       lenses: [security]
       signature: '@auth.on; @auth.on.threads.create; @auth.on.threads.read -> {"owner": ctx.user.identity}'
@@ -979,36 +979,36 @@ groups:
       - 'add a deny-all global handler for default-deny'
       ref: /langsmith/resource-auth.md
     - id: lg-custom-routes
-      name: Custom HTTP
+      name: 'Custom HTTP'
       summary: '`http.app` (Starlette/FastAPI) adds routes; also `cors`, header passthrough, `enable_custom_route_auth`, `disable_*` flags'
       lenses: [composability, security]
       signature: http.app, cors, configurable_headers, logging_headers, enable_custom_route_auth, disable_*
       ref: /langsmith/custom-routes.md
     - id: lg-custom-middleware
-      name: Server middleware
+      name: 'Server middleware'
       summary: 'ASGI middleware on `http.app`; `middleware_order` is `middleware_first` (default) or `auth_first`'
       lenses: [composability, security]
       ref: /langsmith/custom-middleware.md
     - id: lg-lifespan
-      name: Lifespan events
+      name: 'Lifespan events'
       summary: 'Startup and shutdown hooks on the custom app, for pools and clients'
       lenses: [reliability]
       ref: /langsmith/custom-lifespan.md
     - id: lg-server-env
-      name: Environment variables
+      name: 'Environment variables'
       summary: 'Self-hosted server settings: DB and Redis URIs, workers, scaling'
       lenses: [perf, reliability]
       ref: /langsmith/env-var-self-hosted.md
-- title: CLI, local development, deployment
+- title: 'CLI, local development, deployment'
   sections:
   - id: lg-cli-flow
-    title: Run and ship the server
+    title: 'Run and ship the server'
     level: basic
     requires: [lg-server-config]
     ref: /langsmith/cli.md
     entries:
     - id: lg-dev
-      name: langgraph dev
+      name: 'langgraph dev'
       summary: 'Lightweight in-memory hot-reload Agent Server on port 2024, no Docker; state pickled to a local dir'
       lenses: [testing, best-practice]
       signature: langgraph dev [-c FILE] [--host H] [--port 2024] [--no-reload] [--no-browser] [--allow-blocking] [--tunnel] [--debug-port N] [--wait-for-client]
@@ -1022,7 +1022,7 @@ groups:
       - 'sync blocking calls inside async code raise unless --allow-blocking'
       ref: /langsmith/cli.md
     - id: lg-local-server
-      name: Run a local server
+      name: 'Run a local server'
       summary: '`langgraph new` from a template, install editable, copy `.env.example`, `langgraph dev`, test in Studio or the SDK'
       lenses: [testing, reuse]
       signature: langgraph new PATH --template new-langgraph-project-python; uv sync; langgraph dev
@@ -1032,7 +1032,7 @@ groups:
       - 'the dev server is in-memory, for development and testing only'
       ref: /oss/python/langgraph/local-server.md
     - id: lg-up
-      name: langgraph up
+      name: 'langgraph up'
       summary: 'Docker build with Postgres and Redis on port 8123; production-like check, `--watch` restarts on file changes'
       lenses: [testing, reliability]
       signature: langgraph up [-p 8123] [--wait] [--watch] [--image TEXT] [--postgres-uri TEXT] [--pull/--no-pull] [--recreate]
@@ -1040,7 +1040,7 @@ groups:
       - 'custom auth under `up` needs a license key; needs Docker running'
       ref: /langsmith/cli.md
     - id: lg-build
-      name: langgraph build / dockerfile
+      name: 'langgraph build / dockerfile'
       summary: 'Build the server image (`build -t tag [--platform]`) or emit its Dockerfile'
       lenses: [reuse]
       signature: langgraph build -t TAG [--platform P]; langgraph dockerfile PATH
@@ -1050,7 +1050,7 @@ groups:
       - {name: pip_installer, type: str, default: auto, desc: 'langgraph.json: auto, pip or uv (uv pip is the default since 0.3).'}
       ref: /langsmith/cli.md
     - id: lg-deploy
-      name: langgraph deploy
+      name: 'langgraph deploy'
       summary: 'Beta: build and push to LangSmith Deployment; subcommands list, logs, delete; `--deployment-type`'
       lenses: [reliability]
       signature: langgraph deploy [--image TEXT --push-to REGISTRY] | list | logs | delete
@@ -1058,7 +1058,7 @@ groups:
       - 'beta; needs Docker (Buildx on Apple silicon); --image must target linux/amd64'
       ref: /langsmith/deployment-quickstart.md
     - id: lg-deploy-cloud
-      name: Deploy to LangSmith Cloud
+      name: 'Deploy to LangSmith Cloud'
       summary: 'Push the app to GitHub, create a deployment in LangSmith, test in Studio, call the API URL with an API key'
       lenses: [reliability]
       signature: 'langgraph_sdk.get_sync_client(url=DEPLOYMENT_URL, api_key=KEY).runs.stream(None, "agent", input=..., stream_mode="updates")'
@@ -1067,12 +1067,12 @@ groups:
       - 'REST callers send an X-Api-Key header to POST <DEPLOYMENT_URL>/runs/stream'
       ref: /oss/python/langgraph/deploy.md
     - id: lg-standalone
-      name: Self-host standalone server
+      name: 'Self-host standalone server'
       summary: 'Docker, Compose or Kubernetes without the control plane; needs Postgres and Redis'
       lenses: [reliability, cost]
       ref: /langsmith/deploy-standalone-server.md
     - id: lg-cli-telemetry
-      name: CLI analytics
+      name: 'CLI analytics'
       summary: 'One event per command; opt out with `LANGGRAPH_CLI_NO_ANALYTICS=1`'
       lenses: [security]
       ref: /langsmith/data-storage-and-privacy.md

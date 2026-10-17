@@ -8,156 +8,156 @@ toc:
 - index: 'https://tanstack.com/query/latest/llms.txt'
   match: '^https://tanstack\.com/query/latest/docs/framework/react/'
 groups:
-- title: AI tooling
+- title: 'AI tooling'
   sections:
   - id: tsq-ai-tooling
-    title: Docs-site agent entry points
+    title: 'Docs-site agent entry points'
     level: basic
     requires: []
     ref: /llms.txt
     entries:
     - id: tsq-llms-txt
-      name: llms.txt
-      summary: markdown index of every page; each route also serves a `.md` twin under /docs/framework/react/
+      name: 'llms.txt'
+      summary: 'markdown index of every page; each route also serves a `.md` twin under /docs/framework/react/'
       lenses: [reuse]
       notes: ['the index covers all frameworks, so fetch only the react/ paths', 'no official MCP or skill found']
       ref: /llms.txt
-- title: Setup and defaults
+- title: 'Setup and defaults'
   sections:
   - id: tsq-setup
-    title: Install, provider, devtools
+    title: 'Install, provider, devtools'
     level: basic
     requires: []
     ref: /docs/framework/react/installation.md
     entries:
     - id: tsq-provider
-      name: QueryClientProvider and client creation
-      summary: create the QueryClient once per app instance in `useState`, never at module level, and wrap the tree in the provider
+      name: 'QueryClientProvider and client creation'
+      summary: 'create the QueryClient once per app instance in `useState`, never at module level, and wrap the tree in the provider'
       lenses: [best-practice, reliability]
       import: '@tanstack/react-query'
       signature: 'const [client] = useState(() => new QueryClient({ defaultOptions }))'
       notes: ['in the Next.js app router put it in a `"use client"` providers file imported by the root layout', 'a module-level client shares one cache across requests; harmless in a static export but keep the useState form']
       ref: /docs/framework/react/guides/ssr.md
     - id: tsq-devtools
-      name: ReactQueryDevtools
-      summary: floating panel from `@tanstack/react-query-devtools`, rendered inside the provider
+      name: 'ReactQueryDevtools'
+      summary: 'floating panel from `@tanstack/react-query-devtools`, rendered inside the provider'
       lenses: [observability]
       import: '@tanstack/react-query-devtools'
       notes: ['bundled only when NODE_ENV is development, so production builds drop it', 'props include initialIsOpen, buttonPosition, position']
       ref: /docs/framework/react/devtools.md
   - id: tsq-defaults
-    title: Important defaults
+    title: 'Important defaults'
     level: basic
     requires: []
     ref: /docs/framework/react/guides/important-defaults.md
     entries:
     - id: tsq-stale-gc-tuning
-      name: staleTime and gcTime tuning
-      summary: defaults are staleTime 0, gcTime 5 min, 3 retries, refetch on focus; raise staleTime per data type and keep gcTime at or above it
+      name: 'staleTime and gcTime tuning'
+      summary: 'defaults are staleTime 0, gcTime 5 min, 3 retries, refetch on focus; raise staleTime per data type and keep gcTime at or above it'
       lenses: [perf, cost]
       signature: 'new QueryClient({ defaultOptions: { queries: { staleTime, gcTime } } })'
       notes: ['for many clients, read-mostly lists suit 30-60 s, slow-changing data minutes; "static" never refetches', 'never set gcTime to 0 (hydration errors); use 2000 ms if a short value is needed']
       ref: /docs/framework/react/guides/ssr.md
-- title: Queries
+- title: 'Queries'
   sections:
   - id: tsq-queries
-    title: Keys, functions and options factories
+    title: 'Keys, functions and options factories'
     level: basic
     requires: [tsq-setup]
     ref: /docs/framework/react/guides/queries.md
     entries:
     - id: tsq-query-keys
-      name: Query keys
-      summary: array keys that must include every variable the queryFn uses, hashed deterministically
+      name: 'Query keys'
+      summary: 'array keys that must include every variable the queryFn uses, hashed deterministically'
       lenses: [best-practice, reliability]
       notes: ['order inside objects does not matter, order inside arrays does', 'design keys hierarchically, e.g. ["incidents", mode, filters], so invalidation can target a prefix']
       ref: /docs/framework/react/guides/query-keys.md
     - id: tsq-query-options
-      name: queryOptions factory
-      summary: returns its input unchanged but types it, so one definition feeds useQuery, useSuspenseQuery, prefetch and setQueryData
+      name: 'queryOptions factory'
+      summary: 'returns its input unchanged but types it, so one definition feeds useQuery, useSuspenseQuery, prefetch and setQueryData'
       lenses: [reuse, typing-dx]
       import: '@tanstack/react-query'
       signature: 'queryOptions({ queryKey, queryFn, staleTime })'
       notes: ['define one function per resource, e.g. incidentsOptions(mode), in a shared module', 'use `.queryKey` for setQueryData; add per-component `select` after spreading', 'infinite lists use infiniteQueryOptions']
       ref: /docs/framework/react/guides/query-options.md
   - id: tsq-suspense
-    title: Suspense queries
+    title: 'Suspense queries'
     level: intermediate
     requires: [tsq-queries]
     ref: /docs/framework/react/guides/suspense.md
     entries:
     - id: tsq-use-suspense-query
-      name: useSuspenseQuery
-      summary: loading goes to the nearest Suspense fallback, errors to an error boundary, and `data` is never undefined
+      name: 'useSuspenseQuery'
+      summary: 'loading goes to the nearest Suspense fallback, errors to an error boundary, and `data` is never undefined'
       lenses: [best-practice, ux-a11y]
       import: '@tanstack/react-query'
       signature: 'useSuspenseQuery(queryOptions(...))'
       notes: ['no `enabled` and no `placeholderData`; wrap key changes in startTransition to avoid fallback flashes', 'several suspense queries in one component run in series, so use useSuspenseQueries']
       ref: /docs/framework/react/guides/suspense.md
-- title: Polling, mutations and prefetch
+- title: 'Polling, mutations and prefetch'
   sections:
   - id: tsq-polling
-    title: Polling
+    title: 'Polling'
     level: intermediate
     requires: [tsq-queries]
     ref: /docs/framework/react/guides/polling.md
     entries:
     - id: tsq-refetch-interval
-      name: refetchInterval
-      summary: number or function (query) => ms | false; returning false stops polling, e.g. once a run is done
+      name: 'refetchInterval'
+      summary: 'number or function (query) => ms | false; returning false stops polling, e.g. once a run is done'
       lenses: [best-practice, cost]
       signature: 'refetchInterval: (q) => (q.state.data?.done ? false : 2000)'
       notes: ['polling pauses in background tabs unless refetchIntervalInBackground is true', 'runs independent of staleTime']
       ref: /docs/framework/react/guides/polling.md
   - id: tsq-mutations
-    title: Mutations and optimistic updates
+    title: 'Mutations and optimistic updates'
     level: intermediate
     requires: [tsq-queries]
     ref: /docs/framework/react/guides/optimistic-updates.md
     entries:
     - id: tsq-optimistic-ui
-      name: Optimistic update via variables
-      summary: render the pending `variables` while isPending; no cache edits and no rollback
+      name: 'Optimistic update via variables'
+      summary: 'render the pending `variables` while isPending; no cache edits and no rollback'
       lenses: [best-practice, ux-a11y]
       notes: ['best when only one place shows the result, e.g. a "sent" state on one alert button', 'useMutationState with a mutationKey reads variables from another component']
       ref: /docs/framework/react/guides/optimistic-updates.md
     - id: tsq-optimistic-cache
-      name: Optimistic update via cache
-      summary: onMutate cancels queries, snapshots with getQueryData, writes setQueryData, returns the snapshot; onError restores; onSettled invalidates
+      name: 'Optimistic update via cache'
+      summary: 'onMutate cancels queries, snapshots with getQueryData, writes setQueryData, returns the snapshot; onError restores; onSettled invalidates'
       lenses: [reliability]
       signature: 'cancelQueries / getQueryData / setQueryData / invalidateQueries'
       notes: ['use when several components show the same data', 'always invalidate in onSettled so the server copy wins']
       ref: /docs/framework/react/guides/optimistic-updates.md
   - id: tsq-prefetch
-    title: Prefetching
+    title: 'Prefetching'
     level: intermediate
     requires: [tsq-queries]
     ref: /docs/framework/react/guides/prefetching.md
     entries:
     - id: tsq-prefetch-hover
-      name: Prefetch on hover or focus
-      summary: call `void queryClient.query(options).catch(noop)` in onMouseEnter and onFocus; `prefetchQuery` is documented as deprecated
+      name: 'Prefetch on hover or focus'
+      summary: 'call `void queryClient.query(options).catch(noop)` in onMouseEnter and onFocus; `prefetchQuery` is documented as deprecated'
       lenses: [perf, ux-a11y]
       signature: 'queryClient.query(incidentOptions(id))'
       notes: ['prefetch skips the fetch only when cached data is fresher than staleTime, so set one', 'both query and prefetchQuery exist in 5.104.3 typings; prefetchQuery is slated for removal in the next major', 'a prefetch staleTime does not carry over to useQuery']
       ref: /docs/framework/react/guides/prefetching.md
     - id: tsq-use-prefetch-query
-      name: usePrefetchQuery
-      summary: hook placed above a Suspense boundary to start a fetch before the child suspends, avoiding waterfalls
+      name: 'usePrefetchQuery'
+      summary: 'hook placed above a Suspense boundary to start a fetch before the child suspends, avoiding waterfalls'
       lenses: [perf]
       import: '@tanstack/react-query'
       notes: ['a useQuery in the child or an effect starts too late; useSuspenseQueries in the parent blocks rendering']
       ref: /docs/framework/react/guides/prefetching.md
-- title: Static export constraints
+- title: 'Static export constraints'
   sections:
   - id: tsq-static-export
-    title: Next.js output export gotchas
+    title: 'Next.js output export gotchas'
     level: advanced
     requires: [tsq-setup]
     ref: /docs/framework/react/guides/ssr.md
     entries:
     - id: tsq-no-server-hydration
-      name: No dehydrate or HydrationBoundary at runtime
+      name: 'No dehydrate or HydrationBoundary at runtime'
       summary: "with `output: 'export'` there is no request-time server, so skip server prefetch and hydration and fetch on the client"
       lenses: [best-practice, reliability]
       notes: ['build-time prefetch would freeze data into HTML; avoid it for live incident data', 'queryFn uses relative URLs and must throw on non-2xx; all fetching happens in client components, so first paint shows the Suspense or loading state', 'set a staleTime so cached data is not refetched right after mount']

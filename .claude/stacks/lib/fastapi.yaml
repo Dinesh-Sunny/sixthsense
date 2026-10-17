@@ -10,167 +10,167 @@ toc:
 - index: 'https://pydantic.dev/docs/validation/latest/'
   match: '^https://pydantic\.dev/docs/validation/'
 groups:
-- title: AI tooling
+- title: 'AI tooling'
   sections:
   - id: fa-versions
-    title: Versions and doc locations
+    title: 'Versions and doc locations'
     level: basic
     requires: []
     ref: /release-notes/
     entries:
     - id: fa-pins
-      name: Verified versions (PyPI, 2026-10-17)
-      summary: fastapi 0.143.3 (Python >=3.10), pydantic 2.14.1, pydantic-settings 2.16.0 (Python >=3.11)
+      name: 'Verified versions (PyPI, 2026-10-17)'
+      summary: 'fastapi 0.143.3 (Python >=3.10), pydantic 2.14.1, pydantic-settings 2.16.0 (Python >=3.11)'
       lenses: [reuse]
       notes: ['0.143.0 (2026-10-08) lists Breaking Changes, so read its release notes before upgrading', 'pydantic-settings needs Python 3.11+; docs moved to pydantic.dev/docs/validation/latest', 'fastapi llms.txt was not fetchable on 2026-10-17; fetch pages directly']
       ref: /release-notes/
-- title: App lifecycle and wiring
+- title: 'App lifecycle and wiring'
   sections:
   - id: fa-lifecycle
-    title: Lifespan, dependencies, settings
+    title: 'Lifespan, dependencies, settings'
     level: basic
     requires: []
     ref: /advanced/events/
     entries:
     - id: fa-lifespan
-      name: lifespan
-      summary: async context manager passed to FastAPI(lifespan=...); code before yield runs at startup, after yield at shutdown
+      name: 'lifespan'
+      summary: 'async context manager passed to FastAPI(lifespan=...); code before yield runs at startup, after yield at shutdown'
       lenses: [best-practice, reliability]
       import: fastapi
       signature: FastAPI(lifespan=lifespan)
       notes: ['create the shared httpx.AsyncClient before yield and aclose() it after; never one client per request', 'if lifespan is given, on_event startup/shutdown handlers are no longer called (all lifespan or all events)', 'the docs page does not show lifespan state; see Starlette lifespan docs for yielded state']
       ref: /advanced/events/
     - id: fa-httpx-client
-      name: Shared httpx.AsyncClient
-      summary: one client keeps connection pooling; httpx docs warn against creating clients in loops
+      name: 'Shared httpx.AsyncClient'
+      summary: 'one client keeps connection pooling; httpx docs warn against creating clients in loops'
       lenses: [best-practice, perf]
       notes: ['store it on app.state or yield it as lifespan state, then expose it through a Depends function', 'with client.send(stream=True) you must call Response.aclose() yourself or connections leak']
       ref: https://www.python-httpx.org/async/
     - id: fa-depends
-      name: Depends with Annotated
-      summary: declare dependencies as Annotated[T, Depends(fn)]; the docs say to prefer the Annotated form (needs 0.95.0+)
+      name: 'Depends with Annotated'
+      summary: 'declare dependencies as Annotated[T, Depends(fn)]; the docs say to prefer the Annotated form (needs 0.95.0+)'
       lenses: [best-practice]
       import: fastapi
       signature: Annotated[Settings, Depends(get_settings)]
       notes: ['save the Annotated value in a type alias (SettingsDep) to avoid repeating it', 'dependencies may be async def or def, mixed freely with either kind of route']
       ref: /tutorial/dependencies/
     - id: fa-settings
-      name: pydantic-settings BaseSettings
-      summary: typed env config; env vars match field names case-insensitively and are validated and converted
+      name: 'pydantic-settings BaseSettings'
+      summary: 'typed env config; env vars match field names case-insensitively and are validated and converted'
       lenses: [best-practice, security]
       import: pydantic_settings
       signature: model_config = SettingsConfigDict(env_file=".env")
       notes: ['reading .env needs python-dotenv', 'wrap Settings() in a @lru_cache get_settings dependency so env and .env are read once, not per request', 'tests swap settings with app.dependency_overrides[get_settings]']
       ref: /advanced/settings/
-- title: Models and responses
+- title: 'Models and responses'
   sections:
   - id: fa-models
-    title: Pydantic v2 response models
+    title: 'Pydantic v2 response models'
     level: basic
     requires: [fa-lifecycle]
     ref: /tutorial/response-model/
     entries:
     - id: fa-response-model
-      name: response_model and return annotation
-      summary: the declared type validates, filters and serialises output through Pydantic (Rust core); response_model wins if both are set
+      name: 'response_model and return annotation'
+      summary: 'the declared type validates, filters and serialises output through Pydantic (Rust core); response_model wins if both are set'
       lenses: [best-practice, security, perf]
       import: fastapi
       signature: '@app.get("/incidents", response_model=list[Incident])'
       notes: ['returning a richer object is safe: fields missing from the response model are stripped', 'with response_model, annotate the function -> Any to keep type checkers quiet', 'docs say a response model beats an orjson response for performance']
       ref: /tutorial/response-model/
     - id: fa-model-config
-      name: model_config = ConfigDict(...)
-      summary: per-model settings; subclass config is merged with the parent config
+      name: 'model_config = ConfigDict(...)'
+      summary: 'per-model settings; subclass config is merged with the parent config'
       lenses: [best-practice]
       import: pydantic
       signature: model_config = ConfigDict(extra="forbid")
       notes: ['extra and frozen are shown in the config page; from_attributes, alias options and str_strip_whitespace live in the ConfigDict API reference, fetch it before use', 'frozen=True flags mutation as a type-check error']
       ref: https://pydantic.dev/docs/validation/latest/concepts/config/
-- title: Serving the frontend and media
+- title: 'Serving the frontend and media'
   sections:
   - id: fa-serving
-    title: Static export, streaming, middleware
+    title: 'Static export, streaming, middleware'
     level: intermediate
     requires: [fa-lifecycle]
     ref: /tutorial/static-files/
     entries:
     - id: fa-staticfiles
-      name: StaticFiles mount
-      summary: app.mount(path, StaticFiles(directory=...)) hands a whole sub-path to an independent app; html=True serves index.html for directories
+      name: 'StaticFiles mount'
+      summary: 'app.mount(path, StaticFiles(directory=...)) hands a whole sub-path to an independent app; html=True serves index.html for directories'
       lenses: [best-practice, reliability]
       import: fastapi.staticfiles
       signature: app.mount("/", StaticFiles(directory="out", html=True), name="web")
       notes: ['Starlette signature: StaticFiles(directory, packages, html=False, check_dir=True, follow_symlink=False)', 'html=True also serves 404.html on misses', 'mount last: a mount at "/" swallows any route declared after it', 'mounted apps are absent from the main OpenAPI docs']
       ref: /tutorial/static-files/
     - id: fa-frontend
-      name: app.frontend()
-      summary: newer built-in for serving built frontends; API path operations are checked first, files only when no route matched
+      name: 'app.frontend()'
+      summary: 'newer built-in for serving built frontends; API path operations are checked first, files only when no route matched'
       lenses: [best-practice]
       signature: app.frontend("/", directory="out")
       notes: ['fallback defaults to "auto" (uses 404.html if present, else index.html); other values index.html, 404.html, None', 'fallback applies only to GET/HEAD that accept HTML; missing JS/CSS/images still 404', 'the page does not mention Next.js or a minimum version; test against an out/ export first']
       ref: /tutorial/static-files/
     - id: fa-streaming
-      name: StreamingResponse
-      summary: takes a sync or async generator and streams the body chunk by chunk
+      name: 'StreamingResponse'
+      summary: 'takes a sync or async generator and streams the body chunk by chunk'
       lenses: [best-practice, reliability]
       import: fastapi.responses
       signature: StreamingResponse(gen(), media_type="video/mp4")
       notes: ['async tasks cancel only at an await, so await in the generator loop (docs use anyio.sleep(0))', 'docs prefer yield-style path operations (Stream Data page) for automatic cancellation handling', 'no docs page covers proxying or Range for StreamingResponse; forward Range upstream and set 206/Content-Range yourself, verify with a real player']
       ref: /advanced/custom-response/
     - id: fa-fileresponse
-      name: FileResponse
-      summary: async file streaming with Content-Length, Last-Modified and ETag; Starlette adds HTTP Range support (206, 416 invalid)
+      name: 'FileResponse'
+      summary: 'async file streaming with Content-Length, Last-Modified and ETag; Starlette adds HTTP Range support (206, 416 invalid)'
       lenses: [perf]
       import: fastapi.responses
       signature: FileResponse(path, media_type="video/mp4")
       notes: ['only the bytes unit is supported; Accept-Ranges: bytes is sent when the file exists', 'use it for local files and reserve StreamingResponse for upstream proxying']
       ref: https://starlette.dev/responses/
     - id: fa-cors
-      name: CORSMiddleware
-      summary: app.add_middleware(CORSMiddleware, allow_origins=[...]); allow_methods defaults to GET only, max_age 600
+      name: 'CORSMiddleware'
+      summary: 'app.add_middleware(CORSMiddleware, allow_origins=[...]); allow_methods defaults to GET only, max_age 600'
       lenses: [security, reliability]
       import: fastapi.middleware.cors
       notes: ['origins, methods and headers cannot be "*" when allow_credentials=True; list them explicitly (docs example contradicts this)', 'same-origin serving of out/ plus /api needs no CORS at all; add it only for separate origins', 'expose_headers is empty by default; list Content-Range if a browser client reads it']
       ref: /tutorial/cors/
     - id: fa-gzip
-      name: GZipMiddleware
-      summary: compresses responses for clients sending Accept-Encoding gzip, including streaming responses
+      name: 'GZipMiddleware'
+      summary: 'compresses responses for clients sending Accept-Encoding gzip, including streaming responses'
       lenses: [perf]
       import: fastapi.middleware.gzip
       signature: app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
       notes: ['defaults are minimum_size=500 and compresslevel=9; lower the level to save CPU at high traffic', 'do not compress video: it is already compressed, and compression can interfere with ranged playback (inference, not in docs)', 'middleware ordering is not covered by FastAPI docs; check Starlette']
       ref: /advanced/middleware/
-- title: Operations and testing
+- title: 'Operations and testing'
   sections:
   - id: fa-ops
-    title: Tasks, workers, health, tests
+    title: 'Tasks, workers, health, tests'
     level: intermediate
     requires: [fa-lifecycle]
     ref: /deployment/server-workers/
     entries:
     - id: fa-background-tasks
-      name: BackgroundTasks vs a queue
-      summary: tasks run after the response is sent, inside the same process; good for small work needing app objects
+      name: 'BackgroundTasks vs a queue'
+      summary: 'tasks run after the response is sent, inside the same process; good for small work needing app objects'
       lenses: [best-practice, reliability]
       import: fastapi
       signature: background_tasks.add_task(fn, arg, kw=1)
       notes: ['docs point to Celery or similar (with RabbitMQ or Redis) for heavy work, multiple processes or servers', 'tasks die with the process and have no retries, so use a real queue for anything that must not be lost']
       ref: /tutorial/background-tasks/
     - id: fa-workers
-      name: Workers and replicas
-      summary: uvicorn main:app --workers 4 (or fastapi run --workers 4) starts a process manager plus one server process per worker
+      name: 'Workers and replicas'
+      summary: 'uvicorn main:app --workers 4 (or fastapi run --workers 4) starts a process manager plus one server process per worker'
       lenses: [best-practice, perf]
       notes: ['docs advise one Uvicorn process per container on Kubernetes and scaling with replicas instead of --workers', 'each worker has its own lifespan, so each gets its own httpx client and in-memory cache']
       ref: /deployment/server-workers/
     - id: fa-health
-      name: Health endpoints
-      summary: not covered by a dedicated docs page; add cheap GET /healthz (liveness) and /readyz (checks upstream/DB) routes
+      name: 'Health endpoints'
+      summary: 'not covered by a dedicated docs page; add cheap GET /healthz (liveness) and /readyz (checks upstream/DB) routes'
       lenses: [best-practice]
       notes: ['keep liveness free of I/O; docs have no official pattern, so this is team convention, not verified guidance', 'declare these before any root StaticFiles mount']
       ref: /deployment/server-workers/
     - id: fa-async-tests
-      name: Async tests with httpx
-      summary: AsyncClient(transport=ASGITransport(app=app), base_url="http://test") with @pytest.mark.anyio test functions
+      name: 'Async tests with httpx'
+      summary: 'AsyncClient(transport=ASGITransport(app=app), base_url="http://test") with @pytest.mark.anyio test functions'
       lenses: [best-practice, reliability]
       import: httpx
       signature: AsyncClient(transport=ASGITransport(app=app), base_url="http://test")

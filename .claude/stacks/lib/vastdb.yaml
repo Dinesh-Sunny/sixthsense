@@ -8,184 +8,184 @@ toc:
 - index: 'https://raw.githubusercontent.com/vast-data/vastdb_sdk/main/README.md'
   match: '^https://raw\.githubusercontent\.com/vast-data/vastdb_sdk/main/'
 groups:
-- title: AI tooling
+- title: 'AI tooling'
   sections:
   - id: vdb-ai-tooling
-    title: Agent entry points
+    title: 'Agent entry points'
     level: basic
     requires: []
     ref: /README.md
     entries:
     - id: vdb-no-agent-tooling
-      name: Official MCP, skill, llms.txt
-      summary: none found; github.com HTML is robots-blocked for fetchers, use raw.githubusercontent.com source files
+      name: 'Official MCP, skill, llms.txt'
+      summary: 'none found; github.com HTML is robots-blocked for fetchers, use raw.githubusercontent.com source files'
       lenses: [reuse]
       notes: ['the README says more Ibis predicate patterns live in a separate predicate doc that was not fetched']
       ref: /README.md
-- title: Connect and write
+- title: 'Connect and write'
   sections:
   - id: vdb-connect
-    title: Session and transactions
+    title: 'Session and transactions'
     level: basic
     requires: []
     ref: /vastdb/session.py
     entries:
     - id: vdb-connect-fn
-      name: vastdb.connect
-      summary: build one Session from endpoint, access, secret; ssl_verify defaults to True
+      name: 'vastdb.connect'
+      summary: 'build one Session from endpoint, access, secret; ssl_verify defaults to True'
       lenses: [best-practice, perf]
       import: vastdb
       signature: 'vastdb.connect(endpoint=, access=, secret=, ssl_verify=True, timeout=None)'
       notes: ['the SDK Session signature also takes backoff_config; omitted creds fall back to AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_ENDPOINT_URL', 'create the Session once at module level and reuse it; open a transaction per unit of work']
       ref: /vastdb/session.py
     - id: vdb-transaction
-      name: session.transaction()
-      summary: context manager that commits on exit; every catalog and table call runs inside it
+      name: 'session.transaction()'
+      summary: 'context manager that commits on exit; every catalog and table call runs inside it'
       lenses: [best-practice, reliability]
       signature: with session.transaction() as tx
       notes: ['keep the transaction open while reading the returned reader; select raises MissingTransaction once it has ended', 'batch many reads or writes into one transaction instead of one per row']
       ref: /README.md
     - id: vdb-endpoints
-      name: Data VIP versus Query Engine VIP
-      summary: DDL and DML go to the data VIP; the QE VIP is only for reads that specifically need it
+      name: 'Data VIP versus Query Engine VIP'
+      summary: 'DDL and DML go to the data VIP; the QE VIP is only for reads that specifically need it'
       lenses: [reliability]
       notes: ['hackathon: data VIP is S3_ENDPOINT in /config/<team>.config and must include http:// or https://; QE VIP is vdb_endpoint in the backend secret', 'other teams buckets return 403 by identity policy']
       ref: /README.md
   - id: vdb-ddl
-    title: Schemas and tables
+    title: 'Schemas and tables'
     level: basic
     requires: [vdb-connect]
     ref: /vastdb/schema.py
     entries:
     - id: vdb-create-schema
-      name: create_schema and schema
-      summary: create a schema in a bucket, or fetch one and get None when missing
+      name: 'create_schema and schema'
+      summary: 'create a schema in a bucket, or fetch one and get None when missing'
       lenses: [best-practice]
       signature: 'bucket.create_schema(name, fail_if_exists=True); bucket.schema(name, fail_if_missing=True)'
       notes: ['pass fail_if_exists=False or fail_if_missing=False to make startup idempotent', 'Schema.create_schema(name, fail_if_exists) is the verified signature; the Bucket variant was not in the fetched files, so confirm it before coding']
       ref: /vastdb/schema.py
     - id: vdb-create-table
-      name: create_table with a pyarrow schema
-      summary: define columns with pa.schema([...]) and create the table once
+      name: 'create_table with a pyarrow schema'
+      summary: 'define columns with pa.schema([...]) and create the table once'
       lenses: [best-practice, reliability]
       signature: 'schema.create_table(name, columns, fail_if_exists=True, use_external_row_ids_allocation=False, sorting_key=[], vector_index=None)'
       notes: ['use fail_if_exists=False for idempotent setup', 'sorting_key is for Elysium (sorted) tables; sorted_table, sorted_columns() report it', 'the VSS skill forbids dropping or recreating vss-collection or vss-prompts-events; make sibling tables only']
       ref: /vastdb/schema.py
     - id: vdb-table-lookup
-      name: schema.table and table.columns
-      summary: get a table handle (None if missing) and read its pa.Schema
+      name: 'schema.table and table.columns'
+      summary: 'get a table handle (None if missing) and read its pa.Schema'
       lenses: [best-practice]
       signature: 'schema.table(name, fail_if_missing=True); table.columns() -> pa.Schema'
       notes: ['table() loads schema and stats eagerly, which suits interactive use', 'for a long-lived service use TableMetadata plus tx.table_from_metadata to load lazily and reuse across transactions']
       ref: /README.md
   - id: vdb-dml
-    title: Insert, update, delete
+    title: 'Insert, update, delete'
     level: basic
     requires: [vdb-ddl]
     ref: /vastdb/table.py
     entries:
     - id: vdb-insert
-      name: table.insert
-      summary: append a pa.Table or pa.RecordBatch, returns the new row ids
+      name: 'table.insert'
+      summary: 'append a pa.Table or pa.RecordBatch, returns the new row ids'
       lenses: [best-practice, perf]
       signature: 'table.insert(rows, by_columns=True) -> pa.ChunkedArray'
       notes: ['build the batch with the table pa.schema so types match exactly (int64, utf8, float32)', 'insert many rows per call; there is no documented upsert, so a repeat insert of the same id makes a duplicate row']
       ref: /vastdb/table.py
     - id: vdb-upsert-pattern
-      name: Upsert by id
-      summary: select the existing row id for the key, then update; insert only when none matched
+      name: 'Upsert by id'
+      summary: 'select the existing row id for the key, then update; insert only when none matched'
       lenses: [best-practice, reliability]
       notes: ['no native upsert found in the fetched docs; do the select, update or insert inside one transaction', 'enforce uniqueness of id yourself']
       ref: /vastdb/table.py
     - id: vdb-row-id
-      name: Internal row id ($row_id)
-      summary: update and delete address rows by a uint64 $row_id column
+      name: 'Internal row id ($row_id)'
+      summary: 'update and delete address rows by a uint64 $row_id column'
       lenses: [reliability]
       signature: 'table.select(columns=[...], predicate=..., internal_row_id=True)'
       notes: ['internal_row_id=True adds the $row_id column to the result; carry it into update or delete', 'missing it raises errors.MissingRowIdColumn']
       ref: /vastdb/table.py
     - id: vdb-update
-      name: table.update
-      summary: change cells of rows named by $row_id
+      name: 'table.update'
+      summary: 'change cells of rows named by $row_id'
       lenses: [best-practice]
       signature: 'table.update(rows, columns=None) -> None'
       notes: ['rows holds $row_id plus the new values; columns limits which columns change', 'read the row ids and update in the same transaction']
       ref: /vastdb/table.py
     - id: vdb-delete
-      name: table.delete
-      summary: remove rows named by $row_id
+      name: 'table.delete'
+      summary: 'remove rows named by $row_id'
       lenses: [best-practice]
       signature: 'table.delete(rows) -> None'
       notes: ['pass a table containing only the $row_id uint64 column', 'retire with a status column instead when history matters']
       ref: /vastdb/table.py
-- title: Reading
+- title: 'Reading'
   sections:
   - id: vdb-read
-    title: Select, predicates, limits
+    title: 'Select, predicates, limits'
     level: basic
     requires: [vdb-connect]
     ref: /vastdb/table.py
     entries:
     - id: vdb-select
-      name: table.select
-      summary: returns a pa.RecordBatchReader; call read_all() for a pa.Table
+      name: 'table.select'
+      summary: 'returns a pa.RecordBatchReader; call read_all() for a pa.Table'
       lenses: [best-practice, perf]
       signature: 'table.select(columns=None, predicate=None, config=None, *, internal_row_id=False, limit_rows=None)'
       notes: ['always pass columns; select() with no columns reads everything', 'convert with read_all().to_pylist() before leaving the transaction']
       ref: /vastdb/table.py
     - id: vdb-predicate
-      name: Ibis predicates
-      summary: filter server-side with ibis expressions; raw SQL strings are not accepted
+      name: 'Ibis predicates'
+      summary: 'filter server-side with ibis expressions; raw SQL strings are not accepted'
       lenses: [best-practice, perf]
       import: 'from ibis import _'
       signature: 'predicate=(_.status == "open") & (_.score > 0.5)'
       notes: ['verified operators: comparison, &, |, between, isnull, contains; the predicate doc has more', 'push every filter into predicate so the cluster prunes data, not Python']
       ref: /README.md
     - id: vdb-limit
-      name: limit_rows
-      summary: cap the rows returned by one select
+      name: 'limit_rows'
+      summary: 'cap the rows returned by one select'
       lenses: [perf]
       signature: 'table.select(columns=[...], limit_rows=50)'
       notes: ['no order_by parameter was found; limit_rows gives the first rows found, not the newest', 'for newest-first, filter by a timestamp predicate, then sort client-side']
       ref: /vastdb/table.py
     - id: vdb-sort-client
-      name: Client-side sorting
-      summary: sort the returned pa.Table in pyarrow
+      name: 'Client-side sorting'
+      summary: 'sort the returned pa.Table in pyarrow'
       lenses: [best-practice]
       signature: 'result.sort_by([("created_at", "descending")])'
       notes: ['sort after read_all(); keep the result set small with predicate and limit_rows first', 'sort_by and to_pylist are pyarrow APIs, not fetched this session; confirm against pyarrow docs']
       ref: /README.md
     - id: vdb-vectors
-      name: Vector columns
-      summary: never select vector columns from vss-collection
+      name: 'Vector columns'
+      summary: 'never select vector columns from vss-collection'
       lenses: [reliability]
       notes: ['hackathon skill: vectors and vectors_visual (256-dim) can crash the SDK; build the column list from table.columns() minus those names', 'incidents table should hold no vector columns']
       ref: /README.md
-- title: Performance
+- title: 'Performance'
   sections:
   - id: vdb-perf
-    title: Query config and many reads
+    title: 'Query config and many reads'
     level: advanced
     requires: [vdb-read]
     ref: /vastdb/config.py
     entries:
     - id: vdb-query-config
-      name: QueryConfig
-      summary: tune parallelism per select via config=
+      name: 'QueryConfig'
+      summary: 'tune parallelism per select via config='
       lenses: [perf]
       import: from vastdb.config import QueryConfig
       signature: 'QueryConfig(num_splits=None, num_sub_splits=4, data_endpoints=None, limit_rows_per_sub_split=131072, rows_per_split=4000000, queue_priority=None)'
       notes: ['data_endpoints spreads one select across CNodes; repeating one DNS name adds threads', 'a tiny incidents table needs no tuning; leave defaults']
       ref: /vastdb/config.py
     - id: vdb-backoff
-      name: BackoffConfig retries
-      summary: retry settings for failed requests, default 10 tries or 60 s
+      name: 'BackoffConfig retries'
+      summary: 'retry settings for failed requests, default 10 tries or 60 s'
       lenses: [perf, reliability]
       notes: ['pass backoff_config to the Session to shorten retries on a live demo', 'select can raise errors.TooLargeRequest for huge predicates']
       ref: /vastdb/config.py
     - id: vdb-many-reads
-      name: Many reads from a web app
-      summary: serve repeated page loads from a cache, not one DB round trip each
+      name: 'Many reads from a web app'
+      summary: 'serve repeated page loads from a cache, not one DB round trip each'
       lenses: [perf, best-practice]
       notes: ['reuse the Session, open one transaction per request, read only needed columns', 'cache the incidents list in memory for a few seconds, or keep app/incidents.json as the fast path']
       ref: /README.md

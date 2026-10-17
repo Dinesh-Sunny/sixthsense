@@ -8,122 +8,122 @@ toc:
 - index: 'https://zustand.docs.pmnd.rs/llms.txt'
   match: '^https://zustand\.docs\.pmnd\.rs/'
 groups:
-- title: AI tooling
+- title: 'AI tooling'
   sections:
   - id: zus-ai-tooling
-    title: Docs-site agent entry points
+    title: 'Docs-site agent entry points'
     level: basic
     requires: []
     ref: /llms.txt
     entries:
     - id: zus-llms-txt
-      name: llms.txt and llms-full.txt
-      summary: page index plus full text, one `.md` per route
+      name: 'llms.txt and llms-full.txt'
+      summary: 'page index plus full text, one `.md` per route'
       lenses: [reuse]
       notes: ['both return HTTP 200; llms-full.txt is ~370 KB, so grep it, never load it whole']
       ref: /llms.txt
     - id: zus-no-agent-tooling
-      name: Official MCP, skill, AGENTS.md
-      summary: none found
+      name: 'Official MCP, skill, AGENTS.md'
+      summary: 'none found'
       lenses: [reuse]
       ref: /llms.txt
   - id: zus-doc-indexes
-    title: Docs section landing pages
+    title: 'Docs section landing pages'
     level: basic
     requires: []
     ref: /learn/index.md
     entries:
     - id: zus-learn-index
-      name: Learn index
-      summary: reading order for the guides, grouped as start, core concepts, perf, TypeScript, frameworks
+      name: 'Learn index'
+      summary: 'reading order for the guides, grouped as start, core concepts, perf, TypeScript, frameworks'
       lenses: [reuse]
       ref: /learn/index.md
     - id: zus-reference-index
-      name: Reference index
-      summary: API reference map, grouped as APIs, hooks, middlewares, integrations, migrations, previous versions
+      name: 'Reference index'
+      summary: 'API reference map, grouped as APIs, hooks, middlewares, integrations, migrations, previous versions'
       lenses: [reuse]
       ref: /reference/index.md
-- title: Getting started and TypeScript
+- title: 'Getting started and TypeScript'
   sections:
   - id: zus-getting-started
-    title: Introduction, comparison and tutorial
+    title: 'Introduction, comparison and tutorial'
     level: basic
     requires: []
     ref: /learn/getting-started/introduction.md
     entries:
     - id: zus-intro
-      name: Introduction
-      summary: install with `npm install zustand`; the store is a hook with no provider, and components select the state they read
+      name: 'Introduction'
+      summary: 'install with `npm install zustand`; the store is a hook with no provider, and components select the state they read'
       lenses: [best-practice]
       import: zustand
       signature: create((set) => ({ ... }))
       notes: ['`set` merges state', 'the docs claim handling of the zombie-child problem, React concurrency and context loss between mixed renderers']
       ref: /learn/getting-started/introduction.md
     - id: zus-comparison
-      name: Comparison with Redux, Valtio, Jotai, Recoil
-      summary: Zustand is a single immutable-state store with no provider; render optimization is manual via selectors
+      name: 'Comparison with Redux, Valtio, Jotai, Recoil'
+      summary: 'Zustand is a single immutable-state store with no provider; render optimization is manual via selectors'
       lenses: [best-practice]
       notes: ['Redux needs a context provider, Zustand does not', 'Valtio is mutable and tracks property access, Jotai composes primitive atoms, Recoil keys atoms by string', 'Jotai, Valtio and Recoil optimize renders automatically through dependency or access tracking; Zustand recommends selectors']
       ref: /learn/getting-started/comparison.md
     - id: zus-tutorial-tic-tac-toe
-      name: Tic-tac-toe tutorial
-      summary: builds a game with one store using `combine`, lifting state into the store, and a history array for time travel
+      name: 'Tic-tac-toe tutorial'
+      summary: 'builds a game with one store using `combine`, lifting state into the store, and a history array for time travel'
       lenses: [best-practice]
       import: zustand/middleware
       notes: ['uses `create(combine(initialState, (set) => ({ setters })))` and per-field selectors', 'repeats APIs covered under Stores and Middleware']
       ref: /learn/guides/tutorial-tic-tac-toe.md
   - id: zus-ts-beginner
-    title: Beginner TypeScript patterns
+    title: 'Beginner TypeScript patterns'
     level: basic
     requires: [zus-store-basics]
     ref: /learn/guides/beginner-typescript.md
     entries:
     - id: zus-ts-typed-store
-      name: Typed store with curried create
-      summary: declare a state-plus-actions interface and call `create<State>()((set) => ...)`, giving `UseBoundStore<StoreApi<State>>`
+      name: 'Typed store with curried create'
+      summary: 'declare a state-plus-actions interface and call `create<State>()((set) => ...)`, giving `UseBoundStore<StoreApi<State>>`'
       lenses: [typing-dx]
       signature: create<BearState>()((set) => ({ ... }))
       ref: /learn/guides/beginner-typescript.md
     - id: zus-extract-state
-      name: ExtractState
-      summary: derives the full state-and-actions type from an untyped store for tests, utilities and props
+      name: 'ExtractState'
+      summary: 'derives the full state-and-actions type from an untyped store for tests, utilities and props'
       lenses: [typing-dx, testing]
       import: zustand
       signature: ExtractState<typeof useStore>
       ref: /learn/guides/beginner-typescript.md
     - id: zus-ts-reset-initial-state
-      name: Reset with typeof initialState
+      name: 'Reset with typeof initialState'
       summary: 'build the state type from a shared `initialState` constant so `reset: () => set(initialState)` stays in sync'
       lenses: [typing-dx, reliability]
       signature: 'type State = typeof initialState & { reset: () => void }'
       ref: /learn/guides/beginner-typescript.md
     - id: zus-ts-derived-state
-      name: Derived state in selectors
-      summary: compute derived values inside the selector, e.g. `(s) => s.bears * s.foodPerBear`, instead of storing them
+      name: 'Derived state in selectors'
+      summary: 'compute derived values inside the selector, e.g. `(s) => s.bears * s.foodPerBear`, instead of storing them'
       lenses: [best-practice, perf]
       notes: ['a selector that returns a fresh object or array needs `useShallow`']
       ref: /learn/guides/beginner-typescript.md
     - id: zus-ts-async-actions
-      name: Typed async actions
-      summary: an async action awaits the fetch, types the response, then calls `set` with the result
+      name: 'Typed async actions'
+      summary: 'an async action awaits the fetch, types the response, then calls `set` with the result'
       lenses: [typing-dx]
       ref: /learn/guides/beginner-typescript.md
     - id: zus-multiple-stores
-      name: Multiple domain stores
-      summary: separate stores per domain keep state isolated, each with its own strict type
+      name: 'Multiple domain stores'
+      summary: 'separate stores per domain keep state isolated, each with its own strict type'
       lenses: [composability]
       ref: /learn/guides/beginner-typescript.md
-- title: Stores and state updates
+- title: 'Stores and state updates'
   sections:
   - id: zus-store-basics
-    title: Creating stores and updating state
+    title: 'Creating stores and updating state'
     level: basic
     requires: []
     ref: /reference/apis/create.md
     entries:
     - id: zus-create
-      name: create
-      summary: builds a React hook store with `getState/setState/getInitialState/subscribe` attached; choose it for a global client store
+      name: 'create'
+      summary: 'builds a React hook store with `getState/setState/getInitialState/subscribe` attached; choose it for a global client store'
       lenses: [best-practice, typing-dx]
       import: zustand
       signature: create<T>()(stateCreatorFn)
@@ -133,7 +133,7 @@ groups:
       notes: ['docs recommend the curried `create<T>()(…)` so the store type is inferred and middleware infers; required for middleware']
       ref: /reference/apis/create.md
     - id: zus-set-merge
-      name: Updating state
+      name: 'Updating state'
       summary: '`set` shallow-merges one level by default; a function form reads previous state; `true` replaces the whole state'
       lenses: [best-practice, reliability]
       signature: set(partial | (state) => partial, replace?)
@@ -143,38 +143,38 @@ groups:
       notes: [merge is one level deep; nest via spread or immer, 'primitive state needs `set(next, true)`']
       ref: /learn/guides/immutable-state-and-merging.md
     - id: zus-colocate-actions
-      name: Colocated actions
-      summary: actions live in the store, outside React use `useStore.getState()`
+      name: 'Colocated actions'
+      summary: 'actions live in the store, outside React use `useStore.getState()`'
       lenses: [best-practice, composability]
       notes: ['one store, all updates via set/setState']
       ref: /learn/guides/flux-inspired-practice.md
     - id: zus-external-actions
-      name: Actions outside the store
-      summary: module-level functions calling `useStore.setState`; callable without a hook and friendlier to code splitting
+      name: 'Actions outside the store'
+      summary: 'module-level functions calling `useStore.setState`; callable without a hook and friendlier to code splitting'
       lenses: [composability]
       ref: /learn/guides/practice-with-no-store-actions.md
     - id: zus-slices
-      name: Slices pattern
-      summary: split a large store into slice creators spread into one bound store
+      name: 'Slices pattern'
+      summary: 'split a large store into slice creators spread into one bound store'
       lenses: [composability, typing-dx]
       signature: create<T>()((...a) => ({ ...sliceA(...a), ...sliceB(...a) }))
       notes: ['apply middlewares only on the combined store, never inside a slice', 'slices type as `StateCreator<T, Mis, Mos, Slice>`; a slice reaches siblings via `get()`']
       ref: /learn/guides/slices-pattern.md
     - id: zus-map-set
-      name: Map and Set in state
-      summary: Map and Set are mutable, so build a new instance on every update or subscribers will not fire
+      name: 'Map and Set in state'
+      summary: 'Map and Set are mutable, so build a new instance on every update or subscribers will not fire'
       lenses: [reliability]
       notes: ['`set((s) => ({ foo: new Map(s.foo).set(k, v) }))`']
       ref: /learn/guides/maps-and-sets-usage.md
     - id: zus-reset
-      name: Reset state
-      summary: restore initial state with `set(store.getInitialState())`, or replace to drop added keys
+      name: 'Reset state'
+      summary: 'restore initial state with `set(store.getInitialState())`, or replace to drop added keys'
       lenses: [reliability, testing]
       signature: set(store.getInitialState()) | store.setState(store.getInitialState(), true)
       notes: ['the creator'' third arg `store` gives access to `getInitialState` inside actions']
       ref: /learn/guides/how-to-reset-state.md
     - id: zus-vanilla
-      name: createStore and useStore
+      name: 'createStore and useStore'
       summary: '`createStore` makes a React-free store; `useStore(store, selector)` binds it, for scoped, per-request or dynamic stores'
       lenses: [composability]
       import: zustand/vanilla
@@ -182,8 +182,8 @@ groups:
       returns: '`StoreApi<T>` (getState, setState, getInitialState, subscribe) for createStore; selected slice for useStore'
       ref: /reference/hooks/use-store.md
     - id: zus-create-store
-      name: createStore
-      summary: builds a vanilla store exposing `setState`, `getState`, `getInitialState`, `subscribe`; no React dependency
+      name: 'createStore'
+      summary: 'builds a vanilla store exposing `setState`, `getState`, `getInitialState`, `subscribe`; no React dependency'
       lenses: [composability, typing-dx]
       import: zustand/vanilla
       signature: 'createStore<T>()(stateCreatorFn: StateCreator<T, [], []>): StoreApi<T>'
@@ -192,23 +192,23 @@ groups:
       returns: 'StoreApi<T> with setState, getState, getInitialState and subscribe'
       notes: ['updater-function actions read previous state via `set((state) => ...)`', 'mutating a nested object in place does not notify subscribers; build a new object', '`subscribe` listener receives `(state, prevState)`']
       ref: /reference/apis/create-store.md
-- title: Selectors and rendering
+- title: 'Selectors and rendering'
   sections:
   - id: zus-selectors
-    title: Selectors and re-renders
+    title: 'Selectors and re-renders'
     level: basic
     requires: [zus-store-basics]
     ref: /learn/guides/prevent-rerenders-with-use-shallow.md
     entries:
     - id: zus-atomic-selector
-      name: Atomic selectors
-      summary: select one field per hook call so a component re-renders only when that field changes by `Object.is`
+      name: 'Atomic selectors'
+      summary: 'select one field per hook call so a component re-renders only when that field changes by `Object.is`'
       lenses: [perf, best-practice]
       signature: useStore((s) => s.field)
       ref: /learn/guides/updating-state.md
     - id: zus-use-shallow
-      name: useShallow
-      summary: wraps a selector that returns a fresh object, array or key list so shallow equality keeps the result stable
+      name: 'useShallow'
+      summary: 'wraps a selector that returns a fresh object, array or key list so shallow equality keeps the result stable'
       lenses: [perf]
       import: zustand/react/shallow
       signature: useShallow<T, U = T>(selectorFn)
@@ -218,21 +218,21 @@ groups:
       notes: ['also re-exported from `zustand/shallow` together with plain `shallow(a, b)`; the use-shallow page imports `zustand/react/shallow`', 'only top-level props are compared']
       ref: /reference/hooks/use-shallow.md
     - id: zus-shallow-fn
-      name: shallow
-      summary: top-level equality of objects, arrays, Maps and Sets, for a custom equality function
+      name: 'shallow'
+      summary: 'top-level equality of objects, arrays, Maps and Sets, for a custom equality function'
       lenses: [perf]
       import: zustand/shallow
       signature: shallow<T>(a, b)
       returns: boolean, true when the top-level entries are equal
       ref: /reference/apis/shallow.md
     - id: zus-stable-selector
-      name: Stable selector outputs (v5)
-      summary: a selector returning a fresh reference each call loops with "Maximum update depth exceeded"
+      name: 'Stable selector outputs (v5)'
+      summary: 'a selector returning a fresh reference each call loops with "Maximum update depth exceeded"'
       lenses: [reliability, perf]
       notes: ['fix with `useShallow` or a module-level constant fallback (`state.action ?? FALLBACK`)', '`create` has no equality arg in v5; v4 behavior needs `createWithEqualityFn`']
       ref: /reference/migrations/migrating-to-v5.md
     - id: zus-equality-fn
-      name: Custom equality
+      name: 'Custom equality'
       summary: '`createWithEqualityFn` and `useStoreWithEqualityFn` give per-store or per-call equality, restoring v4 selector behavior'
       lenses: [perf]
       import: zustand/traditional
@@ -242,8 +242,8 @@ groups:
       notes: [needs the `use-sync-external-store` peer dependency; plain `create` has no equality fn in v5]
       ref: /reference/apis/create-with-equality-fn.md
     - id: zus-use-store-equality-fn
-      name: useStoreWithEqualityFn
-      summary: reads a vanilla store in React with a custom equality function to skip re-renders
+      name: 'useStoreWithEqualityFn'
+      summary: 'reads a vanilla store in React with a custom equality function to skip re-renders'
       lenses: [perf, composability]
       import: zustand/traditional
       signature: 'useStoreWithEqualityFn<T, U = T>(store: StoreApi<T>, selectorFn: (state: T) => U, equalityFn?: (a: U, b: U) => boolean): U'
@@ -255,15 +255,15 @@ groups:
       notes: ['needs the `use-sync-external-store` package because `zustand/traditional` relies on `useSyncExternalStoreWithSelector`', 'the page documents global, dynamic and scoped vanilla stores; its Troubleshooting section is TBD']
       ref: /reference/hooks/use-store-with-equality-fn.md
     - id: zus-auto-selectors
-      name: Auto-generated selectors
+      name: 'Auto-generated selectors'
       summary: '`createSelectors(store)` helper that adds `store.use.field()` hooks, to cut selector boilerplate'
       lenses: [reuse, typing-dx]
       signature: createSelectors(store); store.use.field()
       notes: ['a documented snippet to copy into the project, not a library export']
       ref: /learn/guides/auto-generating-selectors.md
     - id: zus-subscribe-selector
-      name: subscribeWithSelector
-      summary: lets `store.subscribe` take a selector so non-React code reacts only to one slice of state
+      name: 'subscribeWithSelector'
+      summary: 'lets `store.subscribe` take a selector so non-React code reacts only to one slice of state'
       lenses: [perf, composability]
       import: zustand/middleware
       signature: subscribeWithSelector(stateCreatorFn); store.subscribe(selector, listener, options?)
@@ -272,17 +272,17 @@ groups:
       - {name: fireImmediately, type: boolean, default: 'false', desc: calls the listener once with the current selected value on subscribe}
       returns: unsubscribe function
       ref: /reference/middlewares/subscribe-with-selector.md
-- title: Middleware
+- title: 'Middleware'
   sections:
   - id: zus-middleware
-    title: Middleware and typing
+    title: 'Middleware and typing'
     level: intermediate
     requires: [zus-store-basics]
     ref: /learn/guides/advanced-typescript.md
     entries:
     - id: zus-persist
-      name: persist
-      summary: saves selected state to a storage and rehydrates it on load, with versioned migrations
+      name: 'persist'
+      summary: 'saves selected state to a storage and rehydrates it on load, with versioned migrations'
       lenses: [reliability, security]
       import: zustand/middleware
       signature: persist(stateCreatorFn, persistOptions)
@@ -299,8 +299,8 @@ groups:
       notes: ['createJSONStorage does no runtime validation; docs advise a custom PersistStorage that validates with a schema (e.g. Zod)']
       ref: /reference/middlewares/persist.md
     - id: zus-persist-api
-      name: persist API
-      summary: the `store.persist` namespace controls persistence from inside or outside React
+      name: 'persist API'
+      summary: 'the `store.persist` namespace controls persistence from inside or outside React'
       lenses: [reliability, testing]
       signature: store.persist.{getOptions, setOptions, clearStorage, rehydrate, hasHydrated, onHydrate, onFinishHydration}
       params:
@@ -313,8 +313,8 @@ groups:
       - {name: onFinishHydration, type: '(listener: (state) => void) => () => void', default: null, desc: 'listener when hydration ends; returns an unsubscribe function'}
       ref: /reference/integrations/persisting-store-data.md
     - id: zus-persist-json-storage
-      name: createJSONStorage
-      summary: wraps a `getItem/setItem/removeItem` engine (sessionStorage, AsyncStorage) into a `PersistStorage`, with JSON reviver and replacer hooks
+      name: 'createJSONStorage'
+      summary: 'wraps a `getItem/setItem/removeItem` engine (sessionStorage, AsyncStorage) into a `PersistStorage`, with JSON reviver and replacer hooks'
       lenses: [reliability, typing-dx]
       import: zustand/middleware
       signature: 'createJSONStorage(getStorage: () => StateStorage, options?: JsonStorageOptions)'
@@ -325,27 +325,27 @@ groups:
       returns: PersistStorage
       ref: /reference/integrations/persisting-store-data.md
     - id: zus-persist-hydration
-      name: Sync vs async hydration
-      summary: sync storage hydrates at store creation; async storage hydrates in a microtask, so the first render sees defaults
+      name: 'Sync vs async hydration'
+      summary: 'sync storage hydrates at store creation; async storage hydrates in a microtask, so the first render sees defaults'
       lenses: [reliability, ux-a11y]
       notes: ['guard auth or other persisted-dependent UI until hydrated, via `onRehydrateStorage` setting a `_hasHydrated` field, or a hook combining `onHydrate`, `onFinishHydration` and `hasHydrated`']
       ref: /reference/integrations/persisting-store-data.md
     - id: zus-persist-next-hydration
-      name: Persist with Next.js SSR
-      summary: reading localStorage state in the first client render mismatches server HTML and throws hydration warnings
+      name: 'Persist with Next.js SSR'
+      summary: 'reading localStorage state in the first client render mismatches server HTML and throws hydration warnings'
       lenses: [reliability]
       notes: ['docs fix: a custom `useStore(store, selector)` hook that copies the selected value into `useState` in an effect, so the first render matches the server', 'alternative: `skipHydration: true` plus `persist.rehydrate()` in a mount effect']
       ref: /reference/integrations/persisting-store-data.md
     - id: zus-persist-cross-tab
-      name: Rehydrate on storage event
-      summary: listen to `window` `storage` events and call `store.persist.rehydrate()` when the persist `name` key changes
+      name: 'Rehydrate on storage event'
+      summary: 'listen to `window` `storage` events and call `store.persist.rehydrate()` when the persist `name` key changes'
       lenses: [reliability]
       signature: window.addEventListener('storage', e => e.key === store.persist.getOptions().name && store.persist.rehydrate())
       notes: ['typed via `Mutate<StoreApi<State>, [["zustand/persist", unknown]]>`', 'return a cleanup that removes the listener']
       ref: /reference/integrations/persisting-store-data.md
     - id: zus-devtools
-      name: devtools
-      summary: connects a store to Redux DevTools; `set(partial, undefined, 'name')` labels the action
+      name: 'devtools'
+      summary: 'connects a store to Redux DevTools; `set(partial, undefined, ''name'')` labels the action'
       lenses: [observability]
       import: zustand/middleware
       signature: devtools(stateCreatorFn, devtoolsOptions?)
@@ -357,138 +357,138 @@ groups:
       notes: ['needs the Redux DevTools browser extension (`@redux-devtools/extension` types)', 'place devtools outermost: `devtools(immer(...))`, not `immer(devtools(...))`']
       ref: /reference/middlewares/devtools.md
     - id: zus-immer
-      name: immer
-      summary: lets `set` accept a mutating draft recipe, for deeply nested updates
+      name: 'immer'
+      summary: 'lets `set` accept a mutating draft recipe, for deeply nested updates'
       lenses: [typing-dx, reuse]
       import: zustand/middleware/immer
       signature: immer(stateCreatorFn)
       notes: [requires the optional `immer` peer package]
       ref: /reference/middlewares/immer.md
     - id: zus-immer-guide
-      name: immer integration guide
-      summary: install `immer` as a direct dependency; write `state.count += qty` inside `set` recipes
+      name: 'immer integration guide'
+      summary: 'install `immer` as a direct dependency; write `state.count += qty` inside `set` recipes'
       lenses: [typing-dx, reliability]
       import: zustand/middleware/immer
       signature: create<State & Actions>()(immer((set) => ({ ... })))
       notes: ['needs the extra call parentheses, as in the Advanced TypeScript guide', 'class instances need `[immerable] = true`; otherwise Immer mutates the current state in place and Zustand skips subscriptions because nothing changed']
       ref: /reference/integrations/immer-middleware.md
     - id: zus-combine
-      name: combine
-      summary: infers state types from an initial-state object so the curried `create<T>()` is unnecessary
+      name: 'combine'
+      summary: 'infers state types from an initial-state object so the curried `create<T>()` is unnecessary'
       lenses: [typing-dx]
       import: zustand/middleware
       signature: combine(initialState, additionalStateCreatorFn)
       notes: ['the creator receives (set, get, store) and returns only the actions or extra state']
       ref: /reference/middlewares/combine.md
     - id: zus-redux
-      name: redux
-      summary: reducer-and-action style, adds `dispatch` to the state and store
+      name: 'redux'
+      summary: 'reducer-and-action style, adds `dispatch` to the state and store'
       lenses: [composability]
       import: zustand/middleware
       signature: redux(reducerFn, initialState)
       ref: /reference/middlewares/redux.md
     - id: zus-middleware-typing
-      name: Typing and authoring middleware
-      summary: middleware types as `StateCreator<T, Mps, Mcs>` with mutator tuples; apply middleware directly inside `create`
+      name: 'Typing and authoring middleware'
+      summary: 'middleware types as `StateCreator<T, Mps, Mcs>` with mutator tuples; apply middleware directly inside `create`'
       lenses: [typing-dx]
       signature: StateCreator<T, Mps, Mcs, U>
       notes: ['wrapping middleware in a helper function breaks contextual inference and needs the advanced types']
       ref: /learn/guides/advanced-typescript.md
     - id: zus-url-state
-      name: Persist to URL hash or search params
-      summary: custom `PersistStorage` that reads and writes the URL
+      name: 'Persist to URL hash or search params'
+      summary: 'custom `PersistStorage` that reads and writes the URL'
       lenses: [ux-a11y]
       signature: PersistStorage
       ref: /learn/guides/connect-to-state-with-url-hash.md
     - id: zus-third-party
-      name: Third-party libraries
-      summary: community extensions, none officially recommended by pmndrs; the page warns of bugs and limited maintenance
+      name: 'Third-party libraries'
+      summary: 'community extensions, none officially recommended by pmndrs; the page warns of bugs and limited maintenance'
       lenses: [reuse]
       notes: ['listed by purpose: undo/redo `zundo`; computed state `zustand-computed`; cross-tab sync `zustand-sync-tabs`, `shared-zustand`; devtools `zukeeper`; slices `zustand-slices`; forms `zustand-forms`, `zustorm`; query-string state `zustand-querystring`; props-initialised stores `zustand-di`; React Native storage `zustand-mmkv-storage`; Yjs, Liveblocks multiplayer; adapters for Vue, Solid, Angular, Lit']
       ref: /reference/integrations/third-party-libraries.md
-- title: Next.js and SSR
+- title: 'Next.js and SSR'
   sections:
   - id: zus-next
-    title: Per-request stores, SSR and hydration
+    title: 'Per-request stores, SSR and hydration'
     level: advanced
     requires: [zus-vanilla]
     ref: /learn/guides/nextjs.md
     entries:
     - id: zus-store-per-request
-      name: Store per request
+      name: 'Store per request'
       summary: '`createStore` factory called once in a client Context provider, read through `useStore(ctx, selector)`'
       lenses: [best-practice, reliability]
       signature: useState(() => createStore<T>()(...)); useStore(storeApi, selector)
       notes: ['docs: no global stores on the server and RSCs never read or write stores', 'docs: resetting a store on SPA navigation needs component-level init via Context']
       ref: /learn/guides/nextjs.md
     - id: zus-init-from-props
-      name: Initialize state with props
+      name: 'Initialize state with props'
       summary: '`createStore(initProps)` inside the provider, the documented dependency-injection route'
       lenses: [composability]
       signature: createBearStore(initProps?) via createStore
       ref: /learn/guides/initialize-state-with-props.md
     - id: zus-ssr-hydration
-      name: SSR and hydration
+      name: 'SSR and hydration'
       summary: '`persist` `skipHydration` plus manual `rehydrate()` after mount avoids hydration mismatches'
       lenses: [reliability]
       signature: 'persist({ skipHydration: true }); store.persist.rehydrate()'
       ref: /learn/guides/ssr-and-hydration.md
-- title: Testing
+- title: 'Testing'
   sections:
   - id: zus-testing
-    title: Testing stores and components
+    title: 'Testing stores and components'
     level: intermediate
     requires: [zus-store-basics]
     ref: /learn/guides/testing.md
     entries:
     - id: zus-test-manual-reset
-      name: Manual per-test reset
-      summary: reset a module-level store in `beforeEach` with `setState`, wrapped in `act` for component tests
+      name: 'Manual per-test reset'
+      summary: 'reset a module-level store in `beforeEach` with `setState`, wrapped in `act` for component tests'
       lenses: [testing]
       signature: beforeEach(() => useStore.setState(useStore.getInitialState(), true))
       notes: [fine for one small store]
       ref: /learn/guides/testing.md
     - id: zus-test-auto-reset
-      name: Auto-reset mock
+      name: 'Auto-reset mock'
       summary: '`__mocks__/zustand.ts` wraps `create`/`createStore` and resets every store in `afterEach(act)`; `vi.mock(''zustand'')` in setup'
       lenses: [testing, reliability]
       signature: __mocks__/zustand.ts; vi.mock('zustand')
       notes: ['`__mocks__` must sit next to the Vitest root, not the repo root, if root is changed', 'the mock must support both curried and uncurried `create`']
       ref: /learn/guides/testing.md
     - id: zus-test-rtl-msw
-      name: React Testing Library plus MSW
-      summary: docs recommend RTL for components and MSW for network, `userEvent.setup()`
+      name: 'React Testing Library plus MSW'
+      summary: 'docs recommend RTL for components and MSW for network, `userEvent.setup()`'
       lenses: [testing]
       ref: /learn/guides/testing.md
-- title: Versions and deprecations
+- title: 'Versions and deprecations'
   sections:
   - id: zus-versions
-    title: Migrations and legacy APIs
+    title: 'Migrations and legacy APIs'
     level: basic
     requires: []
     ref: /reference/migrations/migrating-to-v5.md
     entries:
     - id: zus-migrate-v5
-      name: Migrating v4 to v5
-      summary: default exports dropped, React 18 minimum, TS 4.5 minimum, `use-sync-external-store` peer,
+      name: 'Migrating v4 to v5'
+      summary: 'default exports dropped, React 18 minimum, TS 4.5 minimum, `use-sync-external-store` peer,'
         persist and replace-flag changes
       lenses: [reliability]
       ref: /reference/migrations/migrating-to-v5.md
     - id: zus-migrate-v4
-      name: Migrating v3 to v4
-      summary: breaking changes are types only; `create`, `StateCreator`, `PartialState`, `useStore`, `UseBoundStore` signatures changed
+      name: 'Migrating v3 to v4'
+      summary: 'breaking changes are types only; `create`, `StateCreator`, `PartialState`, `useStore`, `UseBoundStore` signatures changed'
       lenses: [typing-dx]
       notes: ['`create` gained the curried `create<State>()(f)` overload and a Mutators generic; no change needed without TypeScript or JSDoc types']
       ref: /reference/migrations/migrating-to-v4.md
     - id: zus-legacy-context
-      name: createContext from zustand/context
-      summary: v3 previous-versions API
+      name: 'createContext from zustand/context'
+      summary: 'v3 previous-versions API'
       lenses: [composability]
       deprecated: superseded by createStore plus React Context
       ref: /reference/previous-versions/zustand-v3-create-context.md
     - id: zus-pre-react18
-      name: Pre-React-18 batching
-      summary: wrap handlers in `unstable_batchedUpdates` so React batches store updates before React 18
+      name: 'Pre-React-18 batching'
+      summary: 'wrap handlers in `unstable_batchedUpdates` so React batches store updates before React 18'
       lenses: [reliability]
       signature: unstable_batchedUpdates
       ref: /learn/guides/event-handler-in-pre-react-18.md

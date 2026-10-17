@@ -9,16 +9,16 @@ toc:
 - index: 'https://react.dev/llms.txt'
   match: '^https://react\.dev/(reference|learn)/'
 groups:
-- title: AI tooling
+- title: 'AI tooling'
   sections:
   - id: ai-docs
-    title: Machine-readable docs and lint guards
+    title: 'Machine-readable docs and lint guards'
     level: basic
     requires: []
     ref: /llms.txt
     entries:
     - id: llms-txt
-      name: react.dev llms.txt + page Markdown
+      name: 'react.dev llms.txt + page Markdown'
       summary: '/llms.txt index, append `.md` to any react.dev page (no llms-full.txt: 404 on 2026-10-05)'
       lenses: [reuse]
       notes: [docs describe the latest (19.3); check the installed version before using 19.3-only APIs]
@@ -26,7 +26,7 @@ groups:
       returns: Markdown index of react.dev pages; each page fetchable as `<path>.md` for agent-readable
         reference
     - id: hooks-lint
-      name: eslint-plugin-react-hooks
+      name: 'eslint-plugin-react-hooks'
       summary: 'ESLint plugin enforcing the Rules of React: rules-of-hooks, exhaustive-deps and the compiler-derived
         lints'
       lenses: [best-practice, reliability]
@@ -39,85 +39,85 @@ groups:
       - {name: compiler lints, type: rules, default: on in recommended, desc: 'compiler diagnostics (purity,
           immutability, refs, ...) also flag code the compiler would skip'}
     - id: react-devtools-cli
-      name: React DevTools via agent-browser
-      summary: Inspect the live component tree (incl. pending Suspense) from an agent via agent-browser
+      name: 'React DevTools via agent-browser'
+      summary: 'Inspect the live component tree (incl. pending Suspense) from an agent via agent-browser'
         instead of the DevTools extension
       lenses: [observability, testing]
       signature: agent-browser open --enable react-devtools, react tree
       notes: [workflow from nextjs.org/docs/app/guides/ai-agents]
       ref: /learn/react-developer-tools
     - id: perf-tracks
-      name: React Performance tracks
-      summary: Dev-build custom tracks in the browser Performance panel showing React scheduler lanes,
+      name: 'React Performance tracks'
+      summary: 'Dev-build custom tracks in the browser Performance panel showing React scheduler lanes,'
         renders and Effects
       lenses: [observability, perf]
       ref: /reference/dev-tools/react-performance-tracks
       notes: [dev builds only by default; production needs a profiling build]
-- title: Learn React
+- title: 'Learn React'
   sections:
   - id: get-started
-    title: Get started and setup
+    title: 'Get started and setup'
     level: basic
     requires: []
     ref: /learn
     entries:
     - id: quick-start
-      name: Quick Start and Thinking in React
-      summary: component model, UI as a tree
+      name: 'Quick Start and Thinking in React'
+      summary: 'component model, UI as a tree'
       lenses: [best-practice]
       ref: /learn/thinking-in-react
     - id: installation
-      name: Installation / Creating a React App
-      summary: frameworks (Next.js) over from-scratch builds
+      name: 'Installation / Creating a React App'
+      summary: 'frameworks (Next.js) over from-scratch builds'
       lenses: [best-practice]
       ref: /learn/creating-a-react-app
     - id: typescript
-      name: Using TypeScript
-      summary: Type props, state, events and context with `@types/react`; keep types at component boundaries
+      name: 'Using TypeScript'
+      summary: 'Type props, state, events and context with `@types/react`; keep types at component boundaries'
       lenses: [typing-dx]
       signature: 'function Comp({ children }: { children: ReactNode })'
       ref: /learn/typescript
     - id: editor-devtools
-      name: Editor setup and React Developer Tools
-      summary: extension, profiler
+      name: 'Editor setup and React Developer Tools'
+      summary: 'extension, profiler'
       lenses: [observability]
       ref: /learn/react-developer-tools
     - id: learn-editor-setup
-      name: Editor setup
-      summary: Lint with ESLint plus all eslint-plugin-react-hooks rules, format with Prettier (eslint-config-prettier)
+      name: 'Editor setup'
+      summary: 'Lint with ESLint plus all eslint-plugin-react-hooks rules, format with Prettier (eslint-config-prettier)'
       lenses:
       - best-practice
       - typing-dx
       ref: /learn/editor-setup
     - id: learn-from-scratch
-      name: Build a React app from scratch
-      summary: Pick a build tool (Vite, Parcel, Rsbuild) and add routing and data fetching yourself; frameworks
+      name: 'Build a React app from scratch'
+      summary: 'Pick a build tool (Vite, Parcel, Rsbuild) and add routing and data fetching yourself; frameworks'
         are recommended for SSR, SSG and RSC
       lenses:
       - composability
       ref: /learn/build-a-react-app-from-scratch
     - id: learn-existing-project
-      name: Add React to an existing project
-      summary: React for a whole subroute (framework base path plus proxy) or for parts of a page via createRoot
+      name: 'Add React to an existing project'
+      summary: 'React for a whole subroute (framework base path plus proxy) or for parts of a page via createRoot'
       lenses:
       - composability
       ref: /learn/add-react-to-an-existing-project
   - id: react-compiler-guide
-    title: React Compiler guide
+    title: 'React Compiler guide'
     level: intermediate
     requires: [get-started]
     ref: /learn/react-compiler
     entries:
     - id: compiler-intro
-      name: React Compiler
-      summary: build-time auto-memoization, `infer` mode default; 1.0 stable since 2025-10-07
+      name: 'React Compiler'
+      summary: 'build-time auto-memoization, `infer` mode default; 1.0 stable since 2025-10-07'
       lenses: [perf, best-practice]
       notes: [NOT enabled here; manual useMemo in assistant.tsx would become redundant]
       ref: /learn/react-compiler/introduction
       returns: Auto-memoized components/hooks at build time; no manual useMemo/useCallback/memo needed
         for most code
     - id: compiler-install
-      name: Compiler installation
+      name: 'Compiler installation'
       summary: 'Install `babel-plugin-react-compiler` as a devDependency and enable it (Next: `reactCompiler:
         true`)'
       lenses: [perf]
@@ -125,56 +125,56 @@ groups:
       notes: [supports React 17/18 via `target`; best on 19; see next outline `react-compiler`]
       ref: /learn/react-compiler/installation
     - id: compiler-adoption
-      name: Incremental adoption
-      summary: Babel overrides, `"use memo"` opt-in, `"use no memo"` opt-out, gating
+      name: 'Incremental adoption'
+      summary: 'Babel overrides, `"use memo"` opt-in, `"use no memo"` opt-out, gating'
       lenses: [reliability, perf]
       notes: ['compilationMode infer (default), annotation, syntax, all']
       ref: /learn/react-compiler/incremental-adoption
     - id: compiler-debug
-      name: Debugging and troubleshooting the compiler
-      summary: panicThreshold, logger, skipped components
+      name: 'Debugging and troubleshooting the compiler'
+      summary: 'panicThreshold, logger, skipped components'
       lenses: [observability, reliability]
       ref: /learn/react-compiler/debugging
   - id: describing-ui
-    title: Describing the UI
+    title: 'Describing the UI'
     level: basic
     requires: [get-started]
     ref: /learn/describing-the-ui
     entries:
     - id: components-jsx
-      name: Components, JSX, props, conditional rendering, lists
-      summary: keys, import/export
+      name: 'Components, JSX, props, conditional rendering, lists'
+      summary: 'keys, import/export'
       lenses: [best-practice]
       ref: /learn/describing-the-ui
     - id: keeping-pure
-      name: Keeping components pure
-      summary: same inputs, same output; no mutation during render
+      name: 'Keeping components pure'
+      summary: 'same inputs, same output; no mutation during render'
       lenses: [best-practice, reliability]
       ref: /learn/keeping-components-pure
     - id: learn-first-component
-      name: Your first component
-      summary: Components are JavaScript functions with a capitalized name that return JSX
+      name: 'Your first component'
+      summary: 'Components are JavaScript functions with a capitalized name that return JSX'
       lenses:
       - best-practice
       ref: /learn/your-first-component
       notes:
       - do not define components inside other components; lowercase tags are treated as built-in elements
     - id: learn-import-export
-      name: Importing and exporting components
-      summary: Root component file, default versus named exports, several components per file
+      name: 'Importing and exporting components'
+      summary: 'Root component file, default versus named exports, several components per file'
       lenses:
       - composability
       ref: /learn/importing-and-exporting-components
     - id: learn-jsx-markup
-      name: Writing markup with JSX
-      summary: JSX groups rendering logic with markup; stricter than HTML (closed tags, one root, camelCase
+      name: 'Writing markup with JSX'
+      summary: 'JSX groups rendering logic with markup; stricter than HTML (closed tags, one root, camelCase'
         attributes)
       lenses:
       - best-practice
       ref: /learn/writing-markup-with-jsx
     - id: learn-jsx-curly
-      name: JavaScript in JSX with curly braces
-      summary: Curly braces embed JS values and expressions in content and attributes; double braces pass
+      name: 'JavaScript in JSX with curly braces'
+      summary: 'Curly braces embed JS values and expressions in content and attributes; double braces pass'
         an object
       lenses:
       - best-practice
@@ -182,8 +182,8 @@ groups:
       notes:
       - '`{{ }}` is a plain object inside braces, not special syntax'
     - id: learn-props
-      name: Passing props to a component
-      summary: Props flow down as read-only snapshots; destructure with defaults; nested JSX arrives as children
+      name: 'Passing props to a component'
+      summary: 'Props flow down as read-only snapshots; destructure with defaults; nested JSX arrives as children'
       lenses:
       - best-practice
       - typing-dx
@@ -194,51 +194,51 @@ groups:
         props cannot be changed
       - use state
     - id: learn-conditional
-      name: Conditional rendering
-      summary: Branch with plain JavaScript (if, ternary, &&) returning JSX or null
+      name: 'Conditional rendering'
+      summary: 'Branch with plain JavaScript (if, ternary, &&) returning JSX or null'
       lenses:
       - best-practice
       ref: /learn/conditional-rendering
     - id: learn-lists
-      name: Rendering lists
-      summary: map and filter arrays into elements; every item needs a stable key so React tracks it across
+      name: 'Rendering lists'
+      summary: 'map and filter arrays into elements; every item needs a stable key so React tracks it across'
         reorders
       lenses:
       - best-practice
       - perf
       ref: /learn/rendering-lists
     - id: learn-ui-tree
-      name: Understanding your UI as a tree
-      summary: Render tree (components in one render) versus module dependency tree (bundling and bundle size)
+      name: 'Understanding your UI as a tree'
+      summary: 'Render tree (components in one render) versus module dependency tree (bundling and bundle size)'
       lenses:
       - perf
       ref: /learn/understanding-your-ui-as-a-tree
   - id: interactivity
-    title: Adding interactivity and managing state
+    title: 'Adding interactivity and managing state'
     level: basic
     requires: [describing-ui]
     ref: /learn/adding-interactivity
     entries:
     - id: state-snapshot
-      name: State as a snapshot and update queueing
-      summary: updater functions, immutable updates
+      name: 'State as a snapshot and update queueing'
+      summary: 'updater functions, immutable updates'
       lenses: [best-practice]
       ref: /learn/state-as-a-snapshot
     - id: state-structure
-      name: State structure
-      summary: choosing structure, sharing state, preserving and resetting state with keys
+      name: 'State structure'
+      summary: 'choosing structure, sharing state, preserving and resetting state with keys'
       lenses: [composability, best-practice]
       notes: [global stores live in zustand (see zustand outline)]
       ref: /learn/choosing-the-state-structure
     - id: reducer-context
-      name: Reducer and Context
+      name: 'Reducer and Context'
       summary: '`useReducer` with `createContext` at scale'
       lenses: [composability]
       signature: useReducer, createContext
       ref: /learn/scaling-up-with-reducer-and-context
     - id: learn-events
-      name: Responding to events
-      summary: Pass handler functions (never call them) to event props; events bubble, so use stopPropagation
+      name: 'Responding to events'
+      summary: 'Pass handler functions (never call them) to event props; events bubble, so use stopPropagation'
         and preventDefault
       lenses:
       - best-practice
@@ -247,8 +247,8 @@ groups:
       - define custom event props on your components with application-specific names; calling a parent handler
         explicitly is an alternative to propagation
     - id: learn-state-memory
-      name: State, a component's memory
-      summary: useState persists values between renders; hooks run unconditionally at top level; state is
+      name: 'State, a component''s memory'
+      summary: 'useState persists values between renders; hooks run unconditionally at top level; state is'
         private per rendered instance
       lenses:
       - best-practice
@@ -257,16 +257,16 @@ groups:
       - React matches several state variables by call order; rendering a component twice gives each copy its
         own state
     - id: learn-render-commit
-      name: Render and commit
-      summary: Every update is trigger, render, commit; React touches the DOM only if the render output changed;
+      name: 'Render and commit'
+      summary: 'Every update is trigger, render, commit; React touches the DOM only if the render output changed;'
         Strict Mode surfaces mistakes
       lenses:
       - perf
       - best-practice
       ref: /learn/render-and-commit
     - id: learn-queue-updates
-      name: Queueing a series of state updates
-      summary: Updates are batched after handlers finish; use an updater function (n => n + 1) for several
+      name: 'Queueing a series of state updates'
+      summary: 'Updates are batched after handlers finish; use an updater function (n => n + 1) for several'
         updates to one value
       lenses:
       - best-practice
@@ -275,8 +275,8 @@ groups:
       notes:
       - setting state requests a new render and does not change the variable in the current render
     - id: learn-update-objects
-      name: Updating objects in state
-      summary: Treat state as immutable; copy with spread (shallow) up the path to nested values; Immer reduces
+      name: 'Updating objects in state'
+      summary: 'Treat state as immutable; copy with spread (shallow) up the path to nested values; Immer reduces'
         boilerplate
       lenses:
       - best-practice
@@ -285,44 +285,44 @@ groups:
       notes:
       - mutating does not trigger renders and corrupts earlier render snapshots
     - id: learn-update-arrays
-      name: Updating arrays in state
-      summary: Replace arrays with new ones via spread, filter and map rather than mutating; Immer is optional
+      name: 'Updating arrays in state'
+      summary: 'Replace arrays with new ones via spread, filter and map rather than mutating; Immer is optional'
       lenses:
       - best-practice
       - reliability
       ref: /learn/updating-arrays-in-state
   - id: learn-managing-state
-    title: Managing state
+    title: 'Managing state'
     level: intermediate
     requires:
     - interactivity
     ref: /learn/managing-state
     entries:
     - id: learn-input-state
-      name: Reacting to input with state
-      summary: Describe UI per visual state declaratively; identify states and triggers, model with useState,
+      name: 'Reacting to input with state'
+      summary: 'Describe UI per visual state declaratively; identify states and triggers, model with useState,'
         drop redundant state
       lenses:
       - best-practice
       ref: /learn/reacting-to-input-with-state
     - id: learn-lift-state
-      name: Sharing state between components
-      summary: Lift state to the closest common parent and pass values and handlers down; controlled versus
+      name: 'Sharing state between components'
+      summary: 'Lift state to the closest common parent and pass values and handlers down; controlled versus'
         uncontrolled components
       lenses:
       - composability
       ref: /learn/sharing-state-between-components
     - id: learn-preserve-state
-      name: Preserving and resetting state
-      summary: State belongs to a tree position; a different key resets a subtree; nested component definitions
+      name: 'Preserving and resetting state'
+      summary: 'State belongs to a tree position; a different key resets a subtree; nested component definitions'
         reset state by accident
       lenses:
       - best-practice
       - reliability
       ref: /learn/preserving-and-resetting-state
     - id: learn-reducer
-      name: Extracting state logic into a reducer
-      summary: Move useState updates into a pure reducer where each action describes one user interaction
+      name: 'Extracting state logic into a reducer'
+      summary: 'Move useState updates into a pure reducer where each action describes one user interaction'
       lenses:
       - best-practice
       - testing
@@ -330,53 +330,53 @@ groups:
       notes:
       - Immer enables mutating-style reducers; reducers ease debugging and testing
     - id: learn-context
-      name: Passing data deeply with context
-      summary: createContext, useContext and a provider avoid prop drilling; try props or children first
+      name: 'Passing data deeply with context'
+      summary: 'createContext, useContext and a provider avoid prop drilling; try props or children first'
       lenses:
       - composability
       ref: /learn/passing-data-deeply-with-context
       notes:
       - provide with <MyContext value={...}> in React 19; context passes through intermediate components
   - id: escape-hatches
-    title: Escape hatches
+    title: 'Escape hatches'
     level: intermediate
     requires: [interactivity]
     ref: /learn/escape-hatches
     entries:
     - id: refs-dom
-      name: Refs and DOM manipulation
+      name: 'Refs and DOM manipulation'
       summary: '`useRef`, ref as a prop'
       lenses: [best-practice]
       signature: useRef
       notes: ['React 19: `ref` is a plain prop; forwardRef no longer needed']
       ref: /learn/referencing-values-with-refs
     - id: effects
-      name: Synchronizing with Effects and lifecycle
-      summary: An Effect connects a component to an external system with setup/cleanup that mirrors it;
+      name: 'Synchronizing with Effects and lifecycle'
+      summary: 'An Effect connects a component to an external system with setup/cleanup that mirrors it;'
         StrictMode runs an extra setup+cleanup in dev
       lenses: [best-practice, reliability]
       ref: /learn/synchronizing-with-effects
     - id: no-effect
-      name: You Might Not Need an Effect
-      summary: derive in render, events not effects, key to reset state
+      name: 'You Might Not Need an Effect'
+      summary: 'derive in render, events not effects, key to reset state'
       lenses: [best-practice, perf]
       notes: [compiler lint `set-state-in-effect` flags the anti-pattern]
       ref: /learn/you-might-not-need-an-effect
     - id: effect-events
-      name: Separating events from Effects
+      name: 'Separating events from Effects'
       summary: '`useEffectEvent`, removing dependencies'
       lenses: [best-practice]
       signature: useEffectEvent
       notes: [only call Effect Events inside Effects; never to dodge dependency arrays]
       ref: /learn/separating-events-from-effects
     - id: custom-hooks
-      name: Custom hooks
-      summary: reuse stateful logic across components
+      name: 'Custom hooks'
+      summary: 'reuse stateful logic across components'
       lenses: [reuse, composability]
       ref: /learn/reusing-logic-with-custom-hooks
     - id: learn-dom-refs
-      name: Manipulating the DOM with refs
-      summary: Refs hold DOM nodes for focus, scroll and measurement; components expose nodes only via the
+      name: 'Manipulating the DOM with refs'
+      summary: 'Refs hold DOM nodes for focus, scroll and measurement; components expose nodes only via the'
         ref prop; avoid mutating React-managed DOM
       lenses:
       - best-practice
@@ -384,8 +384,8 @@ groups:
       notes:
       - use ref callbacks to manage lists of refs; modify only DOM parts React has no reason to update
     - id: learn-effect-lifecycle
-      name: Lifecycle of reactive effects
-      summary: Each Effect is an independent start/stop synchronization process; reactive values must be dependencies,
+      name: 'Lifecycle of reactive effects'
+      summary: 'Each Effect is an independent start/stop synchronization process; reactive values must be dependencies,'
         verified by the linter
       lenses:
       - best-practice
@@ -395,8 +395,8 @@ groups:
       - think per Effect rather than per component mount or unmount; an empty array means no reactive values;
         every linter error is legitimate
     - id: learn-remove-deps
-      name: Removing Effect dependencies
-      summary: Fix code, not the dependency list; move logic to handlers, split Effects, use updater functions
+      name: 'Removing Effect dependencies'
+      summary: 'Fix code, not the dependency list; move logic to handlers, split Effects, use updater functions'
         or Effect Events
       lenses:
       - best-practice
@@ -405,17 +405,17 @@ groups:
       notes:
       - never suppress the linter; avoid object and function dependencies by moving them outside the component
         or inside the Effect; extract non-reactive reads into an Effect Event
-- title: API Reference
+- title: 'API Reference'
   sections:
   - id: api-hooks
-    title: React Hooks
+    title: 'React Hooks'
     level: intermediate
     requires: [interactivity]
     ref: /reference/react/hooks
     entries:
     - id: use-state
-      name: useState / useReducer
-      summary: Local component state; pass an initializer function for expensive initial values and an
+      name: 'useState / useReducer'
+      summary: 'Local component state; pass an initializer function for expensive initial values and an'
         updater function for derived updates
       lenses: [best-practice]
       ref: /reference/react/useState
@@ -427,8 +427,8 @@ groups:
       returns: '[state, setState]; setState accepts a value or a pure updater `(prev) => next` and bails
         out on Object.is equality'
     - id: use-effect
-      name: useEffect / useLayoutEffect / useInsertionEffect
-      summary: Synchronize a component with an external system; setup returns cleanup, which StrictMode
+      name: 'useEffect / useLayoutEffect / useInsertionEffect'
+      summary: 'Synchronize a component with an external system; setup returns cleanup, which StrictMode'
         exercises on mount
       lenses: [best-practice, reliability]
       ref: /reference/react/useEffect
@@ -441,8 +441,8 @@ groups:
           read inside setup; [] = once on mount'}
       returns: undefined; effects never run during server rendering
     - id: use-effect-event
-      name: useEffectEvent
-      summary: Wrap non-reactive logic called from an Effect so it reads latest props/state without becoming
+      name: 'useEffectEvent'
+      summary: 'Wrap non-reactive logic called from an Effect so it reads latest props/state without becoming'
         a dependency
       lenses: [best-practice, typing-dx]
       ref: /reference/react/useEffectEvent
@@ -454,8 +454,8 @@ groups:
       returns: Effect Event function (same type as callback, identity changes every render); call only
         inside Effects or other Effect Events
     - id: use-sync-external-store
-      name: useSyncExternalStore
-      summary: Subscribe to a non-React store (or browser API) tear-free; also the idiom for hydration-safe
+      name: 'useSyncExternalStore'
+      summary: 'Subscribe to a non-React store (or browser API) tear-free; also the idiom for hydration-safe'
         client-only values
       lenses: [reliability, composability]
       signature: useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot?)
@@ -473,8 +473,8 @@ groups:
       returns: current snapshot of the store; re-renders when subscribe callback fires and snapshot changes
         (Object.is)
     - id: use-memo
-      name: useMemo / useCallback / memo
-      summary: Cache a pure computation between renders as a perf hint; React may discard it, and the
+      name: 'useMemo / useCallback / memo'
+      summary: 'Cache a pure computation between renders as a perf hint; React may discard it, and the'
         Compiler makes most uses redundant
       lenses: [perf, best-practice]
       notes: [compiler makes manual memo redundant]
@@ -487,8 +487,8 @@ groups:
       - {name: dependencies, type: 'unknown[]', default: null, desc: every reactive value read in calculateValue}
       returns: cached value from last render, or fresh calculateValue() result when dependencies changed
     - id: use-ref
-      name: useRef / useImperativeHandle / useId / useDebugValue
-      summary: Hold a mutable value that does not trigger re-render (DOM node, timer id); never read or
+      name: 'useRef / useImperativeHandle / useId / useDebugValue'
+      summary: 'Hold a mutable value that does not trigger re-render (DOM node, timer id); never read or'
         write `.current` during render
       lenses: [best-practice]
       ref: /reference/react/useRef
@@ -498,8 +498,8 @@ groups:
       - {name: initialValue, type: T, default: null, desc: initial `current`; ignored after first render}
       returns: stable `{ current }` object; assigned to a DOM node when passed as a `ref` prop
     - id: use-id
-      name: useId
-      summary: Generate a stable unique id string for accessibility attributes; not for list keys or cache
+      name: 'useId'
+      summary: 'Generate a stable unique id string for accessibility attributes; not for list keys or cache'
         keys
       lenses: [ux-a11y]
       signature: useId()
@@ -507,8 +507,8 @@ groups:
       ref: /reference/react/useId
       import: react
     - id: use-context
-      name: useContext / createContext
-      summary: Read a context value (nearest provider above, else the default); re-renders when the value
+      name: 'useContext / createContext'
+      summary: 'Read a context value (nearest provider above, else the default); re-renders when the value'
         changes by Object.is
       lenses: [composability]
       signature: useContext(SomeContext)
@@ -518,8 +518,8 @@ groups:
       - {name: SomeContext, type: Context<T>, default: null, desc: object from createContext}
       returns: context value of the closest provider; `use(Context)` is the conditional-capable alternative
     - id: use-transition
-      name: useTransition / startTransition / useDeferredValue
-      summary: Mark state updates as non-blocking Transitions and expose a pending flag; async Actions
+      name: 'useTransition / startTransition / useDeferredValue'
+      summary: 'Mark state updates as non-blocking Transitions and expose a pending flag; async Actions'
         are supported
       lenses: [perf, ux-a11y]
       ref: /reference/react/useTransition
@@ -529,7 +529,7 @@ groups:
         re-wrapped in startTransition'
       notes: [Transitions are interruptible and keep already-revealed Suspense content on screen]
     - id: use-deferred-value
-      name: useDeferredValue
+      name: 'useDeferredValue'
       summary: 'Defer re-rendering a slow subtree: returns the old value first, then re-renders in background
         with the new one'
       lenses: [perf, ux-a11y]
@@ -543,8 +543,8 @@ groups:
       returns: deferred copy of value; inside a Transition it equals the new value (no extra render)
       ref: /reference/react/useDeferredValue
     - id: use-action-state
-      name: useActionState / useOptimistic / react-dom `useFormStatus`
-      summary: State driven by an (async) Action, with pending flag; the form-submit counterpart of useReducer
+      name: 'useActionState / useOptimistic / react-dom `useFormStatus`'
+      summary: 'State driven by an (async) Action, with pending flag; the form-submit counterpart of useReducer'
       lenses: [ux-a11y, best-practice]
       ref: /reference/react/useActionState
       import: react
@@ -559,8 +559,8 @@ groups:
       returns: '[state, dispatchAction, isPending]; dispatchAction must run inside an Action (form action
         or startTransition)'
     - id: use-optimistic
-      name: useOptimistic
-      summary: Show a temporary optimistic value while an Action is pending; reverts to the real value
+      name: 'useOptimistic'
+      summary: 'Show a temporary optimistic value while an Action is pending; reverts to the real value'
         when it settles
       lenses: [ux-a11y, best-practice]
       signature: useOptimistic(value, reducer?)
@@ -571,8 +571,8 @@ groups:
       returns: '[optimisticState, setOptimistic]; setOptimistic must be called inside an Action'
       ref: /reference/react/useOptimistic
     - id: use-reducer
-      name: useReducer
-      summary: State with a pure reducer and dispatch; centralizes complex update logic and has a stable dispatch
+      name: 'useReducer'
+      summary: 'State with a pure reducer and dispatch; centralizes complex update logic and has a stable dispatch'
         identity
       lenses:
       - best-practice
@@ -581,15 +581,15 @@ groups:
       import: react
       signature: useReducer(reducer, initialArg, init?)
       params:
-      - name: reducer
+      - name: 'reducer'
         type: (state, action) => state
         default: null
         desc: pure function returning the next state
-      - name: initialArg
+      - name: 'initialArg'
         type: S
         default: null
         desc: initial state or the input to init
-      - name: init
+      - name: 'init'
         type: (initialArg) => S
         default: null
         desc: optional initializer; initial state is init(initialArg)
@@ -599,8 +599,8 @@ groups:
       - Strict Mode calls reducer and initializer twice in development to expose impurities; dispatch only
         changes the next render's state
     - id: use-callback
-      name: useCallback
-      summary: Cache a function definition between renders as a perf hint; the Compiler makes most manual
+      name: 'useCallback'
+      summary: 'Cache a function definition between renders as a perf hint; the Compiler makes most manual'
         uses redundant
       lenses:
       - perf
@@ -609,11 +609,11 @@ groups:
       import: react
       signature: useCallback(fn, dependencies)
       params:
-      - name: fn
+      - name: 'fn'
         type: (...args) => any
         default: null
         desc: function to cache; returned, not called
-      - name: dependencies
+      - name: 'dependencies'
         type: unknown[]
         default: null
         desc: every reactive value referenced inside fn
@@ -622,8 +622,8 @@ groups:
       - React Compiler memoizes functions automatically; React may discard the cache
       - so use only as a performance hint
     - id: use-imperative-handle
-      name: useImperativeHandle
-      summary: Customize the handle a component exposes through a ref prop (React 19 passes ref as a plain
+      name: 'useImperativeHandle'
+      summary: 'Customize the handle a component exposes through a ref prop (React 19 passes ref as a plain'
         prop)
       lenses:
       - composability
@@ -632,22 +632,22 @@ groups:
       import: react
       signature: useImperativeHandle(ref, createHandle, dependencies?)
       params:
-      - name: ref
+      - name: 'ref'
         type: Ref<T>
         default: null
         desc: the ref received as a prop
-      - name: createHandle
+      - name: 'createHandle'
         type: () => T
         default: null
         desc: no-arg function returning the exposed handle, usually an object of methods
-      - name: dependencies
+      - name: 'dependencies'
         type: unknown[]
         default: null
         desc: optional; reactive values read in createHandle
       returns: undefined
     - id: use-layout-effect
-      name: useLayoutEffect
-      summary: Effect that fires before the browser repaints, for layout measurement; blocks painting so prefer
+      name: 'useLayoutEffect'
+      summary: 'Effect that fires before the browser repaints, for layout measurement; blocks painting so prefer'
         useEffect
       lenses:
       - perf
@@ -656,11 +656,11 @@ groups:
       import: react
       signature: useLayoutEffect(setup, dependencies?)
       params:
-      - name: setup
+      - name: 'setup'
         type: () => void | (() => void)
         default: null
         desc: runs after commit and before repaint; optional cleanup
-      - name: dependencies
+      - name: 'dependencies'
         type: unknown[]
         default: omitted = every render
         desc: reactive values read in setup
@@ -669,19 +669,19 @@ groups:
       - client-only
       - does not run during server rendering; a state update inside it flushes remaining effects immediately
     - id: use-insertion-effect
-      name: useInsertionEffect
-      summary: Effect that fires before layout effects, meant for CSS-in-JS libraries injecting styles
+      name: 'useInsertionEffect'
+      summary: 'Effect that fires before layout effects, meant for CSS-in-JS libraries injecting styles'
       lenses:
       - perf
       ref: /reference/react/useInsertionEffect
       import: react
       signature: useInsertionEffect(setup, dependencies?)
       params:
-      - name: setup
+      - name: 'setup'
         type: () => void | (() => void)
         default: null
         desc: runs before any layout effect; optional cleanup
-      - name: dependencies
+      - name: 'dependencies'
         type: unknown[]
         default: omitted = every render
         desc: reactive values read in setup
@@ -690,8 +690,8 @@ groups:
       - cannot update state; refs are not attached yet; client-only; for library authors
       - application code should use useEffect or useLayoutEffect
     - id: use-debug-value
-      name: useDebugValue
-      summary: Label a custom hook value in React DevTools, with an optional lazy formatter
+      name: 'useDebugValue'
+      summary: 'Label a custom hook value in React DevTools, with an optional lazy formatter'
       lenses:
       - observability
       - typing-dx
@@ -699,29 +699,29 @@ groups:
       import: react
       signature: useDebugValue(value, format?)
       params:
-      - name: value
+      - name: 'value'
         type: any
         default: null
         desc: value displayed in DevTools
-      - name: format
+      - name: 'format'
         type: (value) => any
         default: null
         desc: optional formatter called only when the component is inspected
       returns: undefined
   - id: api-components
-    title: React components
+    title: 'React components'
     level: intermediate
     requires: [api-hooks]
     ref: /reference/react/components
     entries:
     - id: strict-mode
       name: '`<StrictMode>`'
-      summary: dev-only extra renders and Effect re-runs to expose impurity
+      summary: 'dev-only extra renders and Effect re-runs to expose impurity'
       lenses: [reliability, testing]
       ref: /reference/react/StrictMode
     - id: suspense
       name: '`<Suspense>`'
-      summary: Show a fallback until children finish loading (lazy code, `use(promise)`, framework data);
+      summary: 'Show a fallback until children finish loading (lazy code, `use(promise)`, framework data);'
         pairs with error boundaries
       lenses: [ux-a11y, perf]
       ref: /reference/react/Suspense
@@ -735,7 +735,7 @@ groups:
           once per 300ms]
     - id: activity
       name: '`<Activity mode="visible|hidden">`'
-      summary: Hide UI while preserving state and unmounting its Effects; hidden children re-render at
+      summary: 'Hide UI while preserving state and unmounting its Effects; hidden children re-render at'
         low priority
       lenses: [ux-a11y, perf]
       ref: /reference/react/Activity
@@ -745,7 +745,7 @@ groups:
           destroys Effects, keeps state; visible restores both'}
     - id: view-transition
       name: '`<ViewTransition>` / `addTransitionType`'
-      summary: Animate enter/exit/update/shared-element changes caused by Transitions, Suspense or useDeferredValue
+      summary: 'Animate enter/exit/update/shared-element changes caused by Transitions, Suspense or useDeferredValue'
         via the browser View Transition API
       lenses: [ux-a11y]
       notes: ['only updates inside a Transition, Suspense or useDeferredValue activate it; plain setState
@@ -760,8 +760,8 @@ groups:
       - {name: onEnter / onExit / onUpdate / onShare, type: '(instance, types) => cleanup?', default: null,
         desc: imperative animation callbacks using Web Animations API}
     - id: fragment-profiler
-      name: Fragment and Profiler
-      summary: Fragment with a ref exposes a FragmentInstance for observing/measuring its first-level
+      name: 'Fragment and Profiler'
+      summary: 'Fragment with a ref exposes a FragmentInstance for observing/measuring its first-level'
         DOM children; Profiler reports render timings
       lenses: [composability, observability]
       signature: <Fragment ref={ref}> / <Profiler id onRender>
@@ -774,8 +774,8 @@ groups:
           => void', default: null, desc: called per commit of the profiled subtree; disabled in production
           builds}
     - id: profiler
-      name: Profiler
-      summary: Measure render cost of a subtree programmatically via an onRender callback; disabled in production
+      name: 'Profiler'
+      summary: 'Measure render cost of a subtree programmatically via an onRender callback; disabled in production'
         builds by default
       lenses:
       - observability
@@ -784,25 +784,25 @@ groups:
       import: react
       signature: <Profiler id onRender>
       options:
-      - name: id
+      - name: 'id'
         type: string
         default: null
         desc: identifies the profiled UI part
-      - name: onRender
+      - name: 'onRender'
         type: (id, phase, actualDuration, baseDuration, startTime, commitTime) => void
         default: null
         desc: called on every commit within the tree; phase is mount, update or nested-update
       notes:
       - needs a profiling build to run in production; adds overhead
   - id: api-apis
-    title: React APIs
+    title: 'React APIs'
     level: intermediate
     requires: [api-hooks]
     ref: /reference/react/apis
     entries:
     - id: use-api
-      name: use
-      summary: Read a Promise (suspends) or context during render; unlike Hooks it may be called in loops
+      name: 'use'
+      summary: 'Read a Promise (suspends) or context during render; unlike Hooks it may be called in loops'
         and conditionals
       lenses: [composability, perf]
       ref: /reference/react/use
@@ -815,7 +815,7 @@ groups:
       notes: ['`use(Context)` is not supported in Server Components', '`use(browser())` is the 19.3 browser-only
           render marker']
     - id: use-browser
-      name: use(browser())
+      name: 'use(browser())'
       summary: 'Mark a Client Component browser-only during SSR: leaves the nearest Suspense fallback
         in the HTML, renders normally in the browser'
       lenses: [reliability, ux-a11y]
@@ -828,8 +828,8 @@ groups:
       ref: /reference/react-dom/browser
       import: react-dom
     - id: cache-api
-      name: cache / cacheSignal
-      summary: Memoize a function per server request in Server Components; `cacheSignal()` yields an AbortSignal
+      name: 'cache / cacheSignal'
+      summary: 'Memoize a function per server request in Server Components; `cacheSignal()` yields an AbortSignal'
         for that cache lifetime
       lenses: [perf, reliability]
       ref: /reference/react/cache
@@ -842,8 +842,8 @@ groups:
       notes: [call cache() once at module scope; each call creates an independent cache, Server Components
           only]
     - id: act-api
-      name: act
-      summary: Flush React updates and Effects before assertions in tests; always `await` it with an async
+      name: 'act'
+      summary: 'Flush React updates and Effects before assertions in tests; always `await` it with an async'
         callback
       lenses: [testing]
       notes: [imported via @testing-library/react]
@@ -855,7 +855,7 @@ groups:
           updates are queued and flushed together}
       returns: Promise resolving after updates flush; sync form is slated for deprecation
     - id: lazy-start
-      name: lazy and startTransition
+      name: 'lazy and startTransition'
       summary: '`lazy` defers component code until first render (suspends); standalone `startTransition`
         marks updates as Transitions outside components'
       lenses: [perf]
@@ -869,21 +869,21 @@ groups:
           set* calls inside become Transitions; no pending flag (use useTransition)'}
       returns: lazy returns a component that suspends until loaded; startTransition returns nothing
     - id: taint-apis
-      name: experimental_taintObjectReference / experimental_taintUniqueValue
-      summary: stop secrets reaching the client
+      name: 'experimental_taintObjectReference / experimental_taintUniqueValue'
+      summary: 'stop secrets reaching the client'
       lenses: [security]
       ref: /reference/react/experimental_taintObjectReference
     - id: owner-stack
-      name: captureOwnerStack
-      summary: Dev-only string of the component owner stack at the current render, for richer error reports
+      name: 'captureOwnerStack'
+      summary: 'Dev-only string of the component owner stack at the current render, for richer error reports'
       lenses: [observability]
       ref: /reference/react/captureOwnerStack
       import: react
       signature: captureOwnerStack()
       returns: string | null; null in production or when called outside render/error callbacks
     - id: start-transition
-      name: startTransition
-      summary: Standalone function marking state updates in its action as a Transition, without a pending
+      name: 'startTransition'
+      summary: 'Standalone function marking state updates in its action as a Transition, without a pending'
         flag
       lenses:
       - perf
@@ -892,7 +892,7 @@ groups:
       import: react
       signature: startTransition(action)
       params:
-      - name: action
+      - name: 'action'
         type: () => void | Promise<void>
         default: null
         desc: called immediately; set functions called synchronously inside become Transitions
@@ -901,19 +901,19 @@ groups:
       - no pending indicator (use useTransition); updates after an await need another startTransition; cannot
         drive text inputs; setTimeout updates are not Transitions
     - id: memo-api
-      name: memo
-      summary: Skip re-rendering a component when props are unchanged; a perf hint the Compiler applies automatically
+      name: 'memo'
+      summary: 'Skip re-rendering a component when props are unchanged; a perf hint the Compiler applies automatically'
       lenses:
       - perf
       ref: /reference/react/memo
       import: react
       signature: memo(Component, arePropsEqual?)
       params:
-      - name: Component
+      - name: 'Component'
         type: ComponentType
         default: null
         desc: component to memoize; returns a new memoized component
-      - name: arePropsEqual
+      - name: 'arePropsEqual'
         type: (prevProps, nextProps) => boolean
         default: null
         desc: optional custom comparison; default is shallow Object.is per prop
@@ -921,8 +921,8 @@ groups:
       notes:
       - React Compiler applies the equivalent to all components
     - id: create-context
-      name: createContext
-      summary: Create a context object to provide and read; React 19 renders the context itself as the provider
+      name: 'createContext'
+      summary: 'Create a context object to provide and read; React 19 renders the context itself as the provider'
       lenses:
       - composability
       - typing-dx
@@ -930,7 +930,7 @@ groups:
       import: react
       signature: createContext(defaultValue)
       params:
-      - name: defaultValue
+      - name: 'defaultValue'
         type: T
         default: null
         desc: value when no provider is above; use null if there is no meaningful default; never changes
@@ -939,51 +939,51 @@ groups:
       notes:
       - call outside any component
     - id: create-element
-      name: createElement
-      summary: Create a React element without JSX; elements and props are immutable
+      name: 'createElement'
+      summary: 'Create a React element without JSX; elements and props are immutable'
       lenses:
       - composability
       ref: /reference/react/createElement
       import: react
       signature: createElement(type, props, ...children)
       params:
-      - name: type
+      - name: 'type'
         type: string | ComponentType
         default: null
         desc: tag name string, component, Fragment, Suspense or Activity
-      - name: props
+      - name: 'props'
         type: object | null
         default: null
         desc: element props; ref and key are lifted out of props
-      - name: children
+      - name: 'children'
         type: ReactNode
         default: null
         desc: optional children as rest args; pass a dynamic array as one argument
       returns: element object { type, props, ref, key }
     - id: is-valid-element
-      name: isValidElement
-      summary: Type guard for React elements (JSX or createElement results; not numbers, strings or arrays)
+      name: 'isValidElement'
+      summary: 'Type guard for React elements (JSX or createElement results; not numbers, strings or arrays)'
       lenses:
       - typing-dx
       ref: /reference/react/isValidElement
       import: react
       signature: isValidElement(value)
       params:
-      - name: value
+      - name: 'value'
         type: unknown
         default: null
         desc: value to check
       returns: boolean
     - id: add-transition-type
-      name: addTransitionType
-      summary: Tag the current Transition with a cause string, consumed by ViewTransition to choose animations
+      name: 'addTransitionType'
+      summary: 'Tag the current Transition with a cause string, consumed by ViewTransition to choose animations'
       lenses:
       - ux-a11y
       ref: /reference/react/addTransitionType
       import: react
       signature: addTransitionType(type)
       params:
-      - name: type
+      - name: 'type'
         type: string
         default: null
         desc: cause of the transition; multiple types accumulate
@@ -992,8 +992,8 @@ groups:
       - types reset after each commit
       - so a Suspense fallback gets them but the later content reveal does not; call inside startTransition
     - id: cache-signal
-      name: cacheSignal
-      summary: AbortSignal aborted when the cache() lifetime ends, to cancel in-flight work; Server Components
+      name: 'cacheSignal'
+      summary: 'AbortSignal aborted when the cache() lifetime ends, to cancel in-flight work; Server Components'
         only
       lenses:
       - reliability
@@ -1004,22 +1004,22 @@ groups:
       returns: AbortSignal during rendering in an RSC (aborted when render completes, aborts or fails); null
         in Client Components and outside render
     - id: taint-unique-value
-      name: experimental_taintUniqueValue
-      summary: Experimental; block high-entropy secrets (tokens, keys, hashes) from reaching Client Components
+      name: 'experimental_taintUniqueValue'
+      summary: 'Experimental; block high-entropy secrets (tokens, keys, hashes) from reaching Client Components'
       lenses:
       - security
       ref: /reference/react/experimental_taintUniqueValue
       signature: taintUniqueValue(message, lifetime, value)
       params:
-      - name: message
+      - name: 'message'
         type: string
         default: null
         desc: error text thrown if the value reaches a Client Component
-      - name: lifetime
+      - name: 'lifetime'
         type: object
         default: null
         desc: value stays tainted while this object exists, e.g. globalThis
-      - name: value
+      - name: 'value'
         type: string | bigint | TypedArray
         default: null
         desc: unique high-entropy value
@@ -1028,25 +1028,25 @@ groups:
       - only in react@experimental and RSC; derived values (uppercase or base64) are not tainted; useless
         for low-entropy values like PINs
   - id: api-react-dom
-    title: React DOM
+    title: 'React DOM'
     level: intermediate
     requires: [api-components]
     ref: /reference/react-dom
     entries:
     - id: dom-components
-      name: react-dom components
+      name: 'react-dom components'
       summary: '`<form action>` plus hoisted `<title>`/`<meta>`/`<link>`/`<script>`/`<style>` (with precedence)'
       lenses: [best-practice, ux-a11y]
       signature: <form action>, <input>, <img>, <link>, <meta>, <title>, <script>, <style>
       ref: /reference/react-dom/components
     - id: dom-apis
-      name: react-dom APIs
-      summary: createPortal, flushSync, preload/preinit/preconnect/prefetchDNS
+      name: 'react-dom APIs'
+      summary: 'createPortal, flushSync, preload/preinit/preconnect/prefetchDNS'
       lenses: [perf]
       ref: /reference/react-dom
     - id: client-apis
-      name: createRoot / hydrateRoot
-      summary: Root-level error reporting hooks on createRoot/hydrateRoot; Next owns the root so use Next
+      name: 'createRoot / hydrateRoot'
+      summary: 'Root-level error reporting hooks on createRoot/hydrateRoot; Next owns the root so use Next'
         error boundaries instead
       lenses: [reliability, observability]
       signature: createRoot(domNode, options?)
@@ -1063,14 +1063,14 @@ groups:
           with multiple roots}
       returns: root with render(node) and unmount()
     - id: server-static-apis
-      name: Server and Static APIs
-      summary: Server render/prerender APIs (renderToPipeableStream, renderToReadableStream, resume, prerender);
+      name: 'Server and Static APIs'
+      summary: 'Server render/prerender APIs (renderToPipeableStream, renderToReadableStream, resume, prerender);'
         Next calls these itself
       lenses: [perf]
       ref: /reference/react-dom/server
     - id: create-root
-      name: createRoot
-      summary: Create a client-rendered root with render and unmount; first render clears existing DOM content
+      name: 'createRoot'
+      summary: 'Create a client-rendered root with render and unmount; first render clears existing DOM content'
       lenses:
       - reliability
       - observability
@@ -1078,19 +1078,19 @@ groups:
       import: react-dom/client
       signature: createRoot(domNode, options?)
       options:
-      - name: onCaughtError
+      - name: 'onCaughtError'
         type: (error, errorInfo) => void
         default: console.error
         desc: called when an Error Boundary catches; errorInfo.componentStack
-      - name: onUncaughtError
+      - name: 'onUncaughtError'
         type: (error, errorInfo) => void
         default: reportError
         desc: errors no boundary caught
-      - name: onRecoverableError
+      - name: 'onRecoverableError'
         type: (error, errorInfo) => void
         default: reportError
         desc: automatically recovered errors; may carry error.cause
-      - name: identifierPrefix
+      - name: 'identifierPrefix'
         type: string
         default: '""'
         desc: prefix for useId ids; avoids collisions with several roots
@@ -1099,8 +1099,8 @@ groups:
       - not supported for server-rendered HTML (use hydrateRoot); root.render is async so DOM and effects
         are not yet updated on the next line; use createPortal for modals instead of extra roots
     - id: hydrate-root
-      name: hydrateRoot
-      summary: Attach React to server-rendered HTML; mismatches are bugs and the markup must match the client
+      name: 'hydrateRoot'
+      summary: 'Attach React to server-rendered HTML; mismatches are bugs and the markup must match the client'
         render
       lenses:
       - reliability
@@ -1108,23 +1108,23 @@ groups:
       import: react-dom/client
       signature: hydrateRoot(domNode, reactNode, options?)
       options:
-      - name: onCaughtError
+      - name: 'onCaughtError'
         type: (error, errorInfo) => void
         default: console.error
         desc: Error Boundary caught
-      - name: onUncaughtError
+      - name: 'onUncaughtError'
         type: (error, errorInfo) => void
         default: reportError
         desc: no boundary caught
-      - name: onRecoverableError
+      - name: 'onRecoverableError'
         type: (error, errorInfo) => void
         default: reportError
         desc: automatic recovery, e.g. hydration mismatch
-      - name: identifierPrefix
+      - name: 'identifierPrefix'
         type: string
         default: '""'
         desc: must equal the prefix used on the server
-      - name: formState
+      - name: 'formState'
         type: ReactFormState | null
         default: null
         desc: form state from a Server Function submission using useActionState with a permalink
@@ -1133,8 +1133,8 @@ groups:
       notes:
       - attribute mismatches are not patched up in production
     - id: create-portal
-      name: createPortal
-      summary: Render children into a different DOM node while keeping React context and event bubbling through
+      name: 'createPortal'
+      summary: 'Render children into a different DOM node while keeping React context and event bubbling through'
         the React tree
       lenses:
       - composability
@@ -1143,15 +1143,15 @@ groups:
       import: react-dom
       signature: createPortal(children, domNode, key?)
       params:
-      - name: children
+      - name: 'children'
         type: ReactNode
         default: null
         desc: anything renderable
-      - name: domNode
+      - name: 'domNode'
         type: Element
         default: null
         desc: existing DOM node; changing it recreates the content
-      - name: key
+      - name: 'key'
         type: string | number
         default: null
         desc: optional portal key
@@ -1160,15 +1160,15 @@ groups:
       - events propagate along the React tree
       - not the DOM tree
     - id: flush-sync
-      name: flushSync
-      summary: Force synchronous DOM update for updates inside a callback; last resort that hurts performance
+      name: 'flushSync'
+      summary: 'Force synchronous DOM update for updates inside a callback; last resort that hurts performance'
       lenses:
       - perf
       ref: /reference/react-dom/flushSync
       import: react-dom
       signature: flushSync(callback)
       params:
-      - name: callback
+      - name: 'callback'
         type: () => void
         default: null
         desc: called immediately; its updates are flushed synchronously
@@ -1176,8 +1176,8 @@ groups:
       notes:
       - may re-show Suspense fallbacks and flush pending effects and unrelated pending updates
     - id: use-form-status
-      name: useFormStatus
-      summary: Read status of the parent form submission from a child component (pending, data, method, action)
+      name: 'useFormStatus'
+      summary: 'Read status of the parent form submission from a child component (pending, data, method, action)'
       lenses:
       - ux-a11y
       - composability
@@ -1189,15 +1189,15 @@ groups:
       - must be called from a component rendered inside the form; reports only the parent form
       - not one rendered in the same component
     - id: preconnect
-      name: preconnect
-      summary: Hint the browser to open a connection to a server hosting expected resources
+      name: 'preconnect'
+      summary: 'Hint the browser to open a connection to a server hosting expected resources'
       lenses:
       - perf
       ref: /reference/react-dom/preconnect
       import: react-dom
       signature: preconnect(href)
       params:
-      - name: href
+      - name: 'href'
         type: string
         default: null
         desc: server URL
@@ -1205,15 +1205,15 @@ groups:
       notes:
       - idempotent; on the server only effective during component render; useless for the page's own origin
     - id: prefetch-dns
-      name: prefetchDNS
-      summary: Hint the browser to resolve the IP of a server early; cheaper than preconnect for many domains
+      name: 'prefetchDNS'
+      summary: 'Hint the browser to resolve the IP of a server early; cheaper than preconnect for many domains'
       lenses:
       - perf
       ref: /reference/react-dom/prefetchDNS
       import: react-dom
       signature: prefetchDNS(href)
       params:
-      - name: href
+      - name: 'href'
         type: string
         default: null
         desc: server URL
@@ -1221,35 +1221,35 @@ groups:
       notes:
       - idempotent; on the server only effective during component render
     - id: preinit
-      name: preinit
-      summary: Eagerly fetch and evaluate a stylesheet or external script
+      name: 'preinit'
+      summary: 'Eagerly fetch and evaluate a stylesheet or external script'
       lenses:
       - perf
       ref: /reference/react-dom/preinit
       import: react-dom
       signature: preinit(href, options)
       options:
-      - name: as
+      - name: 'as'
         type: '''script'' | ''style'''
         default: null
         desc: required resource type
-      - name: precedence
+      - name: 'precedence'
         type: '''reset'' | ''low'' | ''medium'' | ''high'''
         default: null
         desc: required for stylesheets; insertion order versus other sheets
-      - name: crossOrigin
+      - name: 'crossOrigin'
         type: '''anonymous'' | ''use-credentials'''
         default: null
         desc: CORS policy
-      - name: integrity
+      - name: 'integrity'
         type: string
         default: null
         desc: subresource integrity hash
-      - name: nonce
+      - name: 'nonce'
         type: string
         default: null
         desc: CSP nonce
-      - name: fetchPriority
+      - name: 'fetchPriority'
         type: '''auto'' | ''high'' | ''low'''
         default: auto
         desc: relative fetch priority
@@ -1257,74 +1257,74 @@ groups:
       notes:
       - frameworks usually handle resource loading; idempotent per href
     - id: preinit-module
-      name: preinitModule
-      summary: Eagerly fetch and evaluate an ESM module
+      name: 'preinitModule'
+      summary: 'Eagerly fetch and evaluate an ESM module'
       lenses:
       - perf
       ref: /reference/react-dom/preinitModule
       import: react-dom
       signature: preinitModule(href, options)
       options:
-      - name: as
+      - name: 'as'
         type: '''script'''
         default: null
         desc: required, must be script
-      - name: crossOrigin
+      - name: 'crossOrigin'
         type: '''anonymous'' | ''use-credentials'''
         default: null
         desc: CORS policy
-      - name: integrity
+      - name: 'integrity'
         type: string
         default: null
         desc: subresource integrity hash
-      - name: nonce
+      - name: 'nonce'
         type: string
         default: null
         desc: CSP nonce
       returns: undefined
     - id: preload
-      name: preload
-      summary: Eagerly fetch a stylesheet, font, image, script or other resource without evaluating it
+      name: 'preload'
+      summary: 'Eagerly fetch a stylesheet, font, image, script or other resource without evaluating it'
       lenses:
       - perf
       ref: /reference/react-dom/preload
       import: react-dom
       signature: preload(href, options)
       options:
-      - name: as
+      - name: 'as'
         type: string
         default: null
         desc: required; audio, document, embed, fetch, font, image, object, script, style, track, video or
           worker
-      - name: crossOrigin
+      - name: 'crossOrigin'
         type: '''anonymous'' | ''use-credentials'''
         default: null
         desc: required when as is fetch
-      - name: referrerPolicy
+      - name: 'referrerPolicy'
         type: string
         default: no-referrer-when-downgrade
         desc: Referer header policy
-      - name: integrity
+      - name: 'integrity'
         type: string
         default: null
         desc: subresource integrity hash
-      - name: type
+      - name: 'type'
         type: string
         default: null
         desc: MIME type
-      - name: nonce
+      - name: 'nonce'
         type: string
         default: null
         desc: CSP nonce
-      - name: fetchPriority
+      - name: 'fetchPriority'
         type: '''auto'' | ''high'' | ''low'''
         default: auto
         desc: relative fetch priority
-      - name: imageSrcSet
+      - name: 'imageSrcSet'
         type: string
         default: null
         desc: only with as image
-      - name: imageSizes
+      - name: 'imageSizes'
         type: string
         default: null
         desc: only with as image
@@ -1333,34 +1333,34 @@ groups:
       - calls are deduplicated by href (image also by imageSrcSet and imageSizes); on the server only effective
         during component render
     - id: preload-module
-      name: preloadModule
-      summary: Eagerly fetch an ESM module without evaluating it
+      name: 'preloadModule'
+      summary: 'Eagerly fetch an ESM module without evaluating it'
       lenses:
       - perf
       ref: /reference/react-dom/preloadModule
       import: react-dom
       signature: preloadModule(href, options)
       options:
-      - name: as
+      - name: 'as'
         type: '''script'''
         default: null
         desc: required, must be script
-      - name: crossOrigin
+      - name: 'crossOrigin'
         type: '''anonymous'' | ''use-credentials'''
         default: null
         desc: CORS policy
-      - name: integrity
+      - name: 'integrity'
         type: string
         default: null
         desc: subresource integrity hash
-      - name: nonce
+      - name: 'nonce'
         type: string
         default: null
         desc: CSP nonce
       returns: undefined
     - id: dom-common
-      name: Common props, ref callbacks and event objects
-      summary: Props all built-in elements accept (ref, style, dangerouslySetInnerHTML), ref callback cleanup, event object, handlers
+      name: 'Common props, ref callbacks and event objects'
+      summary: 'Props all built-in elements accept (ref, style, dangerouslySetInnerHTML), ref callback cleanup, event object, handlers'
       lenses:
       - best-practice
       - security
@@ -1368,27 +1368,27 @@ groups:
       ref: /reference/react-dom/components/common
       signature: <div ref={(node) => cleanup?} style={...} onClick={(e) => ...} />
       options:
-      - name: children
+      - name: 'children'
         type: ReactNode
         default: null
         desc: content; cannot be combined with dangerouslySetInnerHTML
-      - name: dangerouslySetInnerHTML
+      - name: 'dangerouslySetInnerHTML'
         type: '{ __html: string | TrustedHTML }'
         default: null
         desc: raw HTML; XSS risk if untrusted
-      - name: ref
+      - name: 'ref'
         type: RefObject | (node) => void | (() => void)
         default: null
         desc: ref object or callback; React 19 callbacks may return a cleanup, else called with null on detach
-      - name: style
+      - name: 'style'
         type: CSSProperties
         default: null
         desc: camelCase CSS object; bare numbers get px unless unitless
-      - name: suppressHydrationWarning
+      - name: 'suppressHydrationWarning'
         type: boolean
         default: 'false'
         desc: silences mismatch warnings one level deep; escape hatch for timestamps
-      - name: suppressContentEditableWarning
+      - name: 'suppressContentEditableWarning'
         type: boolean
         default: 'false'
         desc: silences the children plus contentEditable warning
@@ -1400,8 +1400,8 @@ groups:
       - isPropagationStopped); onAbort and onLoad bubble in React; a new ref callback each render is cleaned
         up and re-called every render so keep it stable
     - id: dom-form
-      name: <form>
-      summary: Function-valued action runs the submission in a Transition (POST regardless of method); pairs
+      name: '<form>'
+      summary: 'Function-valued action runs the submission in a Transition (POST regardless of method); pairs'
         with useActionState and useFormStatus
       lenses:
       - best-practice
@@ -1409,7 +1409,7 @@ groups:
       ref: /reference/react-dom/components/form
       signature: <form action={string | (formData) => void | Promise<void>}>
       options:
-      - name: action
+      - name: 'action'
         type: 'string | (formData: FormData) => void | Promise<void>'
         default: null
         desc: URL behaves like HTML; a function handles the submit as an Action
@@ -1417,8 +1417,8 @@ groups:
       - formAction on inputs and buttons overrides the form action; method is forced to POST when a function
         is passed
     - id: dom-input
-      name: <input>
-      summary: Controlled via value or checked plus onChange, uncontrolled via defaultValue or defaultChecked;
+      name: '<input>'
+      summary: 'Controlled via value or checked plus onChange, uncontrolled via defaultValue or defaultChecked;'
         cannot switch between modes
       lenses:
       - best-practice
@@ -1426,35 +1426,35 @@ groups:
       ref: /reference/react-dom/components/input
       signature: <input type value | checked onChange />
       options:
-      - name: value
+      - name: 'value'
         type: string
         default: null
         desc: controlled text; requires onChange
-      - name: checked
+      - name: 'checked'
         type: boolean
         default: null
         desc: controlled checkbox or radio; requires onChange
-      - name: defaultValue
+      - name: 'defaultValue'
         type: string
         default: null
         desc: initial value for uncontrolled inputs
-      - name: defaultChecked
+      - name: 'defaultChecked'
         type: boolean
         default: null
         desc: initial state for uncontrolled checkbox or radio
-      - name: formAction
+      - name: 'formAction'
         type: string | function
         default: null
         desc: overrides the form action for submit and image inputs
-      - name: onChange
+      - name: 'onChange'
         type: (e) => void
         default: null
         desc: fires on every change like onInput; must update the value synchronously
       notes:
       - checkboxes use checked not value; a string value prop makes a text input controlled; no children
     - id: dom-select
-      name: <select> and <option>
-      summary: Controlled via value plus onChange or uncontrolled via defaultValue; React ignores option selected
+      name: '<select> and <option>'
+      summary: 'Controlled via value plus onChange or uncontrolled via defaultValue; React ignores option selected'
         in favour of select value
       lenses:
       - best-practice
@@ -1462,15 +1462,15 @@ groups:
       ref: /reference/react-dom/components/select
       signature: <select value | defaultValue multiple onChange>
       options:
-      - name: value
+      - name: 'value'
         type: string | string[]
         default: null
         desc: controlled selection; array for multiple; requires onChange
-      - name: defaultValue
+      - name: 'defaultValue'
         type: string | string[]
         default: null
         desc: initial selection for uncontrolled use
-      - name: multiple
+      - name: 'multiple'
         type: boolean
         default: 'false'
         desc: allow multiple selection
@@ -1478,28 +1478,28 @@ groups:
       - cannot switch between controlled and uncontrolled; accepts option
       - optgroup and datalist children
     - id: dom-option
-      name: <option>
-      summary: Option inside select; selected is unsupported, set select value or defaultValue instead
+      name: '<option>'
+      summary: 'Option inside select; selected is unsupported, set select value or defaultValue instead'
       lenses:
       - ux-a11y
       ref: /reference/react-dom/components/option
       signature: <option value label disabled>
       options:
-      - name: value
+      - name: 'value'
         type: string
         default: null
         desc: submitted value when chosen
-      - name: label
+      - name: 'label'
         type: string
         default: null
         desc: meaning of the option; defaults to its text
-      - name: disabled
+      - name: 'disabled'
         type: boolean
         default: 'false'
         desc: not selectable
     - id: dom-textarea
-      name: <textarea>
-      summary: Multiline input, controlled via value plus onChange or uncontrolled via defaultValue; children
+      name: '<textarea>'
+      summary: 'Multiline input, controlled via value plus onChange or uncontrolled via defaultValue; children'
         are not allowed
       lenses:
       - best-practice
@@ -1507,43 +1507,43 @@ groups:
       ref: /reference/react-dom/components/textarea
       signature: <textarea value | defaultValue onChange rows cols>
       options:
-      - name: value
+      - name: 'value'
         type: string
         default: null
         desc: controlled text; requires onChange
-      - name: defaultValue
+      - name: 'defaultValue'
         type: string
         default: null
         desc: initial text for uncontrolled use
-      - name: rows
+      - name: 'rows'
         type: number
         default: '2'
         desc: default height in lines
-      - name: cols
+      - name: 'cols'
         type: number
         default: '20'
         desc: default width in characters
       notes:
       - passing children throws; cannot switch controlled to uncontrolled
     - id: dom-progress
-      name: <progress>
-      summary: Native progress indicator; value null renders indeterminate
+      name: '<progress>'
+      summary: 'Native progress indicator; value null renders indeterminate'
       lenses:
       - ux-a11y
       ref: /reference/react-dom/components/progress
       signature: <progress value max>
       options:
-      - name: value
+      - name: 'value'
         type: number | null
         default: null
         desc: between 0 and max; null = indeterminate
-      - name: max
+      - name: 'max'
         type: number
         default: '1'
         desc: maximum value
     - id: dom-img
-      name: <img>
-      summary: Image element; React preloads server-rendered images unless loading is lazy or fetchPriority
+      name: '<img>'
+      summary: 'Image element; React preloads server-rendered images unless loading is lazy or fetchPriority'
         is low
       lenses:
       - perf
@@ -1551,31 +1551,31 @@ groups:
       ref: /reference/react-dom/components/img
       signature: <img src alt width height loading fetchPriority srcSet sizes>
       options:
-      - name: alt
+      - name: 'alt'
         type: string
         default: null
         desc: alternative text; empty string for decorative images
-      - name: loading
+      - name: 'loading'
         type: '''eager'' | ''lazy'''
         default: eager
         desc: lazy also stops the automatic server preload
-      - name: fetchPriority
+      - name: 'fetchPriority'
         type: '''high'' | ''low'' | ''auto'''
         default: auto
         desc: low stops the automatic server preload
-      - name: decoding
+      - name: 'decoding'
         type: '''async'' | ''sync'' | ''auto'''
         default: auto
         desc: decode timing hint
-      - name: onLoad
+      - name: 'onLoad'
         type: () => void
         default: null
         desc: passing it stops a client-rendered View Transition waiting for the image
       notes:
       - empty src warns and is omitted; no children or dangerouslySetInnerHTML
     - id: dom-link
-      name: <link>
-      summary: Hoisted to head; stylesheets with precedence are deduplicated by href and suspend the component
+      name: '<link>'
+      summary: 'Hoisted to head; stylesheets with precedence are deduplicated by href and suspend the component'
         until loaded
       lenses:
       - perf
@@ -1583,15 +1583,15 @@ groups:
       ref: /reference/react-dom/components/link
       signature: <link rel href precedence>
       options:
-      - name: rel
+      - name: 'rel'
         type: string
         default: null
         desc: required relationship; stylesheet gets special treatment
-      - name: precedence
+      - name: 'precedence'
         type: string
         default: null
         desc: required for hoisting stylesheets; orders them in head
-      - name: onLoad
+      - name: 'onLoad'
         type: function
         default: null
         desc: with onError or disabled opts out of special stylesheet handling
@@ -1599,8 +1599,8 @@ groups:
       - props changes after first render are ignored; may remain in DOM after unmount; itemProp links are
         not hoisted; blocking=render discouraged
     - id: dom-meta
-      name: <meta>
-      summary: Rendered from any component but placed in head (unless itemProp is set)
+      name: '<meta>'
+      summary: 'Rendered from any component but placed in head (unless itemProp is set)'
       lenses:
       - composability
       ref: /reference/react-dom/components/meta
@@ -1610,8 +1610,8 @@ groups:
       - httpEquiv
       - charset or itemProp
     - id: dom-title
-      name: <title>
-      summary: Rendered from any component but placed in head; text only, render a single one at a time
+      name: '<title>'
+      summary: 'Rendered from any component but placed in head; text only, render a single one at a time'
       lenses:
       - ux-a11y
       ref: /reference/react-dom/components/title
@@ -1620,58 +1620,58 @@ groups:
       - inside svg or with itemProp it is not hoisted; several titles all land in head with undefined browser
         behaviour
     - id: dom-script
-      name: <script>
-      summary: Inline or external script; src plus async is hoisted to head and deduplicated by src
+      name: '<script>'
+      summary: 'Inline or external script; src plus async is hoisted to head and deduplicated by src'
       lenses:
       - perf
       - security
       ref: /reference/react-dom/components/script
       signature: <script src async | children>
       options:
-      - name: src
+      - name: 'src'
         type: string
         default: null
         desc: external script URL; with async=true React dedupes by src
-      - name: nonce
+      - name: 'nonce'
         type: string
         default: null
         desc: CSP nonce
-      - name: integrity
+      - name: 'integrity'
         type: string
         default: null
         desc: subresource integrity hash
-      - name: onLoad
+      - name: 'onLoad'
         type: function
         default: null
         desc: with onError disables special handling
       notes:
       - prop changes after first render are ignored; defer is incompatible with streaming SSR so use async
     - id: dom-style
-      name: <style>
-      summary: With href and precedence the style is hoisted, deduplicated by href and suspends until loaded
+      name: '<style>'
+      summary: 'With href and precedence the style is hoisted, deduplicated by href and suspends until loaded'
       lenses:
       - perf
       - composability
       ref: /reference/react-dom/components/style
       signature: <style href precedence>css</style>
       options:
-      - name: precedence
+      - name: 'precedence'
         type: string
         default: null
         desc: ranks the style in head; required for hoisting
-      - name: href
+      - name: 'href'
         type: string
         default: null
         desc: dedupe key
-      - name: nonce
+      - name: 'nonce'
         type: string
         default: null
         desc: CSP nonce
       notes:
       - with precedence extra props beyond href and precedence are dropped; may stay in the DOM after unmount
     - id: render-to-pipeable-stream
-      name: renderToPipeableStream
-      summary: Node.js streaming SSR with Suspense; pipe in onShellReady to stream or onAllReady for crawlers
+      name: 'renderToPipeableStream'
+      summary: 'Node.js streaming SSR with Suspense; pipe in onShellReady to stream or onAllReady for crawlers'
         and static output
       lenses:
       - perf
@@ -1680,55 +1680,55 @@ groups:
       import: react-dom/server
       signature: renderToPipeableStream(reactNode, options?)
       options:
-      - name: bootstrapScripts
+      - name: 'bootstrapScripts'
         type: string[]
         default: null
         desc: script URLs emitted to call hydrateRoot
-      - name: bootstrapModules
+      - name: 'bootstrapModules'
         type: string[]
         default: null
         desc: like bootstrapScripts as type=module
-      - name: bootstrapScriptContent
+      - name: 'bootstrapScriptContent'
         type: string
         default: null
         desc: inline bootstrap script
-      - name: nonce
+      - name: 'nonce'
         type: string
         default: null
         desc: CSP script-src nonce
-      - name: identifierPrefix
+      - name: 'identifierPrefix'
         type: string
         default: null
         desc: must equal the hydrateRoot prefix
-      - name: formState
+      - name: 'formState'
         type: ReactFormState
         default: null
         desc: form state from a Server Function submission
-      - name: onShellReady
+      - name: 'onShellReady'
         type: () => void
         default: null
         desc: shell rendered; set status and call pipe to start streaming
-      - name: onShellError
+      - name: 'onShellError'
         type: (error) => void
         default: null
         desc: shell failed before any bytes; output a fallback shell
-      - name: onAllReady
+      - name: 'onAllReady'
         type: () => void
         default: null
         desc: all content rendered; use for crawlers and static generation
-      - name: onError
+      - name: 'onError'
         type: (error) => void
         default: console.error
         desc: every server error; override to log crash reports
-      - name: onHeaders
+      - name: 'onHeaders'
         type: ({ Link }) => void
         default: null
         desc: resource-hint Link header; capped by maxHeadersLength (default 2000)
-      - name: onBrowserBailout
+      - name: 'onBrowserBailout'
         type: (error, errorInfo) => void
         default: null
         desc: called when browser() leaves a Suspense fallback for the client
-      - name: progressiveChunkSize
+      - name: 'progressiveChunkSize'
         type: number
         default: null
         desc: bytes per chunk
@@ -1737,8 +1737,8 @@ groups:
       - reactNode should render the whole document including html; Node only
       - Web Streams runtimes use renderToReadableStream
     - id: render-to-readable-stream
-      name: renderToReadableStream
-      summary: Web Streams streaming SSR (edge, Deno, Bun); promise rejects if the shell fails, stream.allReady
+      name: 'renderToReadableStream'
+      summary: 'Web Streams streaming SSR (edge, Deno, Bun); promise rejects if the shell fails, stream.allReady'
         waits for all content
       lenses:
       - perf
@@ -1747,27 +1747,27 @@ groups:
       import: react-dom/server
       signature: renderToReadableStream(reactNode, options?)
       options:
-      - name: signal
+      - name: 'signal'
         type: AbortSignal
         default: null
         desc: abort server rendering and finish on the client
-      - name: bootstrapScripts
+      - name: 'bootstrapScripts'
         type: string[]
         default: null
         desc: script URLs emitted to call hydrateRoot
-      - name: onError
+      - name: 'onError'
         type: (error) => void
         default: console.error
         desc: every server error; use for crash reports
-      - name: onHeaders
+      - name: 'onHeaders'
         type: '(headers: Headers) => void'
         default: null
         desc: resource-hint Link headers
-      - name: nonce
+      - name: 'nonce'
         type: string
         default: null
         desc: CSP script-src nonce
-      - name: identifierPrefix
+      - name: 'identifierPrefix'
         type: string
         default: null
         desc: must equal the hydrateRoot prefix
@@ -1775,8 +1775,8 @@ groups:
       notes:
       - await stream.allReady before responding to crawlers or for static generation
     - id: render-to-string
-      name: renderToString
-      summary: Legacy synchronous HTML string render; no streaming or data waiting and only fallback Suspense
+      name: 'renderToString'
+      summary: 'Legacy synchronous HTML string render; no streaming or data waiting and only fallback Suspense'
         support
       lenses:
       - reliability
@@ -1784,7 +1784,7 @@ groups:
       import: react-dom/server
       signature: renderToString(reactNode, options?)
       options:
-      - name: identifierPrefix
+      - name: 'identifierPrefix'
         type: string
         default: null
         desc: useId prefix; must equal hydrateRoot prefix
@@ -1793,15 +1793,15 @@ groups:
       - a suspended component immediately yields its fallback; discouraged in client code (render into a DOM
         node instead); prefer streaming APIs
     - id: render-to-static-markup
-      name: renderToStaticMarkup
-      summary: Non-interactive HTML string for emails or static pages; output cannot be hydrated
+      name: 'renderToStaticMarkup'
+      summary: 'Non-interactive HTML string for emails or static pages; output cannot be hydrated'
       lenses:
       - reliability
       ref: /reference/react-dom/server/renderToStaticMarkup
       import: react-dom/server
       signature: renderToStaticMarkup(reactNode, options?)
       options:
-      - name: identifierPrefix
+      - name: 'identifierPrefix'
         type: string
         default: null
         desc: useId prefix
@@ -1809,23 +1809,23 @@ groups:
       notes:
       - limited Suspense support with immediate fallbacks
     - id: server-resume
-      name: resume
-      summary: Web Streams resume of a partially prerendered tree from the postponed state returned by prerender
+      name: 'resume'
+      summary: 'Web Streams resume of a partially prerendered tree from the postponed state returned by prerender'
       lenses:
       - perf
       ref: /reference/react-dom/server/resume
       import: react-dom/server
       signature: resume(reactNode, postponedState, options?)
       params:
-      - name: reactNode
+      - name: 'reactNode'
         type: ReactNode
         default: null
         desc: same node passed to prerender
-      - name: postponedState
+      - name: 'postponedState'
         type: object
         default: null
         desc: opaque postponed object from a prerender API, loaded from storage
-      - name: options
+      - name: 'options'
         type: '{ signal?, onError?, nonce?, ... }'
         default: null
         desc: streaming options
@@ -1833,34 +1833,34 @@ groups:
       notes:
       - re-renders from the root until it hits a component that was not fully prerendered
     - id: resume-to-pipeable-stream
-      name: resumeToPipeableStream
-      summary: Node.js variant of resume for partial prerendering, with pipe and abort
+      name: 'resumeToPipeableStream'
+      summary: 'Node.js variant of resume for partial prerendering, with pipe and abort'
       lenses:
       - perf
       ref: /reference/react-dom/server/resumeToPipeableStream
       import: react-dom/server
       signature: resumeToPipeableStream(reactNode, postponedState, options?)
       options:
-      - name: onShellReady
+      - name: 'onShellReady'
         type: () => void
         default: null
         desc: call pipe here to stream
-      - name: onShellError
+      - name: 'onShellError'
         type: (error) => void
         default: null
         desc: shell failed; no bytes emitted
-      - name: onAllReady
+      - name: 'onAllReady'
         type: () => void
         default: null
         desc: all content done
-      - name: onError
+      - name: 'onError'
         type: (error) => void
         default: console.error
         desc: server errors
       returns: '{ pipe(writable), abort() }'
     - id: static-prerender
-      name: prerender
-      summary: Web Streams static HTML generation that waits for all data; returns prelude plus postponed
+      name: 'prerender'
+      summary: 'Web Streams static HTML generation that waits for all data; returns prelude plus postponed'
         state for partial prerendering
       lenses:
       - perf
@@ -1868,11 +1868,11 @@ groups:
       import: react-dom/static
       signature: prerender(reactNode, options?)
       options:
-      - name: signal
+      - name: 'signal'
         type: AbortSignal
         default: null
         desc: abort prerendering; remainder is continued via resume or resumeAndPrerender
-      - name: onError
+      - name: 'onError'
         type: (error) => void
         default: console.error
         desc: server errors
@@ -1881,68 +1881,68 @@ groups:
       notes:
       - unlike renderToString it waits for all data; for SSG
     - id: static-prerender-node
-      name: prerenderToNodeStream
-      summary: Node.js static HTML generation returning a Node stream prelude and postponed state
+      name: 'prerenderToNodeStream'
+      summary: 'Node.js static HTML generation returning a Node stream prelude and postponed state'
       lenses:
       - perf
       ref: /reference/react-dom/static/prerenderToNodeStream
       import: react-dom/static
       signature: prerenderToNodeStream(reactNode, options?)
       options:
-      - name: signal
+      - name: 'signal'
         type: AbortSignal
         default: null
         desc: abort prerendering; continue with resumeToPipeableStream
-      - name: onError
+      - name: 'onError'
         type: (error) => void
         default: console.error
         desc: server errors
       returns: 'Promise of { prelude: Node stream, postponed: object | null }'
     - id: static-resume-and-prerender
-      name: resumeAndPrerender
-      summary: Continue a prerendered tree to static HTML (Web Streams); can be aborted and resumed again
+      name: 'resumeAndPrerender'
+      summary: 'Continue a prerendered tree to static HTML (Web Streams); can be aborted and resumed again'
       lenses:
       - perf
       ref: /reference/react-dom/static/resumeAndPrerender
       import: react-dom/static
       signature: resumeAndPrerender(reactNode, postponedState, options?)
       options:
-      - name: signal
+      - name: 'signal'
         type: AbortSignal
         default: null
         desc: abort; continue with resume or another resumeAndPrerender
-      - name: onError
+      - name: 'onError'
         type: (error) => void
         default: console.error
         desc: server errors
       returns: 'Promise of { prelude: ReadableStream, postponed: object | null }'
     - id: static-resume-and-prerender-node
-      name: resumeAndPrerenderToNodeStream
-      summary: Continue a prerendered tree to static HTML with Node streams
+      name: 'resumeAndPrerenderToNodeStream'
+      summary: 'Continue a prerendered tree to static HTML with Node streams'
       lenses:
       - perf
       ref: /reference/react-dom/static/resumeAndPrerenderToNodeStream
       import: react-dom/static
       signature: resumeAndPrerenderToNodeStream(reactNode, postponedState, options?)
       options:
-      - name: signal
+      - name: 'signal'
         type: AbortSignal
         default: null
         desc: abort; continue with resume or another resumeAndPrerenderToNodeStream
-      - name: onError
+      - name: 'onError'
         type: (error) => void
         default: console.error
         desc: server errors
       returns: 'Promise of { prelude, postponed: object | null }'
   - id: api-compiler
-    title: React Compiler reference
+    title: 'React Compiler reference'
     level: advanced
     requires: [react-compiler-guide]
     ref: /reference/react-compiler/configuration
     entries:
     - id: compiler-config
-      name: Compiler options
-      summary: Options passed to babel-plugin-react-compiler (or Next `reactCompiler`) controlling which
+      name: 'Compiler options'
+      summary: 'Options passed to babel-plugin-react-compiler (or Next `reactCompiler`) controlling which'
         code is compiled and how errors surface
       lenses: [perf, reliability]
       signature: '{ compilationMode, target, panicThreshold, logger, gating }'
@@ -1960,20 +1960,20 @@ groups:
       - {name: gating, type: '{ source, importSpecifierName }', default: 'null', desc: runtime feature
           flag choosing compiled vs original code for A/B or gradual rollout}
     - id: compiler-directives
-      name: Directives
+      name: 'Directives'
       summary: 'Function- or module-level string directives: `"use memo"` forces compilation, `"use no
         memo"` opts out (debugging, incompatible code)'
       lenses: [perf, reliability]
       signature: '"use memo" | "use no memo"'
       ref: /reference/react-compiler/directives
     - id: compiling-libraries
-      name: Compiling libraries
-      summary: publish pre-compiled output with a `target`
+      name: 'Compiling libraries'
+      summary: 'publish pre-compiled output with a `target`'
       lenses: [composability]
       ref: /reference/react-compiler/compiling-libraries
     - id: compilation-mode
-      name: compilationMode
-      summary: Strategy selecting which functions the compiler optimizes; annotation mode suits incremental
+      name: 'compilationMode'
+      summary: 'Strategy selecting which functions the compiler optimizes; annotation mode suits incremental'
         adoption
       lenses:
       - perf
@@ -1981,63 +1981,63 @@ groups:
       ref: /reference/react-compiler/compilationMode
       signature: 'compilationMode: ''infer'' | ''syntax'' | ''annotation'' | ''all'''
       options:
-      - name: infer
+      - name: 'infer'
         type: mode
         default: default
         desc: PascalCase components and use-prefixed hooks that create JSX or call hooks, plus use memo functions
-      - name: annotation
+      - name: 'annotation'
         type: mode
         default: null
         desc: only functions marked with use memo
-      - name: syntax
+      - name: 'syntax'
         type: mode
         default: null
         desc: only Flow component and hook syntax; unusable with TypeScript
-      - name: all
+      - name: 'all'
         type: mode
         default: null
         desc: all top-level functions; not recommended, may compile non-React code
       notes:
       - use no memo wins over every mode; infer needs React naming conventions
     - id: compiler-target
-      name: target
-      summary: React version of the compiled output; 17 and 18 need react-compiler-runtime
+      name: 'target'
+      summary: 'React version of the compiled output; 17 and 18 need react-compiler-runtime'
       lenses:
       - composability
       - reliability
       ref: /reference/react-compiler/target
       signature: 'target: ''17'' | ''18'' | ''19'''
       options:
-      - name: target
+      - name: 'target'
         type: '''17'' | ''18'' | ''19'''
         default: '''19'''
         desc: string, no patch version; 19 uses the built-in react/compiler-runtime
       notes:
       - for 17 and 18 install react-compiler-runtime@latest
     - id: panic-threshold
-      name: panicThreshold
-      summary: Whether compile errors fail the build; keep none in production so uncompilable components are
+      name: 'panicThreshold'
+      summary: 'Whether compile errors fail the build; keep none in production so uncompilable components are'
         skipped
       lenses:
       - reliability
       ref: /reference/react-compiler/panicThreshold
       signature: 'panicThreshold: ''none'' | ''critical_errors'' | ''all_errors'''
       options:
-      - name: none
+      - name: 'none'
         type: level
         default: default
         desc: skip components that cannot be compiled and keep building
-      - name: critical_errors
+      - name: 'critical_errors'
         type: level
         default: null
         desc: fail only on critical errors, for development debugging
-      - name: all_errors
+      - name: 'all_errors'
         type: level
         default: null
         desc: fail on any compiler diagnostic
     - id: compiler-logger
-      name: logger
-      summary: Hook receiving compiler events per file for coverage and failure analysis
+      name: 'logger'
+      summary: 'Hook receiving compiler events per file for coverage and failure analysis'
       lenses:
       - observability
       ref: /reference/react-compiler/logger
@@ -2050,19 +2050,19 @@ groups:
       - PipelineError
       - Timing; event shape may change between versions
     - id: compiler-gating
-      name: gating
-      summary: Runtime feature flag choosing compiled versus original code, for A/B tests or gradual rollout
+      name: 'gating'
+      summary: 'Runtime feature flag choosing compiled versus original code, for A/B tests or gradual rollout'
       lenses:
       - reliability
       - perf
       ref: /reference/react-compiler/gating
       signature: 'gating: { source: string, importSpecifierName: string } | null'
       options:
-      - name: source
+      - name: 'source'
         type: string
         default: null
         desc: module path exporting the flag function
-      - name: importSpecifierName
+      - name: 'importSpecifierName'
         type: string
         default: null
         desc: exported function name; must return a boolean
@@ -2071,7 +2071,7 @@ groups:
       - increasing bundle size; the import is added to every file with compiled functions
     - id: directive-use-memo
       name: '"use memo"'
-      summary: Force-compile a function; required in annotation mode, redundant in all mode
+      summary: 'Force-compile a function; required in annotation mode, redundant in all mode'
       lenses:
       - perf
       ref: /reference/react-compiler/directives/use-memo
@@ -2081,7 +2081,7 @@ groups:
       - not backticks; exact text; only the first directive is processed
     - id: directive-use-no-memo
       name: '"use no memo"'
-      summary: Temporary escape hatch excluding a function from compilation; overrides every mode and directive
+      summary: 'Temporary escape hatch excluding a function from compilation; overrides every mode and directive'
       lenses:
       - reliability
       ref: /reference/react-compiler/directives/use-no-memo
@@ -2090,15 +2090,15 @@ groups:
       - alias "use no forget"; same placement rules as use memo; for debugging or incompatible libraries,
         not a permanent fix
   - id: api-hooks-lint
-    title: eslint-plugin-react-hooks lints
+    title: 'eslint-plugin-react-hooks lints'
     level: intermediate
     requires:
     - api-rules
     ref: /reference/eslint-plugin-react-hooks
     entries:
     - id: lint-rules-of-hooks
-      name: react-hooks/rules-of-hooks
-      summary: Hooks only at the top level of components or hooks, in the same order every render
+      name: 'react-hooks/rules-of-hooks'
+      summary: 'Hooks only at the top level of components or hooks, in the same order every render'
       lenses:
       - reliability
       - best-practice
@@ -2108,14 +2108,14 @@ groups:
       - 'violations: hooks in conditions, loops, after early returns, in callbacks, async functions, class
         methods or at module level; `use` is exempt'
       options:
-      - name: additionalEffectHooks
+      - name: 'additionalEffectHooks'
         type: string (regex)
         default: null
         desc: additionalEffectHooks (settings.react-hooks, regex, plugin 6.1.1+) treats custom hooks as
           effects so useEffectEvent may be called from them
     - id: lint-exhaustive-deps
-      name: react-hooks/exhaustive-deps
-      summary: Dependency arrays of useEffect, useMemo and useCallback must list every reactive value read
+      name: 'react-hooks/exhaustive-deps'
+      summary: 'Dependency arrays of useEffect, useMemo and useCallback must list every reactive value read'
         inside
       lenses:
       - reliability
@@ -2125,14 +2125,14 @@ groups:
       notes:
       - fix by restructuring (see Removing Effect Dependencies), not by silencing the rule
       options:
-      - name: additionalEffectHooks
+      - name: 'additionalEffectHooks'
         type: string (regex)
         default: null
         desc: additionalEffectHooks (settings.react-hooks, regex) or rule option additionalHooks (regex,
           takes precedence) add custom hooks to the check
     - id: lint-component-hook-factories
-      name: react-hooks/component-hook-factories
-      summary: Components and hooks must be defined at module level, not created inside higher-order functions
+      name: 'react-hooks/component-hook-factories'
+      summary: 'Components and hooks must be defined at module level, not created inside higher-order functions'
       lenses:
       - reliability
       - best-practice
@@ -2141,8 +2141,8 @@ groups:
       notes:
       - nested definitions create a new component type per call, destroying state
     - id: lint-config
-      name: react-hooks/config
-      summary: Validates React Compiler configuration option names and value types to prevent silent typos
+      name: 'react-hooks/config'
+      summary: 'Validates React Compiler configuration option names and value types to prevent silent typos'
       lenses:
       - reliability
       - best-practice
@@ -2151,8 +2151,8 @@ groups:
       notes:
       - runs in the recommended preset
     - id: lint-error-boundaries
-      name: react-hooks/error-boundaries
-      summary: Use Error Boundaries, not try/catch, for errors thrown while rendering child components
+      name: 'react-hooks/error-boundaries'
+      summary: 'Use Error Boundaries, not try/catch, for errors thrown while rendering child components'
       lenses:
       - reliability
       - best-practice
@@ -2161,8 +2161,8 @@ groups:
       notes:
       - try/catch cannot catch render-time errors in children
     - id: lint-gating
-      name: react-hooks/gating
-      summary: Validates the compiler gating configuration
+      name: 'react-hooks/gating'
+      summary: 'Validates the compiler gating configuration'
       lenses:
       - reliability
       - best-practice
@@ -2171,8 +2171,8 @@ groups:
       notes:
       - runs in the recommended preset
     - id: lint-globals
-      name: react-hooks/globals
-      summary: No assignment or mutation of globals during render; side effects belong outside render
+      name: 'react-hooks/globals'
+      summary: 'No assignment or mutation of globals during render; side effects belong outside render'
       lenses:
       - best-practice
       ref: /reference/eslint-plugin-react-hooks/lints/globals
@@ -2180,8 +2180,8 @@ groups:
       notes:
       - global mutation breaks purity, Fast Refresh and dev versus prod parity
     - id: lint-immutability
-      name: react-hooks/immutability
-      summary: Never mutate props, state or other immutable values; use the state setter
+      name: 'react-hooks/immutability'
+      summary: 'Never mutate props, state or other immutable values; use the state setter'
       lenses:
       - best-practice
       ref: /reference/eslint-plugin-react-hooks/lints/immutability
@@ -2189,8 +2189,8 @@ groups:
       notes:
       - props and state are immutable snapshots
     - id: lint-incompatible-library
-      name: react-hooks/incompatible-library
-      summary: Flags libraries using patterns (e.g. interior mutability) that break under manual or automatic
+      name: 'react-hooks/incompatible-library'
+      summary: 'Flags libraries using patterns (e.g. interior mutability) that break under manual or automatic'
         memoization
       lenses:
       - reliability
@@ -2200,8 +2200,8 @@ groups:
       notes:
       - detection uses a known-library list; if manual useMemo breaks, so would the compiler
     - id: lint-preserve-manual-memoization
-      name: react-hooks/preserve-manual-memoization
-      summary: Existing useMemo, useCallback and memo must be preserved by the compiler; incomplete dependencies
+      name: 'react-hooks/preserve-manual-memoization'
+      summary: 'Existing useMemo, useCallback and memo must be preserved by the compiler; incomplete dependencies'
         block compilation of that function
       lenses:
       - perf
@@ -2211,8 +2211,8 @@ groups:
       notes:
       - compiler only compiles when its inference matches or exceeds the manual memoization
     - id: lint-purity
-      name: react-hooks/purity
-      summary: Components and hooks must not call known-impure functions during render
+      name: 'react-hooks/purity'
+      summary: 'Components and hooks must not call known-impure functions during render'
       lenses:
       - best-practice
       ref: /reference/eslint-plugin-react-hooks/lints/purity
@@ -2220,8 +2220,8 @@ groups:
       notes:
       - 'violations: Math.random(), Date.now(), new Date(), crypto.randomUUID(), performance.now()'
     - id: lint-refs
-      name: react-hooks/refs
-      summary: No reading or writing ref.current during render
+      name: 'react-hooks/refs'
+      summary: 'No reading or writing ref.current during render'
       lenses:
       - best-practice
       ref: /reference/eslint-plugin-react-hooks/lints/refs
@@ -2230,8 +2230,8 @@ groups:
       - 'applies to values inferred as refs: useRef or createRef results, identifiers named ref or ending
         in Ref that touch .current, JSX ref props'
     - id: lint-set-state-in-effect
-      name: react-hooks/set-state-in-effect
-      summary: No synchronous setState directly in an effect body; it forces an extra render pass
+      name: 'react-hooks/set-state-in-effect'
+      summary: 'No synchronous setState directly in an effect body; it forces an extra render pass'
       lenses:
       - perf
       - best-practice
@@ -2241,8 +2241,8 @@ groups:
       - 'typical causes: deriving state from props, setting loading flags synchronously, transforming data
         in effects; see You Might Not Need an Effect'
     - id: lint-set-state-in-render
-      name: react-hooks/set-state-in-render
-      summary: No unconditional setState during render (infinite render loop)
+      name: 'react-hooks/set-state-in-render'
+      summary: 'No unconditional setState during render (infinite render loop)'
       lenses:
       - reliability
       - best-practice
@@ -2251,8 +2251,8 @@ groups:
       notes:
       - runs in the recommended preset
     - id: lint-static-components
-      name: react-hooks/static-components
-      summary: Components must not be defined inside other components; they are recreated each render and
+      name: 'react-hooks/static-components'
+      summary: 'Components must not be defined inside other components; they are recreated each render and'
         lose state
       lenses:
       - reliability
@@ -2262,8 +2262,8 @@ groups:
       notes:
       - each render makes a new component type, unmounting the old one
     - id: lint-unsupported-syntax
-      name: react-hooks/unsupported-syntax
-      summary: Flags syntax the compiler cannot analyze (eval, with); keep it out of components
+      name: 'react-hooks/unsupported-syntax'
+      summary: 'Flags syntax the compiler cannot analyze (eval, with); keep it out of components'
       lenses:
       - reliability
       - best-practice
@@ -2272,8 +2272,8 @@ groups:
       notes:
       - may still be used in standalone utilities outside React
     - id: lint-use-memo
-      name: react-hooks/use-memo
-      summary: useMemo must return a value; side effects belong in effects or handlers
+      name: 'react-hooks/use-memo'
+      summary: 'useMemo must return a value; side effects belong in effects or handlers'
       lenses:
       - best-practice
       ref: /reference/eslint-plugin-react-hooks/lints/use-memo
@@ -2281,33 +2281,33 @@ groups:
       notes:
       - a useMemo without a return value yields undefined
   - id: api-rules
-    title: Rules of React and Server Components
+    title: 'Rules of React and Server Components'
     level: intermediate
     requires: [describing-ui]
     ref: /reference/rules
     entries:
     - id: rules-of-react
-      name: Rules of React
-      summary: components and hooks must be pure, React calls them, Rules of Hooks
+      name: 'Rules of React'
+      summary: 'components and hooks must be pure, React calls them, Rules of Hooks'
       lenses: [best-practice, reliability]
       notes: [lint-enforced via eslint-plugin-react-hooks]
       ref: /reference/rules
     - id: rsc-server-components
-      name: Server Components
-      summary: async components, server-only module graph, props must serialize
+      name: 'Server Components'
+      summary: 'async components, server-only module graph, props must serialize'
       lenses: [perf, security]
       notes: [19.3 lets `<Context>` render directly in Server Components]
       ref: /reference/rsc/server-components
     - id: rsc-server-functions
-      name: Server Functions and directives
+      name: 'Server Functions and directives'
       summary: '`"use server"` marks async functions callable from the client; `"use client"` marks the
         Server/Client module boundary'
       lenses: [security, best-practice]
       signature: '"use server" / "use client"'
       ref: /reference/rsc/server-functions
     - id: rule-pure
-      name: Components and Hooks must be pure
-      summary: Idempotent render, side effects outside render, props, state and hook values immutable, values
+      name: 'Components and Hooks must be pure'
+      summary: 'Idempotent render, side effects outside render, props, state and hook values immutable, values'
         frozen once passed to JSX
       lenses:
       - best-practice
@@ -2317,8 +2317,8 @@ groups:
       - local mutation of values created during the same render is allowed; enforced by the purity
       - immutability and globals lints
     - id: rule-react-calls
-      name: React calls Components and Hooks
-      summary: Never call component functions directly or pass Hooks around as values; React orchestrates
+      name: 'React calls Components and Hooks'
+      summary: 'Never call component functions directly or pass Hooks around as values; React orchestrates'
         rendering
       lenses:
       - best-practice
@@ -2327,8 +2327,8 @@ groups:
       notes:
       - do not dynamically mutate a Hook or dynamically choose which Hook to call; render components as JSX
     - id: rule-hooks
-      name: Rules of Hooks
-      summary: Call Hooks only at the top level and only from components or custom Hooks
+      name: 'Rules of Hooks'
+      summary: 'Call Hooks only at the top level and only from components or custom Hooks'
       lenses:
       - best-practice
       - reliability
@@ -2340,8 +2340,8 @@ groups:
       - event handlers
       - try/catch/finally or class components; enforced by react-hooks/rules-of-hooks
     - id: rsc-directives
-      name: RSC directives overview
-      summary: Source-code directives for RSC-compatible bundlers
+      name: 'RSC directives overview'
+      summary: 'Source-code directives for RSC-compatible bundlers'
       lenses:
       - reuse
       ref: /reference/rsc/directives
@@ -2349,7 +2349,7 @@ groups:
       - use client marks client code and use server marks server functions callable from the client
     - id: rsc-use-client
       name: '''use client'''
-      summary: File-level directive marking a module and its transitive imports as client code, the server/client
+      summary: 'File-level directive marking a module and its transitive imports as client code, the server/client'
         module boundary
       lenses:
       - best-practice
@@ -2362,7 +2362,7 @@ groups:
         the whole client subtree ships to the browser
     - id: rsc-use-server
       name: '''use server'''
-      summary: Marks async functions (or all exports of a module) as Server Functions callable from the client
+      summary: 'Marks async functions (or all exports of a module) as Server Functions callable from the client'
         over the network
       lenses:
       - security
@@ -2375,21 +2375,21 @@ groups:
         meant for mutations
       - not data fetching; arguments and return values must be serializable
   - id: api-legacy
-    title: Legacy APIs
+    title: 'Legacy APIs'
     level: basic
     requires: []
     ref: /reference/react/legacy
     entries:
     - id: forwardref-legacy
-      name: forwardRef
-      summary: unnecessary in React 19 (`ref` is a prop); will be deprecated
+      name: 'forwardRef'
+      summary: 'unnecessary in React 19 (`ref` is a prop); will be deprecated'
       lenses: [best-practice]
       deprecated: 'React 19: pass ref as a prop'
       ref: /reference/react/forwardRef
       signature: forwardRef(render)
     - id: class-component
-      name: Component
-      summary: Class components remain the only way to write an Error Boundary (getDerivedStateFromError
+      name: 'Component'
+      summary: 'Class components remain the only way to write an Error Boundary (getDerivedStateFromError'
         + componentDidCatch)
       lenses: [reliability]
       signature: class X extends Component { static getDerivedStateFromError(error); componentDidCatch(error,
@@ -2403,8 +2403,8 @@ groups:
       - {name: 'componentDidCatch(error, info)', type: '(error, { componentStack }) => void', default: null,
         desc: 'commit-phase: log to an error reporting service; do not setState here (deprecated)'}
     - id: pure-component
-      name: PureComponent
-      summary: Class base skipping re-renders for shallow-equal props and state; discouraged in new code
+      name: 'PureComponent'
+      summary: 'Class base skipping re-renders for shallow-equal props and state; discouraged in new code'
       lenses:
       - perf
       ref: /reference/react/PureComponent
@@ -2413,8 +2413,8 @@ groups:
       - equivalent to a custom shouldComponentUpdate with shallow comparison; prefer function components with
         memo
     - id: children-api
-      name: Children
-      summary: Count, map, iterate, validate and flatten the children prop; uncommon and fragile
+      name: 'Children'
+      summary: 'Count, map, iterate, validate and flatten the children prop; uncommon and fragile'
       lenses:
       - composability
       ref: /reference/react/Children
@@ -2426,8 +2426,8 @@ groups:
       - traversal does not go deeper than elements; arrays count through their items; keys are combined with
         the original child key; prefer render props or explicit props
     - id: clone-element
-      name: cloneElement
-      summary: Copy an element with overridden props and children; makes data flow hard to trace so prefer
+      name: 'cloneElement'
+      summary: 'Copy an element with overridden props and children; makes data flow hard to trace so prefer'
         alternatives
       lenses:
       - composability
@@ -2435,17 +2435,17 @@ groups:
       import: react
       signature: cloneElement(element, props, ...children)
       params:
-      - name: element
+      - name: 'element'
         type: ReactElement
         default: null
         desc: element to clone
-      - name: props
+      - name: 'props'
         type: object | null
         default: null
         desc: shallow-merged over element.props; null keeps all
       returns: new element; the original is unmodified
     - id: create-ref
-      name: createRef
+      name: 'createRef'
       summary: 'Create a { current: null } ref object, mostly for class components; function components use
         useRef'
       lenses:

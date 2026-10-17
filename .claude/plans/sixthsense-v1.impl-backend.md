@@ -29,3 +29,6 @@
 - [x] `sixthsense gate-debug --mode bus_front|bus_nearside --limit N`: search + detections only, one line per candidate (hazard, best track class, start->end height %, start area, growth/span/frames, conf, ttc, lane, rejecting rule) + summary counts.
 - [x] Removed the regex yes->partly cap (judge instruction kept). Hazard match falls back to the best passing track with "(closest road user: <class>)".
 - [x] Provisional gate: growth >=1.4x over >=0.6 s and >=6 frames, start area >=0.8%, mean conf >=0.35; nearside bottom-band mask kept. 99 tests.
+
+## v3.3 gate from data
+- [x] Class gates (person/bicycle/motorcycle >=1.25x, vehicles >=1.4x, inclusive); person span floor 0.5 s / 12 frames (others 0.6 s / 6); growth on a rising window (peak since the window minimum) and the note/debug show that window's start->end heights; front-camera lane-entry rule for person/bicycle (outside lane -> inside or within 5% of its edge, moved >=5% of width, <=2 s); gate-debug prints the passing rule (growth/ttc/lane-entry). 102 tests.

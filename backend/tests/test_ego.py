@@ -3,7 +3,7 @@
 from sixthsense.clients.vss import DetectionsResp
 from sixthsense.modes import MODES, VEHICLES, VULNERABLE
 from sixthsense.pipeline import Verification, bus_prompt, retarget_ego
-from sixthsense.tracking import closing_on_us, ego_diagnostics
+from sixthsense.tracking import closing_on_us, ego_diagnostics, growth_min
 
 ALL = VEHICLES | VULNERABLE
 W, H = 1920, 1080
@@ -44,18 +44,23 @@ def test_constant_size_box_is_not_kept():
     assert r.passed is False and r.note == "1 road user tracked, none closing on us fast enough"
 
 
-def test_growth_below_1_4_is_not_kept():
-    # 1.25x/s over 1.2 s -> ~1.3x total
-    r = ego_diagnostics(growing(rate=1.25, n=36), ALL, "front")[0]
-    assert r.reason.startswith("growth ") and closing_on_us(growing(rate=1.25, n=36), ALL, "front").passed is False
+def test_growth_gate_is_per_class_and_inclusive():
+    # 1.25x/s over 1.2 s -> ~1.3x: below the vehicle gate (1.4x), above the person gate (1.25x)
+    car = ego_diagnostics(growing(label="car", h0=250, rate=1.25, n=36), ALL, "front")[0]
+    assert car.reason == "growth 1.27x < 1.4x"
+    person = ego_diagnostics(growing(rate=1.25, n=36), ALL, "front")[0]
+    assert person.reason == "pass" and person.rule == "growth"
+    # exactly at the gate passes (>=): 1.4x for a car over the window
+    assert growth_min("car") == 1.4 and growth_min("person") == growth_min("bicycle") == 1.25
 
 
-def test_growth_needs_0_6_s_and_6_frames():
-    # 3x/s but only 0.5 s of track (15 frames at 30 fps): too short to measure
+def test_span_floor_is_per_class():
+    # vehicles: 0.6 s / 6 frames. At 8 fps the tracker confirms from frame 2: 7 frames = 6 tracked
+    assert closing_on_us(growing(label="car", h0=250, rate=3.0, n=7, fps=8), ALL, "front").passed is True
+    assert closing_on_us(growing(label="car", h0=250, rate=3.0, n=6, fps=8), ALL, "front").passed is False
+    # people: 0.5 s / 12 frames. 15 frames at 30 fps = 14 tracked over 0.43 s: too short
     assert ego_diagnostics(growing(rate=3.0, n=15), ALL, "front")[0].reason.startswith("short span")
-    # at 8 fps the tracker confirms from frame 2, so 7 frames = 6 tracked over 0.625 s: just enough
-    assert closing_on_us(growing(rate=3.0, n=7, fps=8), ALL, "front").passed is True
-    assert closing_on_us(growing(rate=3.0, n=6, fps=8), ALL, "front").passed is False
+    assert closing_on_us(growing(rate=3.0, n=17), ALL, "front").passed is True  # 16 tracked, 0.5 s
 
 
 def test_growth_alone_needs_ttc_or_a_near_box():
@@ -64,7 +69,7 @@ def test_growth_alone_needs_ttc_or_a_near_box():
     assert slow.passed is False
     # same growth, but the box ends at ~31% of the frame height -> close enough
     near = closing_on_us(growing(label="car", rate=1.3, n=60, h0=200), ALL, "front")
-    assert near.passed is True and near.note.endswith("of the frame height")
+    assert near.passed is True and near.note.endswith("of the frame height), now close")
 
 
 def test_single_jitter_spike_does_not_count():
@@ -159,3 +164,46 @@ def test_diagnostics_explain_each_rejection():
         d = ego_diagnostics(det, ALL, "front")[0]
         assert d.reason.split(" ")[0] == want, (want, d)
         assert d.frames > 0 and 0 < d.start_h < 1
+
+
+def crossing(start_x, end_x, seconds=1.3, fps=30, h=300.0, label="person", bottom=900.0):
+    n = int(seconds * fps) + 1
+    frames = [
+        {"frame_index": i, "time_sec": i / fps,
+         "detections": [box(label, start_x + (end_x - start_x) * i / (n - 1), h, bottom, 0.8)]}
+        for i in range(n)
+    ]
+    return DetectionsResp.model_validate({"fps": fps, "video_shape": [H, W], "frames": frames})
+
+
+def test_pedestrian_stepping_into_our_lane_passes_without_growth():
+    r = closing_on_us(crossing(1700, 1300), ALL, "front")  # from the right edge into the lane (<= 1440)
+    assert r.passed is True and r.note.startswith("a pedestrian stepped into the bus's path from the right in ")
+    d = ego_diagnostics(crossing(1700, 1300), ALL, "front")[0]
+    assert d.rule == "lane-entry"
+    left = closing_on_us(crossing(150, 520, label="bicycle", h=200), ALL, "front")  # to within 5% of 480
+    assert left.passed is True and left.note.startswith("a cyclist moved into the bus's path from the left")
+
+
+def test_lane_entry_needs_people_front_camera_and_real_movement():
+    assert closing_on_us(crossing(1700, 1300, label="car", h=200), ALL, "front").passed is False
+    nearside = ego_diagnostics(crossing(1700, 1300), ALL, "nearside")[0]
+    assert nearside.rule != "lane-entry"
+    assert closing_on_us(crossing(1700, 1650), ALL, "front").passed is False  # never reaches the lane
+    # drifts 100 px over 3 s: never 5% of the width within 2 s (jitter, not a step)
+    assert closing_on_us(crossing(1520, 1420, seconds=3.0), ALL, "front").passed is False
+    assert closing_on_us(crossing(1700, 1300, bottom=400.0, h=150), ALL, "front").passed is False  # far, high
+
+
+def test_growth_window_reports_its_own_heights_on_a_shrinking_track():
+    # a box that grows for 1 s then shrinks: growth and heights come from the rising part only
+    frames = []
+    for i in range(60):
+        t = i / 30
+        h = 200 * (2.0 ** t if t <= 1 else 2.0 * 0.5 ** (t - 1))
+        frames.append({"frame_index": i, "time_sec": t, "detections": [box("car", 960, h, 900, 0.9)]})
+    det = DetectionsResp.model_validate({"fps": 30, "video_shape": [H, W], "frames": frames})
+    d = ego_diagnostics(det, ALL, "front")[0]
+    assert d.end_h > d.start_h and abs(d.end_h / d.start_h - d.growth) < 0.01
+    r = closing_on_us(det, ALL, "front")
+    assert f"({d.start_h:.0%} to {d.end_h:.0%} of the frame height)" in r.note

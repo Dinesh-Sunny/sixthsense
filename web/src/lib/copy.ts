@@ -239,7 +239,7 @@ export const BUS_COPY = {
   heroTitle: "Every London bus,",
   heroItalic: "a second pair of eyes.",
   heroSub:
-    "SixthSense watches bus camera footage, spots close calls, predicts the next few seconds, then checks the next clip to see if it was right.",
+    "Most camera footage is never watched. The few seconds that matter deserve a second look.",
   visionZero: "TfL's goal: no one killed on or by a London bus by 2030.",
   visionZeroUrl:
     "https://tfl.gov.uk/info-for/media/press-releases/2018/october/london-s-bus-network-to-meet-new-world-leading-bus-safety-standard",

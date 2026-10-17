@@ -45,9 +45,6 @@ export function BuiltWith() {
             </li>
           ))}
         </ul>
-        <p className={`text-data text-ink-muted ${rise}`} style={stagger(BRANDS.length, 80)}>
-          Logos are trademarks of their owners.
-        </p>
       </Reveal>
     </section>
   );

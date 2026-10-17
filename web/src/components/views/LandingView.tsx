@@ -118,7 +118,6 @@ function FeatureRow({
         </span>
         <h2 className="font-serif text-[36px] leading-[1.08] whitespace-pre-line md:text-[44px]">{step.title}</h2>
         <p className="max-w-[400px] text-[15px] leading-[23px] text-ink-muted">{step.body}</p>
-        <p className="max-w-[400px] text-data text-ink-muted">{step.plain}</p>
       </div>
       <div
         className={cn(
@@ -302,13 +301,6 @@ export function LandingView() {
       {/* Live results: real numbers only; hidden when metrics fail or no run exists. */}
       {resultRun && <LiveResults metrics={resultRun} incidents={resultIncidents} />}
 
-      <section className="bg-surface px-4 py-16 text-center md:px-10 md:py-24">
-        <Reveal>
-          <p className={cn("mx-auto max-w-[1040px] font-serif text-[36px] leading-[1.08] text-ink md:text-[56px]", rise)}>
-            Most camera footage is never watched. The few seconds that matter deserve a second look.
-          </p>
-        </Reveal>
-      </section>
 
       <section className="mx-auto grid max-w-[1200px] grid-cols-1 gap-6 px-4 py-16 md:grid-cols-3 md:px-10 md:py-24 lg:px-[80px]">
         {AUDIENCES.map((a, n) => (

@@ -215,10 +215,23 @@ def selfcheck(hit: dict, what_next: str) -> dict:
             nd = desc(v.metadata(nxt["source"]))
         except Exception:
             nd = ""
-    j = parse_json(llm(JUDGE.format(what_next=what_next, next_desc=nd[:1500])))
+    if os.environ.get("SELFCHECK_VIA", "video") == "video":
+        # Cosmos watches the NEXT clip itself - grounded in pixels, not in another caption
+        q = (f'Prediction made from the previous clip: "{what_next}". Watch this clip. Did that happen? '
+             'Reply JSON only: {"came_true": "yes|partly|no", "evidence": "<what you see, one short line>"}')
+        try:
+            j = parse_json(cosmos(q, v.clip_bytes(nxt["source"]), 160))
+        except Exception as e:
+            print("cosmos judge failed, falling back to text", e)
+            j = parse_json(llm(JUDGE.format(what_next=what_next, next_desc=nd[:1500])))
+        j["judge"] = "cosmos-video"
+    else:
+        j = parse_json(llm(JUDGE.format(what_next=what_next, next_desc=nd[:1500])))
+        j["judge"] = "llm-text"
     ct = str(j.get("came_true", "unknown")).lower()
     return {"came_true": ct if ct in ("yes", "partly", "no") else "unknown",
-            "came_true_evidence": str(j.get("evidence", ""))[:200], "next_source": nxt.get("source")}
+            "came_true_evidence": str(j.get("evidence", ""))[:200], "next_source": nxt.get("source"),
+            "judged_by": j.get("judge")}
 
 
 # ---------- 5 STORE ----------

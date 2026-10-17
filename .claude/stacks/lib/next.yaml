@@ -1980,7 +1980,7 @@ groups:
       deprecated: use generateStaticParams with app (getStaticPaths with pages)
       ref: /docs/app/api-reference/config/next-config-js/exportPathMap
   - id: api-cfg-perf-dev
-    title: Config - performance, dev and experimental
+    title: Config - perf, dev and experimental
     level: advanced
     requires: [api-config]
     ref: /docs/app/api-reference/config/next-config-js

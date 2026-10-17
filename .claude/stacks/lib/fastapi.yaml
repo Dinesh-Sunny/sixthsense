@@ -35,7 +35,7 @@ groups:
     - id: fa-lifespan
       name: lifespan
       summary: async context manager passed to FastAPI(lifespan=...); code before yield runs at startup, after yield at shutdown
-      lenses: [best-practice, gotcha]
+      lenses: [best-practice, reliability]
       import: fastapi
       signature: FastAPI(lifespan=lifespan)
       notes: ['create the shared httpx.AsyncClient before yield and aclose() it after; never one client per request', 'if lifespan is given, on_event startup/shutdown handlers are no longer called (all lifespan or all events)', 'the docs page does not show lifespan state; see Starlette lifespan docs for yielded state']
@@ -43,7 +43,7 @@ groups:
     - id: fa-httpx-client
       name: Shared httpx.AsyncClient
       summary: one client keeps connection pooling; httpx docs warn against creating clients in loops
-      lenses: [best-practice, performance]
+      lenses: [best-practice, perf]
       notes: ['store it on app.state or yield it as lifespan state, then expose it through a Depends function', 'with client.send(stream=True) you must call Response.aclose() yourself or connections leak']
       ref: https://www.python-httpx.org/async/
     - id: fa-depends
@@ -73,7 +73,7 @@ groups:
     - id: fa-response-model
       name: response_model and return annotation
       summary: the declared type validates, filters and serialises output through Pydantic (Rust core); response_model wins if both are set
-      lenses: [best-practice, security, performance]
+      lenses: [best-practice, security, perf]
       import: fastapi
       signature: '@app.get("/incidents", response_model=list[Incident])'
       notes: ['returning a richer object is safe: fields missing from the response model are stripped', 'with response_model, annotate the function -> Any to keep type checkers quiet', 'docs say a response model beats an orjson response for performance']
@@ -97,7 +97,7 @@ groups:
     - id: fa-staticfiles
       name: StaticFiles mount
       summary: app.mount(path, StaticFiles(directory=...)) hands a whole sub-path to an independent app; html=True serves index.html for directories
-      lenses: [best-practice, gotcha]
+      lenses: [best-practice, reliability]
       import: fastapi.staticfiles
       signature: app.mount("/", StaticFiles(directory="out", html=True), name="web")
       notes: ['Starlette signature: StaticFiles(directory, packages, html=False, check_dir=True, follow_symlink=False)', 'html=True also serves 404.html on misses', 'mount last: a mount at "/" swallows any route declared after it', 'mounted apps are absent from the main OpenAPI docs']
@@ -112,7 +112,7 @@ groups:
     - id: fa-streaming
       name: StreamingResponse
       summary: takes a sync or async generator and streams the body chunk by chunk
-      lenses: [best-practice, gotcha]
+      lenses: [best-practice, reliability]
       import: fastapi.responses
       signature: StreamingResponse(gen(), media_type="video/mp4")
       notes: ['async tasks cancel only at an await, so await in the generator loop (docs use anyio.sleep(0))', 'docs prefer yield-style path operations (Stream Data page) for automatic cancellation handling', 'no docs page covers proxying or Range for StreamingResponse; forward Range upstream and set 206/Content-Range yourself, verify with a real player']
@@ -120,7 +120,7 @@ groups:
     - id: fa-fileresponse
       name: FileResponse
       summary: async file streaming with Content-Length, Last-Modified and ETag; Starlette adds HTTP Range support (206, 416 invalid)
-      lenses: [performance]
+      lenses: [perf]
       import: fastapi.responses
       signature: FileResponse(path, media_type="video/mp4")
       notes: ['only the bytes unit is supported; Accept-Ranges: bytes is sent when the file exists', 'use it for local files and reserve StreamingResponse for upstream proxying']
@@ -128,14 +128,14 @@ groups:
     - id: fa-cors
       name: CORSMiddleware
       summary: app.add_middleware(CORSMiddleware, allow_origins=[...]); allow_methods defaults to GET only, max_age 600
-      lenses: [security, gotcha]
+      lenses: [security, reliability]
       import: fastapi.middleware.cors
       notes: ['origins, methods and headers cannot be "*" when allow_credentials=True; list them explicitly (docs example contradicts this)', 'same-origin serving of out/ plus /api needs no CORS at all; add it only for separate origins', 'expose_headers is empty by default; list Content-Range if a browser client reads it']
       ref: /tutorial/cors/
     - id: fa-gzip
       name: GZipMiddleware
       summary: compresses responses for clients sending Accept-Encoding gzip, including streaming responses
-      lenses: [performance]
+      lenses: [perf]
       import: fastapi.middleware.gzip
       signature: app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
       notes: ['defaults are minimum_size=500 and compresslevel=9; lower the level to save CPU at high traffic', 'do not compress video: it is already compressed, and compression can interfere with ranged playback (inference, not in docs)', 'middleware ordering is not covered by FastAPI docs; check Starlette']
@@ -151,7 +151,7 @@ groups:
     - id: fa-background-tasks
       name: BackgroundTasks vs a queue
       summary: tasks run after the response is sent, inside the same process; good for small work needing app objects
-      lenses: [best-practice, gotcha]
+      lenses: [best-practice, reliability]
       import: fastapi
       signature: background_tasks.add_task(fn, arg, kw=1)
       notes: ['docs point to Celery or similar (with RabbitMQ or Redis) for heavy work, multiple processes or servers', 'tasks die with the process and have no retries, so use a real queue for anything that must not be lost']
@@ -159,7 +159,7 @@ groups:
     - id: fa-workers
       name: Workers and replicas
       summary: uvicorn main:app --workers 4 (or fastapi run --workers 4) starts a process manager plus one server process per worker
-      lenses: [best-practice, performance]
+      lenses: [best-practice, perf]
       notes: ['docs advise one Uvicorn process per container on Kubernetes and scaling with replicas instead of --workers', 'each worker has its own lifespan, so each gets its own httpx client and in-memory cache']
       ref: /deployment/server-workers/
     - id: fa-health
@@ -171,7 +171,7 @@ groups:
     - id: fa-async-tests
       name: Async tests with httpx
       summary: AsyncClient(transport=ASGITransport(app=app), base_url="http://test") with @pytest.mark.anyio test functions
-      lenses: [best-practice, gotcha]
+      lenses: [best-practice, reliability]
       import: httpx
       signature: AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
       notes: ['TestClient cannot be used inside async def tests', 'AsyncClient does not run lifespan; wrap the app in asgi-lifespan LifespanManager or the shared client will be missing', 'create loop-bound objects inside async functions to avoid "Task attached to a different loop"']

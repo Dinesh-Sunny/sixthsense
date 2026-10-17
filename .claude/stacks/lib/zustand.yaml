@@ -35,7 +35,7 @@ groups:
     entries:
     - id: zus-learn-index
       name: Learn index
-      summary: reading order for the guides, grouped as start, core concepts, performance, TypeScript, frameworks
+      summary: reading order for the guides, grouped as start, core concepts, perf, TypeScript, frameworks
       lenses: [reuse]
       ref: /learn/index.md
     - id: zus-reference-index

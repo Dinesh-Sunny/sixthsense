@@ -937,7 +937,7 @@ groups:
       ref: /docs/prompt-management/features/agentic-access.md
     - id: prompt-troubleshooting
       name: Prompt management troubleshooting
-      summary: Index of prompt FAQs (sub-prompts, agent skills, performance, caching)
+      summary: Index of prompt FAQs (sub-prompts, agent skills, perf, caching)
       lenses: [reliability]
       ref: /docs/prompt-management/troubleshooting-and-faq.md
 - title: Integrations and OpenTelemetry

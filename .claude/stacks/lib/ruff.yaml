@@ -186,13 +186,13 @@ groups:
       name: Default set since 0.16.0
       summary: 413 rules are on without config (was 59); set select to replace them or extend-select to keep them.
       lenses: [best-practice, reliability]
-      notes: ['default set spans correctness, suspicious, complexity, performance, style categories; lists ASYNC2xx, B*, DTZ0xx, LOG015, G010, RUF012/013, RUF100']
+      notes: ['default set spans correctness, suspicious, complexity, perf, style categories; lists ASYNC2xx, B*, DTZ0xx, LOG015, G010, RUF012/013, RUF100']
       ref: /default-rules/
     - id: rule-categories
       name: Rule categories
       summary: Selectors that group rules by intent; the first five form the default set.
       lenses: [best-practice, security]
-      signature: correctness, suspicious, complexity, performance, style, security, formatting, pedantic, restriction
+      signature: correctness, suspicious, complexity, perf, style, security, formatting, pedantic, restriction
       notes: [category selectors need preview = true; first five form the default set]
       ref: /linter/index.md
   - id: fixes

@@ -1781,7 +1781,7 @@ groups:
       - name: openTelemetry
         type: '{ enabled, sdkPath }'
         default: '{ enabled: false }'
-        desc: imports your started SDK in the main thread and before each test file; costs performance, debug only (4.0.11)
+        desc: imports your started SDK in the main thread and before each test file; costs perf, debug only (4.0.11)
       - name: vcsProvider
         type: VCSProvider | string
         default: '''git'''

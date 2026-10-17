@@ -11,13 +11,15 @@
 [![CoreWeave](https://img.shields.io/badge/CoreWeave-GPUs-2741e7)](https://coreweave.com/)
 [![W&B Weave](https://img.shields.io/badge/W%26B-Inference%20%2B%20Weave-ffbe00)](https://wandb.ai/site/weave/)
 
-[Try it](#try-it) · [How it works](#how-it-works) · [Results](#results) · [Run it](#run-it) · [Team](#team)
+[**Website**](https://team-43-app.thecosmoslabs.com/app/) · [Try it](#try-it) · [How it works](#how-it-works) · [Results](#results) · [Run it](#run-it) · [Team](#team)
 
 </div>
 
 ---
 
-<p align="center"><img src="docs/screenshots/homepage.jpg" alt="SixthSense homepage: Every London bus, a second pair of eyes" width="900"></p>
+<p align="center"><a href="https://team-43-app.thecosmoslabs.com/app/"><img src="docs/screenshots/homepage.jpg" alt="SixthSense homepage: Every London bus, a second pair of eyes" width="900"></a></p>
+
+<p align="center"><b><a href="https://team-43-app.thecosmoslabs.com/app/">Visit the website</a></b> · <a href="https://team-43-app.thecosmoslabs.com/app/dashboard/">Open the live map</a> · <a href="https://wandb.ai/vastdata/team-43/weave">See the traces</a></p>
 
 ## The problem
 

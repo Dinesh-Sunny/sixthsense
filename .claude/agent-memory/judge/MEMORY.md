@@ -1,0 +1,1 @@
+- [tally.md](tally.md) - per-advocate-mode raised/adopted/rejected counts and noise to stop raising

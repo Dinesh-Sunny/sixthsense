@@ -1,0 +1,196 @@
+stack: arq-httpx
+version: "arq 0.28.0, httpx 0.28.1, tenacity 9.2.1"
+docs_base: https://www.python-httpx.org
+source: https://pypi.org/project/arq/
+fetched: 2026-10-17
+verified: 2026-10-17
+toc:
+- index: 'https://arq-docs.helpmanual.io/'
+  match: '^https://arq-docs\.helpmanual\.io/'
+- index: 'https://www.python-httpx.org/async/'
+  match: '^https://www\.python-httpx\.org/'
+- index: 'https://tenacity.readthedocs.io/en/latest/'
+  match: '^https://tenacity\.readthedocs\.io/'
+groups:
+- title: arq job workers
+  sections:
+  - id: aq-worker
+    title: Worker settings and job lifecycle
+    level: basic
+    requires: []
+    ref: https://arq-docs.helpmanual.io/
+    entries:
+    - id: aq-simple-or-arq
+      name: When asyncio is enough
+      summary: for a hackathon slice use `asyncio.TaskGroup` plus `asyncio.Semaphore(n)`; move to arq when jobs must survive restarts, retry later or run on several pods
+      lenses: [best-practice]
+      notes: ['TaskGroup and Semaphore are stdlib, so they fit the no-pip app/ rule', 'arq needs Redis and a pip install, so keep it in pipeline/ only']
+      ref: https://arq-docs.helpmanual.io/
+    - id: aq-worker-settings
+      name: WorkerSettings
+      summary: class with `functions`, `cron_jobs`, `max_jobs`, `job_timeout`, `max_tries`, `keep_result`, `on_startup`, `on_shutdown`
+      lenses: [best-practice]
+      import: arq
+      signature: 'class WorkerSettings: functions = [process_segment]; max_jobs = 4'
+      notes: ['defaults: max_jobs 10, job_timeout 300 s, max_tries 5, keep_result 3600 s', 'set max_jobs to what the GPU endpoints tolerate, not the default', 'job functions are `async def f(ctx, *args)`; put the shared httpx client in `ctx` from on_startup and close it in on_shutdown']
+      ref: https://arq-docs.helpmanual.io/
+    - id: aq-cli
+      name: arq CLI
+      summary: `arq module.WorkerSettings` starts a worker; `--burst` exits when idle; `--watch <path>` reloads (needs watchfiles)
+      lenses: [reuse]
+      notes: ['`arq module.WorkerSettings --check` exits 0 if the health key exists, else 1, so use it as a Kubernetes liveness or exec probe']
+      ref: https://arq-docs.helpmanual.io/
+    - id: aq-health
+      name: Health check key
+      summary: worker writes a Redis key every `health_check_interval` seconds, expiring after interval + 1
+      lenses: [best-practice]
+      notes: ['value holds a timestamp and counters j_complete, j_failed, j_retried, j_ongoing, queued', 'default interval is 3600 s, so lower it (e.g. 30) or `--check` stays stale-green for an hour']
+      ref: https://arq-docs.helpmanual.io/
+  - id: aq-enqueue
+    title: Enqueueing, idempotency and retries
+    level: basic
+    requires: [aq-worker]
+    ref: https://arq-docs.helpmanual.io/
+    entries:
+    - id: aq-create-pool
+      name: create_pool
+      summary: `await create_pool(RedisSettings(...))` returns an `ArqRedis`; call it once at FastAPI startup and close it at shutdown
+      lenses: [best-practice]
+      import: arq
+      signature: create_pool(settings_=None, *, retry=0, job_serializer, job_deserializer, default_queue_name='arq:queue')
+      notes: ['store the pool on `app.state` in the lifespan handler, never per request']
+      ref: https://arq-docs.helpmanual.io/
+    - id: aq-enqueue-job
+      name: enqueue_job with _job_id
+      summary: `await pool.enqueue_job('process_segment', seg_id, _job_id=seg_id)` returns a `Job`, or `None` when that id already exists
+      lenses: [best-practice]
+      signature: 'enqueue_job(function, *args, _job_id, _defer_by, _defer_until, _queue_name, _expires, _job_try, **kwargs)'
+      notes: ['job id = segment id gives enqueue-side dedupe; a `None` return means already queued or result still kept', 'keep_result bounds how long the id blocks re-enqueue, so write the result row to the store too and make the job body idempotent anyway']
+      ref: https://arq-docs.helpmanual.io/
+    - id: aq-retry
+      name: Retry exception
+      summary: `raise Retry(defer=30)` from a job requests a later re-run until `max_tries` is reached
+      lenses: [best-practice]
+      import: arq
+      notes: ['use it for 429 and 5xx that outlast the in-job tenacity loop; read `ctx["job_try"]` to grow the delay', 'other exceptions fail the job without retry']
+      ref: https://arq-docs.helpmanual.io/
+    - id: aq-job-status
+      name: Job and JobStatus
+      summary: `await job.status()` returns deferred, queued, in_progress, complete or not_found; `await job.result()` gives the return value
+      lenses: [reuse]
+      import: arq.jobs
+      notes: ['`Job.abort()` only works when `allow_abort_jobs = True` in WorkerSettings']
+      ref: https://arq-docs.helpmanual.io/
+  - id: aq-cron
+    title: Cron jobs
+    level: advanced
+    requires: [aq-worker]
+    ref: https://arq-docs.helpmanual.io/
+    entries:
+    - id: aq-cron-fn
+      name: cron()
+      summary: `cron(coro, minute={0, 30}, run_at_startup=True)` goes in `WorkerSettings.cron_jobs`
+      lenses: [best-practice]
+      import: arq
+      signature: cron(coroutine, *, name, month, day, weekday, hour, minute, second=0, run_at_startup=False, unique=True, timeout, max_tries=1)
+      notes: ['`None` on a time field means every value; `unique=True` runs once per tick across all workers', 'cron results are not kept by default (keep_result=0) and max_tries is 1']
+      ref: https://arq-docs.helpmanual.io/
+- title: httpx client
+  sections:
+  - id: hx-client
+    title: Shared AsyncClient
+    level: basic
+    requires: []
+    ref: /async/
+    entries:
+    - id: hx-asyncclient
+      name: One shared AsyncClient
+      summary: create one `httpx.AsyncClient(...)` per process and close it with `async with` or `await client.aclose()`
+      lenses: [best-practice]
+      import: httpx
+      signature: httpx.AsyncClient(timeout=..., limits=..., http2=False, event_hooks={...})
+      notes: ['a client per request or per loop turn defeats connection pooling', 'keep separate clients per upstream (VSS, GPU endpoints) when auth headers differ']
+      ref: /async/
+    - id: hx-limits
+      name: Limits
+      summary: `httpx.Limits(max_connections=100, max_keepalive_connections=20, keepalive_expiry=5)` caps the pool
+      lenses: [best-practice]
+      import: httpx
+      notes: ['defaults are 100, 20 and 5 s', 'keep max_connections at or above the worker max_jobs times calls per job, else tasks hit PoolTimeout']
+      ref: /advanced/resource-limits/
+    - id: hx-timeout
+      name: Timeout
+      summary: default is 5 s of inactivity; `httpx.Timeout(10.0, connect=5.0, read=60.0)` sets the base value and overrides
+      lenses: [best-practice]
+      import: httpx
+      notes: ['raises ConnectTimeout, ReadTimeout, WriteTimeout or PoolTimeout (all subclasses of TimeoutException)', 'read timeout is per chunk, not total, so keep the arq `job_timeout` as the overall cap', 'GPU inference calls need a longer read than the 5 s default']
+      ref: /advanced/timeouts/
+    - id: hx-http2
+      name: HTTP/2
+      summary: `pip install httpx[http2]` then `AsyncClient(http2=True)`; off by default and falls back to HTTP/1.1 if the server lacks it
+      lenses: [best-practice]
+      notes: ['check `response.http_version` to see what was negotiated', 'worth it only for many parallel calls to one host']
+      ref: /http2/
+  - id: hx-requests
+    title: Streaming, ranges and hooks
+    level: basic
+    requires: [hx-client]
+    ref: /async/
+    entries:
+    - id: hx-stream
+      name: Streaming download
+      summary: `async with client.stream('GET', url) as r:` then `async for chunk in r.aiter_bytes():` writes a clip to disk without loading it whole
+      lenses: [best-practice]
+      notes: ['the response closes when the block exits; with `client.send(req, stream=True)` you must `await r.aclose()` yourself', 'call `r.raise_for_status()` before reading the body', 'write to a temp path then rename, so a retry never sees a half file']
+      ref: /async/
+    - id: hx-range
+      name: Range requests
+      summary: send `headers={'Range': 'bytes=START-'}` to resume a partial download; the server answers 206 when it supports ranges
+      lenses: [best-practice]
+      notes: ['plain HTTP header, no special httpx API; this page was not fetched, so confirm 206 against the real server in a probe before relying on it', 'a 200 reply means the server ignored Range, so restart the file']
+      ref: /async/
+    - id: hx-event-hooks
+      name: Event hooks
+      summary: `event_hooks={'request': [f], 'response': [g]}`; on AsyncClient every hook must be `async def`
+      lenses: [best-practice]
+      notes: ['a response hook calling `raise_for_status()` makes every 4xx or 5xx raise HTTPStatusError', 'hooks run before the body is read; call `await response.aread()` first if you need it', 'log timings here, never headers or bearer tokens']
+      ref: /advanced/event-hooks/
+- title: tenacity retries
+  sections:
+  - id: tn-retry
+    title: Retry policy
+    level: basic
+    requires: []
+    ref: https://tenacity.readthedocs.io/en/latest/
+    entries:
+    - id: tn-async-retrying
+      name: AsyncRetrying
+      summary: `async for attempt in AsyncRetrying(stop=..., wait=..., retry=...): with attempt: await call()` retries a block; `@retry` also works on async functions
+      lenses: [best-practice]
+      import: tenacity
+      signature: 'AsyncRetrying(sleep=asyncio.sleep, **kwargs)'
+      notes: ['pass `reraise=True` to get the real last exception instead of `RetryError`', 'add `before_sleep=before_sleep_log(logger, logging.WARNING)` to see retries']
+      ref: https://tenacity.readthedocs.io/en/latest/
+    - id: tn-wait-jitter
+      name: wait_exponential_jitter
+      summary: `wait_exponential_jitter(initial=1, max=30)` doubles the wait each try and adds random jitter
+      lenses: [best-practice]
+      import: tenacity
+      signature: 'wait_exponential_jitter(initial=1, max=4.6e18, exp_base=2, jitter=1)'
+      notes: ['always set `max`; the default is effectively unbounded', 'jitter stops several workers retrying the same 429 in lockstep']
+      ref: https://tenacity.readthedocs.io/en/latest/api.html
+    - id: tn-stop
+      name: stop_after_attempt
+      summary: `stop_after_attempt(5)` caps tries; combine with `stop_after_delay(60)` using `|`
+      lenses: [best-practice]
+      import: tenacity
+      notes: ['keep total retry time under the arq `job_timeout`']
+      ref: https://tenacity.readthedocs.io/en/latest/
+    - id: tn-retry-if
+      name: retry_if_exception_type and retry_if_exception
+      summary: `retry_if_exception_type((httpx.TransportError, httpx.TimeoutException))` retries by class; `retry_if_exception(pred)` retries by test
+      lenses: [best-practice]
+      import: tenacity
+      signature: 'retry_if_exception(predicate: Callable[[BaseException], bool])'
+      notes: ['use the predicate form to retry HTTPStatusError only when `exc.response.status_code` is 429 or 5xx', 'never retry other 4xx; they will not change']
+      ref: https://tenacity.readthedocs.io/en/latest/api.html

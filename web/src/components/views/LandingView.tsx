@@ -91,10 +91,6 @@ function topIncident(lists: (Incident[] | undefined)[]): Incident | undefined {
     .sort((a, b) => b.risk - a.risk || Number(b.came_true === "yes") - Number(a.came_true === "yes"))[0];
 }
 
-function proofLine(m: ModeMetrics): string {
-  return `${m.came_true_yes} of ${m.checked} predictions came true on the latest ${m.mode} run`;
-}
-
 function bestScore(metrics: ModeMetrics[] | undefined): ModeMetrics | undefined {
   return metrics?.filter((m) => m.checked > 0).sort((a, b) => b.checked - a.checked)[0];
 }
@@ -164,7 +160,8 @@ export function LandingView() {
   return (
     <div className="bg-ground">
       {/* Hero: the sky follows live London weather. */}
-      <section className={cn(`wx-${wx}`, "sky-wash relative flex flex-col items-center px-4 pt-5 pb-16 md:px-10 md:pb-24")}>
+      {/* The hero keeps the bright daytime sky at every hour; live weather shows in the pill only. */}
+      <section className={cn("wx-clear", "sky-wash relative flex flex-col items-center px-4 pt-5 pb-12 md:px-10 md:pb-16")}>
         {wx === "rain" && <div aria-hidden className="rain-streaks pointer-events-none absolute inset-0" />}
         <nav className="relative flex w-full flex-wrap items-center gap-3 md:gap-4">
           <span className="font-serif text-2xl leading-none text-on-sky">
@@ -196,10 +193,6 @@ export function LandingView() {
               <a href="#how">How it works</a>
             </Button>
           </div>
-          {score && (
-            // Live: latest run with the most checked predictions (GET /api/metrics).
-            <p className="mt-4 text-data text-on-sky-muted">{proofLine(score)}</p>
-          )}
           <a
             href={BUS_COPY.visionZeroUrl}
             target="_blank"
@@ -216,7 +209,7 @@ export function LandingView() {
       <BuiltWith />
 
       {/* How it works */}
-      <section id="how" className="mx-auto flex max-w-[1200px] scroll-mt-6 flex-col gap-20 px-4 py-16 md:gap-24 md:px-10 md:py-24 lg:px-[80px]">
+      <section id="how" className="mx-auto flex max-w-[1200px] scroll-mt-6 flex-col gap-20 px-4 py-12 md:gap-24 md:px-10 md:py-16 lg:px-[80px]">
         <FeatureRow
           index={0}
           wash="sky-card"
@@ -302,7 +295,7 @@ export function LandingView() {
       {resultRun && <LiveResults metrics={resultRun} incidents={resultIncidents} />}
 
 
-      <section className="mx-auto grid max-w-[1200px] grid-cols-1 gap-6 px-4 py-16 md:grid-cols-3 md:px-10 md:py-24 lg:px-[80px]">
+      <section className="mx-auto grid max-w-[1200px] grid-cols-1 gap-6 px-4 py-12 md:grid-cols-3 md:px-10 md:py-16 lg:px-[80px]">
         {AUDIENCES.map((a, n) => (
           <Reveal key={a.title} className="h-full">
             <div className={cn("lift flex h-full flex-col gap-2.5 rounded-xl bg-surface p-7 shadow-float", rise)} style={stagger(n)}>

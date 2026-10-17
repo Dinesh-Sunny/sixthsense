@@ -29,7 +29,7 @@ function Avatar({ name, photo }: { name: string; photo: string }) {
 
 export function Team() {
   return (
-    <section aria-labelledby="team-h" className="mx-auto max-w-[1200px] px-4 py-16 md:px-10 md:py-24 lg:px-[80px]">
+    <section aria-labelledby="team-h" className="mx-auto max-w-[1200px] px-4 py-12 md:px-10 md:py-16 lg:px-[80px]">
       <Reveal>
         <h2 id="team-h" className={cn("mb-8 font-serif text-[36px] leading-[1.08] md:text-[44px]", rise)}>
           Team

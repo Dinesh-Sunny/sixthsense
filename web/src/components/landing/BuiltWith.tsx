@@ -25,7 +25,7 @@ function Mark({ logo }: { logo: string }) {
 
 export function BuiltWith() {
   return (
-    <section aria-labelledby="built-with-h" className="mx-auto max-w-[1200px] px-4 pt-16 md:px-10 md:pt-24 lg:px-[80px]">
+    <section aria-labelledby="built-with-h" className="mx-auto max-w-[1200px] px-4 py-12 md:px-10 md:py-16 lg:px-[80px]">
       <Reveal className="flex flex-col items-center gap-5">
         <h2 id="built-with-h" className={`text-eye ${rise}`}>
           Built with

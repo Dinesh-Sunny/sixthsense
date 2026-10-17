@@ -86,7 +86,7 @@ function HazardChips({ incidents }: { incidents: Incident[] }) {
 export function LiveResults({ metrics, incidents }: { metrics: ModeMetrics; incidents: Incident[] }) {
   const runName = metrics.mode === "bus" ? MODE_INFO.bus.name : `${MODE_INFO[metrics.mode].name} run`;
   return (
-    <section className="mx-auto max-w-[1200px] px-4 pb-16 md:px-10 md:pb-24 lg:px-[80px]" aria-labelledby="results-h">
+    <section className="mx-auto max-w-[1200px] px-4 py-12 md:px-10 md:py-16 lg:px-[80px]" aria-labelledby="results-h">
       <Reveal className="mb-8">
         <h2 id="results-h" className={cn("font-serif text-[36px] leading-[1.08] md:text-[44px]", rise)}>
           Live results

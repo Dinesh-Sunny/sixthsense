@@ -13,7 +13,7 @@ from modes import MODES
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 APP = os.path.join(ROOT, "app")
-VEHICLES = {"car", "truck", "bus", "motorcycle", "vehicle", "van", "forklift"}
+VEHICLES = {"car", "truck", "bus", "motorcycle", "vehicle", "van", "forklift"}  # bicycle/person count only as the other party
 v = VSS()
 
 
@@ -62,16 +62,16 @@ def _iou(a, b):
 
 def _tracks(frames, step=2, min_conf=0.25, classes=None):
     """Tracking-lite: link vehicle boxes frame to frame by best IoU. Returns {track_id: [(t, box), ...]}."""
-    tracks, last, nxt = {}, {}, 0
+    tracks, last, nxt, labels = {}, {}, 0, {}
     for fr in frames[::step]:
         t = float(fr.get("time_sec", fr.get("frame_index", 0)))
-        dets = [d["bbox"] for d in fr.get("detections", [])
+        dets = [(d["bbox"], str(d.get("label", "")).lower()) for d in fr.get("detections", [])
                 if str(d.get("label", "")).lower() in (classes or VEHICLES) and float(d.get("confidence", 1)) >= min_conf]
         new_last, used = {}, set()
-        for box in dets:
+        for box, label in dets:
             best, bid = 0.15, None
-            for tid, pb in last.items():
-                if tid in used:
+            for tid, (pb, pl) in last.items():
+                if tid in used or pl != label:
                     continue
                 o = _iou(box, pb)
                 if o > best:
@@ -80,9 +80,14 @@ def _tracks(frames, step=2, min_conf=0.25, classes=None):
                 bid, nxt = nxt, nxt + 1
             used.add(bid)
             tracks.setdefault(bid, []).append((t, box))
-            new_last[bid] = box
+            labels[bid] = label
+            new_last[bid] = (box, label)
         last = new_last
-    return tracks
+    return tracks, labels
+
+
+def _a(label):
+    return {"person": "a pedestrian", "bicycle": "a cyclist", "motorcycle": "a motorbike"}.get(label, "a " + label)
 
 
 def closing_gap(det, classes=None):
@@ -90,27 +95,32 @@ def closing_gap(det, classes=None):
     frames = (det or {}).get("frames") or (det or {}).get("perception_json", {}).get("frames") or []
     if not frames:
         return None
-    tr = {k: dict(v) for k, v in _tracks(frames, classes=classes).items() if len(v) >= 5}
+    raw, labels = _tracks(frames, classes=classes)
+    tr = {k: dict(v) for k, v in raw.items() if len(v) >= 5}
     ids, best = list(tr), (0.0, None)
     for i in range(len(ids)):
         for j in range(i + 1, len(ids)):
+            la, lb = labels[ids[i]], labels[ids[j]]
+            if la not in VEHICLES and lb not in VEHICLES:  # need at least one vehicle
+                continue
             a, b = tr[ids[i]], tr[ids[j]]
             ts = sorted(set(a) & set(b))
             if len(ts) < 5:
                 continue
             dist = []
             for t in ts:
-                ba, bb = a[t], b[t]
+                ba, bb = a[t], b[t]  # noqa
                 ca = ((ba[0] + ba[2]) / 2, (ba[1] + ba[3]) / 2); cb = ((bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2)
                 size = (math.hypot(ba[2] - ba[0], ba[3] - ba[1]) + math.hypot(bb[2] - bb[0], bb[3] - bb[1])) / 2
                 dist.append(math.hypot(ca[0] - cb[0], ca[1] - cb[1]) / max(size, 1.0))
+            dist = [sum(dist[max(0, x - 1):x + 2]) / len(dist[max(0, x - 1):x + 2]) for x in range(len(dist))]  # smooth ID jitter
             d0, dmin = sum(dist[:2]) / 2, min(dist)
             k = dist.index(dmin)
             if d0 <= 0 or dmin > 1.5:  # only pairs that end up within ~1.5 car lengths
                 continue
             score = (d0 - dmin) / d0
             if score > best[0]:
-                best = (score, f"two vehicles closed from {d0:.1f} to {dmin:.1f} car lengths in {ts[k]-ts[0]:.1f}s")
+                best = (score, f"{_a(la)} and {_a(lb)} closed from {d0:.1f} to {dmin:.1f} car lengths in {ts[k]-ts[0]:.1f}s")
     if best[1] is None:
         return 0.0, f"{len(tr)} vehicles tracked, no pair closing within 1.5 car lengths"
     return round(best[0], 2), best[1]
@@ -155,6 +165,7 @@ Answer in JSON only:
  "why": "<the visible cause>",
  "fix": "<one practical change that would prevent it>",
  "risk": <integer 1-5>}}
+"what_next" must be specific and checkable on camera (name the vehicle/person by colour or type and the action), never generic like "traffic continues".
 If nothing risky is happening, set risk to 1 and what_next to "nothing notable".
 Never invent people, vehicles or events you cannot see."""
 
@@ -231,6 +242,9 @@ def run(mode: str, limit: int, per_query: int) -> dict:
             print(f"[{n}/{len(cands)}] rejected ({ver['verify_note']})")
             continue
         fs = foresee(hit, mode)
+        if fs.get("risk", 1) < 2:
+            print(f"[{n}/{len(cands)}] verified but Cosmos sees no hazard (risk 1) - skipped")
+            continue
         sc = selfcheck(hit, fs.get("what_next", ""))
         cam = first(hit, ["camera_id"], MODES[mode]["camera"])
         incidents.append({

@@ -181,6 +181,21 @@ function addLayers(map: MapboxMap) {
   });
 }
 
+// Keep framed buses clear of the floating panels: measure them, with a fallback when they aren't laid out yet.
+function framePadding(): number | { top: number; bottom: number; left: number; right: number } {
+  if (typeof window === "undefined" || window.innerWidth < 768) return 32;
+  const w = (sel: string, fallback: number) => {
+    const el = document.querySelector<HTMLElement>(sel);
+    return el ? el.getBoundingClientRect().width : fallback;
+  };
+  return {
+    top: 110,
+    bottom: 110,
+    left: Math.max(w("[data-map-panel='left']", 320), 320) + 48,
+    right: Math.max(w("[data-map-panel='right']", 360), 360) + 48,
+  };
+}
+
 export function BusMap({
   token,
   vehicles,
@@ -384,7 +399,7 @@ export function BusMap({
         [Math.max(...lons), Math.max(...lats)],
       ],
       {
-        padding: window.innerWidth >= 768 ? { top: 100, bottom: 90, left: 330, right: 380 } : 32,
+        padding: framePadding(),
         maxZoom: 13,
         duration: 900,
       },
@@ -424,7 +439,7 @@ export function BusMap({
       ],
       {
         // Desktop panels cover the left 320px and right 360px of the map.
-        padding: window.innerWidth >= 768 ? { top: 90, bottom: 80, left: 340, right: 380 } : 24,
+        padding: framePadding(),
         maxZoom: 14,
         duration: 900,
       },
@@ -444,7 +459,7 @@ export function BusMap({
 
   // mapbox-gl.css sets .mapboxgl-map{position:relative}, which beats `absolute`, so size an outer box and fill it.
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-0 isolate z-0">
       <div ref={box} className="h-full w-full" aria-label="Live map of London buses" role="region" />
     </div>
   );

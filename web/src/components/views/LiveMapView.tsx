@@ -220,6 +220,7 @@ export function LiveMapView() {
 
       {/* Left panel: routes, follow, one status line */}
       <aside
+        data-map-panel="left"
         className={cn(panel, "z-10 m-4 flex flex-col gap-3 p-4 md:absolute md:top-[76px] md:left-4 md:m-0 md:w-[280px]")}
         aria-label={MAP_COPY.routesTitle}
       >
@@ -301,6 +302,7 @@ export function LiveMapView() {
 
       {/* Right panel: the list, or the selected bus (back arrow returns to the list) */}
       <aside
+        data-map-panel="right"
         className={cn(
           panel,
           "z-10 mx-4 mb-4 flex max-h-[80dvh] flex-col overflow-hidden md:absolute md:top-[76px] md:right-4 md:m-0 md:max-h-[calc(100dvh-160px)] md:w-[340px]",

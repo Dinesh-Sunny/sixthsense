@@ -83,22 +83,27 @@ flowchart LR
 | 1 | **Watch** | Runs saved hazard queries per camera ("truck cutting in close", "sudden hard braking") | `pipeline/run.py · watch` | VSS search over **VastDB** (Cosmos Embed1 256-d vectors) |
 | 2 | **Verify** | Measures how fast the gap between two vehicle boxes shrinks; rejects anything that isn't really closing | `run.py · verify` | **YOLO11** detections sidecar / `/v1/infer` |
 | 3 | **Foresee** | Sends the clip to the reasoning model with a strict JSON prompt | `run.py · foresee` | **NVIDIA Cosmos3-Reason** on **CoreWeave** |
-| 4 | **Self-check** | Finds the next segment of the same video and asks a judge if the forecast came true | `run.py · selfcheck` | **W&B serverless inference** |
+| 4 | **Self-check** | Finds the next segment of the same video and asks a judge if the forecast came true | `run.py · selfcheck` | **W&B serverless inference** (Llama-3.3-70B) |
 | 5 | **Store** | Writes incidents + per-mode accuracy | `run.py · run` | JSON, VastDB-ready |
 | 6 | **Act** | Cards, risk badges, "came true" pills, alerts, ask-the-footage box | `app/` | Python stdlib server on **VAST K8s** |
 
 <details>
-<summary><b>🔍 Step 2 in detail - the closing-gap score</b></summary>
+<summary><b>🔍 Step 2 in detail - tracking-lite closing-gap score</b></summary>
 
-For every sampled frame we take each pair of vehicle boxes and measure the gap between their edges, as a share of the frame width.
+Each 5-second segment carries YOLO11 boxes for all 150 frames. SixthSense:
+
+1. **Tracks** each road user frame to frame (greedy IoU matching, same label only) - a tiny multi-object tracker in ~40 lines.
+2. For every pair that includes **at least one vehicle**, measures centre distance in **car lengths** (distance / average box diagonal), smoothed to remove ID jitter.
+3. Keeps pairs that end up within **1.5 car lengths**, and scores how much they closed in:
 
 ```
-gap(t)   = edge distance between the two closest vehicles / frame width
-score    = (gap(first frame) - smallest gap) / gap(first frame)
-verified = score >= 0.30
+d(t)     = centre distance / mean box diagonal        # "car lengths"
+score    = (d(start) - d(min)) / d(start)
+verified = score >= 0.30 and d(min) <= 1.5
+note     = "a pedestrian and a car closed from 4.1 to 0.9 car lengths in 4.9s"
 ```
 
-A score of `0.48` means the gap shrank by 48% inside the clip. This is a **closing-gap score**, not a time-to-collision: overhead 2D boxes don't give real speed or distance, so we don't pretend they do.
+This is a **closing-gap score**, not time-to-collision: 2D boxes don't give true speed or distance, so we don't pretend they do.
 </details>
 
 <details>
@@ -155,12 +160,23 @@ The Builders Challenge maps to VAST's **CAMP** stack. SixthSense uses every laye
 
 | Mode | Camera | Candidates | Verified | Checked | Came true | Accuracy |
 |---|---|---|---|---|---|---|
-| 🛣️ Road | `i24_cam-1` (Nashville I-24) | _pending_ | _pending_ | _pending_ | _pending_ | _pending_ |
+| 🛣️ Road | `i24_cam-1` (Nashville I-24 highway) | _pending_ | _pending_ | _pending_ | _pending_ | _pending_ |
+| 🚦 City | NYC + SF intersection cams (6) | _pending_ | _pending_ | _pending_ | _pending_ | _pending_ |
 | 🏘️ Street | `neighborhood_cam-1` (2 days) | _pending_ | _pending_ | _pending_ | _pending_ | _pending_ |
 
 Weave trace: _link added after the run_
 
 ---
+
+## 🎥 The footage
+
+One VastDB index, **3,537 five-second segments from 612 videos across 13 cameras**, pre-processed by the VAST DataEngine pipeline (Cosmos3-Reason captions, Cosmos Embed1 vectors, YOLO11 boxes for every frame).
+
+| Mode | Cameras | Why it's here |
+|---|---|---|
+| 🛣️ Road | `i24_cam-1` - Nashville I-24, overhead multi-cam | lane changes, cut-ins, braking at speed |
+| 🚦 City | `nyc_streets_cam-1/2`, `sf_streets_cam-1/2/4/5` | pedestrians, cyclists and turning cars sharing space |
+| 🏘️ Street | `neighborhood_cam-1` - two full days | repeat visits, day-over-day patterns |
 
 ## 🗂️ Example output
 

@@ -331,7 +331,7 @@ export function BusMap({
         const el = document.createElement("button");
         el.type = "button";
         el.className =
-          "relative block h-[34px] w-[40px] cursor-pointer rounded-md transition-transform duration-150 hover:scale-110 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50";
+          "group block h-[34px] w-[40px] cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50";
         el.addEventListener("click", (e) => {
           e.stopPropagation();
           onSelectRef.current(a.id);
@@ -343,11 +343,17 @@ export function BusMap({
       const tint = cssVar(BUS_STATE[a.state].cssVar);
       const sel = a.id === selectedId;
       // Static markup from our own constants only (no API text is injected).
-      entry.el.innerHTML = `
+      // Mapbox positions the marker element with its own CSS transform, so hover scaling lives on an inner
+      // wrapper, and the markup is only rewritten when it changes (rewriting it on every update made it flicker).
+      const html = `<span class="relative block h-full w-full transition-transform duration-150 group-hover:scale-110">
         <span class="absolute inset-x-[3px] top-[6px] grid place-items-center" style="transform:${busTransform(a.bearing)}">${busSvg(tint, cssVar("--illus-glass"), cssVar("--illus-tyre"))}</span>
         ${a.n === 1 ? `<span class="absolute inset-0 animate-ping rounded-full opacity-40" style="background:${tint}"></span>` : ""}
         <span class="absolute -top-1 -left-1 grid size-[18px] place-items-center rounded-full border-[1.5px] border-white bg-pill font-mono text-[10px] font-semibold text-on-ink">${a.n}</span>
-        <span class="absolute -right-1.5 -bottom-1 flex items-center gap-0.5 rounded-full bg-surface px-1 py-0.5 text-ink shadow-float">${iconSvg(a.involved, 10)}<span style="color:${tint}">${iconSvg(a.outcome, 10)}</span></span>`;
+        <span class="absolute -right-1.5 -bottom-1 flex items-center gap-0.5 rounded-full bg-surface px-1 py-0.5 text-ink shadow-float">${iconSvg(a.involved, 10)}<span style="color:${tint}">${iconSvg(a.outcome, 10)}</span></span></span>`;
+      if (entry.el.dataset.html !== html) {
+        entry.el.innerHTML = html;
+        entry.el.dataset.html = html;
+      }
       entry.el.setAttribute(
         "aria-label",
         `Bus ${a.n} of ${attention.length}: ${a.id}, ${BUS_STATE[a.state].label}, ${INVOLVED_LABEL[a.involved]}, ${OUTCOME_LABEL[a.outcome]}`,

@@ -118,12 +118,14 @@ export function BusMap({
   const styleRef = useRef<string>(styleUrl(theme));
   const onSelectRef = useRef(onSelect);
   const onErrorRef = useRef(onError);
+  const themeRef = useRef(theme);
   // Bumped on every style load so data effects re-apply to the fresh style.
   const [styleVersion, setStyleVersion] = useState(0);
 
   useEffect(() => {
     onSelectRef.current = onSelect;
     onErrorRef.current = onError;
+    themeRef.current = theme;
   });
 
   // Create the map once, client-side only (keeps window out of the static prerender).
@@ -145,6 +147,7 @@ export function BusMap({
       map.on("style.load", () => {
         if (!map) return;
         addLayers(map);
+        map.setConfigProperty("basemap", "lightPreset", PRESET[themeRef.current]);
         setStyleVersion((v) => v + 1);
       });
       map.on("click", "buses", (e: MapMouseEvent) => {
@@ -175,7 +178,7 @@ export function BusMap({
     const url = styleUrl(theme);
     if (url !== styleRef.current) {
       styleRef.current = url;
-      map.setStyle(url, { config: { basemap: { lightPreset: PRESET[theme] } } });
+      map.setStyle(url);
     } else if (map.isStyleLoaded()) {
       map.setConfigProperty("basemap", "lightPreset", PRESET[theme]);
     }

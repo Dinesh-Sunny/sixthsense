@@ -80,8 +80,8 @@ function Toggle({ on, label, onClick }: { on: boolean; label: string; onClick: (
       aria-pressed={on}
       onClick={onClick}
       className={cn(
-        "glass h-9 rounded-full px-3.5 text-xs font-medium shadow-float transition-colors duration-150",
-        on ? "bg-pill text-on-ink" : "text-ink-muted hover:text-ink",
+        "h-9 rounded-full px-3.5 text-xs font-medium shadow-float transition-colors duration-150",
+        on ? "border border-transparent bg-pill text-on-ink" : "glass text-ink-muted hover:text-ink",
       )}
     >
       {label}

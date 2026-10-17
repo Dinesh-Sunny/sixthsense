@@ -9,7 +9,7 @@ import { WeatherPill } from "@/components/WeatherPill";
 import { Button } from "@/components/ui/button";
 import { incidentsOptions, metricsOptions, readyOptions, weatherOptions } from "@/lib/api/queries";
 import { MODES, type Incident, type ModeMetrics } from "@/lib/api/types";
-import { COPY, MODE_INFO, STORE_LABEL, VERDICT, cameraLine, gapLine, gapSummary, riskLabel, riskTone, scoreLine } from "@/lib/copy";
+import { BUS_COPY, COPY, MODE_INFO, STORE_LABEL, VERDICT, cameraLine, gapLine, gapSummary, riskLabel, riskTone, scoreLine } from "@/lib/copy";
 import { assetUrl, cn } from "@/lib/utils";
 
 const GITHUB_URL = "https://github.com/Dinesh-Sunny/sixthsense";
@@ -27,12 +27,13 @@ const STACK = [
   { name: "NVIDIA Cosmos3-Reason", role: "Watches each clip, says what happens next and why, then watches the next clip to check." },
   { name: "YOLO11 on CoreWeave", role: "Finds the cars and people in every frame, so close calls are measured, not guessed." },
   { name: "W&B Weave", role: "Records every model call and every score, so each prediction can be traced back." },
+  { name: "TfL Open Data + Mapbox", role: "Live bus arrivals place every London bus on the map, refreshed every 30 seconds." },
 ];
 
 const STEPS = [
   {
     title: "It watches\nevery clip",
-    body: "Highways, crossings, quiet streets. It searches the indexed footage for risky moments across every camera, so nothing waits for a person to press play.",
+    body: "Every bus camera, every clip. It searches the footage for risky moments, so nothing waits for a person to press play.",
     plain: "Under the hood: semantic search over the VAST video archive.",
   },
   {
@@ -53,9 +54,9 @@ const STEPS = [
 ];
 
 const AUDIENCES = [
-  { title: "Road operators", body: "See risky lane changes and braking before they turn into a pile-up." },
-  { title: "City safety teams", body: "Find the crossings where drivers don't yield, with the clips to prove it." },
-  { title: "Fleet insurers", body: "Know which moments were close calls, and which predictions held up." },
+  { title: "Bus safety teams", body: "See which buses had a close call today, with the clip and what happened next." },
+  { title: "Control rooms", body: "Every live bus on one map, sorted so the ones that need a look come first." },
+  { title: "Driver coaches", body: "One card per route with the moments and fixes to talk through with drivers." },
 ];
 
 function Frame({ frame, className }: { frame: { src: string; alt: string }; className?: string }) {
@@ -156,22 +157,20 @@ export function LandingView() {
           </span>
           <div className="hidden flex-1 lg:block" />
           <Button asChild size="sm" variant="glass" className="hidden sm:inline-flex">
-            <Link href="/dashboard">Open the dashboard</Link>
+            <Link href="/dashboard">Open the live map</Link>
           </Button>
         </nav>
 
         <div className="relative mt-12 flex flex-col items-center text-center md:mt-14">
           <h1 className="font-serif text-[clamp(44px,7vw,88px)] leading-[0.95] tracking-[-0.01em] text-balance text-on-sky">
-            See what happens next,
+            {BUS_COPY.heroTitle}
             <br />
-            <i className="text-on-sky-muted">before it happens.</i>
+            <i className="text-on-sky-muted">{BUS_COPY.heroItalic}</i>
           </h1>
-          <p className="mt-5 max-w-[560px] text-[17px] leading-[1.45] text-on-sky md:text-lg">
-            SixthSense watches your cameras, predicts the next few seconds, then checks the next clip to see if it was right.
-          </p>
+          <p className="mt-5 max-w-[580px] text-[17px] leading-[1.45] text-on-sky md:text-lg">{BUS_COPY.heroSub}</p>
           <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row">
             <Button asChild className="h-11 px-6">
-              <Link href="/dashboard">Open the dashboard</Link>
+              <Link href="/dashboard">Open the live map</Link>
             </Button>
             <Button asChild variant="glass" className="h-11 px-6">
               <a href="#how">How it works</a>
@@ -181,6 +180,14 @@ export function LandingView() {
             // Live: latest run with the most checked predictions (GET /api/metrics).
             <p className="mt-4 text-data text-on-sky-muted">{proofLine(score)}</p>
           )}
+          <a
+            href={BUS_COPY.visionZeroUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 text-body-sm text-on-sky underline decoration-on-sky-muted underline-offset-4 hover:decoration-on-sky"
+          >
+            {BUS_COPY.visionZero}
+          </a>
         </div>
 
         <div className="relative mt-10 w-full max-w-[1120px] md:mt-12">
@@ -349,14 +356,15 @@ export function LandingView() {
       </section>
 
       <section className="px-4 pb-10 md:px-10">
-        <div className="dusk-card flex flex-col items-center gap-6 rounded-xl px-6 py-20 text-center md:px-10 md:py-[120px]">
+        <div className="dusk-card flex flex-col items-center gap-6 rounded-xl px-6 py-16 text-center md:px-10 md:py-24">
           <p className="font-serif text-[40px] leading-[1.02] text-ink md:text-[56px]">
-            Never leave your cameras
+            Every bus on one map,
             <br />
-            <i>home alone.</i>
+            <i>the ones that need a look first.</i>
           </p>
+          <p className="max-w-[620px] text-body-sm text-ink-muted">{BUS_COPY.honest}</p>
           <Button asChild size="lg" className="px-7">
-            <Link href="/dashboard">Open the dashboard</Link>
+            <Link href="/dashboard">Open the live map</Link>
           </Button>
         </div>
       </section>
@@ -367,6 +375,9 @@ export function LandingView() {
         {stored && <span className="text-data">{stored}</span>}
         <a href="https://open-meteo.com/" target="_blank" rel="noreferrer" className="text-data underline-offset-2 hover:underline">
           {COPY.weatherCredit}
+        </a>
+        <a href="https://tfl.gov.uk/info-for/open-data-users/" target="_blank" rel="noreferrer" className="text-data underline-offset-2 hover:underline">
+          {BUS_COPY.poweredBy}
         </a>
         <span>Made in London, 17 October 2026</span>
         <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="text-ink underline-offset-2 hover:underline">

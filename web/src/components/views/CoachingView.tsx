@@ -70,7 +70,8 @@ export function CoachingView() {
                     <StatusPill tone={riskTone(top)}>{riskLabel(top)}</StatusPill>
                   </div>
                   <p className="text-data text-ink-muted">
-                    {plural(c.items.length, "moment")} · {cameTrue} of {checked.length} predictions came true
+                    {plural(c.items.length, "moment")} ·{" "}
+                    {checked.length > 0 ? `${cameTrue} of ${checked.length} predictions came true` : "not checked yet"}
                   </p>
                   <ul className="flex flex-col gap-3">
                     {c.items.map(({ pairing: p, incident: i }) => (

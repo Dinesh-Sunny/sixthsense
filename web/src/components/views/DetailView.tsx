@@ -138,7 +138,7 @@ function Forecast({ incident: i }: { incident: Incident }) {
         </Panel>
         <Panel className={cn("flex flex-col gap-2.5", verdictBorder)}>
           <div className="flex items-center gap-3">
-            <div className="text-eye">{COPY.whatHappened}</div>
+            <div className="text-eye">What happened</div>
             <div className="flex-1" />
             <StatusPill tone={i.fixture ? "sample" : verdict.tone}>{i.fixture ? SAMPLE.label : verdict.label}</StatusPill>
           </div>

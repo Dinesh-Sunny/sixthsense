@@ -81,7 +81,7 @@ Before calling a task done, run the compile check and, on the lab VM, `probe.py`
 - Imports: n/a for this hackathon project; order: std/lib → external → internal → relative.
 - Functions: small, single-purpose; early returns over nested conditionals.
 - Types: n/a for this hackathon project
-- Errors: {{throw typed errors | return Result/{data,error} shape}}. Never swallow errors silently.
+- Errors: raise on unexpected API errors; return `unknown` states for missing data. Never swallow errors silently.
 - Constants and config live in `pipeline/modes.py`. No magic numbers or strings inline.
 - Comments explain *why*. Delete commented-out code.
 - Formatting is owned by no formatter (match the file). Don't hand-format; the PostToolUse hook runs it.

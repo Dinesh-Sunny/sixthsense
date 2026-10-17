@@ -85,7 +85,7 @@ Before calling a task done, run the compile check and, on the lab VM, `probe.py`
 - Imports: n/a for this hackathon project; order: std/lib → external → internal → relative.
 - Functions: small, single-purpose; early returns over nested conditionals.
 - Types: n/a for this hackathon project
-- Errors: {{throw typed errors | return Result/{data,error} shape}}. Never swallow errors silently.
+- Errors: raise on unexpected API errors; return `unknown` states for missing data. Never swallow errors silently.
 - Constants and config live in `pipeline/modes.py`. No magic numbers or strings inline.
 - Comments explain *why*. Delete commented-out code.
 - Formatting is owned by no formatter (match the file). Don't hand-format; the PostToolUse hook runs it.
@@ -124,7 +124,7 @@ _Applies to `src/app/api/**, **/server/**, **/routes/**, **/actions/**`_
 # API / server
 
 - Validate request input with VALIDATION_LIB schemas at the edge of every handler.
-- Response shape: {{e.g. `{ data: T } | { error: { code, message } }`}}; consistent HTTP status codes.
+- Response shape: JSON body; errors as `{"error": "<message>"}` with a matching HTTP status.
 - AuthZ check first, before any data access.
 - Business logic lives in SERVICE_LAYER_PATH; handlers stay thin.
 - Idempotency for retries on mutating endpoints where clients may retry.

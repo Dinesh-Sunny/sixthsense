@@ -6,7 +6,7 @@ applyTo: "src/app/api/**,**/server/**,**/routes/**,**/actions/**"
 # API / server
 
 - Validate request input with VALIDATION_LIB schemas at the edge of every handler.
-- Response shape: {{e.g. `{ data: T } | { error: { code, message } }`}}; consistent HTTP status codes.
+- Response shape: JSON body; errors as `{"error": "<message>"}` with a matching HTTP status.
 - AuthZ check first, before any data access.
 - Business logic lives in SERVICE_LAYER_PATH; handlers stay thin.
 - Idempotency for retries on mutating endpoints where clients may retry.

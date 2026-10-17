@@ -19,11 +19,19 @@ import { Wordmark } from "@/components/Wordmark";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { incidentsOptions, metricsOptions } from "@/lib/api/queries";
-import { MODES, type Mode } from "@/lib/api/types";
+import { MODES, type Mode, type ModeMetrics } from "@/lib/api/types";
 import { COPY, MODE_INFO, calmBody, heroSubline, momentsHeadline } from "@/lib/copy";
 
-function parseMode(v: string | null): Mode {
-  return MODES.includes(v as Mode) ? (v as Mode) : "road";
+const FALLBACK_MODE: Mode = "road";
+
+function parseMode(v: string | null): Mode | null {
+  return MODES.includes(v as Mode) ? (v as Mode) : null;
+}
+
+/** No ?mode: open the camera with the most moments from its latest run. */
+function busiestMode(metrics: ModeMetrics[] | undefined): Mode {
+  const best = metrics?.filter((m) => m.verified > 0).sort((a, b) => b.verified - a.verified)[0];
+  return best?.mode ?? FALLBACK_MODE;
 }
 
 export function MainView() {
@@ -31,10 +39,13 @@ export function MainView() {
   const router = useRouter();
   const pathname = usePathname();
   const [, startTransition] = useTransition();
-  const mode = parseMode(params.get("mode"));
-
-  const incidents = useQuery(incidentsOptions(mode));
   const metrics = useQuery(metricsOptions());
+  const asked = parseMode(params.get("mode"));
+  // Wait for metrics before picking a default so the page doesn't jump between tabs.
+  const modeKnown = asked !== null || !metrics.isPending;
+  const mode = asked ?? busiestMode(metrics.data);
+
+  const incidents = useQuery({ ...incidentsOptions(mode), enabled: modeKnown });
   const m = metrics.data?.find((x) => x.mode === mode);
   const list = incidents.data ?? [];
 

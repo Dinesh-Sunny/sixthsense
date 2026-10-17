@@ -4,6 +4,8 @@ import type { Alert, AskIn, AskOut, Health, Incident, Mode, ModeMetrics, RunIn, 
 
 const RUN_POLL_MS = 2_000;
 const WEATHER_MS = 10 * 60_000;
+// Runs can finish from the CLI or another tab; keep the headline numbers fresh.
+const LIVE_MS = 30_000;
 
 export const queryKeys = {
   incidents: (mode: Mode) => ["incidents", mode] as const,
@@ -20,6 +22,8 @@ export const incidentsOptions = (mode: Mode) =>
   queryOptions({
     queryKey: queryKeys.incidents(mode),
     queryFn: ({ signal }) => getJson<Incident[]>("/incidents", { mode }, signal),
+    refetchInterval: LIVE_MS,
+    refetchOnWindowFocus: true,
   });
 
 export const incidentOptions = (id: string) =>
@@ -33,6 +37,8 @@ export const metricsOptions = () =>
   queryOptions({
     queryKey: queryKeys.metrics,
     queryFn: ({ signal }) => getJson<ModeMetrics[]>("/metrics", undefined, signal),
+    refetchInterval: LIVE_MS,
+    refetchOnWindowFocus: true,
   });
 
 export const runOptions = () =>

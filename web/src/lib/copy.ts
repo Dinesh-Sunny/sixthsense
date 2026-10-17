@@ -134,6 +134,10 @@ export const COPY = {
   waiting: "Waiting",
 };
 
+export function plural(n: number, word: string): string {
+  return `${n} ${word}${n === 1 ? "" : "s"}`;
+}
+
 export function momentsHeadline(n: number): string {
   if (n === 0) return "No moments need a look";
   return n === 1 ? "1 moment worth a look" : `${n} moments worth a look`;
@@ -147,12 +151,12 @@ export function heroSubline(mode: Mode, m: ModeMetrics | undefined, sampleOnly: 
   const lead = `${MODE_INFO[mode].where}.`;
   if (sampleOnly) return `${lead} Showing sample moments until a camera is watched.`;
   if (!m) return lead;
-  return `${lead} ${m.candidates} clips watched, ${m.ruled_out} false alarms ruled out.`;
+  return `${lead} ${plural(m.candidates, "clip")} watched, ${plural(m.ruled_out, "false alarm")} ruled out.`;
 }
 
 export function calmBody(m: ModeMetrics | undefined): string {
   if (!m) return "No moments yet. Watch a camera and we'll show anything that needs a look.";
-  return `We watched ${m.candidates} clips and ruled out every alarm. We'll show moments here as soon as something needs a look.`;
+  return `We watched ${plural(m.candidates, "clip")} and ruled out every alarm. We'll show moments here as soon as something needs a look.`;
 }
 
 /** "4 of 6 came true" (decision d7: yes / checked, partly counted on its own). */

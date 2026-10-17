@@ -2,14 +2,14 @@
 export const TEAM = [
   {
     name: "Dinesh Sunny",
-    role: "Product and AI agents. Built the agent loop, the app and the story.",
-    photo: "/team/dinesh.jpg",
+    role: "Applied AI Engineer",
+    photo: "/team/dinesh.jpg?v=2",
     linkedin: "https://www.linkedin.com/in/dinesh-potluru-a967866a/",
   },
   {
     name: "Denesh Ashok",
-    role: "London buses expertise and the live fleet map.",
-    photo: "/team/denesh.jpg",
+    role: "Strategic CIO and CTO, First Bus",
+    photo: "/team/denesh.jpg?v=2",
     linkedin: "https://www.linkedin.com/in/deneshashok/",
   },
 ];

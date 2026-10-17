@@ -2,8 +2,8 @@
 
 from typing import Literal, TypedDict
 
-Mode = Literal["road", "street", "city"]
-MODE_NAMES: tuple[Mode, ...] = ("road", "street", "city")
+Mode = Literal["road", "street", "city", "bus"]
+MODE_NAMES: tuple[Mode, ...] = ("road", "street", "city", "bus")
 
 
 class ModeConfig(TypedDict, total=False):
@@ -14,6 +14,8 @@ class ModeConfig(TypedDict, total=False):
     queries: list[str]
     role: str
     horizon: str
+    prompt: str  # "bus" = London bus safety analyst prompt (pipeline.FORESEE_BUS)
+    round_robin: bool  # take candidates query by query so every hazard type is represented
 
 
 # COCO ids as returned by YOLO11; the tracker is class-agnostic, so ids gate what it sees.
@@ -75,6 +77,47 @@ MODES: dict[Mode, ModeConfig] = {
         "horizon": "the next 5-10 seconds",
     },
 }
+
+CITY_CAMERAS = MODES["city"]["cameras"]
+STREET_CAMERAS = MODES["street"]["cameras"]
+
+# Footage is SF/NYC + one street camera; the bus mode reads it as a London bus front camera
+# would, but every sentence must still describe what is really in the clip.
+BUS_HAZARD_TYPES: tuple[str, ...] = (
+    "Cyclist on the nearside",
+    "Pedestrian stepping out",
+    "Vehicle cutting in",
+    "Car pulling out",
+    "Close following",
+    "Blocked lane",
+    "Turning across a crossing",
+    "Scooter weaving",
+)
+
+MODES["bus"] = {
+    "cameras": [*CITY_CAMERAS, *STREET_CAMERAS],
+    "verify": "boxes",
+    "label": "Bus - London bus safety view over city + street cameras",
+    "classes": VEHICLES | VULNERABLE,
+    "queries": [
+        "cyclist riding close beside a large vehicle",
+        "pedestrian stepping off the kerb into the road",
+        "vehicle cutting in front of a bus or truck",
+        "car pulling out from a side road or parking space",
+        "person running across the road to a bus stop",
+        "delivery van stopped in the traffic lane",
+        "scooter or bike weaving between vehicles",
+        "vehicles turning across a crossing with people on it",
+    ],
+    "role": "London bus safety analyst",
+    "horizon": "the next 5-10 seconds",
+    "prompt": "bus",
+    "round_robin": True,
+}
+
+# --- candidate de-duplication (round-robin modes) ---
+NEAR_DUP_SEGMENTS = 1  # segments of the same video within this many numbers are one event
+NEAR_DUP_DESC_RATIO = 0.9  # difflib ratio above which two descriptions count as the same scene
 
 # --- verify (closing-gap) thresholds, ported from pipeline/run.py ---
 MIN_DET_CONF = 0.25  # boxes below this never reach the tracker

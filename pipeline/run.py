@@ -33,9 +33,11 @@ def desc(d):
 @op
 def watch(mode: str, per_query: int) -> list:
     cfg, seen, out = MODES[mode], set(), []
+    cams = cfg["camera"] if isinstance(cfg["camera"], list) else [cfg["camera"]]
     for q in cfg["queries"]:
+      for cam in cams:
         try:
-            res = v.search(q, cfg["camera"], top_k=per_query, min_similarity=float(os.environ.get("MIN_SIM", "0.15")))
+            res = v.search(q, cam, top_k=per_query, min_similarity=float(os.environ.get("MIN_SIM", "0.15")))
         except Exception as e:
             print("search failed:", q, e)
             continue
@@ -58,16 +60,16 @@ def _iou(a, b):
     return inter / union if union > 0 else 0.0
 
 
-def _tracks(frames, step=3, min_conf=0.3):
+def _tracks(frames, step=2, min_conf=0.25, classes=None):
     """Tracking-lite: link vehicle boxes frame to frame by best IoU. Returns {track_id: [(t, box), ...]}."""
     tracks, last, nxt = {}, {}, 0
     for fr in frames[::step]:
         t = float(fr.get("time_sec", fr.get("frame_index", 0)))
         dets = [d["bbox"] for d in fr.get("detections", [])
-                if str(d.get("label", "")).lower() in VEHICLES and float(d.get("confidence", 1)) >= min_conf]
+                if str(d.get("label", "")).lower() in (classes or VEHICLES) and float(d.get("confidence", 1)) >= min_conf]
         new_last, used = {}, set()
         for box in dets:
-            best, bid = 0.3, None
+            best, bid = 0.15, None
             for tid, pb in last.items():
                 if tid in used:
                     continue
@@ -83,18 +85,18 @@ def _tracks(frames, step=3, min_conf=0.3):
     return tracks
 
 
-def closing_gap(det):
+def closing_gap(det, classes=None):
     """Best pair of tracked vehicles that close in: distance measured in car lengths (box diagonals)."""
     frames = (det or {}).get("frames") or (det or {}).get("perception_json", {}).get("frames") or []
     if not frames:
         return None
-    tr = {k: dict(v) for k, v in _tracks(frames).items() if len(v) >= 6}
+    tr = {k: dict(v) for k, v in _tracks(frames, classes=classes).items() if len(v) >= 5}
     ids, best = list(tr), (0.0, None)
     for i in range(len(ids)):
         for j in range(i + 1, len(ids)):
             a, b = tr[ids[i]], tr[ids[j]]
             ts = sorted(set(a) & set(b))
-            if len(ts) < 6:
+            if len(ts) < 5:
                 continue
             dist = []
             for t in ts:
@@ -117,16 +119,16 @@ def closing_gap(det):
 @op
 def verify(hit: dict, mode: str) -> dict:
     src = hit["source"]
-    if os.environ.get("VERIFY_MODE", "boxes") == "boxes" and mode == "road":
+    if os.environ.get("VERIFY_MODE", "boxes") == "boxes" and MODES[mode].get("verify") == "boxes":
         det = None
         try:
             det = v.detections(src)
         except Exception as e:
             print("detections failed", e)
-        cg = closing_gap(det) if det else None
+        cg = closing_gap(det, MODES[mode].get("classes")) if det else None
         if cg is None and os.environ.get("YOLO_FALLBACK", "1") == "1":
             try:
-                cg = closing_gap(yolo(v.clip_bytes(src)))
+                cg = closing_gap(yolo(v.clip_bytes(src)), MODES[mode].get("classes"))
             except Exception as e:
                 print("yolo failed", e)
         if cg is not None:
@@ -134,7 +136,7 @@ def verify(hit: dict, mode: str) -> dict:
             return {"verified": score >= float(os.environ.get("VERIFY_MIN", "0.30")), "verify_score": round(score, 2), "verify_note": note, "verify_by": "yolo boxes"}
     # fallback / street: strict Cosmos yes-no, asked on the clip
     q = ("Answer only yes or no. Are two vehicles within about one car length of each other and getting closer?"
-         if mode == "road" else
+         if MODES[mode].get("verify") == "boxes" else
          "Answer only yes or no. Is there a vehicle or person here behaving unusually for a quiet residential street?")
     try:
         ans = cosmos(q, v.clip_bytes(src), 10).strip().lower()
@@ -230,7 +232,7 @@ def run(mode: str, limit: int, per_query: int) -> dict:
             continue
         fs = foresee(hit, mode)
         sc = selfcheck(hit, fs.get("what_next", ""))
-        cam = MODES[mode]["camera"]
+        cam = first(hit, ["camera_id"], MODES[mode]["camera"])
         incidents.append({
             "id": f"{cam}-{abs(hash(hit['source'])) % 10**8}", "mode": mode, "camera_id": cam,
             "source": hit["source"], "original_video": first(hit, ["original_video"]),
@@ -259,6 +261,7 @@ def run(mode: str, limit: int, per_query: int) -> dict:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", default="road", choices=list(MODES))
+    ap.add_argument("--dry", action="store_true", help="verify only, print scores")
     ap.add_argument("--limit", type=int, default=12)
     ap.add_argument("--per-query", type=int, default=6)
     a = ap.parse_args()

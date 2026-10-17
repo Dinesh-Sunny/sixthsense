@@ -35,7 +35,8 @@ SHA="$1"
 # Secret from the team config. Values go through a 0600 temp file, never argv or stdout.
 ENVF=$(umask 077; mktemp); trap 'rm -f "$ENVF"' EXIT
 put(){ [ -n "$2" ] && printf '%s=%s\n' "$1" "$2" >> "$ENVF" || true; }
-put VSS_URL "$(get INGRESS_URL)"; put VSS_USERNAME "$USERNAME"; put VSS_PASSWORD "$(get PASSWORD)"
+# Pods can't resolve the public lab hostname, so talk to the backend Service in-cluster.
+put VSS_URL "${VSS_URL_IN_CLUSTER:-http://video-backend-service:8000}";put VSS_USERNAME "$USERNAME"; put VSS_PASSWORD "$(get PASSWORD)"
 put GPU_BEARER_TOKEN "$(get GPU_BEARER_TOKEN)"; put GPU_HOST "$(get GPU_HOST)"
 put COSMOS3_REASON_URL "$(get COSMOS3_REASON_URL)"; put YOLO_URL "$(get YOLO_URL)"
 put WANDB_API_KEY "${WANDB_API_KEY:-$(get WANDB_API_KEY)}"; put WANDB_TEAM "${WANDB_TEAM:-$(get WANDB_TEAM)}"

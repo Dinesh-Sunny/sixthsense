@@ -77,6 +77,10 @@ function topIncident(lists: (Incident[] | undefined)[]): Incident | undefined {
     .sort((a, b) => b.risk - a.risk || Number(b.came_true === "yes") - Number(a.came_true === "yes"))[0];
 }
 
+function proofLine(m: ModeMetrics): string {
+  return `${m.came_true_yes} of ${m.checked} predictions came true on the latest ${m.mode} run`;
+}
+
 function bestScore(metrics: ModeMetrics[] | undefined): ModeMetrics | undefined {
   return metrics?.filter((m) => m.checked > 0).sort((a, b) => b.checked - a.checked)[0];
 }
@@ -139,39 +143,47 @@ export function LandingView() {
   return (
     <div className="bg-ground">
       {/* Hero: the sky follows live London weather. */}
-      <section className={cn(`wx-${wx}`, "sky-wash relative flex flex-col items-center px-4 pt-7 pb-20 md:px-10 md:pb-[120px]")}>
+      <section className={cn(`wx-${wx}`, "sky-wash relative flex flex-col items-center px-4 pt-5 pb-16 md:px-10 md:pb-24")}>
         {wx === "rain" && <div aria-hidden className="rain-streaks pointer-events-none absolute inset-0" />}
-        <nav className="relative flex w-full flex-wrap items-center gap-4">
-          <WordmarkLarge className="text-2xl" />
+        <nav className="relative flex w-full flex-wrap items-center gap-3 md:gap-4">
+          <span className="font-serif text-2xl leading-none text-on-sky">
+            Sixth<i className="text-on-sky-muted">Sense</i>
+          </span>
+          <WeatherPill />
           <div className="flex-1" />
-          <span className="glass hidden h-8 items-center rounded-full px-3.5 text-[13px] font-medium md:inline-flex">
+          <span className="glass hidden h-8 items-center rounded-full px-3.5 text-[13px] font-medium lg:inline-flex">
             Built at the VAST Builders Challenge
           </span>
-          <div className="hidden flex-1 md:block" />
-          <Button asChild size="sm">
-            <Link href="/">Open the dashboard</Link>
+          <div className="hidden flex-1 lg:block" />
+          <Button asChild size="sm" variant="glass" className="hidden sm:inline-flex">
+            <Link href="/dashboard">Open the dashboard</Link>
           </Button>
         </nav>
 
-        <div className="relative mt-16 flex flex-col items-center gap-[22px] text-center md:mt-24">
-          <WeatherPill />
-          <h1>
-            <WordmarkLarge className="text-[56px] md:text-[84px]" />
+        <div className="relative mt-12 flex flex-col items-center text-center md:mt-14">
+          <h1 className="font-serif text-[clamp(44px,7vw,88px)] leading-[0.95] tracking-[-0.01em] text-balance text-on-sky">
+            See what happens next,
+            <br />
+            <i className="text-on-sky-muted">before it happens.</i>
           </h1>
-          <p className="max-w-[620px] text-lg leading-[1.35] text-ink md:text-[22px]">
-            Your cameras record everything. SixthSense tells you what happens next, then checks if it was right.
+          <p className="mt-5 max-w-[560px] text-[17px] leading-[1.45] text-on-sky md:text-lg">
+            SixthSense watches your cameras, predicts the next few seconds, then checks the next clip to see if it was right.
           </p>
-          <div className="mt-2.5 flex w-full max-w-[420px] flex-col gap-2.5">
-            <Button asChild size="lg">
-              <Link href="/">See it on real footage</Link>
+          <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row">
+            <Button asChild className="h-11 px-6">
+              <Link href="/dashboard">Open the dashboard</Link>
             </Button>
-            <Button asChild size="lg" variant="glass">
+            <Button asChild variant="glass" className="h-11 px-6">
               <a href="#how">How it works</a>
             </Button>
           </div>
+          {score && (
+            // Live: latest run with the most checked predictions (GET /api/metrics).
+            <p className="mt-4 text-data text-on-sky-muted">{proofLine(score)}</p>
+          )}
         </div>
 
-        <div className="relative mt-14 w-full max-w-[1120px] md:mt-[88px]">
+        <div className="relative mt-10 w-full max-w-[1120px] md:mt-12">
           <div className="aspect-[16/9] overflow-hidden rounded-xl bg-surface-sunk shadow-float md:aspect-[16/8]">
             <Frame frame={FRAMES.hero} />
           </div>
@@ -193,7 +205,7 @@ export function LandingView() {
       </section>
 
       {/* How it works */}
-      <section id="how" className="mx-auto flex max-w-[1200px] scroll-mt-6 flex-col gap-20 px-4 py-16 md:gap-24 md:px-10 md:py-[72px] lg:px-[80px]">
+      <section id="how" className="mx-auto flex max-w-[1200px] scroll-mt-6 flex-col gap-20 px-4 py-16 md:gap-24 md:px-10 md:py-24 lg:px-[80px]">
         <FeatureRow
           index={0}
           wash="sky-card"
@@ -232,6 +244,7 @@ export function LandingView() {
                   <Frame frame={FRAMES.ruleOut} className="aspect-video" />
                 </div>
               )}
+              {/* Live: sum of ruled_out / candidates over each mode's latest run. */}
               {totalWatched > 0 && (
                 <div className="text-body-sm text-ink">
                   {totalRuledOut} of {totalWatched} alarms never reached a screen.
@@ -282,8 +295,8 @@ export function LandingView() {
 
       {/* Live results: real numbers only; hidden when metrics fail. */}
       {ran.length > 0 && (
-        <section className="mx-auto max-w-[1200px] px-4 pb-16 md:px-10 lg:px-[80px]" aria-labelledby="results-h">
-          <h2 id="results-h" className="mb-6 font-serif text-[32px] leading-[1.1] md:text-[40px]">
+        <section className="mx-auto max-w-[1200px] px-4 pb-16 md:px-10 md:pb-24 lg:px-[80px]" aria-labelledby="results-h">
+          <h2 id="results-h" className="mb-8 font-serif text-[36px] leading-[1.08] md:text-[44px]">
             Live results
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -294,7 +307,7 @@ export function LandingView() {
                 <div key={mode} className="flex flex-col gap-3 rounded-xl bg-surface p-7 shadow-float">
                   <div className="font-serif text-[28px] leading-none">{MODE_INFO[mode].name}</div>
                   <div className="text-body-sm text-ink-muted">{MODE_INFO[mode].place}</div>
-                  <div className="text-metric">{x.checked > 0 ? scoreLine(x) : "Nothing checked yet"}</div>
+                  <div className="font-mono text-[20px] leading-7 font-medium tabular-nums">{x.checked > 0 ? scoreLine(x) : "Nothing checked yet"}</div>
                   <div className="text-data text-ink-muted">
                     {x.candidates} clips watched · {x.ruled_out} ruled out · {x.verified} worth a look
                   </div>
@@ -306,8 +319,8 @@ export function LandingView() {
       )}
 
       {/* Built on */}
-      <section className="mx-auto max-w-[1200px] px-4 pb-16 md:px-10 lg:px-[80px]" aria-labelledby="stack-h">
-        <h2 id="stack-h" className="mb-6 font-serif text-[32px] leading-[1.1] md:text-[40px]">
+      <section className="mx-auto max-w-[1200px] px-4 pb-16 md:px-10 md:pb-24 lg:px-[80px]" aria-labelledby="stack-h">
+        <h2 id="stack-h" className="mb-8 font-serif text-[36px] leading-[1.08] md:text-[44px]">
           Built on
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -320,9 +333,9 @@ export function LandingView() {
         </div>
       </section>
 
-      <section className="bg-surface px-4 py-24 text-center md:px-40 md:py-[140px]">
-        <p className="mx-auto max-w-[1040px] font-serif text-[36px] leading-[1.08] text-ink md:text-[60px]">
-          Cameras record millions of hours a day. Almost nobody watches. The few seconds that matter deserve a second look.
+      <section className="bg-surface px-4 py-16 text-center md:px-10 md:py-24">
+        <p className="mx-auto max-w-[1040px] font-serif text-[36px] leading-[1.08] text-ink md:text-[56px]">
+          Most camera footage is never watched. The few seconds that matter deserve a second look.
         </p>
       </section>
 
@@ -343,7 +356,7 @@ export function LandingView() {
             <i>home alone.</i>
           </p>
           <Button asChild size="lg" className="px-7">
-            <Link href="/">Open the dashboard</Link>
+            <Link href="/dashboard">Open the dashboard</Link>
           </Button>
         </div>
       </section>

@@ -1,10 +1,11 @@
-import { Suspense } from "react";
-import { MainView } from "@/components/views/MainView";
+import type { Metadata } from "next";
+import { LandingView } from "@/components/views/LandingView";
 
-export default function Home() {
-  return (
-    <Suspense fallback={<div className="sky-band min-h-dvh" />}>
-      <MainView />
-    </Suspense>
-  );
+export const metadata: Metadata = {
+  title: "SixthSense",
+  description: "Your cameras record everything. SixthSense tells you what happens next, then checks if it was right.",
+};
+
+export default function HomePage() {
+  return <LandingView />;
 }

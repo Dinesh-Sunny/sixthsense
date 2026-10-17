@@ -57,14 +57,13 @@ export function MainView() {
   return (
     <Atmosphere variant="band">
       <header className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-5 md:px-8">
-        <Wordmark onSky />
+        <Link href="/" aria-label="SixthSense home">
+          <Wordmark onSky />
+        </Link>
         <WeatherPill />
         <div className="hidden flex-1 md:block" />
         <ModeTabs mode={mode} metrics={metrics.data} onChange={setMode} />
         <div className="flex-1" />
-        <Link href="/about" className="text-[13px] font-medium text-on-sky-muted underline-offset-4 hover:underline">
-          About
-        </Link>
         <Button asChild variant="glass" size="sm">
           <Link href="/run">{COPY.watchCamera}</Link>
         </Button>

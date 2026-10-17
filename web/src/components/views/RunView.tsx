@@ -101,9 +101,11 @@ export function RunView() {
     <Atmosphere variant="soft">
       <header className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-5 md:px-8">
         <Button asChild variant="glass" size="sm">
-          <Link href="/">← {COPY.allMoments}</Link>
+          <Link href="/dashboard">← {COPY.allMoments}</Link>
         </Button>
-        <Wordmark />
+        <Link href="/" aria-label="SixthSense home">
+          <Wordmark />
+        </Link>
       </header>
 
       {run.isError && !status ? (
@@ -191,7 +193,7 @@ export function RunView() {
                 <AccuracyMeter metrics={m} showLabel={false} />
                 <p className="text-body-sm text-ink-muted">{m.checked > 0 ? scoreDetail(m) : COPY.scoreNothingBody}</p>
                 <Button asChild className="self-start">
-                  <Link href={{ pathname: "/", query: { mode: runMode } }}>{COPY.runSee}</Link>
+                  <Link href={{ pathname: "/dashboard", query: { mode: runMode } }}>{COPY.runSee}</Link>
                 </Button>
               </Panel>
             ) : (

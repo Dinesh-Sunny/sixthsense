@@ -204,9 +204,11 @@ export function DetailView() {
     <Atmosphere variant="soft">
       <header className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-5 md:px-8">
         <Button asChild variant="glass" size="sm">
-          <Link href="/">← {COPY.allMoments}</Link>
+          <Link href={i ? { pathname: "/dashboard", query: { mode: i.mode } } : "/dashboard"}>← {COPY.allMoments}</Link>
         </Button>
-        <Wordmark />
+        <Link href="/" aria-label="SixthSense home">
+          <Wordmark />
+        </Link>
         <div className="flex-1" />
         {i && <span className="text-data text-ink-muted">{cameraLine(i)}</span>}
       </header>

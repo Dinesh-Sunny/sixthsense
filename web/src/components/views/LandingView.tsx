@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { BuiltWith } from "@/components/landing/BuiltWith";
 import { CheckTimeline } from "@/components/landing/CheckTimeline";
+import { MapTile, ReportStack } from "@/components/landing/AudienceCreatives";
 import { CoachFan } from "@/components/landing/CoachFan";
 import { GapCreative } from "@/components/landing/GapCreative";
 import { HeroStage } from "@/components/landing/HeroStage";
@@ -315,7 +316,9 @@ export function LandingView() {
             <div className={cn("lift flex h-full flex-col gap-2.5 rounded-xl bg-surface p-7 shadow-float", rise)} style={stagger(n)}>
               <div className="font-serif text-[28px] leading-tight">{a.title}</div>
               <p className="text-body-sm text-ink-muted">{a.body}</p>
-              {n === AUDIENCES.length - 1 && <CoachFan />}
+              {n === 0 && <ReportStack />}
+              {n === 1 && <MapTile />}
+              {n === 2 && <CoachFan />}
             </div>
           </Reveal>
         ))}

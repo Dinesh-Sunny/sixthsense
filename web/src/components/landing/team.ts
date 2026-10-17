@@ -10,6 +10,6 @@ export const TEAM = [
     name: "Denesh Ashok",
     role: "London buses expertise and the live fleet map.",
     photo: "/team/denesh.jpg",
-    linkedin: "",
+    linkedin: "https://www.linkedin.com/in/deneshashok/",
   },
 ];

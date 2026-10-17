@@ -265,7 +265,7 @@ sixthsense/
 | | |
 |---|---|
 | **Dinesh Sunny** | Product and AI agents. Built the agent loop, the app and the story. · [LinkedIn](https://www.linkedin.com/in/dinesh-potluru-a967866a/) · [GitHub](https://github.com/Dinesh-Sunny) |
-| **Denesh Ashok** | London buses expertise and the live fleet map. |
+| **Denesh Ashok** | London buses expertise and the live fleet map. · [LinkedIn](https://www.linkedin.com/in/deneshashok/) |
 
 ## Thanks
 

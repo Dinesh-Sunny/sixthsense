@@ -21,6 +21,8 @@ const eslintConfig = defineConfig([
       ],
       // One fetch site: src/lib/api/client.ts (basePath + ApiError).
       "no-restricted-globals": ["error", { name: "fetch", message: "Call the API through src/lib/api/client.ts." }],
+      // next/image is banned (static export, unoptimized), so plain <img> is the sanctioned path.
+      "@next/next/no-img-element": "off",
     },
   },
   {

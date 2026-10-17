@@ -51,6 +51,9 @@ export function MainView() {
         <div className="hidden flex-1 md:block" />
         <ModeTabs mode={mode} metrics={metrics.data} onChange={setMode} />
         <div className="flex-1" />
+        <Link href="/about" className="text-[13px] font-medium text-on-sky-muted underline-offset-4 hover:underline">
+          About
+        </Link>
         <Button asChild variant="glass" size="sm">
           <Link href="/run">{COPY.watchCamera}</Link>
         </Button>

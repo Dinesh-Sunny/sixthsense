@@ -39,14 +39,14 @@ That last row is the point. Most video AI demos *claim* they are accurate. **Six
 
 ## 🎬 Demo
 
-> 📹 **Demo video:** _added after the live run (link here)_ · 🌐 **Live app:** workshop.thecosmoslabs.com → App (team 43)
+> 📹 **Demo video:** _added after the live run (link here)_ · 🌐 **Live app:** [team-43-app.thecosmoslabs.com/app](https://team-43-app.thecosmoslabs.com/app/) (lab access needed; it may go offline after the event)
 
 <!-- screenshot: docs/screenshot.png added after the live run -->
 
 **The 30-second story**
-1. Open the **Road** tab - each card is a real highway clip with a risk score.
-2. Read the forecast: *"the sedan brakes hard within 3 seconds"*.
-3. Look at the pill: ✅ **came true** - the next clip shows the brake lights.
+1. Open the **City** tab - each card is a real San Francisco or New York clip with a risk score.
+2. Read the forecast: *"the pedestrian will complete crossing the street"* after a white sedan cut in close.
+3. Look at the pill: ✅ **came true** - the next clip shows the pedestrian with the stroller finishing the crossing.
 4. The header badge shows how many forecasts came true today.
 5. Hit **Send alert** - the warning lands in the alert feed (and Discord).
 

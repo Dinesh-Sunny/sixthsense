@@ -35,6 +35,8 @@
   --on-sky: #ffffff;
   --on-sky-muted: rgba(255, 255, 255, 0.9);
   --scrim: rgba(20, 20, 20, 0.72);
+  --glass-strong: rgba(255, 255, 255, 0.86);
+  --wordmark-accent: #4a5a78;
 
   /* Default sky = clear; .wx-* on the Atmosphere wrapper overrides these. */
   --sky-deep: #2f6db5;
@@ -163,6 +165,8 @@
   --color-on-sky: var(--on-sky);
   --color-on-sky-muted: var(--on-sky-muted);
   --color-scrim: var(--scrim);
+  --color-glass-strong: var(--glass-strong);
+  --color-wordmark-accent: var(--wordmark-accent);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -270,6 +274,23 @@
     radial-gradient(70% 45% at 78% 4%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 60%),
     radial-gradient(90% 55% at 50% 108%, var(--sun) 0%, transparent 62%),
     linear-gradient(180deg, var(--sky-deep) 0%, var(--sky-mid) 45%, var(--haze) 82%, var(--sky-floor) 100%);
+}
+
+/* Landing feature cards (Landing.dc.html .skycard / .lav / .dusk). */
+@utility sky-card {
+  background:
+    radial-gradient(80% 70% at 60% 0%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, var(--sky-mid), var(--haze));
+}
+@utility lav-card {
+  background:
+    radial-gradient(80% 70% at 30% 0%, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, var(--atmo-lav-1), var(--atmo-lav-2));
+}
+@utility dusk-card {
+  background:
+    radial-gradient(80% 70% at 70% 0%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, var(--atmo-dusk-1), var(--atmo-dusk-2));
 }
 
 /* Fine rain streaks over the sky when it rains. */

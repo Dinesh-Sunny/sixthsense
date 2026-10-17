@@ -16,3 +16,8 @@ const twMerge = extendTailwindMerge({
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+/** Files in public/ need the basePath by hand (only <Link> and Next assets get it). */
+export function assetUrl(path: string): string {
+  return (process.env.NEXT_PUBLIC_BASE_PATH ?? "") + path
+}

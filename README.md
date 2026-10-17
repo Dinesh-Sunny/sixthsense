@@ -39,7 +39,7 @@ That last row is the point. Most video AI demos *claim* they are accurate. **Six
 
 ## 🎬 Demo
 
-> 📹 **Demo video:** _added after the live run (link here)_ · 🌐 **Live app:** [team-43-app.thecosmoslabs.com/app](https://team-43-app.thecosmoslabs.com/app/) (lab access needed; it may go offline after the event)
+> 📹 **Demo video:** _added after the live run (link here)_ · 🌐 **Live app:** [homepage](https://team-43-app.thecosmoslabs.com/app/) · [dashboard](https://team-43-app.thecosmoslabs.com/app/dashboard/) (lab access needed; it may go offline after the event)
 
 <!-- screenshot: docs/screenshot.png added after the live run -->
 

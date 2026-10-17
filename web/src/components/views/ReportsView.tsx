@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { allIncidentsOptions, metricsOptions, pairingsOptions } from "@/lib/api/queries";
 import { MODES, type Mode } from "@/lib/api/types";
 import { MODE_INFO, REPORT_COPY, REPORT_FILTERS, type ReportFilter, matchesFilter, plural, scoreSummary } from "@/lib/copy";
+import { useDataMode } from "@/lib/incident";
 import { useSignedOff } from "@/lib/signoff";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +22,10 @@ export function ReportsView() {
   const metrics = useQuery(metricsOptions());
   const signed = useSignedOff();
   const [filter, setFilter] = useState<ReportFilter>("all");
-  const [source, setSource] = useState<Mode | "all">("all");
+  // Default to the bus safety run (city until the bus run exists); the select overrides it.
+  const dataMode = useDataMode();
+  const [picked, setSource] = useState<Mode | "all" | null>(null);
+  const source: Mode | "all" = picked ?? dataMode ?? "all";
 
   const pairFor = new Map((pairings.data ?? []).map((p) => [p.incident_id, p]));
   const all = incidents.data ?? [];
@@ -29,7 +33,7 @@ export function ReportsView() {
   const list = all
     .filter((i) => matchesFilter(i.came_true, filter) && (source === "all" || i.mode === source))
     .sort((a, b) => Number(signed.has(a.id)) - Number(signed.has(b.id)) || b.risk - a.risk);
-  const toReview = all.filter((i) => !i.fixture && !signed.has(i.id)).length;
+  const toReview = all.filter((i) => !i.fixture && !signed.has(i.id) && (source === "all" || i.mode === source)).length;
   const score = scoreSummary(metrics.data);
 
   return (

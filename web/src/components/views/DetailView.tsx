@@ -36,6 +36,7 @@ import {
   timeOfDay,
 } from "@/lib/copy";
 import { useSignOff } from "@/lib/signoff";
+import { incidentTitle } from "@/lib/incident";
 import { cn } from "@/lib/utils";
 
 function Breadcrumb({ id }: { id: string }) {
@@ -65,17 +66,18 @@ function Section({ label, children, className }: { label: string; children: Reac
   );
 }
 
-function Report({ incident: i, signedOff }: { incident: Incident; signedOff: boolean }) {
+function Report({ incident: i, pairing, signedOff }: { incident: Incident; pairing?: Pairing; signedOff: boolean }) {
   const verdict = VERDICT[i.came_true];
   return (
     <Panel className="flex flex-col gap-4 p-6">
+      <h1 className="font-serif text-[26px] leading-[1.15] text-balance md:text-[30px]">{incidentTitle(i, pairing)}</h1>
       {i.what_happens && (
         <Section label={REPORT_COPY.before}>
           <p className="text-body-sm text-ink">{i.what_happens}</p>
         </Section>
       )}
       <Section label={REPORT_COPY.forecast}>
-        <h1 className="font-serif text-[26px] leading-[1.15] text-balance md:text-[30px]">{i.what_next}</h1>
+        <p className="font-serif text-xl leading-[1.25] text-balance">{i.what_next}</p>
         {i.why && (
           <p className="text-body-sm text-ink-muted">
             <b className="font-medium text-ink">{COPY.why}</b> {i.why}
@@ -256,7 +258,7 @@ function DetailBody({ incident: i }: { incident: Incident }) {
           />
         </div>
         <div className="lg:hidden">
-          <Report incident={i} signedOff={signedOff} />
+          <Report incident={i} pairing={pairing} signedOff={signedOff} />
         </div>
         {i.gap_series.length > 1 && (
           <Panel aria-labelledby="gap-h" className="p-6">
@@ -268,7 +270,7 @@ function DetailBody({ incident: i }: { incident: Incident }) {
       </section>
       <section className="flex flex-col gap-6">
         <div className="hidden lg:block">
-          <Report incident={i} signedOff={signedOff} />
+          <Report incident={i} pairing={pairing} signedOff={signedOff} />
         </div>
         <Actions incident={i} pairing={pairing} alert={alert} />
       </section>

@@ -1,8 +1,8 @@
 // Mirror of backend/src/sixthsense/contracts.py. Field names must match exactly
 // (no generator: openapi-typescript failed the library gate, see decisions).
 
-export type Mode = "road" | "city" | "street";
-export const MODES: readonly Mode[] = ["road", "city", "street"] as const;
+export type Mode = "bus" | "road" | "city" | "street";
+export const MODES: readonly Mode[] = ["bus", "city", "road", "street"] as const;
 
 export type CameTrue = "yes" | "partly" | "no" | "unknown";
 
@@ -209,6 +209,9 @@ export interface Pairing {
   risk: number;
   came_true: CameTrue;
   mode: Mode;
+  /** Bus mode: the live bus's next stop and destination (optional until the backend sends them). */
+  stop_name?: string | null;
+  towards?: string | null;
 }
 
 export interface MapConfig {

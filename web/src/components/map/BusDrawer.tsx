@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { alertsOptions, queryKeys, sendAlert } from "@/lib/api/queries";
 import type { Incident, Pairing, Vehicle } from "@/lib/api/types";
 import { BUS_COPY, BUS_STATE, VERDICT, busState, etaText, riskLabel, riskTone } from "@/lib/copy";
+import { incidentTitle } from "@/lib/incident";
 import { cn } from "@/lib/utils";
 
 /** Selected bus: details scroll, actions stay pinned at the bottom. */
@@ -95,8 +96,9 @@ export function BusDrawer({
                 overlay={<StatusPill tone="sample">{BUS_COPY.standIn}</StatusPill>}
               />
             </div>
+            <p className="font-serif text-xl leading-[1.2] text-balance">{incidentTitle(incident, pairing)}</p>
             <div className="text-eye">Next</div>
-            <p className="font-serif text-xl leading-[1.2] text-balance">{incident.what_next}</p>
+            <p className="text-body-sm text-ink">{incident.what_next}</p>
             {incident.why && (
               <p className="text-body-sm text-ink-muted">
                 <b className="font-medium text-ink">{MAP_COPY.why}</b> {incident.why}

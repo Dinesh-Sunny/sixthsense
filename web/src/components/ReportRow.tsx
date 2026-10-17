@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { clipUrl } from "@/lib/api/client";
 import { incidentOptions } from "@/lib/api/queries";
 import type { Incident, Pairing } from "@/lib/api/types";
+import { incidentTitle, shortLine } from "@/lib/incident";
 import { REPORT_COPY, SAMPLE, VERDICT, reportId, routeLine } from "@/lib/copy";
 
 /** First frame of the clip, muted and inert: the row's overlay link takes every click. */
@@ -51,8 +52,9 @@ export function ReportRow({ incident: i, pairing, signedOff }: { incident: Incid
           onFocus={prefetch}
           className="line-clamp-2 text-body-sm font-medium text-ink outline-none after:absolute after:inset-0 after:rounded-lg after:content-[''] group-hover:underline group-hover:underline-offset-2"
         >
-          {i.what_next || i.description}
+          {incidentTitle(i, pairing)}
         </Link>
+        {shortLine(i) && <p className="line-clamp-1 text-body-sm text-ink-muted">{shortLine(i)}</p>}
         <div className="flex flex-wrap items-center gap-2">
           {i.fixture ? (
             <StatusPill tone="sample">{SAMPLE.label}</StatusPill>

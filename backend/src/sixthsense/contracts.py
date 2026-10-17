@@ -199,6 +199,8 @@ class Pairing(_Out):
     risk: int
     came_true: CameTrue
     mode: Mode
+    stop_name: str = ""  # live vehicle's next stop at pairing time
+    towards: str = ""
 
 
 class MapConfig(_Out):

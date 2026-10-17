@@ -11,3 +11,6 @@
 ## v2 buses (backend)
 - [x] tfl.py (TfL client w/ User-Agent + optional app_key, paced 40 req/min unkeyed, stop cache in data_dir, route geometry cache, stand-in pairings 30 min), fleet poller in lifespan, python-socketio 5.16.1 `vehicles` emit, /api/vehicles|routes|routes/{id}|fleet/pairings|map-config, uvicorn entry `sixthsense.main:create_asgi`, deploy.sh loads ~/.config/sixthsense.env + MAPBOX_TOKEN/TFL_APP_KEY. Tests: 73 passing.
 - Note: unkeyed full sweep of ~700 routes = ~35 batches at 1.5 s = ~55 s, so updates land every ~55 s without TFL_APP_KEY.
+
+## v3 bus mode
+- [x] mode "bus" (city+street cameras, 8 hazard queries, round-robin + near-dup skip), FORESEE_BUS prompt with fixed type set (snapped via difflib), pairings add stop_name/towards and prefer latest bus run then city. 77 tests.

@@ -86,8 +86,19 @@ export function busSvg(body: string, glass: string, tyre: string): string {
 }
 
 /** What's involved, from the incident's own words (plain keyword match; car when nothing else fits). */
+function involvedIn(text: string): Involved | null {
+  if (/\b(cycl|bike|bicycl|scooter)/.test(text)) return "bike";
+  if (/\b(pedestrian|person|people|woman|man|stroller|pram|walker|child)/.test(text)) return "person";
+  if (/\b(truck|van|lorry|hgv)/.test(text)) return "truck";
+  if (/\b(car|vehicle|suv|taxi|sedan)/.test(text)) return "car";
+  return null;
+}
+
+/** What's involved: from the hazard type first, then the incident's own words; car when nothing fits. */
 export function involvedFrom(i: Incident | undefined): Involved {
-  const text = `${i?.what_next ?? ""} ${i?.what_happens ?? ""} ${i?.type ?? ""} ${i?.description ?? ""}`.toLowerCase();
+  const fromType = involvedIn((i?.type ?? "").toLowerCase());
+  if (fromType) return fromType;
+  const text = `${i?.what_next ?? ""} ${i?.what_happens ?? ""} ${i?.description ?? ""}`.toLowerCase();
   if (/\b(cycl|bike|bicycl)/.test(text)) return "bike";
   if (/\b(pedestrian|person|people|woman|man|stroller|pram|walker|child)/.test(text)) return "person";
   if (/\b(truck|van|lorry|hgv)/.test(text)) return "truck";

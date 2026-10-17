@@ -45,6 +45,7 @@ def test_incidents_are_sample_before_any_run(client):
     assert client.get("/api/incidents/fixture-1").json()["id"] == "fixture-1"
     assert client.get("/api/incidents/nope").status_code == 404
     assert client.get("/api/incidents", params={"mode": "moon"}).status_code == 422
+    assert client.get("/api/incidents", params={"mode": "bus"}).json() == []  # no run, no Sample
     assert client.get("/api/metrics").json() == []
 
 

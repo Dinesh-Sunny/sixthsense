@@ -22,6 +22,12 @@ export const VERDICT: Record<CameTrue, { label: string; tone: Tone }> = {
 export const SAMPLE = { label: "Sample", tone: "sample" as Tone, example: "Example" };
 
 export const MODE_INFO: Record<Mode, { name: string; place: string; where: string; calm: string }> = {
+  bus: {
+    name: "Bus safety run",
+    place: "Live London buses, stand-in footage",
+    where: "Across London's bus routes",
+    calm: "All calm on the buses",
+  },
   road: {
     name: "Road",
     place: "I-24 highway, Nashville",

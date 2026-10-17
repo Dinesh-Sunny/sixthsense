@@ -78,11 +78,18 @@ async def test_fleet_poll_route_detail_and_user_agent(settings):
         assert fresh.stops.keys() == STOPS.keys() and len(fake.requests) == n
         # stand-in pairing: real incidents only, stable across calls
         assert await fleet.pairings() == []
-        await store.save_run(ModeMetrics(mode="road", run_id="r1", generated_at="1"),
-                             [Incident(id="i1", mode="road", run_id="r1", risk=4, came_true="yes")])
+        await store.save_run(ModeMetrics(mode="road", run_id="r0", generated_at="1"),
+                             [Incident(id="i0", mode="road", run_id="r0", risk=5)])
+        assert await fleet.pairings() == []  # road is not paired
+        await store.save_run(ModeMetrics(mode="city", run_id="r1", generated_at="1"),
+                             [Incident(id="i1", mode="city", run_id="r1", risk=4, came_true="yes")])
         first = await fleet.pairings()
         assert len(first) == 1 and first[0].vehicle_id in {"LX1", "LX2"} and first[0].risk == 4
+        assert first[0].stop_name in {"Stop A", "Stop C"} and first[0].towards == "Euston"
         assert await fleet.pairings() == first
+        await store.save_run(ModeMetrics(mode="bus", run_id="r2", generated_at="2"),
+                             [Incident(id="b1", mode="bus", run_id="r2", risk=3, type="Blocked lane")])
+        assert [p.incident_id for p in await fleet.pairings()] == ["b1"]  # latest bus run wins
     for r in fake.requests:
         assert r.headers["user-agent"] == TFL_USER_AGENT and r.url.params["app_key"] == "k-secret"
 

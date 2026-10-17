@@ -44,6 +44,7 @@ PAIRING_TTL_S = 30 * 60
 RETRY_AFTER_ERROR_S = 15.0
 ROUTE_ID_RE = re.compile(r"^[a-z0-9-]{1,12}$")
 DIRECTIONS = ("inbound", "outbound")
+PAIRING_MODES = ("bus", "city")
 
 StopCoords = dict[str, tuple[float, float, str]]  # naptanId -> (lon, lat, name)
 SnapshotFn = Callable[[FleetSnapshot], Awaitable[None]]
@@ -131,7 +132,8 @@ class Fleet:
         self.snapshot = FleetSnapshot(ts=_now_iso())
         self._by_route: dict[str, list[Vehicle]] = {}
         self._route_cache: dict[str, RouteDetail] = {}
-        self._pairs: dict[str, tuple[str, float]] = {}  # incident_id -> (vehicle_id, expires)
+        # incident_id -> (vehicle_id, expires, stop_name, towards); stop/towards frozen at pairing time
+        self._pairs: dict[str, tuple[str, float, str, str]] = {}
 
     async def _get(self, path: str, params: dict[str, Any] | None = None) -> Any:
         await self._pacer.wait()
@@ -251,8 +253,15 @@ class Fleet:
         return detail
 
     async def pairings(self) -> list[Pairing]:
-        """Stand-in: pair each real incident (latest run per mode) with a live bus, stable for 30 min."""
-        incidents = [i for i in await self.store.list_incidents(None) if not i.fixture]
+        """Stand-in: pair real incidents with live buses, stable for 30 min.
+
+        Prefers the latest bus-mode run, falling back to the latest city run.
+        """
+        incidents: list = []
+        for mode in PAIRING_MODES:
+            incidents = [i for i in await self.store.list_incidents(mode) if not i.fixture]
+            if incidents:
+                break
         live = {v.id: v for v in self.snapshot.vehicles}
         if not live:
             return []
@@ -261,14 +270,15 @@ class Fleet:
         used: set[str] = set()
         out: list[Pairing] = []
         for inc in incidents:
-            vid, expires = self._pairs.get(inc.id, ("", 0.0))
+            vid, expires, stop_name, towards = self._pairs.get(inc.id, ("", 0.0, "", ""))
             if vid not in live or expires < now or vid in used:
                 start = int(hashlib.sha1(inc.id.encode()).hexdigest(), 16) % len(ids)
                 ring = ids[start:] + ids[:start]  # deterministic start, skip buses already paired
                 vid = next((x for x in ring if x not in used), "")
                 if not vid:
                     break
-                self._pairs[inc.id] = (vid, now + PAIRING_TTL_S)
+                stop_name, towards = live[vid].next_stop_name, live[vid].towards
+                self._pairs[inc.id] = (vid, now + PAIRING_TTL_S, stop_name, towards)
             used.add(vid)
             out.append(
                 Pairing(
@@ -278,6 +288,8 @@ class Fleet:
                     risk=inc.risk,
                     came_true=inc.came_true,
                     mode=inc.mode,
+                    stop_name=stop_name,
+                    towards=towards,
                 )
             )
         return sorted(out, key=lambda p: -p.risk)

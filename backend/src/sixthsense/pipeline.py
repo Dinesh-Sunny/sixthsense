@@ -5,6 +5,7 @@ candidate never cancels the others (gather with return_exceptions).
 """
 
 import asyncio
+import difflib
 import hashlib
 import logging
 from collections.abc import Callable
@@ -19,11 +20,14 @@ from .clients.models import ModelClients, UpstreamError
 from .clients.vss import Segment, VSSClient
 from .contracts import CameTrue, GapPoint, Incident, ModeMetrics, RunSteps
 from .modes import (
+    BUS_HAZARD_TYPES,
     DESCRIPTION_MAX_CHARS,
     EVIDENCE_MAX_CHARS,
     FORESEE_MAX_TOKENS,
     JUDGE_MAX_TOKENS,
     MODES,
+    NEAR_DUP_DESC_RATIO,
+    NEAR_DUP_SEGMENTS,
     NEXT_DESC_MAX_CHARS,
     RISK_MAX,
     RISK_MIN,
@@ -118,6 +122,18 @@ JUDGE_VIDEO = (
     'Reply JSON only: {{"came_true": "yes|partly|no", "evidence": "<what you see, one short line>"}}'
 )
 
+FORESEE_BUS = """You are a London bus safety analyst. Treat this camera as the front camera of a London bus driving
+through this scene. Describe only what is really visible in this clip: never invent people, vehicles or events.
+Answer in JSON only:
+{{"type": "<exactly one of: {types}>",
+ "what_happens": "<one sentence naming the specific road users and where they are: colour, side, distance>",
+ "what_next": "<the most likely thing in {horizon}, one sentence, checkable on camera>",
+ "why": "<one sentence: the visible cause>",
+ "fix": "<one sentence of advice to the bus driver, e.g. Hold back at the stop until the cyclist clears>",
+ "risk": <integer 1-5>}}
+Pick the type that best fits what you see. Use your own fresh wording for this clip; do not reuse stock phrases
+like "continues driving". If nothing risky is happening, set risk to 1 and what_next to "nothing notable"."""
+
 VERIFY_BOXES_Q = (
     "Answer only yes or no. Are two vehicles within about one car length of each other and getting closer?"
 )
@@ -167,7 +183,32 @@ async def watch(deps: Deps, mode: Mode, per_query: int) -> list[Candidate]:
                 seen.add(c.hit.source)
                 out.append(c)
     out.sort(key=lambda c: -c.hit.similarity)
+    if cfg.get("round_robin"):
+        out = round_robin(out, cfg["queries"])
     log.info("watch: %d candidate segments", len(out))
+    return out
+
+
+def _near_duplicate(a: Segment, b: Segment) -> bool:
+    if a.original_video and a.original_video == b.original_video:
+        if abs(a.segment_number - b.segment_number) <= NEAR_DUP_SEGMENTS:
+            return True
+    if a.description and b.description:
+        return difflib.SequenceMatcher(None, a.description, b.description).ratio() > NEAR_DUP_DESC_RATIO
+    return False
+
+
+def round_robin(cands: list[Candidate], queries: list[str]) -> list[Candidate]:
+    """Best hit of each query in turn (so every hazard type gets a slot), skipping near-duplicates."""
+    queues = {q: [c for c in cands if c.query == q] for q in queries}
+    out: list[Candidate] = []
+    while any(queues.values()):
+        for q in queries:
+            while queues[q]:
+                c = queues[q].pop(0)
+                if not any(_near_duplicate(c.hit, kept.hit) for kept in out):
+                    out.append(c)
+                    break
     return out
 
 
@@ -214,14 +255,29 @@ async def verify(deps: Deps, cand: Candidate, mode: Mode, clip: _Clip) -> Verifi
 @op(kind="llm")
 async def foresee(deps: Deps, cand: Candidate, mode: Mode, clip: _Clip) -> tuple[Forecast | None, str | None]:
     cfg = MODES[mode]
-    prompt = FORESEE.format(role=cfg["role"], horizon=cfg["horizon"])
+    if cfg.get("prompt") == "bus":
+        prompt = FORESEE_BUS.format(types=", ".join(BUS_HAZARD_TYPES), horizon=cfg["horizon"])
+    else:
+        prompt = FORESEE.format(role=cfg["role"], horizon=cfg["horizon"])
     if deps.settings.foresee_via == "direct":
         fc = await deps.models.cosmos_json(prompt, await clip.get(), Forecast, FORESEE_MAX_TOKENS)
     else:  # text-only: reason over the stored description
         fc = await deps.models.llm_json(
             prompt + "\n\nClip description: " + cand.hit.description, Forecast, FORESEE_MAX_TOKENS
         )
+    if fc is not None and cfg.get("prompt") == "bus":
+        fc.type = bus_hazard_type(fc.type)
     return fc, tracing.current_call_url()
+
+
+def bus_hazard_type(raw: str) -> str:
+    """Snap the model's label onto the fixed hazard set (case/spacing tolerant); keep it if no match."""
+    by_key = {t.lower(): t for t in BUS_HAZARD_TYPES}
+    key = " ".join(raw.lower().split()).strip(" .\"'")
+    if key in by_key:
+        return by_key[key]
+    close = difflib.get_close_matches(key, list(by_key), n=1, cutoff=0.6)
+    return by_key[close[0]] if close else raw
 
 
 # ---------- 4 SELF-CHECK ----------

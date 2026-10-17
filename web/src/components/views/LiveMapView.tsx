@@ -27,6 +27,7 @@ import {
   weatherOptions,
 } from "@/lib/api/queries";
 import { BUS_COPY, BUS_STATE, busState, pairingPill, riskLabel, riskTone } from "@/lib/copy";
+import { inMode, incidentTitle, shortLine, useDataMode } from "@/lib/incident";
 import { cn } from "@/lib/utils";
 
 const panel = "glass-map rounded-panel shadow-float";
@@ -92,9 +93,11 @@ export function LiveMapView() {
     hadBuses.current = has;
   }, [vehicles.length, refetchPairings]);
 
-  const pairByBus = useMemo(() => new Map((pairings.data ?? []).map((p) => [p.vehicle_id, p])), [pairings.data]);
+  const dataMode = useDataMode();
+  const modePairings = useMemo(() => inMode(pairings.data, dataMode), [pairings.data, dataMode]);
+  const pairByBus = useMemo(() => new Map(modePairings.map((p) => [p.vehicle_id, p])), [modePairings]);
   const vehicleById = useMemo(() => new Map(vehicles.map((v) => [v.id, v])), [vehicles]);
-  const needsLook = useMemo(() => rankPairings(pairings.data ?? []), [pairings.data]);
+  const needsLook = useMemo(() => rankPairings(modePairings), [modePairings]);
   // Numbered 1..N in attention order; only live buses can be placed on the map.
   const incidentById = useMemo(() => new Map((incidents.data ?? []).map((i) => [i.id, i])), [incidents.data]);
   const attention = useMemo<AttentionBus[]>(
@@ -352,16 +355,13 @@ export function LiveMapView() {
                             <Icon name={outcomeOf(p)} className="size-3" />
                             {pill.label}
                           </StatusPill>
-                          <span className="inline-flex items-center gap-1 text-data text-ink-muted">
-                            <Icon name={involvedFrom(inc)} className="size-3.5 text-ink" />
-                            {INVOLVED_LABEL[involvedFrom(inc)]}
-                          </span>
                         </span>
-                        <span className="flex items-baseline gap-2">
-                          <span className="text-body-sm font-medium">Route {p.route}</span>
-                          <span className="truncate text-data text-ink-muted">{p.vehicle_id}</span>
+                        <span className="flex items-start gap-1.5 text-body-sm font-medium text-ink">
+                          <Icon name={involvedFrom(inc)} className="mt-0.5 size-3.5 shrink-0" title={INVOLVED_LABEL[involvedFrom(inc)]} />
+                          <span>{incidentTitle(inc, p)}</span>
                         </span>
-                        {inc && <span className="line-clamp-2 text-body-sm text-ink-muted">{inc.what_next}</span>}
+                        {shortLine(inc) && <span className="line-clamp-1 text-body-sm text-ink-muted">{shortLine(inc)}</span>}
+                        <span className="truncate text-data text-ink-muted">{p.vehicle_id}</span>
                         {!live && <span className="text-data text-ink-muted">Not on the road right now</span>}
                       </button>
                     </li>

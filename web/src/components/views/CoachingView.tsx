@@ -13,7 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { allIncidentsOptions, pairingsOptions } from "@/lib/api/queries";
 import type { Incident, Pairing } from "@/lib/api/types";
-import { COACHING_COPY, REPORT_COPY, plural, riskLabel, riskTone, typeLabel } from "@/lib/copy";
+import { COACHING_COPY, REPORT_COPY, plural, riskLabel, riskTone } from "@/lib/copy";
+import { hazardOf, inMode, useDataMode } from "@/lib/incident";
 import { useSignedOff } from "@/lib/signoff";
 
 interface RouteGroup {
@@ -34,14 +35,19 @@ function groupByRoute(pairings: Pairing[], incidents: Map<string, Incident>): Ro
   return [...byRoute.values()].sort((a, b) => b.top - a.top || a.route.localeCompare(b.route, "en", { numeric: true }));
 }
 
-/** The route's pattern in one line: the most common kind of moment, else its riskiest forecast. */
+function mostCommon(values: string[]): [string, number] | null {
+  const counts = new Map<string, number>();
+  for (const v of values) if (v) counts.set(v, (counts.get(v) ?? 0) + 1);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? null;
+}
+
+/** The route's pattern by hazard type, e.g. "Cyclist on the nearside, 3 times on route 18". */
 function patternLine(g: RouteGroup): string {
   const known = g.items.map((x) => x.incident).filter((i): i is Incident => Boolean(i));
-  const counts = new Map<string, number>();
-  for (const i of known) if (i.type) counts.set(i.type, (counts.get(i.type) ?? 0) + 1);
-  const [type, n] = [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? ["", 0];
-  if (n > 1) return `${typeLabel(type)} in ${n} of ${g.items.length} clips`;
-  return known[0]?.what_next ?? `${plural(g.items.length, "clip")} on this route`;
+  const top = mostCommon(known.map((i) => hazardOf(i)));
+  if (!top) return `${plural(g.items.length, "moment")} on route ${g.route}`;
+  const [hazard, n] = top;
+  return n > 1 ? `${hazard}, ${n} times on route ${g.route}` : `${hazard} on route ${g.route}`;
 }
 
 function scoreLineFor(g: RouteGroup): string {
@@ -51,8 +57,9 @@ function scoreLineFor(g: RouteGroup): string {
   return checked.length > 0 ? `${lead} · ${yes} of ${checked.length} came true` : `${lead} · not checked yet`;
 }
 
+/** The habit to try: the fix that comes up most often on this route. */
 function habit(g: RouteGroup): string | null {
-  return g.items.find((x) => x.incident?.fix)?.incident?.fix ?? null;
+  return mostCommon(g.items.map((x) => x.incident?.fix ?? ""))?.[0] ?? null;
 }
 
 function PromiseLine() {
@@ -168,7 +175,8 @@ export function CoachingView() {
   const pairings = useQuery(pairingsOptions());
   const incidents = useQuery(allIncidentsOptions());
   const byId = new Map((incidents.data ?? []).map((i) => [i.id, i]));
-  const groups = groupByRoute(pairings.data ?? [], byId);
+  const dataMode = useDataMode();
+  const groups = groupByRoute(inMode(pairings.data, dataMode), byId);
 
   return (
     <Atmosphere variant="soft">

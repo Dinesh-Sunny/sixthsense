@@ -12,7 +12,7 @@ COSMOS_URL = CFG.get("COSMOS3_REASON_URL") or f"http://{GPU_HOST}:8001"
 YOLO_URL = CFG.get("YOLO_URL") or f"http://{GPU_HOST}:8002"
 GPU_AUTH = {"Authorization": f"Bearer {CFG.get('GPU_BEARER_TOKEN', '')}"}
 LLM_BASE = CFG.get("LLM_BASE_URL", "https://api.inference.wandb.ai/v1")
-LLM_MODEL = CFG.get("LLM_MODEL", "")  # pick one from `python pipeline/probe.py` output
+LLM_MODEL = CFG.get("LLM_MODEL", "meta-llama/Llama-3.3-70B-Instruct")  # pick one from `python pipeline/probe.py` output
 WANDB_PROJECT_PATH = f"{CFG.get('WANDB_TEAM', '')}/{CFG.get('WANDB_PROJECT', 'sixthsense')}".strip("/")
 
 try:  # optional tracing

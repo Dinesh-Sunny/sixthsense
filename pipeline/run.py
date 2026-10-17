@@ -35,7 +35,7 @@ def watch(mode: str, per_query: int) -> list:
     cfg, seen, out = MODES[mode], set(), []
     for q in cfg["queries"]:
         try:
-            res = v.search(q, cfg["camera"], top_k=per_query, min_similarity=0.25)
+            res = v.search(q, cfg["camera"], top_k=per_query, min_similarity=float(os.environ.get("MIN_SIM", "0.15")))
         except Exception as e:
             print("search failed:", q, e)
             continue
@@ -51,54 +51,67 @@ def watch(mode: str, per_query: int) -> list:
 
 
 # ---------- 2 VERIFY ----------
-def _boxes(obj, out):
-    """Walk any detections JSON and collect (frame_key, label, x1, y1, x2, y2)."""
-    if isinstance(obj, dict):
-        label = first(obj, ["class", "label", "class_name", "name", "cls"])
-        box = first(obj, ["bbox", "box", "xyxy", "bbox_xyxy"])
-        if isinstance(label, str) and isinstance(box, (list, tuple)) and len(box) >= 4:
-            fk = first(obj, ["frame", "frame_idx", "frame_index", "t", "timestamp"], obj.get("_fk", 0))
-            out.append((fk, label.lower(), *map(float, box[:4])))
-        for k, val in obj.items():
-            if isinstance(val, (list, dict)):
-                if isinstance(val, list):
-                    fk = first(obj, ["frame", "frame_idx", "frame_index", "t", "timestamp"])
-                    for item in val:
-                        if isinstance(item, dict) and fk is not None:
-                            item.setdefault("_fk", fk)
-                _boxes(val, out)
-    elif isinstance(obj, list):
-        for i, item in enumerate(obj):
-            if isinstance(item, dict) and "_fk" not in item and not first(item, ["frame", "frame_idx", "frame_index"]):
-                item["_fk"] = i
-            _boxes(item, out)
-    return out
+def _iou(a, b):
+    ix = max(0, min(a[2], b[2]) - max(a[0], b[0])); iy = max(0, min(a[3], b[3]) - max(a[1], b[1]))
+    inter = ix * iy
+    union = (a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - inter
+    return inter / union if union > 0 else 0.0
 
 
-def closing_gap(det) -> tuple[float, str] | None:
-    rows = [r for r in _boxes(det, []) if r[1] in VEHICLES]
-    if not rows:
+def _tracks(frames, step=3, min_conf=0.3):
+    """Tracking-lite: link vehicle boxes frame to frame by best IoU. Returns {track_id: [(t, box), ...]}."""
+    tracks, last, nxt = {}, {}, 0
+    for fr in frames[::step]:
+        t = float(fr.get("time_sec", fr.get("frame_index", 0)))
+        dets = [d["bbox"] for d in fr.get("detections", [])
+                if str(d.get("label", "")).lower() in VEHICLES and float(d.get("confidence", 1)) >= min_conf]
+        new_last, used = {}, set()
+        for box in dets:
+            best, bid = 0.3, None
+            for tid, pb in last.items():
+                if tid in used:
+                    continue
+                o = _iou(box, pb)
+                if o > best:
+                    best, bid = o, tid
+            if bid is None:
+                bid, nxt = nxt, nxt + 1
+            used.add(bid)
+            tracks.setdefault(bid, []).append((t, box))
+            new_last[bid] = box
+        last = new_last
+    return tracks
+
+
+def closing_gap(det):
+    """Best pair of tracked vehicles that close in: distance measured in car lengths (box diagonals)."""
+    frames = (det or {}).get("frames") or (det or {}).get("perception_json", {}).get("frames") or []
+    if not frames:
         return None
-    width = max(r[4] for r in rows) or 1.0
-    frames = {}
-    for fk, _, x1, y1, x2, y2 in rows:
-        frames.setdefault(fk, []).append((x1, y1, x2, y2))
-    gaps = []
-    for fk in sorted(frames, key=lambda k: float(k) if str(k).replace(".", "").isdigit() else 0):
-        bs, best = frames[fk], math.inf
-        for i in range(len(bs)):
-            for j in range(i + 1, len(bs)):
-                a, b = bs[i], bs[j]
-                dx = max(0, max(a[0], b[0]) - min(a[2], b[2]))
-                dy = max(0, max(a[1], b[1]) - min(a[3], b[3]))
-                best = min(best, math.hypot(dx, dy) / width)
-        if best < math.inf:
-            gaps.append(best)
-    if len(gaps) < 2:
-        return None
-    g0, gmin = gaps[0], min(gaps)
-    score = 0.0 if g0 <= 0 else max(0.0, (g0 - gmin) / g0)
-    return score, f"closest gap {gmin*100:.1f}% of frame width, shrank {score*100:.0f}% over {len(gaps)} frames"
+    tr = {k: dict(v) for k, v in _tracks(frames).items() if len(v) >= 6}
+    ids, best = list(tr), (0.0, None)
+    for i in range(len(ids)):
+        for j in range(i + 1, len(ids)):
+            a, b = tr[ids[i]], tr[ids[j]]
+            ts = sorted(set(a) & set(b))
+            if len(ts) < 6:
+                continue
+            dist = []
+            for t in ts:
+                ba, bb = a[t], b[t]
+                ca = ((ba[0] + ba[2]) / 2, (ba[1] + ba[3]) / 2); cb = ((bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2)
+                size = (math.hypot(ba[2] - ba[0], ba[3] - ba[1]) + math.hypot(bb[2] - bb[0], bb[3] - bb[1])) / 2
+                dist.append(math.hypot(ca[0] - cb[0], ca[1] - cb[1]) / max(size, 1.0))
+            d0, dmin = sum(dist[:2]) / 2, min(dist)
+            k = dist.index(dmin)
+            if d0 <= 0 or dmin > 1.5:  # only pairs that end up within ~1.5 car lengths
+                continue
+            score = (d0 - dmin) / d0
+            if score > best[0]:
+                best = (score, f"two vehicles closed from {d0:.1f} to {dmin:.1f} car lengths in {ts[k]-ts[0]:.1f}s")
+    if best[1] is None:
+        return 0.0, f"{len(tr)} vehicles tracked, no pair closing within 1.5 car lengths"
+    return round(best[0], 2), best[1]
 
 
 @op
@@ -118,7 +131,7 @@ def verify(hit: dict, mode: str) -> dict:
                 print("yolo failed", e)
         if cg is not None:
             score, note = cg
-            return {"verified": score >= 0.30, "verify_score": round(score, 2), "verify_note": note, "verify_by": "yolo boxes"}
+            return {"verified": score >= float(os.environ.get("VERIFY_MIN", "0.30")), "verify_score": round(score, 2), "verify_note": note, "verify_by": "yolo boxes"}
     # fallback / street: strict Cosmos yes-no, asked on the clip
     q = ("Answer only yes or no. Are two vehicles within about one car length of each other and getting closer?"
          if mode == "road" else

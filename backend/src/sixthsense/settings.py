@@ -82,6 +82,12 @@ class Settings(BaseSettings):
     weather_tz: str = "Europe/London"
     weather_ttl_s: float = 600.0
 
+    # London buses live map (v2)
+    mapbox_token: SecretStr = SecretStr("")  # public pk token, returned only by /api/map-config
+    tfl_app_key: SecretStr = SecretStr("")
+    fleet_enabled: bool = True
+    fleet_poll_s: float = 30.0
+
     # Web
     web_dir: Path = Path("../web/out")
     seed_file: Path | None = None  # Sample incidents shown while a mode has no runs

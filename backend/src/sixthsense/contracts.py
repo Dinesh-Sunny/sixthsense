@@ -139,3 +139,67 @@ class Health(_Out):
     ok: bool
     store: str | None = None  # "vast" | "json" | "degraded"
     vss: bool | None = None
+
+
+# ---------- v2: London buses live map ----------
+Direction = Literal["inbound", "outbound"]
+
+
+class Vehicle(_Out):
+    id: str  # TfL vehicleId (a registration)
+    route: str
+    dir: Direction
+    towards: str = ""
+    next_stop: str  # naptanId
+    next_stop_name: str = ""
+    eta_s: int
+    lon: float
+    lat: float
+    bearing: float | None = None
+    ts: str
+
+
+class FleetSnapshot(_Out):
+    ts: str
+    vehicles: list[Vehicle] = Field(default_factory=list)
+    routes: int = 0
+    latency_ms: int = 0
+    source: Literal["tfl"] = "tfl"
+
+
+class RouteSummary(_Out):
+    id: str
+    name: str
+
+
+class RouteStop(_Out):
+    id: str
+    name: str
+    lon: float
+    lat: float
+
+
+class RouteDirection(_Out):
+    dir: Direction
+    coords: list[list[float]] = Field(default_factory=list)  # [[lon, lat], ...]
+    stops: list[RouteStop] = Field(default_factory=list)
+
+
+class RouteDetail(_Out):
+    id: str
+    directions: list[RouteDirection] = Field(default_factory=list)
+
+
+class Pairing(_Out):
+    """Stand-in: a real incident shown on a live bus. Labelled "Stand-in clip" on screen."""
+
+    incident_id: str
+    vehicle_id: str
+    route: str
+    risk: int
+    came_true: CameTrue
+    mode: Mode
+
+
+class MapConfig(_Out):
+    mapbox_token: str | None = None

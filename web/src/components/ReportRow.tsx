@@ -32,7 +32,18 @@ function Thumb({ source }: { source: string | null }) {
 }
 
 /** One report in a list. The whole row is a single link to the report. */
-export function ReportRow({ incident: i, pairing, signedOff }: { incident: Incident; pairing?: Pairing; signedOff: boolean }) {
+export function ReportRow({
+  incident: i,
+  pairing,
+  signedOff,
+  secondary = "fix",
+}: {
+  incident: Incident;
+  pairing?: Pairing;
+  signedOff: boolean;
+  /** Which short line to show; coaching shows the fix as its habit, so its rows show what happened. */
+  secondary?: "fix" | "happened";
+}) {
   const queryClient = useQueryClient();
   const prefetch = () => {
     queryClient.setQueryData(incidentOptions(i.id).queryKey, i);
@@ -54,7 +65,7 @@ export function ReportRow({ incident: i, pairing, signedOff }: { incident: Incid
         >
           {incidentTitle(i, pairing)}
         </Link>
-        {shortLine(i) && <p className="line-clamp-1 text-body-sm text-ink-muted">{shortLine(i)}</p>}
+        {shortLine(i, secondary) && <p className="line-clamp-1 text-body-sm text-ink-muted">{shortLine(i, secondary)}</p>}
         <div className="flex flex-wrap items-center gap-2">
           {i.fixture ? (
             <StatusPill tone="sample">{SAMPLE.label}</StatusPill>

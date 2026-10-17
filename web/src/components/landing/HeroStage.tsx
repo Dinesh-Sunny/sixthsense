@@ -4,6 +4,7 @@ import { StatusPill } from "@/components/StatusPill";
 import { useInView } from "@/components/landing/reveal";
 import type { Incident } from "@/lib/api/types";
 import { COPY, VERDICT, cameraLine, riskLabel, riskTone } from "@/lib/copy";
+import { hazardOf } from "@/lib/incident";
 import { assetUrl, cn } from "@/lib/utils";
 
 /** Original flat illustration of a generic red double-decker (no roundel, no operator, no livery text). */
@@ -75,8 +76,9 @@ export function HeroStage({ top, frame }: { top: Incident | undefined; frame: { 
             <StatusPill tone={riskTone(top.risk)}>{riskLabel(top.risk)}</StatusPill>
             <span className="text-data text-ink-muted">{cameraLine(top)}</span>
           </div>
+          <p className="font-serif text-[22px] leading-[1.15] text-balance md:text-2xl">{hazardOf(top)}</p>
           <div className="text-eye">{COPY.next}</div>
-          <p className="font-serif text-[22px] leading-[1.2] text-balance md:text-2xl">{top.what_next}</p>
+          <p className="text-body-sm text-ink">{top.what_next}</p>
           <div className="flex items-center gap-3">
             <StatusPill tone={VERDICT[top.came_true].tone}>{VERDICT[top.came_true].label}</StatusPill>
             {top.came_true !== "unknown" && <span className="text-body-sm text-ink-muted">checked on the next clip</span>}

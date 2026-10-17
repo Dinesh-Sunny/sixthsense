@@ -157,7 +157,7 @@ function RouteDetail({ route, group }: { route: string; group: RouteGroup | unde
           <ul className="flex flex-col gap-3">
             {group.items.map(({ pairing: p, incident: i }) =>
               i ? (
-                <ReportRow key={p.incident_id} incident={i} pairing={p} signedOff={signed.has(i.id)} />
+                <ReportRow key={p.incident_id} incident={i} pairing={p} signedOff={signed.has(i.id)} secondary="happened" />
               ) : (
                 <ReportRowSkeleton key={p.incident_id} />
               ),

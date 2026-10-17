@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { incidentsOptions, metricsOptions, readyOptions, weatherOptions } from "@/lib/api/queries";
 import { MODES, type Incident, type ModeMetrics } from "@/lib/api/types";
 import { BUS_COPY, COPY, MODE_INFO, STORE_LABEL, gapLine, gapSummary, riskLabel, riskTone, scoreLine } from "@/lib/copy";
+import { hazardOf } from "@/lib/incident";
 import { assetUrl, cn } from "@/lib/utils";
 
 const GITHUB_URL = "https://github.com/Dinesh-Sunny/sixthsense";
@@ -77,6 +78,16 @@ function WordmarkLarge({ className }: { className?: string }) {
   );
 }
 
+/** Real incidents, riskiest first, one per distinct forecast sentence. */
+function rankDistinct(lists: (Incident[] | undefined)[]): Incident[] {
+  const seen = new Set<string>();
+  return lists
+    .flatMap((l) => l ?? [])
+    .filter((i) => !i.fixture)
+    .sort((a, b) => b.risk - a.risk)
+    .filter((i) => (seen.has(i.what_next) ? false : (seen.add(i.what_next), true)));
+}
+
 function topIncident(lists: (Incident[] | undefined)[]): Incident | undefined {
   return lists
     .flatMap((l) => l ?? [])
@@ -132,15 +143,20 @@ export function LandingView() {
   const weather = useQuery(weatherOptions());
   const metrics = useQuery(metricsOptions());
   const ready = useQuery(readyOptions());
+  const bus = useQuery(incidentsOptions("bus"));
   const city = useQuery(incidentsOptions("city"));
   const road = useQuery(incidentsOptions("road"));
   const street = useQuery(incidentsOptions("street"));
 
   const wx = weather.data?.wx ?? "clear";
   const m = metrics.isSuccess ? metrics.data : undefined;
-  const top = topIncident([city.data, road.data, street.data]);
+  // Different real incidents per section (hero, step 3, step 2) so no sentence repeats on the page.
+  const pool = rankDistinct([bus.data, city.data, road.data, street.data]);
+  const top = pool[0];
+  const foresee = pool.find((i) => i.id !== top?.id && i.what_next !== top?.what_next) ?? top;
   // City footage only (the frame is a city crossing): riskiest live city moment that has a measured gap.
-  const gap = topIncident([(city.data ?? []).filter((i) => gapSummary(i.gap_series) !== null)]);
+  const withGap = (city.data ?? []).filter((i) => !i.fixture && gapSummary(i.gap_series) !== null);
+  const gap = withGap.find((i) => i.id !== top?.id && i.id !== foresee?.id) ?? topIncident([withGap]);
   const score = bestScore(m);
   const ran = m?.filter((x) => x.candidates > 0) ?? [];
   const totalWatched = ran.reduce((a, x) => a + x.candidates, 0);
@@ -245,19 +261,19 @@ export function LandingView() {
           visual={
             <Reveal className="w-full max-w-[340px] overflow-hidden rounded-[18px] bg-surface shadow-float">
               <Frame frame={FRAMES.predict} className="aspect-video" />
-              {top && (
+              {foresee && (
                 <div className="flex flex-col gap-1.5 px-[18px] py-3.5">
-                  <div className={cn("text-eye", rise)} style={stagger(1)}>{COPY.next}</div>
+                  <div className={cn("text-title", rise)} style={stagger(1)}>{hazardOf(foresee)}</div>
                   <p className={cn("font-serif text-xl leading-[1.2]", rise)} style={stagger(2)}>
-                    {top.what_next}
+                    {foresee.what_next}
                   </p>
-                  {top.fix && (
+                  {foresee.fix && (
                     <p className={cn("text-body-sm text-ink-muted", rise)} style={stagger(3)}>
-                      <b className="font-medium text-ink">{COPY.fix}</b> {top.fix}
+                      <b className="font-medium text-ink">{COPY.fix}</b> {foresee.fix}
                     </p>
                   )}
                   <div className={rise} style={stagger(4)}>
-                    <StatusPill tone={riskTone(top.risk)}>{riskLabel(top.risk)}</StatusPill>
+                    <StatusPill tone={riskTone(foresee.risk)}>{riskLabel(foresee.risk)}</StatusPill>
                   </div>
                 </div>
               )}

@@ -22,9 +22,10 @@ export function incidentTitle(i: Incident | undefined, p?: Pairing): string {
   return place ? `${hazardOf(i)} · ${place}` : hazardOf(i);
 }
 
-/** One short line under a title: the fix, else what was seen next, else what was happening. */
-export function shortLine(i: Incident | undefined): string {
-  return i?.fix || i?.came_true_evidence || i?.what_happens || "";
+/** One short line under a title: the fix (default) or what happened, with the other as fallback. */
+export function shortLine(i: Incident | undefined, prefer: "fix" | "happened" = "fix"): string {
+  const happened = i?.came_true_evidence || i?.what_happens || "";
+  return prefer === "fix" ? i?.fix || happened : happened || i?.fix || "";
 }
 
 /**

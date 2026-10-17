@@ -43,7 +43,7 @@ SixthSense helps a bus safety team see which buses had a close call, what happen
 
 Most video AI demos say they are accurate. SixthSense measures it on the day, with no hand labels.
 
-> **What's live and what's a stand-in.** Bus positions are live TfL open data, placed at each bus's next stop. The camera clips are the hackathon footage from San Francisco and New York, standing in for bus cameras, and matching an incident to a live bus is a stand-in too. Every prediction, check and score you see comes from our real run on VAST.
+> **What's live and what's a stand-in.** Bus positions are live TfL open data, placed at each bus's next stop. The app now uses only the archive's two vehicle-mounted cameras: a car dashcam (front view, the PIE dataset in Toronto) and a bike camera on New York bike lanes (nearside view). Neither is a London bus, and matching an incident to a live bus is a stand-in too. Every prediction, check and score you see comes from our real run on VAST.
 
 ---
 
@@ -90,7 +90,7 @@ flowchart LR
 | Step | What it does | Built with |
 |---|---|---|
 | Watch | Runs 8 bus hazard searches across the city and street cameras, taking results from each in turn and skipping near-duplicates. | VSS hybrid search over **VastDB** |
-| Check | Tracks each road user frame by frame and measures the gap between pairs in car lengths. A clip passes only if a pair really closes in. | **YOLO11** boxes, supervision and a ByteTrack tracker |
+| Check | Tracks each road user frame by frame. On the bus's own cameras it checks whether someone is closing on us: growing fast in the frame, seconds from contact, or stepping into our lane. | **YOLO11** boxes, supervision and a ByteTrack tracker |
 | Predict | Treats the clip as a London bus front camera and returns a hazard type, what happens next, why, a fix for the driver, and a risk score. | **NVIDIA Cosmos3-Reason** on **CoreWeave** |
 | Grade itself | Finds the next clip of the same video and asks a judge whether the prediction came true, with evidence. | A model on **W&B inference**, traced in **Weave** |
 | Save | Stores incidents and runs. | **VastDB** tables `incidents` and `runs` |
@@ -151,35 +151,42 @@ sequenceDiagram
 
 ## Results
 
-Only numbers from today's live runs (17 Oct 2026). Nothing is estimated.
+Only numbers from live runs on 17 Oct 2026. Nothing is estimated.
+
+**Bus camera views (current app).** For a camera on the vehicle itself there is no "pair of boxes" to measure, so SixthSense tracks each road user and checks whether it is closing on us: growing fast in the frame, a few seconds from contact, or stepping into our lane. The thresholds were set from a debug run over real clips.
+
+| Camera | Clips found | Ruled out | Passed the check | Graded | Came true |
+|---|---|---|---|---|---|
+| **Front** (car dashcam, `pie_cam-3`) | 39 | 30 | 8 | 5 | **2 of 5** (+2 partly) |
+| **Nearside** (bike camera, `nyc_bike_gopro-1`) | 29 | 11 | 18 | 18 | **10 of 18** |
+
+Most front-camera clips are calm following traffic, so most are ruled out. That is the check doing its job. The judge marks a prediction "partly" when it only restates what is already happening.
+
+**Hackathon day (fixed street cameras, now retired from the app).**
 
 | Run | Cameras | Clips | Passed the gap check | Graded | Came true |
 |---|---|---|---|---|---|
-| **Bus safety** | 8 hazard searches over the city and street cameras | 10 | 7 (3 false alarms dropped) | 7 | **4 of 7** |
-| City | 6 New York and San Francisco intersections | 10 | 9 | 8 | **5 of 8** |
+| Bus safety | 8 hazard searches over the city and street cameras | 10 | 7 | 7 | 4 of 7 |
+| City | 6 New York and San Francisco intersections | 10 | 9 | 8 | 5 of 8 |
 | City, earlier run | same | 10 | 7 | 6 | 4 of 6 |
-| Highway | I-24 Nashville | 10 | 0 | 0 | - |
-| Street | one street, two days | 10 | 0 | 0 | - |
-
-Across both city runs, 9 of 14 graded predictions came true. The bus run found three kinds of hazard: pedestrian stepping out, blocked lane, and vehicle cutting in.
-
-Highway and street raised no warnings: no clip had a pair closing in fast enough to pass the gap check. SixthSense stays quiet rather than guessing.
+| Highway and street | I-24 Nashville, one street | 20 | 0 | 0 | - |
 
 ### A real incident, unedited
 
 ```json
 {
-  "camera_id": "sf_streets_cam-1",
-  "type": "Pedestrian stepping out",
+  "camera_id": "nyc_bike_gopro-1",
+  "camera_view": "nearside",
+  "type": "Close overtake",
   "verified": true,
-  "verify_note": "a car and a pedestrian closed from 1.7 to 0.5 car lengths in 1.4s",
-  "what_happens": "A pedestrian on a scooter steps out from the right side of the road into the crosswalk, moving towards the left side of the frame.",
-  "what_next": "The pedestrian continues to cross the road, moving further into the crosswalk.",
-  "why": "The pedestrian is crossing the road at the crosswalk, likely following the traffic signal.",
-  "fix": "The bus should slow down and stop to allow the pedestrian to cross safely.",
+  "verify_note": "a car alongside grew 2.8x in 0.9 s (13% to 36% of the frame height), under 1 s from the side of the bus",
+  "what_happens": "A black car overtakes the bus on the nearside, passing very close to the camera.",
+  "what_next": "The black car continues to overtake and moves ahead of the bus.",
+  "why": "The black car is changing lanes to pass other vehicles in traffic.",
+  "fix": "Maintain a safe distance and be cautious of vehicles overtaking on the nearside.",
   "risk": 3,
   "came_true": "yes",
-  "came_true_evidence": "The pedestrian is seen advancing through the crosswalk, moving steadily toward the other side of the street."
+  "came_true_evidence": "The black car is seen moving ahead of the bus in the lane."
 }
 ```
 

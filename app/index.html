@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SixthFrame</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0d12;--panel:#141821;--line:#232a36;--ink:#e8ecf3;--mute:#8a94a7;--accent:#ffb020;--red:#ff4d5e;--amber:#ffb020;--green:#2fd18b;--blue:#5aa8ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif}
+header{display:flex;align-items:center;gap:16px;padding:18px 24px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{font:700 24px "Space Grotesk",sans-serif;letter-spacing:-.5px}.logo span{color:var(--accent)}
+.tag{color:var(--mute);font-size:14px}.grow{flex:1}
+.tabs{display:flex;gap:6px}.tab{background:none;border:1px solid var(--line);color:var(--mute);padding:8px 14px;border-radius:999px;cursor:pointer;font:500 14px Inter}
+.tab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.badge{border:1px solid var(--line);border-radius:12px;padding:8px 14px;text-align:right}
+.badge b{font:700 22px "Space Grotesk";color:var(--green)}.badge small{display:block;color:var(--mute);font-size:12px}
+main{display:grid;grid-template-columns:1fr 320px;gap:20px;padding:20px 24px}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.warn{background:#2a2110;border:1px solid #5a4614;color:#ffd27a;padding:8px 12px;border-radius:10px;margin-bottom:14px;font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.vid{aspect-ratio:16/9;background:#05070a;display:grid;place-items:center;color:var(--mute);font-size:13px;position:relative}
+.vid video{width:100%;height:100%;object-fit:contain}
+.risk{position:absolute;top:10px;left:10px;font:700 12px Inter;padding:4px 9px;border-radius:999px;background:#000a;border:1px solid}
+.body{padding:14px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.meta{color:var(--mute);font-size:12px;display:flex;gap:8px;flex-wrap:wrap}
+.next{font:600 16px/1.35 "Space Grotesk";}.next em{display:block;font:500 11px Inter;color:var(--accent);font-style:normal;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.kv{font-size:13.5px;color:#c9d1de}.kv b{color:var(--mute);font-weight:500}
+.foot{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding:10px 16px}
+.pill{font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
+.yes{color:var(--green);border-color:#1f6b4c}.partly{color:var(--amber);border-color:#6b531f}.no{color:var(--red);border-color:#6b1f28}.unknown{color:var(--mute)}
+button.alert{margin-left:auto;background:var(--red);color:#fff;border:0;border-radius:8px;padding:7px 12px;font:600 13px Inter;cursor:pointer}
+button.alert:disabled{background:#3a2a2e;color:var(--mute);cursor:default}
+aside{display:flex;flex-direction:column;gap:16px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.box h3{margin:0 0 10px;font:600 13px Inter;text-transform:uppercase;letter-spacing:.08em;color:var(--mute)}
+textarea{width:100%;background:#0b0d12;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px;font:14px Inter;resize:vertical}
+.go{margin-top:8px;background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:7px 12px;font:600 13px Inter;cursor:pointer}
+.ans{font-size:13.5px;color:#c9d1de;margin-top:10px;white-space:pre-wrap}
+.al{border-left:3px solid var(--red);padding:4px 10px;margin:8px 0;font-size:13px}.al small{color:var(--mute)}
+.empty{color:var(--mute);padding:40px;text-align:center}
+</style></head><body>
+<header>
+  <div><div class="logo">Sixth<span>Frame</span></div><div class="tag">the sixth sense your cameras were missing</div></div>
+  <div class="grow"></div>
+  <div class="tabs"><button class="tab on" data-m="road">Road</button><button class="tab" data-m="street">Street</button></div>
+  <div class="badge" id="badge"><b>-</b><small>predictions that came true</small></div>
+</header>
+<main>
+  <section><div id="warn"></div><div class="cards" id="cards"><div class="empty">Loading...</div></div></section>
+  <aside>
+    <div class="box"><h3>Ask the footage</h3>
+      <textarea id="q" rows="2" placeholder="e.g. Did any truck cut in close to a car?"></textarea>
+      <button class="go" id="ask">Ask</button><div class="ans" id="ans"></div></div>
+    <div class="box"><h3>Alerts sent</h3><div id="alerts"><div class="tag">None yet</div></div></div>
+    <div class="box"><h3>How it works</h3><div class="kv">Watch saved hazard searches → Verify with YOLO boxes → Foresee with Cosmos Reason → Self-check against the next clip → Alert. Every step traced in W&B Weave.</div></div>
+  </aside>
+</main>
+<script>
+let mode="road";const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const rc=r=>r>=4?"var(--red)":r==3?"var(--amber)":"var(--green)";
+const icon={yes:"✅ came true",partly:"🟡 partly",no:"❌ did not happen",unknown:"⏳ not checked"};
+async function j(u,o){const r=await fetch(u,o);return r.json()}
+async function load(){
+  const [inc,met]=await Promise.all([j("api/incidents?mode="+mode),j("api/metrics")]);
+  const m=met.find(x=>x.mode===mode);
+  $("#badge").innerHTML=m&&m.accuracy!=null?`<b>${m.came_true_yes}${m.came_true_partly?" + "+m.came_true_partly+"½":""} / ${m.checked}</b><small>predictions that came true (${Math.round(m.accuracy*100)}%)</small>`:`<b>-</b><small>predictions that came true</small>`;
+  $("#warn").innerHTML=inc.some(i=>i.fixture)?'<div class="warn">Showing sample (fixture) cards - run the pipeline to replace them with real footage.</div>':"";
+  $("#cards").innerHTML=inc.length?inc.map(card).join(""):'<div class="empty">No warnings for this camera yet.</div>';
+  document.querySelectorAll("button.alert").forEach(b=>b.onclick=()=>sendAlert(b,inc.find(i=>i.id===b.dataset.id)));
+}
+function card(i){
+  const vid=i.source?`<video src="clip?source=${encodeURIComponent(i.source)}#t=0" controls muted playsinline preload="metadata"></video>`:`<span>${esc(i.camera_id)} · clip ${Math.round(i.start_s)}s</span>`;
+  return `<article class="card"><div class="vid">${vid}<span class="risk" style="color:${rc(i.risk)};border-color:${rc(i.risk)}">RISK ${i.risk}/5</span></div>
+  <div class="body"><div class="meta"><span>${esc(i.camera_id)}</span><span>${esc(i.type)}</span><span>${Math.round(i.start_s)}-${Math.round(i.end_s)}s</span></div>
+  <div class="next"><em>What happens next</em>${esc(i.what_next)}</div>
+  <div class="kv"><b>Now:</b> ${esc(i.what_happens)}</div><div class="kv"><b>Why:</b> ${esc(i.why)}</div><div class="kv"><b>Fix:</b> ${esc(i.fix)}</div>
+  <div class="meta">✔ ${esc(i.verify_note)}</div></div>
+  <div class="foot"><span class="pill ${i.came_true}" title="${esc(i.came_true_evidence)}">${icon[i.came_true]||i.came_true}</span>
+  <button class="alert" data-id="${esc(i.id)}">Send alert</button></div></article>`}
+async function sendAlert(b,i){b.disabled=true;b.textContent="Sent";await j("api/alerts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(i)});alerts()}
+async function alerts(){const a=await j("api/alerts");$("#alerts").innerHTML=a.length?a.map(x=>`<div class="al">Risk ${x.risk} · ${esc(x.camera_id)}<br>${esc(x.what_next)}<br><small>${x.sent_at}</small></div>`).join(""):'<div class="tag">None yet</div>'}
+$("#ask").onclick=async()=>{$("#ans").textContent="Thinking...";const r=await j("api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:$("#q").value})});$("#ans").textContent=r.answer||r.error||"No answer"};
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));t.classList.add("on");mode=t.dataset.m;load()});
+load();alerts();
+</script></body></html>

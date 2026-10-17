@@ -63,7 +63,7 @@ select = ["E", "F", "I", "B", "UP", "ASYNC", "TID", "BLE"]
 "ibis".msg = "Storage goes through sixthsense.store."
 "supervision".msg = "Tracking lives in sixthsense.tracking."
 "trackers".msg = "Tracking lives in sixthsense.tracking."
-"cv2".msg = "Tracking lives in sixthsense.tracking."
+"cv2".msg = "OpenCV lives in sixthsense.tracking and sixthsense.media."
 "supervision.ByteTrack".msg = "Removed in supervision 0.27+: use trackers.ByteTrackTracker."
 "os.environ".msg = "Read config through sixthsense.settings.Settings."
 "os.getenv".msg = "Read config through sixthsense.settings.Settings."
@@ -74,6 +74,7 @@ select = ["E", "F", "I", "B", "UP", "ASYNC", "TID", "BLE"]
 "src/sixthsense/clients/models.py" = ["TID251"]
 "src/sixthsense/store.py" = ["TID251"]
 "src/sixthsense/tracking.py" = ["TID251"]
+"src/sixthsense/media.py" = ["TID251"]  # cv2 for poster stills
 "src/sixthsense/settings.py" = ["TID251"]
 # tracing.py: weave + the WANDB_API_KEY env bridge (weave reads the key from env/netrc only).
 "src/sixthsense/tracing.py" = ["TID251"]

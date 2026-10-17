@@ -279,7 +279,7 @@ sixthsense/
 - "Came true" is judged from the next segment's description, so it inherits that description's quality.
 - Street mode matches lookalike vehicles by description ("a dark van matching this"), not by identity.
 - The box check and the forecast can name different objects (boxes say "pedestrian", Cosmos says "SUV"); they are not yet reconciled.
-- 10 clips per mode is a small sample: 4 of 6 is a signal, not a benchmark.
+- 10 clips per mode is a small sample: 9 of 14 is a signal, not a benchmark.
 
 ## 🛣️ Next
 - [ ] Re-ingest with a SixthSense-tuned prompt and measure accuracy before/after in Weave

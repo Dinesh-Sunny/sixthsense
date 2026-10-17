@@ -30,13 +30,6 @@ groups:
     requires: []
     ref: /docs/framework/react/installation.md
     entries:
-    - id: tsq-install
-      name: Install
-      summary: `@tanstack/react-query` needs React 18+; add `@tanstack/eslint-plugin-query` as a dev dependency
-      lenses: [best-practice]
-      import: '@tanstack/react-query'
-      notes: ['the lint plugin catches missing queryKey deps and an unstable QueryClient']
-      ref: /docs/framework/react/installation.md
     - id: tsq-provider
       name: QueryClientProvider and client creation
       summary: create the QueryClient once per app instance in `useState`, never at module level, and wrap the tree in the provider
@@ -58,15 +51,9 @@ groups:
     requires: []
     ref: /docs/framework/react/guides/important-defaults.md
     entries:
-    - id: tsq-default-values
-      name: Default option values
-      summary: staleTime 0, gcTime 5 minutes, 3 retries with exponential backoff, refetch on window focus, structural sharing on
-      lenses: [perf, cost]
-      notes: ['staleTime 0 means every new mount and focus refetches, so set a staleTime in defaultOptions', 'gcTime counts only after the last observer unmounts']
-      ref: /docs/framework/react/guides/important-defaults.md
     - id: tsq-stale-gc-tuning
       name: staleTime and gcTime tuning
-      summary: raise staleTime per data type to cut request volume; keep gcTime at or above staleTime
+      summary: defaults are staleTime 0, gcTime 5 min, 3 retries, refetch on focus; raise staleTime per data type and keep gcTime at or above it
       lenses: [perf, cost]
       signature: 'new QueryClient({ defaultOptions: { queries: { staleTime, gcTime } } })'
       notes: ['for many clients, read-mostly lists suit 30-60 s, slow-changing data minutes; "static" never refetches', 'never set gcTime to 0 (hydration errors); use 2000 ms if a short value is needed']
@@ -79,14 +66,6 @@ groups:
     requires: [tsq-setup]
     ref: /docs/framework/react/guides/queries.md
     entries:
-    - id: tsq-use-query
-      name: useQuery
-      summary: subscribes a component to cached async data and returns status flags, data and error
-      lenses: [best-practice]
-      import: '@tanstack/react-query'
-      signature: 'useQuery({ queryKey, queryFn })'
-      notes: ['use isPending for no data yet and isFetching for any in-flight request', 'a custom fetcher must throw on non-2xx; the library does not check res.ok']
-      ref: /docs/framework/react/guides/queries.md
     - id: tsq-query-keys
       name: Query keys
       summary: array keys that must include every variable the queryFn uses, hashed deterministically
@@ -101,12 +80,6 @@ groups:
       signature: 'queryOptions({ queryKey, queryFn, staleTime })'
       notes: ['define one function per resource, e.g. incidentsOptions(mode), in a shared module', 'use `.queryKey` for setQueryData; add per-component `select` after spreading', 'infinite lists use infiniteQueryOptions']
       ref: /docs/framework/react/guides/query-options.md
-    - id: tsq-select
-      name: select for derived data
-      summary: transform or pick from cached data per component without changing the cache, e.g. a metrics badge count
-      lenses: [perf]
-      notes: ['keep select stable (module function or useCallback) to avoid recompute', 'one cached list can feed both the list and the badge']
-      ref: /docs/framework/react/guides/query-options.md
   - id: tsq-suspense
     title: Suspense queries
     level: intermediate
@@ -120,14 +93,6 @@ groups:
       import: '@tanstack/react-query'
       signature: 'useSuspenseQuery(queryOptions(...))'
       notes: ['no `enabled` and no `placeholderData`; wrap key changes in startTransition to avoid fallback flashes', 'several suspense queries in one component run in series, so use useSuspenseQueries']
-      ref: /docs/framework/react/guides/suspense.md
-    - id: tsq-error-reset
-      name: QueryErrorResetBoundary
-      summary: resets failed queries when an error boundary retries
-      lenses: [reliability]
-      import: '@tanstack/react-query'
-      signature: useQueryErrorResetBoundary
-      notes: ['errors reach a boundary only when the query has no cached data']
       ref: /docs/framework/react/guides/suspense.md
 - title: Polling, mutations and prefetch
   sections:
@@ -150,13 +115,6 @@ groups:
     requires: [tsq-queries]
     ref: /docs/framework/react/guides/optimistic-updates.md
     entries:
-    - id: tsq-use-mutation
-      name: useMutation
-      summary: runs a write with mutate/mutateAsync and lifecycle callbacks onMutate, onError, onSuccess, onSettled
-      lenses: [best-practice]
-      import: '@tanstack/react-query'
-      signature: 'useMutation({ mutationFn, onMutate, onError, onSettled })'
-      ref: /docs/framework/react/guides/mutations.md
     - id: tsq-optimistic-ui
       name: Optimistic update via variables
       summary: render the pending `variables` while isPending; no cache edits and no rollback
@@ -202,17 +160,5 @@ groups:
       name: No dehydrate or HydrationBoundary at runtime
       summary: with `output: 'export'` there is no request-time server, so skip server prefetch and hydration; fetch on the client
       lenses: [best-practice, reliability]
-      notes: ['build-time prefetch would freeze data into HTML; avoid it for live incident data', 'all fetching happens in client components, so first paint shows the Suspense or loading state', 'set a staleTime so cached data is not refetched right after mount']
-      ref: /docs/framework/react/guides/ssr.md
-    - id: tsq-relative-urls
-      name: Relative URLs in queryFn
-      summary: queryFn calls the same-origin API with relative paths; throw on non-2xx so errors reach the retry logic
-      lenses: [reliability]
-      notes: ['a basePath or sub-path deploy needs the prefix on every fetch URL', 'at scale, set retry and retryDelay in defaultOptions so failures do not multiply load']
-      ref: /docs/framework/react/guides/query-retries.md
-    - id: tsq-hydration-pitfalls
-      name: Hydration and serialization pitfalls
-      summary: only relevant if SSR is ever added; never JSON.stringify dehydrated state into HTML (XSS)
-      lenses: [security]
-      notes: ['use devalue or serialize-javascript for dehydrated state', 'initialData never overwrites existing cache data']
+      notes: ['build-time prefetch would freeze data into HTML; avoid it for live incident data', 'queryFn uses relative URLs and must throw on non-2xx; all fetching happens in client components, so first paint shows the Suspense or loading state', 'set a staleTime so cached data is not refetched right after mount']
       ref: /docs/framework/react/guides/ssr.md

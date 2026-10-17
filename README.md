@@ -17,6 +17,8 @@
 
 ---
 
+<p align="center"><img src="docs/screenshots/homepage.jpg" alt="SixthSense homepage: Every London bus, a second pair of eyes" width="900"></p>
+
 ## The problem
 
 London has 25,000 bus drivers, and TfL's goal is that no one is killed on or by a London bus by 2030 ([TfL, 2018](https://tfl.gov.uk/info-for/media/press-releases/2018/october/london-s-bus-network-to-meet-new-world-leading-bus-safety-standard)).
@@ -56,6 +58,14 @@ A 60-second walk through:
 3. **Act.** Nudge the driver, open the report, or follow the bus.
 4. **The report.** Before, prediction, what happened, outcome. Sign it off or send it to the garage.
 5. **Coaching.** Each route gets one card: the most common hazard and one habit to try.
+
+### Screens
+
+| Live map: only the buses that need a look | One bus: clip, prediction, actions |
+|---|---|
+| ![Live map of London buses with 7 numbered buses that need a look](docs/screenshots/live-map.jpg) | ![A selected bus on route 55 with its stand-in clip and actions](docs/screenshots/bus.jpg) |
+| **Near-miss reports inbox** | **A report: before, prediction, what happened, outcome** |
+| ![Near-miss reports inbox with hazard, place and outcome](docs/screenshots/reports.jpg) | ![A near-miss report with the clip, gap chart and outcome](docs/screenshots/report.jpg) |
 
 ---
 

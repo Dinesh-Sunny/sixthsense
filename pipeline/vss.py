@@ -85,7 +85,7 @@ class VSS:
             return json.loads(txt) if txt else None
 
     # ---- retrieval ----
-    def search(self, query, camera_id=None, top_k=20, min_similarity=0.3, llm_top_n=0, **extra):
+    def search(self, query, camera_id=None, top_k=20, min_similarity=0.3, llm_top_n=1, **extra):
         body = {"query": query, "top_k": top_k, "min_similarity": min_similarity,
                 "llm_top_n": llm_top_n, "include_public": True}
         if camera_id:

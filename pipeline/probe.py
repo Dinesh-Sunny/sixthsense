@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from vss import VSS, first
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "fixtures")
+os.makedirs(OUT, exist_ok=True)
 
 
 def shape(x, depth=0):

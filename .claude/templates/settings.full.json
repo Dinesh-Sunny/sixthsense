@@ -1,0 +1,816 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "defaultMode": "default",
+    "allow": [
+      "Bash(git status *)",
+      "Read(./src/**)",
+      "WebFetch(domain:example.com)",
+      "mcp__github__*",
+      "Agent(Explore)"
+    ],
+    "ask": [
+      "Bash(git push *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Bash(sudo *)"
+    ],
+    "additionalDirectories": [
+      "../shared-lib"
+    ],
+    "disableBypassPermissionsMode": "disable",
+    "disableAutoMode": "disable"
+  },
+  "disableAutoMode": "disable",
+  "autoMode": {
+    "environment": [
+      "$defaults",
+      "Trusted repo: github.com/{{org}}/{{repo}}"
+    ],
+    "allow": [
+      "$defaults"
+    ],
+    "soft_deny": [
+      "$defaults"
+    ],
+    "hard_deny": [
+      "$defaults",
+      "Never touch production databases"
+    ],
+    "classifyAllShell": false
+  },
+  "useAutoModeDuringPlan": false,
+  "skipDangerousModePermissionPrompt": false,
+  "sandbox": {
+    "enabled": true,
+    "enabledPlatforms": [
+      "macos",
+      "linux"
+    ],
+    "failIfUnavailable": false,
+    "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": true,
+    "excludedCommands": [
+      "docker",
+      "git"
+    ],
+    "ignoreViolations": {
+      "*": [
+        "/tmp"
+      ]
+    },
+    "enableWeakerNetworkIsolation": false,
+    "enableWeakerNestedSandbox": false,
+    "allowAppleEvents": false,
+    "filesystem": {
+      "allowWrite": [
+        "~/.cache"
+      ],
+      "denyWrite": [
+        "./.git/hooks"
+      ],
+      "denyRead": [
+        "~/.ssh"
+      ],
+      "allowRead": [
+        "~/.ssh/known_hosts"
+      ],
+      "disabled": false
+    },
+    "network": {
+      "allowedDomains": [
+        "registry.npmjs.org",
+        "*.github.com"
+      ],
+      "deniedDomains": [
+        "evil.example.com"
+      ],
+      "allowLocalBinding": true,
+      "allowUnixSockets": [
+        "/var/run/docker.sock"
+      ],
+      "allowAllUnixSockets": false,
+      "allowMachLookup": [],
+      "httpProxyPort": 8888,
+      "socksProxyPort": 8889,
+      "strictAllowlist": false,
+      "tlsTerminate": {
+        "caCertPath": "~/.certs/ca.pem",
+        "caKeyPath": "~/.certs/ca.key"
+      }
+    },
+    "credentials": {
+      "files": [
+        "~/.npmrc"
+      ],
+      "envVars": [
+        "GITHUB_TOKEN"
+      ],
+      "allowPlaintextInject": false
+    },
+    "ripgrep": {
+      "command": "/opt/homebrew/bin/rg",
+      "args": [
+        "--hidden"
+      ]
+    }
+  },
+  "skipWebFetchPreflight": false,
+  "hooks": {
+    "Setup": [
+      {
+        "matcher": "init|maintenance",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact|fork",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "InstructionsLoaded": [
+      {
+        "matcher": "session_start|nested_traversal|path_glob_match|include|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "UserPromptExpansion": [
+      {
+        "matcher": "plan|review",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Edit|Write|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git push *)",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-bash.sh",
+            "statusMessage": "Checking push"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/scripts/check.js",
+              "--file"
+            ]
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PermissionDenied": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "http://localhost:8080/hooks/post-tool-use",
+            "timeout": 30,
+            "headers": {
+              "Authorization": "Bearer $HOOK_TOKEN"
+            },
+            "allowedEnvVars": [
+              "HOOK_TOKEN"
+            ]
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "mcp_tool",
+            "server": "{{mcp-server-name}}",
+            "tool": "security_scan",
+            "input": {
+              "file_path": "${tool_input.file_path}"
+            }
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "asyncRewake": true
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PostToolBatch": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "code-reviewer|debugger",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "code-reviewer|debugger",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "Verify the subagent's claimed changes exist and tests pass. Input: $ARGUMENTS",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
+    "TaskCreated": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt|idle_prompt|agent_needs_input|agent_completed",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "MessageDisplay": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Given this context: $ARGUMENTS. Did Claude finish every requested task and verify it? Answer JSON {\"ok\": true|false, \"reason\": \"...\"}.",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "matcher": "rate_limit|overloaded|server_error|unknown",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PreModelSwitch": [
+      {
+        "matcher": ".*opus.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PostModelSwitch": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "ConfigChange": [
+      {
+        "matcher": "user_settings|project_settings|local_settings|policy_settings|skills",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "CwdChanged": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "DirectoryAdded": [
+      {
+        "matcher": "slash_command|register_repo_root",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "FileChanged": [
+      {
+        "matcher": ".envrc|.env",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "WorktreeCreate": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'WorktreeCreate replaces git worktree creation: print the new worktree path on stdout' >&2; exit 1",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "WorktreeRemove": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Elicitation": [
+      {
+        "matcher": "{{mcp-server-name}}",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "ElicitationResult": [
+      {
+        "matcher": "{{mcp-server-name}}",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "clear|resume|logout|prompt_input_exit|other",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-event.sh",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ]
+  },
+  "disableAllHooks": false,
+  "allowedHttpHookUrls": [
+    "http://localhost:*"
+  ],
+  "httpHookAllowedEnvVars": [
+    "HOOK_TOKEN"
+  ],
+  "statusLine": {
+    "type": "command",
+    "command": "\"${CLAUDE_PROJECT_DIR:-.}\"/.claude/hooks/statusline.sh",
+    "padding": 0,
+    "refreshInterval": 30,
+    "hideVimModeIndicator": false
+  },
+  "subagentStatusLine": {
+    "type": "command",
+    "command": "\"${CLAUDE_PROJECT_DIR:-.}\"/.claude/hooks/statusline.sh"
+  },
+  "fileSuggestion": {
+    "type": "command",
+    "command": "{{path/to/file-suggest.sh}}"
+  },
+  "footerLinksRegexes": [],
+  "prUrlTemplate": "https://{host}/{owner}/{repo}/pull/{number}",
+  "model": "opus",
+  "availableModels": [
+    "opus",
+    "sonnet",
+    "haiku"
+  ],
+  "fallbackModel": [
+    "sonnet"
+  ],
+  "modelOverrides": {},
+  "advisorModel": "opus",
+  "effortLevel": "high",
+  "alwaysThinkingEnabled": true,
+  "showThinkingSummaries": false,
+  "fastMode": false,
+  "fastModePerSessionOptIn": true,
+  "agent": "{{agent-name-for-main-thread}}",
+  "teammateMode": "auto",
+  "teammateDefaultModel": null,
+  "autoMemoryEnabled": true,
+  "autoMemoryDirectory": "~/.claude/my-project-memory",
+  "claudeMdExcludes": [
+    "**/vendor/**/CLAUDE.md"
+  ],
+  "autoCompactEnabled": true,
+  "fileCheckpointingEnabled": true,
+  "cleanupPeriodDays": 30,
+  "plansDirectory": "docs/plans",
+  "includeGitInstructions": true,
+  "includeCoAuthoredBy": true,
+  "attribution": {
+    "commit": "Co-Authored-By: Claude <noreply@anthropic.com>",
+    "pr": "🤖 Generated with Claude Code",
+    "sessionUrl": true
+  },
+  "respectGitignore": true,
+  "language": "english",
+  "outputStyle": "Senior Engineer",
+  "skillOverrides": {
+    "project-conventions": "on"
+  },
+  "skillListingMaxDescChars": 1536,
+  "skillListingBudgetFraction": 0.01,
+  "disableSkillShellExecution": false,
+  "disableBundledSkills": false,
+  "disableWorkflows": false,
+  "workflowKeywordTriggerEnabled": true,
+  "workflowSizeGuideline": "medium",
+  "enabledPlugins": {
+    "{{plugin}}@{{marketplace}}": true
+  },
+  "extraKnownMarketplaces": {
+    "{{marketplace}}": {
+      "source": {
+        "source": "github",
+        "repo": "{{org}}/{{repo}}"
+      }
+    }
+  },
+  "pluginConfigs": {},
+  "skippedMarketplaces": [],
+  "skippedPlugins": [],
+  "enableAllProjectMcpServers": false,
+  "enabledMcpjsonServers": [
+    "{{server}}"
+  ],
+  "disabledMcpjsonServers": [
+    "example-stdio"
+  ],
+  "disableClaudeAiConnectors": false,
+  "worktree": {
+    "baseRef": "fresh",
+    "bgIsolation": "worktree",
+    "sparsePaths": [
+      "src",
+      "packages/shared"
+    ],
+    "symlinkDirectories": [
+      "node_modules"
+    ]
+  },
+  "env": {
+    "BASH_DEFAULT_TIMEOUT_MS": "120000",
+    "BASH_MAX_TIMEOUT_MS": "600000",
+    "MCP_TIMEOUT": "30000",
+    "MAX_MCP_OUTPUT_TOKENS": "25000",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "32000",
+    "ENABLE_TOOL_SEARCH": "auto",
+    "DISABLE_TELEMETRY": "0"
+  },
+  "apiKeyHelper": "{{path/to/print-api-key.sh}}",
+  "awsAuthRefresh": "aws sso login --profile {{profile}}",
+  "awsCredentialExport": "{{path/to/aws-creds.sh}}",
+  "gcpAuthRefresh": "gcloud auth application-default login",
+  "otelHeadersHelper": "{{path/to/otel-headers.sh}}",
+  "forceLoginMethod": "claudeai",
+  "forceLoginOrgUUID": "{{org-uuid}}",
+  "forceLoginGatewayUrl": "https://{{gateway}}",
+  "processWrapper": "{{corp-launcher}}",
+  "autoUpdatesChannel": "stable",
+  "minimumVersion": "2.1.0",
+  "theme": "auto",
+  "tui": "default",
+  "viewMode": "default",
+  "verbose": false,
+  "editorMode": "normal",
+  "vimInsertModeRemaps": {
+    "jk": "<Esc>"
+  },
+  "spinnerVerbs": {
+    "mode": "append",
+    "verbs": [
+      "Shipping",
+      "Refactoring"
+    ]
+  },
+  "spinnerTipsEnabled": true,
+  "spinnerTipsOverride": {
+    "excludeDefault": false,
+    "tips": [
+      "Run /plan before big changes"
+    ]
+  },
+  "showTurnDuration": true,
+  "terminalProgressBarEnabled": true,
+  "prefersReducedMotion": false,
+  "syntaxHighlightingDisabled": false,
+  "axScreenReader": false,
+  "autoScrollEnabled": true,
+  "wheelScrollAccelerationEnabled": true,
+  "emojiCompletionEnabled": true,
+  "externalEditorContext": false,
+  "diffTool": "auto",
+  "autoConnectIde": false,
+  "autoInstallIdeExtension": true,
+  "defaultShell": "bash",
+  "respondToBashCommands": true,
+  "askUserQuestionTimeout": "never",
+  "showClearContextOnPlanAccept": false,
+  "awaySummaryEnabled": true,
+  "permissionExplainerEnabled": true,
+  "preferredNotifChannel": "auto",
+  "voice": {
+    "enabled": false,
+    "mode": "hold",
+    "autoSubmit": false
+  },
+  "voiceEnabled": false,
+  "feedbackSurveyRate": 0.05,
+  "companyAnnouncements": [
+    "Welcome to {{PROJECT_NAME}}: read CLAUDE.md first"
+  ],
+  "enableArtifact": true,
+  "disableArtifact": false,
+  "disableRemoteControl": false,
+  "remoteControlAtStartup": false,
+  "agentPushNotifEnabled": false,
+  "inputNeededNotifEnabled": false,
+  "disableDeepLinkRegistration": "disable",
+  "wslInheritsWindowsSettings": false,
+  "//": "TEMPLATE ONLY, not loaded. Every non-managed settings key with an EXAMPLE value; {{...}} marks a stub. Copy keys selectively: project-wide → .claude/settings.json, personal → .claude/settings.local.json or ~/.claude/settings.json. Several values here (apiKeyHelper, forceLogin*, sandbox.enabled, model ...) change behavior or break auth if copied blindly. See ../SETTINGS_REFERENCE.md.",
+  "allowedMcpServers": [
+    {
+      "serverName": "github"
+    }
+  ],
+  "deniedMcpServers": [
+    {
+      "serverName": "blocked-server"
+    }
+  ]
+}

@@ -1,0 +1,924 @@
+stack: freellmapi
+version: "0.13.4"
+docs_base: https://github.com/tashfeenahmed/freellmapi
+source: github.com/tashfeenahmed/freellmapi at tag v0.13.4 (docs/en + server/src, cloned)
+fetched: 2026-10-05
+verified: 2026-10-05
+toc:
+- index: 'https://api.github.com/repos/tashfeenahmed/freellmapi/git/trees/v0.13.4?recursive=1'
+  match: '/blob/v0\.13\.4/docs/en/.*\.md$'
+  base: 'https://github.com/tashfeenahmed/freellmapi/blob/v0.13.4'
+groups:
+- title: AI tooling
+  sections:
+  - id: ai-tooling
+    title: Repo-shipped AI tooling
+    level: basic
+    requires: []
+    ref: /blob/v0.13.4/docs/en/clients/01-agent-clients.md
+    entries:
+    - id: mcp-server
+      name: 'Gateway MCP server'
+      summary: 'Streamable-HTTP MCP endpoint on the gateway itself for diagnostics, routing control and one-shot inference.'
+      lenses: [composability, security]
+      signature: 'POST /mcp'
+      returns: 'JSON-RPC tools: ask_freellmapi, healthcheck, list_models, provider_health, usage_summary, routing_info, set_routing_strategy, cache_stats, compression_stats'
+      options:
+      - {name: 'enable_mcp', type: 'setting', default: '"0"', desc: 'Off on fresh installs (403 until enabled); toggle with PUT /api/settings/enable-mcp {"enabled":true}.'}
+      - {name: 'MCP_INFERENCE_DEFAULT_MODEL', type: 'env', default: 'auto', desc: 'Model used by ask_freellmapi when the call omits `model`; at most 256 chars.'}
+      - {name: 'MCP_INFERENCE_TIMEOUT_MS', type: 'env', default: '120000', desc: 'ask_freellmapi timeout; integer 1000..300000, anything else falls back to the default.'}
+      notes:
+      - 'auth is the unified API key as Bearer or x-api-key, same as /v1'
+      - 'set_routing_strategy mutates server state'
+      ref: /blob/v0.13.4/server/src/routes/mcp.ts
+    - id: openapi-viewer
+      name: 'OpenAPI viewer'
+      summary: 'Unauthenticated interactive viewer and JSON spec covering the /v1 proxy endpoints (not the /api admin routes).'
+      lenses: [typing-dx]
+      signature: 'GET /v1/docs'
+      returns: 'HTML viewer; GET /v1/openapi.json returns the hand-written spec'
+      notes:
+      - 'spec is hand-maintained so it can lag the source'
+      ref: /blob/v0.13.4/server/src/routes/docs.ts
+    - id: no-agent-docs
+      name: 'llms.txt, AGENTS.md, skills'
+      summary: 'The repo ships no llms.txt, AGENTS.md or skills; the docs/en tree and server/src are the references.'
+      lenses: [best-practice]
+      ref: /tree/v0.13.4
+- title: Inference surface
+  sections:
+  - id: inference-api
+    title: OpenAI-compatible /v1
+    level: basic
+    requires: []
+    ref: /blob/v0.13.4/docs/en/api/01-rest-api.md
+    entries:
+    - id: chat-completions
+      name: 'Chat completions'
+      summary: 'OpenAI-compatible endpoint; point any OpenAI client at `<host>/v1` with the unified key as Bearer.'
+      lenses: [reuse, composability]
+      signature: 'POST /v1/chat/completions'
+      params:
+      - {name: 'model', type: 'string', default: null, desc: 'Concrete model id, `auto` (active chain), `auto:<profile|strategy>`, or `fusion`.'}
+      - {name: 'stream', type: 'bool', default: 'false', desc: 'SSE chunks incl. delta.tool_calls; Idempotency-Key is ignored for streams.'}
+      returns: 'OpenAI chat completion; every response carries X-Routed-Via, plus X-Fallback-* headers after failover'
+      notes:
+      - 'auth key is the stable freellmapi-<48hex> value from GET /api/settings/api-key; /v1 always requires it'
+      ref: /blob/v0.13.4/docs/en/api/01-rest-api.md
+    - id: auto-profile-routing
+      name: 'Named chains'
+      summary: 'Route a request through a hand-built profile chain so each role gets its own ordered model list.'
+      lenses: [best-practice, reliability]
+      signature: 'model="auto:<profile>"'
+      returns: 'response served by the first chain entry that succeeds; unknown profile name is a 400, not a silent fallback'
+      notes:
+      - 'chain order is honored only with routing strategy priority'
+      - 'profile name is matched case-insensitively'
+      ref: /blob/v0.13.4/docs/en/fallback/01-named-chains.md
+    - id: auto-strategy-suffix
+      name: 'Strategy suffixes'
+      summary: 'One-off steering that re-ranks every enabled model and ignores chain order; not a way to use a chain.'
+      lenses: [cost, perf]
+      signature: 'model="auto:<smart|fast|cheap|reliable|balanced>"'
+      notes:
+      - 'synonyms resolve too (fastest, speed, smartest, cheapest, budget)'
+      - 'cheap currently equals balanced'
+      - 'string is case-insensitive'
+      ref: /blob/v0.13.4/docs/en/api/01-rest-api.md
+    - id: tool-calling
+      name: 'Tool calling'
+      summary: 'OpenAI-style tools round-trip through every provider; Gemini is translated to functionDeclarations and back.'
+      lenses: [reliability, typing-dx]
+      signature: 'tools=[...], tool_choice=auto|required|{function}'
+      options:
+      - {name: 'VALIDATE_TOOL_ARGUMENTS', type: 'env', default: 'off', desc: '`1` fails over when returned arguments violate the declared schema; watch X-Fallback-Trail for invalid_tool_arguments.'}
+      returns: 'assistant tool_calls (or delta.tool_calls when streaming) then finish_reason tool_calls'
+      notes:
+      - 'argument repair already happens without the flag'
+      ref: /blob/v0.13.4/docs/en/api/01-rest-api.md
+    - id: model-listing
+      name: 'Model listing'
+      summary: 'Cheap preflight that lists the whole catalog with a live answer to "would a request work right now".'
+      lenses: [observability, reliability]
+      signature: 'GET /v1/models?available=true&execution_status=ready'
+      params:
+      - {name: 'available', type: 'bool', default: 'false', desc: 'Aliases connected, ready; narrows catalog rows to models that can serve now.'}
+      - {name: 'execution_status', type: 'ready|needsKey|exhausted', default: null, desc: 'Filters catalog rows (case-insensitive); unknown value filters nothing; auto, fusion and auto:<profile> are always listed.'}
+      returns: 'catalog entries each with execution_status; exhausted means every matching key is cooling down or out of window'
+      notes:
+      - 'a key with status unknown counts as ready because probing is lazy'
+      ref: /blob/v0.13.4/docs/en/api/01-rest-api.md
+    - id: routing-trace-headers
+      name: 'Trace headers'
+      summary: 'Response headers that say which provider answered and which hops failed first, readable from the SDK raw response.'
+      lenses: [observability]
+      signature: 'X-Routed-Via, X-Fallback-Attempts, X-Fallback-Trail, X-Fallback-Detail'
+      returns: 'X-Routed-Via=<platform>/<model> (`cache` or `idempotency` on replay); Trail lists up to 10 failed hops as `platform/model keyN=class`'
+      options:
+      - {name: 'FALLBACK_DETAIL_HEADER', type: 'env', default: 'off', desc: '`1` adds X-Fallback-Detail with per-hop `t=start+durationms msg=...`; settings key expose_fallback_detail_header wins.'}
+      notes:
+      - 'only failed hops appear (the serving hop is recorded after headers)'
+      - 'non-ASCII model ids are percent-encoded'
+      ref: /blob/v0.13.4/docs/en/api/01-rest-api.md
+    - id: per-request-headers
+      name: 'Per-request knobs'
+      summary: 'Request headers that bias or bypass cache, compression and routing weights for a single call.'
+      lenses: [cost, perf]
+      signature: 'X-FreeLLM-Cache, X-FreeLLM-Compress, X-FreeLLM-Task-Type'
+      options:
+      - {name: 'X-FreeLLM-Cache', type: 'on|off', default: null, desc: 'Force or bypass the response cache for this call (also accepts yes/no/1/0, Cache-Control no-store/no-cache means off).'}
+      - {name: 'X-FreeLLM-Compress', type: 'off|on|lossless|standard|aggressive', default: null, desc: 'Can only lower the configured mode, never raise it or override a global off.'}
+      - {name: 'X-FreeLLM-Task-Type', type: 'code|chat|auto', default: 'auto', desc: 'Soft bias of 30% of one routing axis; fastest, reliable and custom strategies ignore it.'}
+      returns: 'X-FreeLLM-Compress response header reports the effective mode and `saved~=` tokens'
+      ref: /blob/v0.13.4/docs/en/api/01-rest-api.md
+    - id: idempotency-key
+      name: 'Idempotency'
+      summary: 'Opt-in header that makes a retried non-streaming completion replay the stored answer at zero provider cost.'
+      lenses: [reliability]
+      signature: 'Idempotency-Key header'
+      options:
+      - {name: 'IDEMPOTENCY_TTL_MS', type: 'env', default: '86400000', desc: 'Replay window for completed claims (24 h).'}
+      returns: 'replay has X-Routed-Via idempotency; same key with a different fingerprint is 409 idempotency_key_conflict'
+      notes:
+      - 'key at most 255 bytes'
+      - 'only SHA-256 stored'
+      - 'finish_reason length is not stored'
+      - 'in-flight duplicates both execute'
+      ref: /blob/v0.13.4/docs/en/api/02-idempotency.md
+    - id: fusion-model
+      name: 'Fusion'
+      summary: 'Virtual model that fans a prompt to a panel in parallel and has a judge synthesize one answer.'
+      lenses: [cost, best-practice]
+      signature: 'model="fusion"'
+      notes:
+      - 'panel, judge and strategy are set on the dashboard or per request via the `fusion` field'
+      - 'every sub-call spends quota'
+      ref: /blob/v0.13.4/docs/en/api/01-rest-api.md
+    - id: other-wire-formats
+      name: 'Other surfaces'
+      summary: 'The same chain also answers Responses, Anthropic and Gemini wire formats, Ollama emulation, embeddings and media.'
+      lenses: [composability]
+      signature: '/v1/responses, /v1/messages, /v1beta'
+      ref: /blob/v0.13.4/docs/en/clients/01-agent-clients.md
+- title: Routing and failover
+  sections:
+  - id: routing-engine
+    title: Strategy and chain order
+    level: intermediate
+    requires: [inference-api]
+    ref: /blob/v0.13.4/docs/en/architecture/01-routing-and-bandit-scoring.md
+    entries:
+    - id: routing-strategy-priority
+      name: 'Routing strategy'
+      summary: 'Global switch between manual chain order and bandit-scored presets; only `priority` honors a chain as written.'
+      lenses: [reliability]
+      signature: 'PUT /api/fallback/routing {strategy}'
+      params:
+      - {name: 'strategy', type: 'priority|balanced|smartest|fastest|reliable|custom', default: null, desc: 'priority = manual order plus 429 penalty (3 positions per 429, cap 10) and sticky sessions.'}
+      - {name: 'weights', type: '{reliability,speed,intelligence}', default: null, desc: 'Non-negative; used by custom (all-zero is a 400).'}
+      - {name: 'keySelectionStrategy', type: 'auto|least-remaining', default: null, desc: 'Which key of one platform to use; orthogonal to strategy.'}
+      - {name: 'cooldownCeilingMs', type: 'int|null', default: null, desc: 'Cap on automatic cooldowns, 60000..86400000; null removes the cap.'}
+      returns: 'GET /api/fallback/routing returns {strategy, presets, weights, exploreEnabled, keySelectionStrategy, ...}'
+      notes:
+      - 'same keys exist in declarative config routing'
+      ref: /blob/v0.13.4/server/src/routes/fallback.ts
+    - id: sticky-sessions
+      name: 'Sticky sessions'
+      summary: 'A conversation stays pinned to the model that served it for 30 minutes, so chain order is not re-evaluated.'
+      lenses: [reliability]
+      notes:
+      - 'in-memory map in the proxy route, lost on restart'
+      - 'explains why a chain''s first entry may be skipped on turn two'
+      ref: /blob/v0.13.4/server/src/routes/proxy.ts
+    - id: model-routing-overrides
+      name: 'Weight overrides'
+      summary: 'Per-model score multipliers for the automatic router; 0 means auto never picks the model.'
+      lenses: [best-practice]
+      signature: 'MODEL_ROUTING_OVERRIDES={"<modelId>": 0..2}'
+      notes:
+      - 'manual priority can still pick a 0 model'
+      - 'matches by model id across platforms'
+      - 'unmatched ids are silently ignored'
+      ref: /blob/v0.13.4/docs/en/env/01-variables.md
+    - id: task-weight-share
+      name: 'Task weight share'
+      summary: 'Tunes how far X-FreeLLM-Task-Type shifts routing weight between speed and intelligence.'
+      lenses: [cost, perf]
+      signature: 'PUT /api/settings/task-weight-share {share}'
+      params:
+      - {name: 'share', type: 'float 0..1 | null', default: '0.3', desc: '0 disables the bias; null clears back to the default; effective next request.'}
+      ref: /blob/v0.13.4/server/src/routes/settings.ts
+  - id: failover-limits
+    title: Failover budgets and limits
+    level: intermediate
+    requires: [inference-api]
+    ref: /blob/v0.13.4/docs/en/env/01-variables.md
+    entries:
+    - id: fallback-time-budget
+      name: 'Failover budget'
+      summary: 'Soft wall-clock budget for failover; the first attempt and one retry always run before it can stop anything.'
+      lenses: [reliability, perf]
+      signature: 'FALLBACK_TIME_BUDGET_MS=45000'
+      options:
+      - {name: 'FALLBACK_TIME_BUDGET_MS', type: 'env', default: '45000', desc: '0 disables the budget and adaptive widening; settings key fallback_time_budget_ms wins.'}
+      - {name: 'SLOW_ENDPOINT_BUFFER_MS', type: 'env', default: '10000', desc: 'Padding on historical P95 TTFB; effective budget is max(base, P95+buffer) capped at 3x base.'}
+      - {name: 'TTFB_BUDGET_DISABLED', type: 'env', default: 'off', desc: '`1` turns off adaptive widening.'}
+      notes:
+      - 'it can also cancel a first-byte wait, so a client timeout must exceed 3x budget (135 s)'
+      ref: /blob/v0.13.4/server/src/lib/fallback-loop.ts
+    - id: stream-stall-timeout
+      name: 'Provider timeouts'
+      summary: 'Per-provider first-byte timeout plus a mid-stream stall watchdog that fails over before any output was sent.'
+      lenses: [reliability]
+      signature: 'PROVIDER_TIMEOUT_<PLATFORM>=ms'
+      options:
+      - {name: 'PROVIDER_TIMEOUT_<PLATFORM>', type: 'env', default: '60000', desc: 'Chat HTTP timeout and first-byte grace; NVIDIA 180000; Ollama Cloud, AI Horde, custom 120000; 0 disables; read at startup.'}
+      - {name: 'PROVIDER_STREAM_STALL_TIMEOUT_MS', type: 'env', default: '90000', desc: 'Silence after the first byte; per-platform variant _<PLATFORM> wins; 0 disables.'}
+      notes:
+      - 'stall budget excludes time-to-first-byte'
+      - 'after output was sent a stall ends the stream with an error frame'
+      ref: /blob/v0.13.4/server/src/lib/provider-timeout.ts
+    - id: failure-guards
+      name: 'Request guards'
+      summary: 'Two hard per-request limits, both off by default, that stop wasteful retries or oversized prompts.'
+      lenses: [reliability, cost]
+      signature: 'PUT /api/settings/guardrails {requestMaxTokensBudget, maxConsecutiveUpstreamFails}'
+      options:
+      - {name: 'MAX_CONSECUTIVE_UPSTREAM_FAILS', type: 'env', default: '0', desc: 'N consecutive upstream failures in one request end the chain with a 503; 0 = off.'}
+      - {name: 'REQUEST_MAX_TOKENS_BUDGET', type: 'env', default: '0', desc: 'Estimated input + max_tokens above this is a 413 before any provider; no max_tokens gets capped to the remainder.'}
+      ref: /blob/v0.13.4/docs/en/env/01-variables.md
+    - id: degraded-mode
+      name: 'Degraded mode'
+      summary: 'Gateway flips to a degraded state when too few providers hold a usable key, disabling bandit exploration.'
+      lenses: [reliability]
+      signature: 'DEGRADED_HEALTHY_RATIO=0.5'
+      options:
+      - {name: 'DEGRADED_HEALTHY_RATIO', type: 'env', default: '0.5', desc: 'Fraction of providers needing at least one usable key.'}
+      - {name: 'DEGRADED_MIN_PROVIDERS', type: 'env', default: '3', desc: 'Minimum enabled providers before the ratio is evaluated.'}
+      - {name: 'DEGRADED_ENTRY_GRACE_MS', type: 'env', default: '60000', desc: 'Time below threshold before entering degraded.'}
+      - {name: 'DEGRADED_EXIT_GRACE_MS', type: 'env', default: '120000', desc: 'Time above threshold before leaving degraded.'}
+      returns: 'GET /api/health `degradation` {healthyProviders, totalProviders, ratio, state, degradedAt}'
+      ref: /blob/v0.13.4/docs/en/architecture/04-degraded-mode-and-failover.md
+    - id: proxy-rate-limit
+      name: 'Rate limits'
+      summary: 'Per-client-IP request caps on /v1 and /api; clients behind one IP share a bucket.'
+      lenses: [reliability, security]
+      signature: 'PROXY_RATE_LIMIT_RPM=120'
+      options:
+      - {name: 'PROXY_RATE_LIMIT_RPM', type: 'env', default: '120', desc: 'Requests per minute per client IP on /v1; 0 disables.'}
+      - {name: 'ADMIN_RATE_LIMIT_RPM', type: 'env', default: '600', desc: 'Requests per minute per client IP on /api; 0 disables.'}
+      notes:
+      - 'with TRUST_PROXY the limiter keys on the left-most untrusted X-Forwarded-For entry'
+      ref: /blob/v0.13.4/server/src/middleware/rateLimit.ts
+- title: Admin API and declarative config
+  sections:
+  - id: admin-api
+    title: Admin API (/api, session Bearer)
+    level: intermediate
+    requires: []
+    ref: /blob/v0.13.4/server/src/app.ts
+    entries:
+    - id: admin-login
+      name: 'Admin login'
+      summary: 'Exchange the dashboard account for a 30-day session token used on every other /api call.'
+      lenses: [security]
+      signature: 'POST /api/auth/login {email, password}'
+      returns: '{token, email}; send as `Authorization: Bearer` or `X-Dashboard-Token`; 5 failures lock the email 15 min (429 + Retry-After)'
+      notes:
+      - 'login only needs non-empty fields, never retry a 401'
+      - 'POST /api/auth/logout deletes the session'
+      ref: /blob/v0.13.4/server/src/routes/auth.ts
+    - id: models-list
+      name: 'Models'
+      summary: 'Bare array of every catalog model with its chain state, used to resolve database ids for chain writes.'
+      lenses: [typing-dx]
+      signature: 'GET /api/models'
+      returns: 'array of {id, platform, modelId, enabled, supportsTools, supportsVision, priority, fallbackEnabled, source, keyCount, ...}'
+      notes:
+      - 'match entries on (platform, modelId)'
+      - 'keyCount counts enabled keys of the platform only'
+      ref: /blob/v0.13.4/server/src/routes/models.ts
+    - id: profiles-crud
+      name: 'Profiles'
+      summary: 'Create, rename or delete named chains; `empty:true` starts with no models instead of a catalog copy.'
+      lenses: [best-practice]
+      signature: 'POST /api/profiles {name, empty}'
+      params:
+      - {name: 'name', type: 'string', default: null, desc: 'At most 20 chars [A-Za-z0-9-_]; reserved auto smart fast cheap budget intelligence speed active default; 409 on case-insensitive duplicate.'}
+      - {name: 'empty', type: 'bool', default: 'false', desc: 'True starts the chain empty and sets auto_include_new_models=0.'}
+      - {name: 'sourceProfileId', type: 'int', default: null, desc: 'Copy another chain''s rows; ignored when empty is true.'}
+      returns: '201 profile row {id, name, type, auto_include_new_models, ...}; GET /api/profiles lists them, DELETE removes (default profile protected)'
+      notes:
+      - 'PUT /api/profiles/:id updates metadata and flags'
+      - 'built-in chains cannot be renamed (403)'
+      ref: /blob/v0.13.4/server/src/routes/profiles.ts
+    - id: profile-auto-include
+      name: 'Backfill flag'
+      summary: 'When true, catalog syncs append new models to the profile; created profiles default to true unless empty.'
+      lenses: [reliability]
+      signature: 'PUT /api/profiles/:id {auto_include_new_models: false}'
+      params:
+      - {name: 'auto_include_new_models', type: 'bool', default: 'true', desc: 'POST with empty:true stores 0; a profile created otherwise stores 1 and gets new models after each sync.'}
+      notes:
+      - 'docs say new profiles start empty; source sets the flag from `empty` only, so trust source'
+      ref: /blob/v0.13.4/server/src/routes/profiles.ts
+    - id: profile-reorder
+      name: 'Chain write'
+      summary: 'Replace a profile''s whole chain in one transaction; the way to set order and per-model enabled.'
+      lenses: [reliability]
+      signature: 'PUT /api/profiles/:id/reorder [{modelDbId, priority, enabled}]'
+      params:
+      - {name: 'modelDbId', type: 'int', default: null, desc: 'models.id from GET /api/models; unknown or duplicate id surfaces as a 500.'}
+      - {name: 'priority', type: 'int', default: null, desc: 'Lower runs first.'}
+      - {name: 'enabled', type: 'bool', default: null, desc: 'false keeps the row but skips it.'}
+      returns: '{success:true}; GET /api/profiles/:id/models returns the rows (enabled as bool) joined to enabled models only'
+      notes:
+      - 'replace-all, so omitted models are removed from the chain'
+      ref: /blob/v0.13.4/server/src/routes/profiles.ts
+    - id: empty-chain-refusal
+      name: 'Empty active chain'
+      summary: 'An active profile with no enabled models answers 400 instead of routing over the whole catalog.'
+      lenses: [reliability]
+      returns: '400 "The active fallback chain ''<name>'' has no enabled models."'
+      notes:
+      - 'applies to plain `auto` only'
+      - 'installs without profiles keep ordinary exhaustion errors'
+      ref: /blob/v0.13.4/docs/en/fallback/01-named-chains.md
+    - id: unified-api-key
+      name: 'Unified key'
+      summary: 'The single Bearer key clients use on /v1; stable across restarts and stored in the DB.'
+      lenses: [security]
+      signature: 'GET /api/settings/api-key'
+      returns: '{apiKey} of the form freellmapi-<48hex>; POST /api/settings/api-key/regenerate rotates it'
+      ref: /blob/v0.13.4/server/src/routes/settings.ts
+    - id: key-health
+      name: 'Key health'
+      summary: 'Per-platform and per-key health counters plus quota and degradation state; check-all forces a slow probe.'
+      lenses: [observability, reliability]
+      signature: 'GET /api/health'
+      returns: '{platforms[{platform, totalKeys, healthyKeys, invalidKeys, errorKeys, unknownKeys, enabledKeys}], keys[], quotaStates, degradation}'
+      notes:
+      - 'POST /api/health/check-all probes every key (forced, slow)'
+      - 'healthyKeys counts disabled keys too'
+      ref: /blob/v0.13.4/server/src/routes/health.ts
+    - id: premium-sync
+      name: 'Forced catalog sync'
+      summary: 'Manual catalog refresh now; works without a license key.'
+      lenses: [reliability]
+      signature: 'POST /api/premium/sync'
+      returns: 'status payload plus sync {ok, action: applied|up_to_date|skipped_older|error, version, tier, counts}'
+      ref: /blob/v0.13.4/server/src/routes/premium.ts
+    - id: feature-readback
+      name: 'Readback'
+      summary: 'Authoritative read of whether optional features are really on, since a DB setting beats the env var.'
+      lenses: [testing, reliability]
+      signature: 'GET /api/cache/stats'
+      returns: 'cache stats {enabled, ttlSeconds, ...}; GET /api/compression/stats returns config.mode'
+      notes:
+      - 'PUT /api/cache/config {enabled: bool|null} flips at runtime, null reverts to env'
+      ref: /blob/v0.13.4/server/src/routes/cache.ts
+  - id: declarative-config
+    title: Declarative startup config
+    level: intermediate
+    requires: [admin-api]
+    ref: /blob/v0.13.4/docs/en/install/01-install.md
+    entries:
+    - id: config-file
+      name: 'Config source'
+      summary: 'JSON applied idempotently after migrations on every boot; the schema is strict so a typo crashes startup.'
+      lenses: [best-practice, typing-dx]
+      signature: 'FREEAPI_CONFIG_PATH=/path/config.json'
+      options:
+      - {name: 'FREEAPI_CONFIG_PATH', type: 'env', default: null, desc: 'Path to the JSON file; must be readable by the container user.'}
+      - {name: 'FREEAPI_CONFIG_JSON', type: 'env', default: null, desc: 'Inline JSON; wins over the path.'}
+      notes:
+      - 'top-level keys admin license keys customProviders models fallback routing'
+      - 'no profiles key'
+      - 'unknown key aborts boot'
+      ref: /blob/v0.13.4/server/src/services/declarative-config.ts
+    - id: config-key-upsert
+      name: 'Key upsert'
+      summary: 'Provider keys are upserted by (platform, label), so repeated boots update instead of duplicating.'
+      lenses: [reliability]
+      signature: 'keys: [{platform, key, label, enabled, baseUrl}]'
+      params:
+      - {name: 'label', type: 'string', default: 'env', desc: 'Identity within the platform; two keys of one platform need distinct labels or the second overwrites the first.'}
+      - {name: 'key', type: 'string', default: null, desc: 'Plaintext, encrypted at rest; missing on a non-keyless platform logs a warning and skips the entry.'}
+      - {name: 'enabled', type: 'bool', default: 'true', desc: 'false stores the key disabled.'}
+      notes:
+      - 'removing an entry never deletes the row'
+      - 'status resets to unknown each boot'
+      - 'placeholder keys are accepted and counted'
+      ref: /blob/v0.13.4/server/src/services/declarative-config.ts
+    - id: config-routing-fallback
+      name: 'Config models and routing'
+      summary: 'Declarative `models`, `fallback` and `routing` entries tune catalog rows, the global chain and strategy.'
+      lenses: [best-practice]
+      signature: 'routing: {strategy, weights, keySelectionStrategy}'
+      options:
+      - {name: 'models', type: '[{platform, modelId, enabled, supportsTools, ...}]', default: null, desc: 'Edits catalog or custom model fields via overrides.'}
+      - {name: 'fallback', type: '[{platform, modelId, priority, enabled}]', default: null, desc: 'Rows of the global fallback_config chain (profile_models rows are added too); named profiles are not configurable here.'}
+      ref: /blob/v0.13.4/server/src/services/declarative-config.ts
+    - id: config-admin-bootstrap
+      name: 'Admin bootstrap'
+      summary: 'Creates the first dashboard account before the listener starts, closing the unauthenticated setup window.'
+      lenses: [security]
+      signature: 'admin: {email, password}'
+      params:
+      - {name: 'password', type: 'string', default: null, desc: 'At least 8 chars; email must be a valid address.'}
+      notes:
+      - 'applied only while no user exists, otherwise a warning, then POST /api/auth/setup answers 409 from the first request'
+      ref: /blob/v0.13.4/docs/en/install/01-install.md
+    - id: config-secrets
+      name: 'Config secrets'
+      summary: 'The config file holds plaintext provider keys and the admin password, so guard it like ENCRYPTION_KEY.'
+      lenses: [security]
+      notes:
+      - 'mount read-only'
+      - 'container drops root to uid 1000 so the file must be readable by it'
+      ref: /blob/v0.13.4/docs/en/install/01-install.md
+    - id: custom-providers
+      name: 'Custom providers'
+      summary: 'Register any OpenAI-compatible endpoint with its models; `endpoint` disambiguates a shared model id.'
+      lenses: [composability]
+      signature: 'customProviders: [{baseUrl, apiKey, label, models}]'
+      params:
+      - {name: 'baseUrl', type: 'url', default: null, desc: 'Endpoint such as http://host.docker.internal:11434/v1; link-local and metadata addresses are always blocked.'}
+      - {name: 'models', type: '[string | {model, displayName, supportsTools, ...}]', default: '[]', desc: 'Models served by the endpoint.'}
+      notes:
+      - 'FREEAPI_BLOCK_PRIVATE_PROVIDER_URLS=true also blocks loopback and private ranges'
+      - 'add `endpoint` in models/fallback entries when two endpoints share an id'
+      ref: /blob/v0.13.4/docs/en/install/01-install.md
+- title: Container and operations
+  sections:
+  - id: container-ops
+    title: Image, health, security
+    level: basic
+    requires: []
+    ref: /blob/v0.13.4/docs/en/deployment/01-docker.md
+    entries:
+    - id: image-tags
+      name: 'Image tags'
+      summary: 'Multi-arch GHCR image with immutable version tags; pin an exact tag rather than `latest`.'
+      lenses: [reliability, security]
+      signature: 'ghcr.io/tashfeenahmed/freellmapi:vX.Y.Z'
+      notes:
+      - 'also latest and sha-<commit>'
+      - 'linux/amd64 and arm64'
+      ref: /blob/v0.13.4/docs/en/deployment/01-docker.md
+    - id: encryption-key
+      name: '`ENCRYPTION_KEY`'
+      summary: '64-hex key that encrypts provider keys at rest (AES-256-GCM); mandatory in production.'
+      lenses: [security]
+      signature: 'ENCRYPTION_KEY=<64 hex>'
+      notes:
+      - 'losing it makes stored keys unreadable'
+      - 'keep it identical across upgrades and backups'
+      ref: /blob/v0.13.4/docs/en/env/02-security-and-keys.md
+    - id: data-volume
+      name: 'Data volume'
+      summary: 'SQLite lives in /app/server/data; the entrypoint starts as root and drops to the node user (1000).'
+      lenses: [reliability]
+      notes:
+      - 'short bind syntax makes a missing host path a directory, use long syntax with create_host_path false'
+      - 'FREEAPI_DB_PATH relocates the DB'
+      ref: /blob/v0.13.4/docker-entrypoint.sh
+    - id: health-probes
+      name: 'Health probes'
+      summary: 'Unauthenticated liveness and readiness probes plus the image''s own HEALTHCHECK.'
+      lenses: [observability, reliability]
+      signature: 'GET /api/ping'
+      returns: 'image HEALTHCHECK uses /api/ping; /livez 200 when DB answers; /readyz 200 only when an upstream is serviceable'
+      notes:
+      - 'a compose healthcheck is redundant'
+      ref: /blob/v0.13.4/server/src/routes/status.ts
+    - id: network-binding
+      name: 'Binding'
+      summary: 'Separate knobs for the in-container listen address, the Docker publish interface and reverse-proxy trust.'
+      lenses: [security]
+      signature: 'HOST_BIND=127.0.0.1'
+      options:
+      - {name: 'HOST', type: 'env', default: '::', desc: 'Listen interface inside the process (dual-stack); falls back to IPv4 when IPv6 is off.'}
+      - {name: 'HOST_BIND', type: 'env', default: '127.0.0.1', desc: 'Docker only; interface the port is published on.'}
+      - {name: 'TRUST_PROXY', type: 'false|true|int|CIDR list', default: 'false', desc: 'Trust X-Forwarded-* from a reverse proxy; needed for real client IPs in rate limits.'}
+      ref: /blob/v0.13.4/docs/en/env/01-variables.md
+    - id: backup-update
+      name: 'Backups and updates'
+      summary: 'Encrypted DB backups to a file or HTTP target plus a manual update checker; restore runs when the DB is missing.'
+      lenses: [reliability]
+      signature: 'FREEAPI_DB_BACKUP_PATH=/path'
+      options:
+      - {name: 'FREEAPI_DB_BACKUP_URL', type: 'env', default: null, desc: 'HTTP(S) target instead of a path; optional bearer FREEAPI_DB_BACKUP_TOKEN.'}
+      - {name: 'FREEAPI_DB_BACKUP_INTERVAL_MS', type: 'env', default: '300000', desc: 'Period between background uploads.'}
+      - {name: 'FREELLMAPI_UPDATE_CHECK', type: 'env', default: 'enabled', desc: '`off` removes the update checker and its outbound requests.'}
+      notes:
+      - 'backup key defaults to ENCRYPTION_KEY'
+      - '/api/backups is the admin API'
+      - 'update is `docker compose pull`'
+      ref: /blob/v0.13.4/docs/en/deployment/02-updates-and-backup.md
+  - id: optional-features
+    title: Off-by-default features
+    level: intermediate
+    requires: [container-ops]
+    ref: /blob/v0.13.4/docs/en/env/01-variables.md
+    entries:
+    - id: response-cache
+      name: 'Response cache'
+      summary: 'Exact-match in-memory LRU for identical requests (streams included); hits cost no provider quota.'
+      lenses: [cost, perf]
+      signature: 'RESPONSE_CACHE=true'
+      options:
+      - {name: 'RESPONSE_CACHE_TTL_SECONDS', type: 'env', default: '3600', desc: 'Freshness window.'}
+      - {name: 'RESPONSE_CACHE_MAX_TEMPERATURE', type: 'env', default: '1.0', desc: 'Only cache requests at or below this temperature.'}
+      - {name: 'RESPONSE_CACHE_PERSIST', type: 'env', default: 'true', desc: 'Writes non-streaming answers (plaintext) to SQLite; set false to keep memory-only.'}
+      notes:
+      - 'DB setting beats env'
+      - 'X-FreeLLM-Cache overrides per request'
+      - 'hits report X-Routed-Via cache'
+      ref: /blob/v0.13.4/docs/en/architecture/03-streaming-pipeline.md
+    - id: prompt-compression
+      name: 'Prompt compression'
+      summary: 'Request-side prompt and context compression that mutates what the model sees; off by default.'
+      lenses: [cost, perf]
+      signature: 'FREELLMAPI_COMPRESSION=off|lossless|standard|aggressive'
+      notes:
+      - 'a request may lower the mode via X-FreeLLM-Compress but not raise it'
+      - 'dashboard setting wins over env'
+      ref: /blob/v0.13.4/docs/en/compression/01-compression-pipeline.md
+    - id: context-handoff
+      name: 'Context handoff'
+      summary: 'Injects a compact summary system message when a session switches models (for example after failover).'
+      lenses: [reliability]
+      signature: 'FREELLMAPI_CONTEXT_HANDOFF=on_model_switch'
+      notes:
+      - 'env only, no runtime toggle'
+      - 'it changes the prompt the next model sees'
+      ref: /blob/v0.13.4/docs/en/clients/01-agent-clients.md
+    - id: request-guardrails
+      name: 'Guardrails'
+      summary: 'Runtime-tunable per-request token ceiling and failover circuit breaker, both off by default.'
+      lenses: [cost, security]
+      signature: 'GET /api/settings/guardrails'
+      returns: '{requestMaxTokensBudget, maxConsecutiveUpstreamFails}; PUT takes either key partially, 0 disables a knob'
+      ref: /blob/v0.13.4/server/src/lib/guardrails.ts
+- title: Catalog and quotas
+  sections:
+  - id: catalog-quotas
+    title: Catalog sync and quota accounting
+    level: advanced
+    requires: [routing-engine]
+    ref: /blob/v0.13.4/docs/en/architecture/05-catalog-sync.md
+    entries:
+    - id: catalog-sync
+      name: 'Signed catalog'
+      summary: 'Models and limits arrive from a signed upstream catalog shortly after boot and every 12 hours.'
+      lenses: [reliability]
+      notes:
+      - 'first sync ~10 s after boot'
+      - 'models newer than bundled migrations exist only after it'
+      - 'premium models reach free tier after a 30-day age gate'
+      ref: /blob/v0.13.4/server/src/services/catalog-sync.ts
+    - id: model-retirement
+      name: 'Upstream retirement'
+      summary: 'A provider EOL disables the model in fallback_config and profile_models while keeping the row.'
+      lenses: [reliability]
+      notes:
+      - 'Inferred: re-applying reorder with enabled:true would undo it, so skip retired models'
+      ref: /blob/v0.13.4/server/src/services/model-state.ts
+    - id: quota-windows
+      name: 'Quota accounting'
+      summary: 'Per (platform, model, key) RPM/RPD/TPM/TPD windows with learned limits, an escalating cooldown ladder and bandit key choice.'
+      lenses: [reliability, cost]
+      ref: /blob/v0.13.4/docs/en/architecture/02-quota-and-cooldown-engine.md
+    - id: request-analytics
+      name: 'Analytics and logs'
+      summary: 'Every request and failover hop is stored with latency percentiles and TTFT; error text is redacted.'
+      lenses: [observability]
+      signature: 'requests, request_attempts'
+      options:
+      - {name: 'REQUEST_ANALYTICS_RETENTION_DAYS', type: 'env', default: '90', desc: 'Age bound; 0 disables the limit.'}
+      - {name: 'REQUEST_ANALYTICS_MAX_ROWS', type: 'env', default: '100000', desc: 'Row cap; 0 disables the limit.'}
+      ref: /blob/v0.13.4/docs/en/architecture/06-observability.md
+- title: Providers and quota engine
+  sections:
+  - id: provider-catalog
+    title: Supported platforms
+    level: intermediate
+    requires: []
+    ref: /blob/v0.13.4/docs/en/providers/01-supported-platforms.md
+    entries:
+    - id: platform-registry
+      name: 'Platform registry'
+      summary: 'The Platform union is the identity source; 43 built-in adapters (10 dedicated, 33 OpenAI-compatible) plus `custom`.'
+      lenses: [reuse, composability]
+      signature: 'shared/types.ts Platform union; server/src/providers/index.ts'
+      notes:
+      - 'sambanova stays in the union for old key rows but is unregistered since V23 (free tier retired)'
+      - 'kilo, ovh and aihorde are registered keyless'
+      - 'cloudflare keys are `account_id:token`'
+      - 'some gateway rosters live only in the hosted catalog, so the count shown in the dashboard is smaller than the union'
+      ref: /blob/v0.13.4/docs/en/providers/01-supported-platforms.md
+    - id: platform-quirks
+      name: 'Per-platform quirks'
+      summary: 'Provider-specific traps the adapters work around: probes, headers, timeouts and wire limits that shape which models can serve.'
+      lenses: [reliability]
+      notes:
+      - 'nvidia pins parallel_tool_calls=false and uses a 180 s timeout'
+      - 'aihorde needs max_tokens >= 16, array-only stop, and has no tools or upstream streaming'
+      - 'routeway and navy need a browser-style User-Agent behind Cloudflare'
+      - 'opencode free roster is locked to its own client since 2026-09 (403) and disabled in the catalog'
+      - 'pollinations and modelscope public /v1/models answers 200 for bad keys, so key validation uses an authenticated probe'
+      ref: /blob/v0.13.4/docs/en/providers/01-supported-platforms.md
+    - id: credit-gateways
+      name: 'Credit-pool gateways'
+      summary: 'ElectronHub and Experiential Labs serve from shared weekly/monthly credit pools, not per-model quotas.'
+      lenses: [cost, reliability]
+      signature: 'electronhub, experiential'
+      notes:
+      - 'electronhub: $0.25 weekly shared credits; key validated via GET /v1/user/me; rejects HTTP-200 proxy-error banners'
+      - 'experiential: 500 shared monthly credits; Claude routes omit fixed-temperature and top-p knobs'
+      - 'adapters never change provider billing; set provider spend controls before enabling top-ups'
+      - 'key import also accepts ELECTRONHUB_API_KEY, EXPERIENTIAL_API_KEY and their aliases'
+      ref: /blob/v0.13.4/docs/en/providers/04-recurring-credit-gateways.md
+    - id: free-tier-limits
+      name: 'Free-tier limitations'
+      summary: 'Documented ceilings of stacking free tiers: top models have the smallest daily caps and quality drops late in the UTC day.'
+      lenses: [reliability, cost]
+      notes:
+      - 'daily caps reset at UTC midnight'
+      - 'no multi-tenant auth: documented as single-user, do not expose to the internet'
+      - 'not supported: /v1/moderations and n > 1'
+      - 'failover is up to 20 attempts within the wall-clock budget'
+      ref: /blob/v0.13.4/docs/en/architecture/00-high-level-index.md
+  - id: quota-cooldowns
+    title: Quotas, cooldowns and key health
+    level: advanced
+    requires: [provider-catalog, routing-engine]
+    ref: /blob/v0.13.4/docs/en/providers/02-quotas-and-cooldowns.md
+    entries:
+    - id: rate-limit-windows
+      name: 'RPM/RPD/TPM/TPD windows'
+      summary: 'Sliding request and token windows per (platform, model, key); in-flight leases count toward the limit.'
+      lenses: [reliability]
+      signature: 'platform:modelId:keyId:rpm|rpd'
+      notes:
+      - 'admitted only while recorded + in-flight < limit'
+      - 'a null limit means unknown, never guessed'
+      - 'daily token checks also derive a cap so one burst cannot spend a day in seconds'
+      ref: /blob/v0.13.4/docs/en/providers/02-quotas-and-cooldowns.md
+    - id: quota-pools
+      name: 'Shared quota pools'
+      summary: 'Account-level ceilings (openrouter free, google project, groq, nvidia credit pool) get an aggregate gate on top of model windows.'
+      lenses: [reliability, cost]
+      signature: 'inferPoolForPlatform: openrouter::free, google::project, groq::account, nvidia::credit-pool'
+      notes:
+      - 'also unorouter::free and xkiro::free (5M tokens/day account-wide)'
+      - 'prevents (models x rpd) fan-out from earning surprise 429s'
+      ref: /blob/v0.13.4/docs/en/providers/02-quotas-and-cooldowns.md
+    - id: concurrency-caps
+      name: 'Concurrency caps'
+      summary: 'Opt-in per-key parallelism cap checked against live leases; off by default and no built-in per-platform table.'
+      lenses: [reliability, perf]
+      signature: 'MAX_CONCURRENT_REQUESTS_PER_KEY[_<PLATFORM>]'
+      options:
+      - {name: 'MAX_CONCURRENT_REQUESTS_PER_KEY_<PLATFORM>', type: 'env', default: null, desc: 'Per-platform cap on in-flight requests per key.'}
+      - {name: 'MAX_CONCURRENT_REQUESTS_PER_KEY', type: 'env', default: null, desc: 'Fallback cap for platforms without their own variable.'}
+      ref: /blob/v0.13.4/docs/en/providers/02-quotas-and-cooldowns.md
+    - id: cooldown-ladder
+      name: 'Cooldown ladder'
+      summary: 'A 429 benches the model+key pair: 90 s, then 2 min, 10 min, 1 h, 1 day over a rolling 24 h; success clears the counter.'
+      lenses: [reliability]
+      returns: '402 and 403 tier gate bench for 1 day; local endpoint errors 5 s and never escalate; 401 waits for the next health cycle (~5 min); unknown-limit exhaustion capped at 10 min'
+      notes:
+      - 'Retry-After and daily-quota reset times are never shortened by the ceiling'
+      ref: /blob/v0.13.4/docs/en/providers/02-quotas-and-cooldowns.md
+    - id: cooldown-ceiling
+      name: 'Cooldown ceiling and reset'
+      summary: 'Operator cap on automatic benches plus bulk and per-key cooldown reset endpoints.'
+      lenses: [reliability]
+      signature: 'PUT /api/fallback/routing {"cooldownCeilingMs"}'
+      returns: 'caps ladder and 402/403 benches (10 min, 1 h or 6 h in the UI); DELETE /api/fallback/penalty-inspector clears every cooldown, penalty and failure streak; DELETE /api/keys/:id/cooldowns resets one key'
+      notes:
+      - 'setting key routing_cooldown_ceiling_ms'
+      ref: /blob/v0.13.4/docs/en/providers/02-quotas-and-cooldowns.md
+    - id: cooldown-probe
+      name: 'Probe-based early recovery'
+      summary: 'A 60 s job re-validates keys holding heuristic cooldowns and clears them early; provider-stated benches are never probed.'
+      lenses: [reliability, perf]
+      signature: 'COOLDOWN_PROBE_MAX_PER_PASS=3, COOLDOWN_PROBE_DISABLED=1'
+      options:
+      - {name: 'COOLDOWN_PROBE_MAX_PER_PASS', type: 'env', default: '3', desc: 'Probe budget per scan pass.'}
+      - {name: 'COOLDOWN_PROBE_DISABLED', type: 'env', default: null, desc: '`1` turns the job off.'}
+      notes:
+      - 'a bench is ripe after half elapsed and only if > 60 s remains'
+      - 'a failed probe reschedules further out (2 min doubling, cap 15 min) and never extends the bench'
+      - 'cooldown provenance is heuristic, authoritative, credit or tier; only heuristic is probed'
+      ref: /blob/v0.13.4/docs/en/providers/02-quotas-and-cooldowns.md
+    - id: stated-backoff
+      name: 'Stated retry delays'
+      summary: 'Adapters read Retry-After and delays embedded in error bodies so the bench matches what the provider said.'
+      lenses: [reliability]
+      returns: 'Retry-After (seconds or HTTP-date) wins; else Gemini RetryInfo.retryDelay, retry_after shapes, or anchored prose; every delay clamped to 24 h'
+      notes:
+      - 'only the number is kept, never the error body'
+      ref: /blob/v0.13.4/docs/en/providers/02-quotas-and-cooldowns.md
+    - id: health-check-cadence
+      name: 'Health pass cadence'
+      summary: 'Scheduled key validation every 5 min (+-20% jitter, concurrency 8); validation that costs quota must be cached.'
+      lenses: [reliability, cost]
+      signature: 'MODELSCOPE_VALIDATE_CACHE_MS=86400000'
+      options:
+      - {name: 'MODELSCOPE_VALIDATE_CACHE_MS', type: 'env', default: '86400000', desc: 'Per-key cache of a successful modelscope validation (it spends a paid 1-token chat); tokens not prefixed `ms-` are rejected without network.'}
+      notes:
+      - 'keys validated within 3.5 min are skipped; >= 1 s spacing between same-provider probes'
+      ref: /blob/v0.13.4/docs/en/providers/02-quotas-and-cooldowns.md
+    - id: glossary-terms
+      name: 'Routing glossary'
+      summary: 'Short definitions of headroom, pool key, least-remaining, model-age gate, bandit router and in-flight window.'
+      lenses: [best-practice]
+      notes:
+      - 'headroom = 1 - max(RPM/RPD/TPM/TPD used); tunable via HEADROOM_RAMP_START and HEADROOM_FLOOR'
+      - 'bandit router is Thompson sampling with 10% explore'
+      - 'in-flight duplicates are not deduplicated by idempotency'
+      ref: /blob/v0.13.4/docs/en/glossary/01-glossary.md
+- title: Outbound networking
+  sections:
+  - id: outbound-proxy
+    title: Provider-bound proxies
+    level: intermediate
+    requires: [container-ops]
+    ref: /blob/v0.13.4/docs/en/env/03-outbound-proxies.md
+    entries:
+    - id: proxy-precedence
+      name: 'Proxy precedence'
+      summary: 'Which proxy source wins for provider traffic; the dashboard beats generic env vars, system auto-detect is the last resort.'
+      lenses: [security, reliability]
+      signature: 'PROXY_URL > dashboard proxy_url > ALL_PROXY > HTTPS_PROXY > HTTP_PROXY > system > direct'
+      options:
+      - {name: 'PROXY_MODE', type: 'forward|fetch-relay', default: 'forward', desc: 'Selects how the winning URL is used, not its rank; ambient or legacy URLs stay forward.'}
+      notes:
+      - 'lower-case spellings of the standard variables are read too'
+      - 'resolved at boot and on PUT /api/settings/proxy'
+      ref: /blob/v0.13.4/docs/en/env/03-outbound-proxies.md
+    - id: proxy-schemes-bypass
+      name: 'Schemes and bypass'
+      summary: 'http, https and socks4/4a/5/5h schemes; NO_PROXY and loopback/LAN destinations go direct unless forced.'
+      lenses: [reliability]
+      signature: 'PROXY_URL=socks5h://host:1080, NO_PROXY=host,.suffix'
+      options:
+      - {name: 'NO_PROXY', type: 'env', default: null, desc: 'Comma list; bare domain covers subdomains, host:port narrows, `*` disables the proxy.'}
+      - {name: 'FREEAPI_PROXY_LOCAL_DESTINATIONS', type: 'env', default: null, desc: '`1|true|yes` proxies loopback and LAN destinations too (for example an ssh -D tunnel).'}
+      notes:
+      - 'the h and a scheme variants resolve DNS at the proxy'
+      - 'per-key proxy_url overrides pick which proxy, not whether to proxy; the same bypasses apply'
+      ref: /blob/v0.13.4/docs/en/env/03-outbound-proxies.md
+    - id: fetch-relay
+      name: 'Fetch Relay'
+      summary: 'Application-layer relay transport (for example a Cloudflare Worker) for provider calls when CONNECT or SOCKS is not available.'
+      lenses: [security, composability]
+      signature: 'PROXY_MODE=fetch-relay, PROXY_URL=<relay>, FETCH_RELAY_TOKEN'
+      options:
+      - {name: 'FETCH_RELAY_TOKEN', type: 'env', default: null, desc: 'Relay bearer, sent as Fetch-Relay-Authorization; env wins over the encrypted dashboard value; empty means unauthenticated.'}
+      returns: 'each call carries Fetch-Relay-Target (full provider URL), Fetch-Relay-Authorization and the provider Authorization'
+      notes:
+      - 'relay URL must be https, or http only for loopback; SOCKS rejected at boot'
+      - 'a relay sees provider keys and prompts, so run one you control'
+      - 'redirects are handled manually; response bodies are streamed, not buffered'
+      ref: /blob/v0.13.4/docs/en/proxy/01-fetch-relay.md
+    - id: docker-host-networking
+      name: 'Container host networking'
+      summary: 'Inside the container 127.0.0.1 is the container; reach host services via host.docker.internal.'
+      lenses: [reliability]
+      signature: 'extra_hosts: ["host.docker.internal:host-gateway"]'
+      notes:
+      - 'a host proxy must listen beyond loopback (for example allow-lan)'
+      - 'an IPv6-only host needs Docker ipv6 enabled or the container cannot resolve anything'
+      - 'diagnose with docker compose exec freellmapi node -e "fetch(...)"'
+      ref: /blob/v0.13.4/docs/en/env/03-outbound-proxies.md
+    - id: trust-proxy-values
+      name: 'TRUST_PROXY values'
+      summary: 'Inbound counterpart of the outbound proxy: whether X-Forwarded-For is trusted so analytics and rate limits see the real client.'
+      lenses: [security]
+      signature: 'TRUST_PROXY=false|true|<hops>|<CIDR list>'
+      notes:
+      - 'unset or false trusts nothing, safe for direct installs'
+      - 'a number trusts that many hops; `true` trusts every hop, only on fully trusted networks'
+      - 'behind one reverse proxy on the same host use TRUST_PROXY=1'
+      ref: /blob/v0.13.4/docs/en/env/03-outbound-proxies.md
+- title: Operator tooling
+  sections:
+  - id: setup-cli
+    title: Setup CLI
+    level: basic
+    requires: []
+    ref: /blob/v0.13.4/docs/en/cli/01-generators.md
+    entries:
+    - id: setup-generators
+      name: 'Setup generators'
+      summary: 'npx freellmapi setup-<tool> merges gateway settings into a coding agent config; every file is backed up and written 0600.'
+      lenses: [composability, security]
+      signature: 'npx freellmapi [--dry-run] setup-<claude|codex|cline|continue|aider|opencode|goose|qwen|roo|kilo|crush|dsh|mimo|atomcode|cursor|generic>'
+      options:
+      - {name: '--dry-run', type: 'flag', default: null, desc: 'Preview the merge as a diff without writing.'}
+      - {name: '--model', type: 'string', default: null, desc: 'Pin a model, resolved against the unfiltered catalog.'}
+      - {name: '--profile', type: 'string', default: null, desc: 'Named profile (Codex profile, Claude CLAUDE_CONFIG_DIR).'}
+      notes:
+      - 'setup-cursor and setup-generic print a manual guide instead of writing a file'
+      - 'merging preserves unrelated JSON keys, TOML provider tables and YAML content'
+      ref: /blob/v0.13.4/docs/en/cli/01-generators.md
+    - id: launchers-doctor
+      name: 'Launchers and doctor'
+      summary: 'Zero-persistence launchers inject the key via env only; doctor proves a client reaches this gateway.'
+      lenses: [security, observability]
+      signature: 'npx freellmapi launch | launch-codex | doctor'
+      returns: 'launchers spawn claude or codex with FREELLMAPI_API_KEY and FREELLMAPI_MODEL in the child env only'
+      ref: /blob/v0.13.4/docs/en/cli/01-generators.md
+    - id: cli-config-merge
+      name: 'Config merge layer'
+      summary: 'Generators return a Generation of files; config-files.ts deep-merges JSON, TOML and YAML and keeps a timestamped .bak copy.'
+      lenses: [best-practice, testing]
+      signature: 'cli/tools.json registry; cli/src/config-files.ts'
+      notes:
+      - 'backup is <path>.bak.<ISO timestamp>, none when the file did not exist'
+      - 'generator output is pinned by snapshot tests'
+      ref: /blob/v0.13.4/docs/en/cli/02-config-files.md
+  - id: server-logs
+    title: Logs and troubleshooting
+    level: intermediate
+    requires: [admin-api]
+    ref: /blob/v0.13.4/docs/en/logs/01-server-logs-viewer.md
+    entries:
+    - id: logs-api
+      name: 'Server logs API'
+      summary: 'Cursor-polled, redacted server log lines behind the dashboard session (never the /v1 key).'
+      lenses: [observability, security]
+      signature: 'GET /api/logs?sinceId&levels&q&provider&limit'
+      params:
+      - {name: 'sinceId', type: 'int', default: null, desc: 'Entries newer than this id; nextId is the store high-water mark so filtered polls still advance.'}
+      - {name: 'levels', type: 'csv', default: null, desc: 'trace,debug,info,warn,error; an unknown level is a 400.'}
+      - {name: 'limit', type: 'int', default: '200', desc: 'Clamped to 1..500.'}
+      returns: '{entries oldest-to-newest, nextId, counts}; GET /api/logs/counts returns the counts alone; POST /api/logs/clear empties both tiers'
+      ref: /blob/v0.13.4/docs/en/logs/01-server-logs-viewer.md
+    - id: logs-store
+      name: 'Log store tiers'
+      summary: 'A 1000-entry in-memory ring for all levels plus a SQLite table that keeps warn and error across restarts.'
+      lenses: [observability, reliability]
+      options:
+      - {name: 'SERVER_LOGS_RETENTION_DAYS', type: 'env', default: '7', desc: 'Daily prune age.'}
+      - {name: 'SERVER_LOGS_MAX_ROWS', type: 'env', default: '50000', desc: 'Hard cap on persisted rows.'}
+      notes:
+      - 'secrets are redacted before capture, so they never reach the ring or database'
+      - 'GET /api/logs and /api/ping lines are filtered at ingest'
+      - 'both variables are read at boot'
+      ref: /blob/v0.13.4/docs/en/logs/01-server-logs-viewer.md
+    - id: common-issues
+      name: 'Common issues'
+      summary: 'Symptom, cause and fix list for container networking, empty chain 400, relay guard, idempotency 409 and proxy IPs.'
+      lenses: [reliability, testing]
+      notes:
+      - 'quota panels slow: tune QUOTA_OBSERVATIONS_RETENTION_DAYS (30) and QUOTA_OBSERVATIONS_MAX_ROWS (200000)'
+      - 'wrong client IPs behind a proxy: set TRUST_PROXY'
+      ref: /blob/v0.13.4/docs/en/troubleshooting/01-common-issues.md
+skipped:
+- {page: /blob/v0.13.4/docs/en/CHANGELOG.md, why: 'Doc revision history, no API'}
+- {page: /blob/v0.13.4/docs/en/OVERVIEW.md, why: 'Domain index repeating the covered pages'}
+- {page: /blob/v0.13.4/docs/en/README.md, why: 'Documentation landing page linking covered pages'}
+- {page: /blob/v0.13.4/docs/en/api/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/api/OVERVIEW.md, why: 'Domain index for api pages'}
+- {page: /blob/v0.13.4/docs/en/architecture/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/architecture/OVERVIEW.md, why: 'Domain index for architecture pages'}
+- {page: /blob/v0.13.4/docs/en/cli/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/cli/OVERVIEW.md, why: 'Domain index for cli pages'}
+- {page: /blob/v0.13.4/docs/en/clients/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/clients/OVERVIEW.md, why: 'Domain index for clients pages'}
+- {page: /blob/v0.13.4/docs/en/compression/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/compression/OVERVIEW.md, why: 'Domain index for compression pages'}
+- {page: /blob/v0.13.4/docs/en/deployment/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/deployment/OVERVIEW.md, why: 'Domain index for deployment pages'}
+- {page: /blob/v0.13.4/docs/en/desktop/01-desktop-app.md, why: 'Electron desktop build and packaging; this repo runs the Docker image'}
+- {page: /blob/v0.13.4/docs/en/desktop/02-logging-and-updates.md, why: 'Desktop app freeapi.log and auto-update internals; not applicable to the Docker image'}
+- {page: /blob/v0.13.4/docs/en/desktop/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/desktop/OVERVIEW.md, why: 'Desktop app domain index; Electron only'}
+- {page: /blob/v0.13.4/docs/en/env/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/env/OVERVIEW.md, why: 'Domain index for env pages'}
+- {page: /blob/v0.13.4/docs/en/fallback/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/fallback/OVERVIEW.md, why: 'Domain index for fallback pages'}
+- {page: /blob/v0.13.4/docs/en/glossary/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/glossary/OVERVIEW.md, why: 'Domain index for the single glossary page'}
+- {page: /blob/v0.13.4/docs/en/install/02-android-termux.md, why: 'Experimental Android Termux install; this repo runs the Docker image'}
+- {page: /blob/v0.13.4/docs/en/install/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/install/OVERVIEW.md, why: 'Domain index for install pages'}
+- {page: /blob/v0.13.4/docs/en/logs/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/logs/OVERVIEW.md, why: 'Domain index for the logs page'}
+- {page: /blob/v0.13.4/docs/en/providers/03-adding-a-new-provider.md, why: 'Contributor guide for extending the gateway source; consumers add endpoints via customProviders'}
+- {page: /blob/v0.13.4/docs/en/providers/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/providers/OVERVIEW.md, why: 'Domain index for providers pages'}
+- {page: /blob/v0.13.4/docs/en/proxy/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/proxy/OVERVIEW.md, why: 'Proxy domain index; content covered by fetch-relay and proxy-precedence entries'}
+- {page: /blob/v0.13.4/docs/en/testing/01-running-tests.md, why: 'Gateway contributor test chain, not consumed by deployments'}
+- {page: /blob/v0.13.4/docs/en/testing/02-server-suite.md, why: 'Gateway server test suite internals for contributors'}
+- {page: /blob/v0.13.4/docs/en/testing/03-compatibility-suite.md, why: 'Gateway agent-compat test suite; surfaces are covered by other-wire-formats'}
+- {page: /blob/v0.13.4/docs/en/testing/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/testing/OVERVIEW.md, why: 'Testing domain index for contributors'}
+- {page: /blob/v0.13.4/docs/en/troubleshooting/CHANGELOG.md, why: 'Doc revision history'}
+- {page: /blob/v0.13.4/docs/en/troubleshooting/OVERVIEW.md, why: 'Domain index for the troubleshooting page'}

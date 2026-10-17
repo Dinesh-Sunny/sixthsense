@@ -1,0 +1,2358 @@
+stack: next
+version: "16.3.8"
+docs_base: https://nextjs.org
+source: https://nextjs.org/docs/llms.txt (live ToC, doc-version 16.3.8) + per-page .md fetches + bundled
+  next/dist/docs (enriched from the bundled API reference pages, 2026-10-05)
+fetched: 2026-10-05
+verified: 2026-10-05
+toc:
+- index: 'https://nextjs.org/docs/llms.txt'
+  match: '^https://nextjs\.org/docs/(app|architecture)/'
+groups:
+- title: AI tooling
+  sections:
+  - id: ai-bundled-docs
+    title: Version-matched docs and AGENTS.md
+    level: basic
+    requires: []
+    ref: /docs/app/guides/ai-agents
+    entries:
+    - id: bundled-docs
+      name: Bundled docs + managed AGENTS.md block
+      summary: node_modules/next/dist/docs/ matches the installed version; `next dev` (16.3+) keeps a managed AGENTS.md
+        block
+      lenses: [best-practice, reliability]
+      signature: agentRules
+      options:
+      - {name: agentRules, type: "boolean", default: "true", desc: "Set false in next.config to stop `next dev` writing or re-adding the AGENTS.md/CLAUDE.md managed block."}
+      notes:
+      - '`next dev` re-adds the BEGIN:nextjs-agent-rules block when an agent is detected; commit it'
+      - '16.2 bundles docs but writes no AGENTS.md; 16.1 and older use `npx @next/codemod@canary agents-md` (.next-docs/)'
+      - content outside the managed markers is preserved on upsert
+      ref: /docs/app/guides/ai-agents
+    - id: docs-as-markdown
+      name: Docs as Markdown over HTTP
+      summary: 'append `.md` to any /docs URL or send `Accept: text/markdown`; /docs/llms.txt, /docs/llms-full.txt'
+      lenses: [reuse]
+      signature: GET https://nextjs.org/docs/<path>.md
+      notes: [per-error pages under /docs/messages (not bundled)]
+      ref: /docs/app/guides/ai-agents
+    - id: devtools-mcp
+      name: Next.js MCP server
+      summary: '`next-devtools-mcp` in .mcp.json discovers running dev servers via `/_next/mcp` (Next 16+)'
+      lenses: [observability]
+      import: next-devtools-mcp
+      signature: npx -y next-devtools-mcp@latest
+      returns: Agent tools over the live dev server - errors, logs, routes, page and project metadata, compile results.
+      options:
+      - {name: get_errors, type: "tool", default: null, desc: "Current build, runtime and type errors from the dev server."}
+      - {name: get_logs, type: "tool", default: null, desc: "Path to the dev log file (browser console + server output)."}
+      - {name: get_routes, type: "tool", default: null, desc: "Entry-point routes grouped by router; dynamic segments as [param]."}
+      - {name: get_page_metadata, type: "tool", default: null, desc: "Routes, components and rendering info for a specific page."}
+      - {name: get_project_metadata, type: "tool", default: null, desc: "Project structure, config and dev server URL."}
+      - {name: get_server_action_by_id, type: "tool", default: null, desc: "Source file and function name for a Server Action id."}
+      - {name: get_compilation_issues, type: "tool", default: null, desc: "Whole-project bundler warnings and errors (Turbopack only)."}
+      - {name: compile_route, type: "tool", default: null, desc: "Compile one route on demand by routeSpecifier or path, return its issues (Turbopack only)."}
+      notes:
+      - the dev server must be running; pin the version for reproducible tooling
+      - via the nextjs_index/nextjs_call wrapper tools the same calls run as toolName values
+      ref: /docs/app/guides/mcp
+    - id: agent-browser
+      name: agent-browser CLI
+      summary: DOM/console/network/Web Vitals as text; `agent-browser open --enable react-devtools`, `react
+        tree` (component tree, pending Suspense)
+      lenses: [testing, observability]
+      signature: agent-browser open <url> --enable react-devtools
+      ref: /docs/app/guides/ai-agents
+    - id: next-skills
+      name: Next.js agent skills
+      summary: 'workflow skills from vercel/next.js: next-dev-loop, cache-components adoption/optimizer, partial-prefetching
+        adoption'
+      lenses: [best-practice, reuse]
+      signature: npx skills add vercel/next.js --skill next-dev-loop
+      notes:
+      - 'skills: next-dev-loop, next-cache-components-adoption, next-cache-components-optimizer, next-partial-prefetching-adoption'
+      - framework knowledge comes from the bundled docs; skills only sequence multi-step workflows
+      ref: /docs/app/guides/ai-agents
+    - id: browser-to-terminal
+      name: Dev log forwarding
+      summary: '`logging` config forwards browser console output to the dev terminal; `.next/dev/lock` records the running server'
+      lenses: [observability]
+      signature: logging.browserToTerminal
+      since: "16.2.0"
+      options:
+      - {name: browserToTerminal, type: "'warn' | 'error' | boolean", default: "'warn'", desc: "Which browser console levels print in the terminal: warn(+error), error, all (true) or none (false)."}
+      - {name: fetches, type: "{fullUrl?, hmrRefreshes?}", default: null, desc: "Dev-only: log full fetch URLs and HMR-cache-restored fetches."}
+      - {name: incomingRequests, type: "false | {ignore: RegExp[]}", default: null, desc: "Dev-only request log; ignore patterns or false to silence."}
+      - {name: serverFunctions, type: "boolean", default: "true", desc: "Dev-only logging of Server Function calls with args and duration."}
+      notes:
+      - '`.next/dev/lock` holds PID, port and URL of the running dev server; a second `next dev` prints it'
+      - '`logging: false` disables all dev logging; it does not affect production builds'
+      ref: /docs/app/api-reference/config/next-config-js/logging
+    - id: debug-prerender
+      name: Build debugging
+      summary: '`next build --debug-prerender` (server source maps, continues past first failure), `/docs/messages/<error>`
+        pages'
+      lenses: [observability, reliability]
+      signature: next build --debug-prerender
+      options:
+      - {name: --debug-prerender, type: "flag", default: null, desc: "Enables server source maps for prerender errors and keeps building past the first failure."}
+      - {name: "--debug-build-paths", type: "<patterns>", default: null, desc: "Build only matching routes (globs, ! to exclude)."}
+      notes: ['`/docs/messages/<error>` pages are written for agents: canonical fixes and trade-offs']
+      ref: /docs/app/guides/building
+- title: Getting Started
+  sections:
+  - id: install-structure
+    title: Installation and project structure
+    level: basic
+    requires: []
+    ref: /docs/app/getting-started/installation
+    entries:
+    - id: create-next-app
+      name: create-next-app
+      summary: scaffolds a project; generates AGENTS.md and CLAUDE.md unless told not to
+      lenses: [best-practice]
+      signature: create-next-app [dir] --no-agents-md
+      ref: /docs/app/api-reference/cli/create-next-app
+    - id: project-structure
+      name: Folder and file conventions
+      summary: app, public and src folders, colocation, private folders, route groups
+      lenses: [best-practice, composability]
+      ref: /docs/app/getting-started/project-structure
+    - id: upgrading
+      name: Upgrading
+      summary: '`next upgrade` runs the codemods and bumps the packages; canary channel available'
+      lenses: [reliability, security]
+      signature: next upgrade [directory] [--revision <tag>]
+      options:
+      - {name: --revision, type: "string", default: "installed release channel", desc: "Version or tag to upgrade to (latest, canary, 15.0.0)."}
+      notes:
+      - 16.3.8 is a security release (2026-10-04 review); keep next + eslint-config-next on latest patch
+      ref: /docs/app/getting-started/upgrading
+  - id: routing-ui
+    title: Layouts, pages, navigation
+    level: basic
+    requires: [install-structure]
+    ref: /docs/app/getting-started/layouts-and-pages
+    entries:
+    - id: layouts-pages
+      name: Layouts and pages
+      summary: layout.js, page.js, nested routes, `PageProps`/`LayoutProps` helpers, dynamic segments
+      lenses: [composability]
+      signature: PageProps<'/route'>, LayoutProps<'/route'>
+      notes: ['global type helpers, generated by `next dev`, `next build` or `next typegen`']
+      ref: /docs/app/getting-started/layouts-and-pages
+    - id: link-navigation
+      name: Linking and navigating
+      summary: '`<Link>`, prefetching, prerendering, client transitions, `useRouter`'
+      lenses: [perf, ux-a11y]
+      signature: <Link>, useRouter
+      ref: /docs/app/getting-started/linking-and-navigating
+  - id: rsc-data
+    title: Server/Client Components and data
+    level: intermediate
+    requires: [routing-ui]
+    ref: /docs/app/getting-started/server-and-client-components
+    entries:
+    - id: server-client-components
+      name: Server and Client Components
+      summary: '`"use client"` boundary, context providers, shrinking bundles'
+      lenses: [perf, best-practice, composability]
+      signature: '"use client"'
+      ref: /docs/app/getting-started/server-and-client-components
+    - id: fetching-data
+      name: Fetching data
+      summary: async Server Components, fetch/ORM, `loading.js`, `<Suspense>`, parallel vs sequential,
+        `use` in Client Components
+      lenses: [perf, best-practice]
+      ref: /docs/app/getting-started/fetching-data
+    - id: mutating-data
+      name: Mutating data
+      summary: Server Functions, Server Actions, `"use server"`, forms, `revalidatePath`/`updateTag`
+      lenses: [best-practice, security]
+      ref: /docs/app/getting-started/mutating-data
+    - id: caching-getting-started
+      name: Caching (Cache Components model)
+      summary: '`use cache`, static shell, `<Suspense>`, prerendering'
+      lenses: [perf, cost]
+      signature: use cache, <Suspense>
+      notes: ['opt-in via `cacheComponents: true`; chat page is client-driven so little to cache']
+      ref: /docs/app/getting-started/caching
+    - id: revalidating
+      name: Revalidating
+      summary: time-based and on-demand (`revalidateTag`, `updateTag`, `refresh`)
+      lenses: [perf]
+      ref: /docs/app/getting-started/revalidating
+  - id: ui-assets
+    title: Errors, CSS, images, fonts, metadata
+    level: basic
+    requires: [routing-ui]
+    ref: /docs/app/getting-started/error-handling
+    entries:
+    - id: error-handling
+      name: Error handling
+      summary: expected errors as return values, `error.js`, `notFound`, `global-error`
+      lenses: [reliability, ux-a11y]
+      notes:
+      - 'error.js props: `error` + `retry`; `reset` skips re-fetch'
+      - error.digest matches a server-side log line; Server Component messages are masked in production
+      ref: /docs/app/getting-started/error-handling
+    - id: css
+      name: Styling
+      summary: Tailwind, CSS Modules, global CSS
+      lenses: [best-practice]
+      ref: /docs/app/getting-started/css
+    - id: images
+      name: Image optimization
+      summary: '`next/image`, `images` config'
+      lenses: [perf]
+      signature: next/image, images
+      ref: /docs/app/getting-started/images
+    - id: fonts
+      name: Font optimization
+      summary: '`next/font/google`, `next/font/local`, CSS variables'
+      lenses: [perf, ux-a11y]
+      signature: next/font/google, next/font/local
+      notes:
+      - Google fonts are fetched at build, so `next build` needs network (verified locally 2026-10-04)
+      ref: /docs/app/getting-started/fonts
+    - id: metadata
+      name: Metadata and OG images
+      summary: '`metadata` export, `generateMetadata`, `opengraph-image`'
+      lenses: [best-practice]
+      signature: metadata, generateMetadata, opengraph-image
+      notes: [use the static `metadata` object when nothing depends on the request]
+      ref: /docs/app/getting-started/metadata-and-og-images
+  - id: server-edge
+    title: Route handlers, Proxy, deploying
+    level: intermediate
+    requires: [rsc-data]
+    ref: /docs/app/getting-started/route-handlers
+    entries:
+    - id: route-handlers
+      name: Route Handlers
+      summary: route.ts method exports on the Web Request/Response APIs; GET/POST/PUT/PATCH/DELETE/HEAD/OPTIONS
+      lenses: [best-practice, composability]
+      import: next/server
+      signature: 'export async function GET(request: NextRequest, ctx: RouteContext<''/route/[id]''>)'
+      params:
+      - {name: request, type: "NextRequest", default: null, desc: "Optional; extends Request with `cookies` and parsed `nextUrl`."}
+      - {name: ctx.params, type: "Promise<{...}>", default: null, desc: "Optional context; await it for dynamic segments (typed by RouteContext)."}
+      returns: A Web `Response` (Response.json, streaming body or NextResponse).
+      notes:
+      - uncached by default
+      - Next implements OPTIONS (with Allow header) when the file does not export it
+      - Client Components call Route Handlers; Server Components should call the data layer directly
+      ref: /docs/app/api-reference/file-conventions/route
+    - id: proxy-file
+      name: Proxy (proxy.ts, formerly middleware)
+      summary: '`proxy` export runs before routes render: rewrite, redirect, set headers, or answer directly'
+      lenses: [security, best-practice]
+      import: next/server
+      signature: 'export function proxy(request: NextRequest, event: NextFetchEvent)'
+      returns: A NextResponse (next, rewrite, redirect) or Response to answer directly; NextResponse.next() continues routing.
+      notes:
+      - without `config.matcher` it runs on every request including _next/static and public/
+      - Node runtime only; setting `runtime` in proxy.ts throws
+      - Server Function calls are POSTs to the page route, so a matcher exclusion skips Proxy for them
+      - not a place for shared module state or globals
+      ref: /docs/app/getting-started/proxy
+    - id: deploying
+      name: Deploying
+      summary: Node server, Docker, static export, adapters
+      lenses: [reliability]
+      ref: /docs/app/getting-started/deploying
+- title: Guides
+  sections:
+  - id: g-rendering
+    title: Rendering, caching, navigation
+    level: advanced
+    requires: [rsc-data]
+    ref: /docs/app/guides/rendering-philosophy
+    entries:
+    - id: cache-components-migration
+      name: Migrating to Cache Components
+      summary: flag on, fix blocking-prerender routes, `use cache`, `<Suspense>`
+      lenses: [perf]
+      notes: ['a blocking-prerender error offers [stream] Suspense, [cache] use cache, or [block] `instant = false`']
+      ref: /docs/app/guides/migrating-to-cache-components
+    - id: instant-navigation
+      name: Instant navigation
+      summary: '`instant` segment export validates instant UI; `instant()` from @next/playwright asserts it in e2e'
+      lenses: [perf, ux-a11y, testing]
+      signature: 'export const instant = true | false | { level: ''warning'' }'
+      options:
+      - {name: level, type: "'warning'", default: "'warning'", desc: "Validate in dev only; errors show in the overlay and the build is unaffected."}
+      notes:
+      - needs cacheComponents; cannot be exported from Client Components
+      - dev has no prefetching, so navigations feel slower than under `next start`
+      - 'e2e: `import { instant } from ''@next/playwright''`'
+      ref: /docs/app/guides/instant-navigation
+    - id: partial-prefetching
+      name: Partial Prefetching
+      summary: '`partialPrefetching`, shared App Shell'
+      lenses: [perf]
+      signature: partialPrefetching
+      notes: [requires Cache Components already adopted]
+      ref: /docs/app/guides/adopting-partial-prefetching
+    - id: prefetching
+      name: Prefetching and optimizing prefetching
+      summary: how `<Link>` prefetches and how to tune or disable it
+      lenses: [perf]
+      signature: <Link prefetch>, useLinkStatus
+      ref: /docs/app/guides/prefetching
+    - id: streaming
+      name: Streaming
+      summary: '`loading.js`, `<Suspense>`, progressive rendering'
+      lenses: [perf, ux-a11y]
+      signature: loading.js, <Suspense>
+      ref: /docs/app/guides/streaming
+    - id: preserving-ui-state
+      name: Preserving UI state (Activity)
+      summary: with cacheComponents, hidden routes stay mounted, Effects cleaned up
+      lenses: [ux-a11y]
+      ref: /docs/app/guides/preserving-ui-state
+    - id: view-transitions
+      name: View transitions
+      summary: App Router runs a bundled React canary, so `ViewTransition` needs no setup
+      lenses: [ux-a11y]
+      ref: /docs/app/guides/view-transitions
+    - id: lazy-loading
+      name: Lazy loading
+      summary: '`next/dynamic` (React.lazy + Suspense) code-splits heavy client libraries'
+      lenses: [perf]
+      import: next/dynamic
+      signature: 'dynamic(() => import(''./Heavy''), { ssr: false })'
+      options:
+      - {name: ssr, type: "boolean", default: "true", desc: "false skips server prerender; only allowed inside Client Components, errors in Server Components."}
+      - {name: loading, type: "() => ReactNode", default: null, desc: "Fallback UI while the chunk loads."}
+      ref: /docs/app/guides/lazy-loading
+    - id: preventing-flash
+      name: Preventing flash before hydration
+      summary: correct SSR content before paint (theme)
+      lenses: [ux-a11y]
+      ref: /docs/app/guides/preventing-flash-before-hydration
+    - id: caching-previous
+      name: Caching (previous model) and ISR/CDN guides
+      summary: '`fetch` cache options, `unstable_cache`, ISR, CDN caching'
+      lenses: [perf]
+      signature: fetch, unstable_cache
+      deprecated: Cache Components replaces unstable_cache in 16
+      ref: /docs/app/guides/caching-without-cache-components
+  - id: g-security
+    title: Security and data
+    level: intermediate
+    requires: [server-edge]
+    ref: /docs/app/guides/data-security
+    entries:
+    - id: data-security
+      name: Data security
+      summary: server-only Data Access Layer returning DTOs, taint APIs, `NEXT_PUBLIC_` exposure, only
+        the DAL reads `process.env`
+      lenses: [security, best-practice]
+      notes: [taint APIs are experimental (`taint` config)]
+      ref: /docs/app/guides/data-security
+    - id: server-only-import
+      name: server-only package
+      summary: build error if a client module imports it
+      lenses: [security, best-practice]
+      import: server-only
+      signature: import "server-only"
+      notes: [outside a React Server environment the package throws, so test runners need an alias or stub]
+      ref: /docs/app/getting-started/server-and-client-components
+    - id: env-vars
+      name: Environment variables
+      summary: '`.env*` loading, `NEXT_PUBLIC_` inlining, `.env*` gitignored'
+      lenses: [security]
+      signature: .env*, NEXT_PUBLIC_, .env*
+      notes: [NEXT_PUBLIC_ values are inlined into the client bundle at build time]
+      ref: /docs/app/guides/environment-variables
+    - id: csp
+      name: Content Security Policy
+      summary: nonce via Proxy (forces dynamic rendering), `headers()` config
+      lenses: [security]
+      notes: [nonce-based CSP needs dynamic rendering; static `headers()` CSP cannot carry a nonce]
+      ref: /docs/app/guides/content-security-policy
+    - id: server-actions-security
+      name: Server Actions security
+      summary: POST-reachable, CSRF Origin vs Host check, `serverActions.allowedOrigins`, re-authorize
+        inside each action
+      lenses: [security]
+      ref: /docs/app/guides/server-actions
+    - id: authentication
+      name: Authentication
+      summary: sessions, DAL checks, Proxy optimistic checks
+      lenses: [security]
+      ref: /docs/app/guides/authentication
+    - id: backend-for-frontend
+      name: Backend for Frontend
+      summary: Route Handlers as BFF, proxying
+      lenses: [composability, security]
+      notes: [see proxy-pitfalls]
+      ref: /docs/app/guides/backend-for-frontend
+    - id: proxy-pitfalls
+      name: Proxy pitfalls
+      summary: allowlist the normalized URL (`%2e%2e` is a dot segment), no `e.message` echo, Host allowlist,
+        `nextUrl.origin` ignores Host
+      lenses: [security]
+      notes: ['2026-10-04']
+      ref: /docs/app/guides/backend-for-frontend
+    - id: production-checklist
+      name: Production checklist
+      summary: global-error, a11y lint, Data Access Layer, bundle analysis, Web Vitals
+      lenses: [best-practice, reliability]
+      notes:
+      - Client Components call Route Handlers; Server Components don't
+      - cookies() and searchParams opt the route into dynamic rendering; wrap in Suspense
+      ref: /docs/app/guides/production-checklist
+  - id: g-observability
+    title: Observability, build, ops
+    level: intermediate
+    requires: [install-structure]
+    ref: /docs/app/guides/instrumentation
+    entries:
+    - id: instrumentation
+      name: Instrumentation
+      summary: root instrumentation.ts `register()` once per server start; `onRequestError` reports server errors
+      lenses: [observability]
+      signature: export function register(); export const onRequestError
+      ref: /docs/app/guides/instrumentation
+    - id: opentelemetry
+      name: OpenTelemetry
+      summary: '`@vercel/otel` spans for routes and fetches'
+      lenses: [observability]
+      import: "@vercel/otel"
+      signature: registerOTel('service-name')
+      ref: /docs/app/guides/open-telemetry
+    - id: analytics
+      name: Analytics and Web Vitals
+      summary: '`useReportWebVitals` reports CWV metrics from a Client Component'
+      lenses: [observability, perf]
+      import: next/web-vitals
+      signature: useReportWebVitals((metric) => void)
+      returns: Nothing; the callback gets {id, name, value, delta, rating, navigationType} per metric.
+      ref: /docs/app/guides/analytics
+    - id: debugging
+      name: Debugging
+      summary: '`--inspect`, VS Code, DevTools'
+      lenses: [observability]
+      signature: next dev --inspect
+      ref: /docs/app/guides/debugging
+    - id: self-hosting
+      name: Self-hosting
+      summary: 'Node server, Docker, `output: ''standalone''`, ISR handlers'
+      lenses: [reliability, cost]
+      ref: /docs/app/guides/self-hosting
+    - id: memory-usage
+      name: Memory usage
+      summary: dev/prod memory tuning, `turbopackMemoryEviction`
+      lenses: [perf, cost]
+      ref: /docs/app/guides/memory-usage
+    - id: local-development
+      name: Development environment
+      summary: '`next dev`, Turbopack FS cache, `allowedDevOrigins`, fast refresh'
+      lenses: [perf]
+      signature: next dev -H <host> -p <port>
+      notes: [dev output goes to .next/dev, so `next dev` and `next build` can run at once]
+      ref: /docs/app/guides/local-development
+  - id: g-testing
+    title: Testing and tooling guides
+    level: intermediate
+    requires: [install-structure]
+    ref: /docs/app/guides/testing
+    entries:
+    - id: testing-vitest
+      name: Testing with Vitest
+      summary: vitest.config.mts, jsdom, React Testing Library
+      lenses: [testing]
+      notes: ['async Server Components unsupported (use e2e); Vite 8 `resolve.tsconfigPaths: true`']
+      ref: /docs/app/guides/testing/vitest
+    - id: testing-e2e
+      name: Testing with Playwright/Cypress and Jest
+      summary: e2e for async components
+      lenses: [testing]
+      ref: /docs/app/guides/testing/playwright
+    - id: third-party-libs
+      name: Third-party libraries
+      summary: '`@next/third-parties` wrappers for analytics, maps and embeds'
+      lenses: [perf]
+      import: "@next/third-parties"
+      ref: /docs/app/guides/third-party-libraries
+    - id: package-bundling
+      name: Package bundling
+      summary: analyze bundles with `next experimental-analyze`; tune barrel imports and externals
+      lenses: [perf]
+      signature: next experimental-analyze [--output]
+      notes: ['see build-output for optimizePackageImports, serverExternalPackages, transpilePackages']
+      ref: /docs/app/guides/package-bundling
+    - id: version-16-upgrade
+      name: Version 16 upgrade
+      summary: async request APIs, Turbopack default, `middleware`→`proxy`, `next lint` removed
+      lenses: [best-practice, reliability]
+      notes: [typecheck = `next typegen && tsc`]
+      ref: /docs/app/guides/upgrading/version-16
+    - id: other-guides
+      name: Other guides (index)
+      summary: forms, i18n, MDX, PWAs, multi-tenant, multi-zones, CSS-in-JS, Sass, draft mode, static
+        exports, SPA mode, custom server
+      lenses: [reuse]
+      ref: /docs/app/guides
+  - id: g-caching-isr
+    title: Guides - caching, revalidation and prefetching
+    level: advanced
+    requires: [g-rendering]
+    ref: /docs/app/guides/how-revalidation-works
+    entries:
+    - id: guide-how-revalidation-works
+      name: How revalidation works
+      summary: time-based (stale-while-revalidate) vs on-demand revalidation, tag system and multi-instance coordination
+      lenses: [perf, reliability]
+      notes:
+      - a revalidation regenerates HTML and the RSC payload together; serving them from different renders mismatches client navigations
+      - deploymentId mitigates cross-deployment skew during rolling deploys
+      - Pages Router res.revalidate still goes through the server cacheHandler (singular)
+      ref: /docs/app/guides/how-revalidation-works
+    - id: guide-isr
+      name: Incremental Static Regeneration (guide)
+      summary: update static pages at runtime without a rebuild, with cache-control headers added automatically; for apps without Cache Components
+      lenses: [perf]
+      notes: [with cacheComponents see the ISR with Cache Components guide instead]
+      ref: /docs/app/guides/incremental-static-regeneration
+    - id: guide-isr-cache-components
+      name: ISR with Cache Components
+      summary: prerender a subset via generateStaticParams, serve the App Shell for other URLs and upgrade after first visit
+      lenses: [perf, ux-a11y]
+      signature: 'cacheComponents: true; partialPrefetching: true'
+      notes: [needs both flags; Cache Components yields the App Shell, Partial Prefetching upgrades it once params are known; replaces fallback:true]
+      ref: /docs/app/guides/incremental-static-regeneration-cache-components
+    - id: guide-cdn-caching
+      name: Using a CDN with Next.js
+      summary: Cache-Control per rendering strategy, immutable static assets, and CDN limits for on-demand revalidation
+      lenses: [perf]
+      notes:
+      - static pages s-maxage one year; ISR pages s-maxage plus stale-while-revalidate (expire minus revalidate); dynamic pages private no-store
+      - /_next/static assets are hashed with a one year immutable max-age; assetPrefix serves them from another origin
+      - CDN caching alone cannot honor revalidateTag/revalidatePath
+      ref: /docs/app/guides/cdn-caching
+    - id: guide-ci-build-caching
+      name: CI build caching
+      summary: persist .next/cache between CI builds to avoid the No Cache Detected warning and slow builds
+      lenses: [perf, cost]
+      notes: [Vercel configures it automatically; other CIs (CircleCI, Travis, GitLab, GitHub Actions) need an explicit cache step for .next/cache]
+      ref: /docs/app/guides/ci-build-caching
+    - id: guide-optimizing-prefetching
+      name: Optimizing prefetching
+      summary: with Cache Components and partialPrefetching, Link prefetch={true} resolves per-URL data while the default prefetch is one shared App Shell
+      lenses: [perf, ux-a11y]
+      signature: '<Link href="/search?q=react" prefetch={true}>'
+      notes: [the shared App Shell excludes params and searchParams; validate instant navigation first]
+      ref: /docs/app/guides/optimizing-prefetching
+    - id: guide-public-static-pages
+      name: Building public pages
+      summary: share data across users, prerender, stream non-blocking lists, then add a user-specific banner without losing static speed
+      lenses: [perf]
+      ref: /docs/app/guides/public-static-pages
+    - id: guide-interactive-apps
+      name: Building interactive apps
+      summary: stream slow reads with Suspense, instant toggles, optimistic UI, transitions and pending feedback around Server Functions
+      lenses: [ux-a11y, perf]
+      notes: [refresh() after mutations; feature-organized code under one folder per domain; patterns also improve FCP and LCP]
+      ref: /docs/app/guides/interactive-apps
+    - id: guide-auth-cache-components
+      name: Authentication with Cache Components
+      summary: read the session at request time behind Suspense, stream authenticated UI and cache session-derived data
+      lenses: [security, perf]
+      notes:
+      - session reads cannot enter the static shell; wrap them in Suspense so they stream on every navigation
+      - builds on the Authentication and Data Security guides; instant-navigation validation flags routes that read the session
+      ref: /docs/app/guides/authentication-with-cache-components
+    - id: guide-draft-mode
+      name: Draft Mode (guide)
+      summary: bypass caching so editors preview unpublished CMS content via a secret-guarded Route Handler
+      lenses: [security, best-practice]
+      notes:
+      - while enabled fetch skips the cache, `use cache` scopes re-run uncached, unstable_cache is bypassed and the page is sent private no-store
+      - the CMS opens /api/draft?secret=..&slug=..; validate the secret, enable draftMode and redirect to the slug
+      ref: /docs/app/guides/draft-mode
+    - id: guide-client-data-fetching
+      name: Client-side data fetching
+      summary: prefer passing a Promise to use() for one-time reads; use SWR or TanStack Query for a shared browser cache
+      lenses: [best-practice, perf]
+      notes: [patterns are inline loading, Suspense loading, or server-provided initial data (SWRConfig fallback or HydrationBoundary)]
+      ref: /docs/app/guides/client-side-data-fetching
+    - id: guide-swr
+      name: Client data with SWR
+      summary: useSWR with conditional keys, suspense option and server-provided fallback data
+      lenses: [best-practice]
+      signature: 'useSWR(key | null, fetcher, { suspense? }); <SWRConfig value={{ fallback }}>'
+      ref: /docs/app/guides/client-side-data-fetching/swr
+    - id: guide-tanstack-query
+      name: Client data with TanStack Query
+      summary: new QueryClient per server render and one in the browser; useQuery enabled option; HydrationBoundary for server data
+      lenses: [best-practice]
+      signature: 'useQuery({ queryKey, queryFn, enabled }); <HydrationBoundary state={dehydrate(client)}>'
+      ref: /docs/app/guides/client-side-data-fetching/tanstack-query
+    - id: guide-forms
+      name: Forms with Server Actions
+      summary: pass a Server Action to form action to receive FormData; bind extra args, validate and re-check auth inside each action
+      lenses: [security, best-practice]
+      signature: '<form action={serverAction}>; action.bind(null, userId)'
+      notes: [use Object.fromEntries(formData) for many fields; always verify authentication and authorization inside the action]
+      ref: /docs/app/guides/forms
+    - id: guide-redirecting
+      name: Handling redirects
+      summary: choose redirect/permanentRedirect, useRouter, next.config redirects, or Proxy NextResponse.redirect by where and when to redirect
+      lenses: [best-practice]
+      notes: [redirect is 307 (303 in Server Actions), permanentRedirect 308; large redirect lists need a scalable approach]
+      ref: /docs/app/guides/redirecting
+    - id: guide-server-client-boundary
+      name: Server and Client boundary
+      summary: Server Components run only on the server; Client Components render on server + browser; client never imports server code
+      lenses: [best-practice, security]
+      notes: [the server graph serializes props passed to Client Components into the RSC payload]
+      ref: /docs/app/guides/server-and-client-boundary
+  - id: g-platform-delivery
+    title: Guides - deployment, platforms and content
+    level: advanced
+    requires: [g-rendering]
+    ref: /docs/app/guides/deploying-to-platforms
+    entries:
+    - id: guide-deploying-to-platforms
+      name: Deploying to different platforms
+      summary: a Node.js server (next start) supports everything; feature matrix of streaming, shared cache and edge stitching needs
+      lenses: [reliability]
+      notes: [functional fidelity is passing the adapter test suite; edge stitching is a performance optimization, not correctness]
+      ref: /docs/app/guides/deploying-to-platforms
+    - id: guide-ppr-platform
+      name: Implementing PPR on your platform
+      summary: build emits a static shell, opaque postponedState and RSC payload; platforms stream the shell then resume
+      lenses: [perf]
+      notes: [treat postponedState as opaque; altering it produces wrong dynamic output]
+      ref: /docs/app/guides/ppr-platform-guide
+    - id: guide-custom-server
+      name: Custom server
+      summary: start Next programmatically (next(), app.prepare(), app.getRequestHandler()) only when the integrated router is not enough
+      lenses: [reliability]
+      import: next
+      signature: 'const app = next({ dev }); await app.prepare(); createServer((req, res) => handle(req, res))'
+      notes:
+      - set response headers before calling handle, since headers are sent inside handle
+      - cannot be combined with standalone output, which emits its own minimal server.js
+      ref: /docs/app/guides/custom-server
+    - id: guide-static-exports
+      name: Static exports
+      summary: output 'export' builds one HTML file per route into out/ for any static host; server-only features are unsupported
+      lenses: [perf, cost]
+      signature: "output: 'export'"
+      notes:
+      - 'unsupported: dynamic routes without generateStaticParams, request-dependent Route Handlers, cookies, rewrites/redirects/headers, Proxy, ISR, default image loader, Draft Mode, Server Actions, intercepting routes'
+      ref: /docs/app/guides/static-exports
+    - id: guide-spa
+      name: Single-page applications
+      summary: build strict SPAs with client-side navigation and data fetching, then add server features progressively
+      lenses: [best-practice]
+      ref: /docs/app/guides/single-page-applications
+    - id: guide-multi-zones
+      name: Multi-zones (micro-frontends)
+      summary: several Next.js apps serve different path sets under one domain, deployed independently
+      lenses: [composability]
+      ref: /docs/app/guides/multi-zones
+    - id: guide-multi-tenant
+      name: Multi-tenant apps
+      summary: points to a recommended reference architecture for one app serving many tenants
+      lenses: [composability]
+      ref: /docs/app/guides/multi-tenant
+    - id: guide-i18n
+      name: Internationalization
+      summary: pick a locale from Accept-Language with sub-path or domain routing and redirect in Proxy
+      lenses: [ux-a11y]
+      notes: [terminology covers locale identifiers such as en-US; use a negotiation library on the incoming Request headers]
+      ref: /docs/app/guides/internationalization
+    - id: guide-mdx
+      name: Markdown and MDX
+      summary: install @next/mdx and related packages, configure next.config.mjs, and add the required mdx-components file
+      lenses: [composability]
+      ref: /docs/app/guides/mdx
+    - id: guide-json-ld
+      name: JSON-LD
+      summary: render structured data as a script tag in a layout or page; sanitize the JSON string against XSS
+      lenses: [security, best-practice]
+      notes: [JSON.stringify does not sanitize, so escape < or use serialize-javascript; schema-dts types the payload]
+      ref: /docs/app/guides/json-ld
+    - id: guide-scripts
+      name: Loading and optimizing scripts
+      summary: next/script in layouts or pages with strategy beforeInteractive, afterInteractive (default), lazyOnload or experimental worker
+      lenses: [perf]
+      import: next/script
+      signature: '<Script src="..." strategy="afterInteractive" />'
+      notes: [worker strategy (Partytown) is not stable and does not yet work with the App Router]
+      ref: /docs/app/guides/scripts
+    - id: guide-css-in-js
+      name: CSS-in-JS
+      summary: supported only in Client Components, needing library support for concurrent rendering; styled-jsx and styled-components need a registry
+      lenses: [best-practice]
+      ref: /docs/app/guides/css-in-js
+    - id: guide-sass
+      name: Sass
+      summary: built-in support for .scss/.sass and CSS modules; configure compiler options via sassOptions
+      lenses: [best-practice]
+      ref: /docs/app/guides/sass
+    - id: guide-tailwind-v3
+      name: Tailwind CSS v3
+      summary: install v3 with init, set content paths in tailwind.config.js; v4 is the default current setup
+      lenses: [best-practice]
+      ref: /docs/app/guides/tailwind-v3-css
+    - id: guide-videos
+      name: Videos
+      summary: embed with video or iframe, store files off-bundle, and tune attributes (preload, controls, poster)
+      lenses: [perf]
+      ref: /docs/app/guides/videos
+    - id: guide-pwa
+      name: Progressive web apps
+      summary: manifest via app/manifest.ts, service worker, push notifications and install prompts
+      lenses: [ux-a11y]
+      ref: /docs/app/guides/progressive-web-apps
+    - id: guide-offline-support
+      name: Handling connectivity drops
+      summary: with experimental.useOffline failed navigations, fetches and Server Actions stay pending and retry; useOffline hook drives feedback
+      lenses: [reliability, ux-a11y]
+      notes: [direct client fetch() calls and libraries such as SWR keep their own retry policy]
+      ref: /docs/app/guides/offline-support
+  - id: g-migration
+    title: Guides - migrating and upgrading
+    level: intermediate
+    requires: [install-structure]
+    ref: /docs/app/guides/migrating
+    entries:
+    - id: guide-app-router-migration
+      name: Migrate from Pages to App Router
+      summary: upgrade Next/Node/ESLint, adopt shared features, then move routes from pages/ to app/ incrementally
+      lenses: [best-practice]
+      ref: /docs/app/guides/migrating/app-router-migration
+    - id: guide-from-cra
+      name: Migrate from Create React App
+      summary: replace client-only rendering, manual code splitting and waterfalls with Next.js routing and server rendering
+      lenses: [best-practice]
+      ref: /docs/app/guides/migrating/from-create-react-app
+    - id: guide-from-vite
+      name: Migrate from Vite
+      summary: same rationale and steps as CRA, for apps built with the default Vite React plugin
+      lenses: [best-practice]
+      ref: /docs/app/guides/migrating/from-vite
+    - id: guide-upgrade-14
+      name: Upgrade to 14
+      summary: Node 18.17 minimum, next export replaced by output export, ImageResponse moved to next/og, @next/font removed
+      lenses: [best-practice]
+      ref: /docs/app/guides/upgrading/version-14
+    - id: guide-upgrade-15
+      name: Upgrade to 15
+      summary: React 19 minimum, useFormState replaced by useActionState, async request APIs; use the upgrade codemod
+      lenses: [best-practice]
+      ref: /docs/app/guides/upgrading/version-15
+    - id: guide-codemods
+      name: Codemods
+      summary: npx @next/codemod <transform> <path> with --dry and --print for previewing programmatic upgrades
+      lenses: [best-practice, reuse]
+      signature: 'npx @next/codemod <transform> <path> [--dry] [--print]'
+      ref: /docs/app/guides/upgrading/codemods
+    - id: guide-testing-jest
+      name: Testing with Jest
+      summary: built-in next/jest config with React Testing Library; async Server Components are not supported by Jest
+      lenses: [testing]
+      ref: /docs/app/guides/testing/jest
+    - id: guide-testing-cypress
+      name: Testing with Cypress
+      summary: E2E and component testing; Cypress 13.6.3+ needed for TypeScript moduleResolution bundler
+      lenses: [testing]
+      ref: /docs/app/guides/testing/cypress
+- title: API Reference
+  sections:
+  - id: api-directives
+    title: Directives
+    level: intermediate
+    requires: [rsc-data]
+    ref: /docs/app/api-reference/directives
+    entries:
+    - id: use-client
+      name: '`"use client"`'
+      summary: marks a Client Component boundary; everything imported joins the client bundle
+      lenses: [perf, composability]
+      signature: '"use client"'
+      ref: /docs/app/api-reference/directives/use-client
+    - id: use-server
+      name: '`"use server"`'
+      summary: Server Functions/Actions
+      lenses: [security]
+      signature: '"use server"'
+      ref: /docs/app/api-reference/directives/use-server
+    - id: use-cache
+      name: '`"use cache"` / `cacheLife` / `cacheTag`'
+      summary: async-only cached functions or components; read cookies/headers outside, pass as args
+      lenses: [perf, cost]
+      import: next/cache
+      signature: "'use cache'; cacheLife('hours'); cacheTag('tag')"
+      options:
+      - {name: cacheLife, type: "'seconds'|'minutes'|'hours'|'days'|'weeks'|'max'|{stale,revalidate,expire}", default: "'default'", desc: "Explicit lifetime in every scope; default profile is stale 5m, revalidate 15m, expire never."}
+      - {name: cacheTag, type: "string", default: null, desc: "Label for on-demand invalidation via updateTag/revalidateTag; max 256 chars, case-sensitive."}
+      notes:
+      - 'needs `cacheComponents: true`; file-level directive caches every export (all must be async)'
+      - cache key = build id + function id + serializable args + closure captures
+      - nesting a short-lived cache inside one without explicit cacheLife fails the build
+      ref: /docs/app/api-reference/directives/use-cache
+    - id: use-cache-variants
+      name: '`"use cache: private"` and `"use cache: remote"`'
+      summary: runtime-data caching and shared remote cache handlers
+      lenses: [perf]
+      signature: "'use cache: private' | 'use cache: remote'"
+      notes: [remote needs a platform cache handler and a network round trip per check]
+      ref: /docs/app/api-reference/directives/use-cache-private
+  - id: api-components
+    title: Components
+    level: basic
+    requires: [routing-ui]
+    ref: /docs/app/api-reference/components
+    entries:
+    - id: font-component
+      name: next/font
+      summary: self-hosted fonts with zero layout shift; `variable` exposes a CSS custom property
+      lenses: [perf, ux-a11y]
+      import: next/font/google
+      signature: 'Inter({ subsets: [''latin''], variable: ''--font-sans'' })'
+      options:
+      - {name: subsets, type: "string[]", default: null, desc: "google only; subsets preloaded when preload is true."}
+      - {name: weight, type: "string | string[]", default: "'variable'", desc: "Required for non-variable fonts; a range like '100 900' works for variable ones."}
+      - {name: display, type: "string", default: "'swap'", desc: "font-display value: auto, block, swap, fallback, optional."}
+      - {name: variable, type: "string", default: null, desc: "CSS variable name to declare, applied via the returned .variable class."}
+      - {name: adjustFontFallback, type: "boolean | string", default: "true", desc: "Auto size-adjusted fallback font to cut layout shift (google: boolean; local: 'Arial'|'Times New Roman'|false)."}
+      - {name: preload, type: "boolean", default: "true", desc: "Inject a preload link for the font files."}
+      returns: A font object; apply its className, or its `variable` class when a CSS variable is configured.
+      ref: /docs/app/api-reference/components/font
+    - id: link-component
+      name: '`<Link>`'
+      summary: prefetch, `replace`, `scroll`, `useLinkStatus`
+      lenses: [perf, ux-a11y]
+      signature: replace, scroll, useLinkStatus
+      ref: /docs/app/api-reference/components/link
+    - id: image-component
+      name: '`<Image>`'
+      summary: '`remotePatterns`, quality allowlist, local IP restriction'
+      lenses: [perf, security]
+      signature: remotePatterns
+      ref: /docs/app/api-reference/components/image
+    - id: form-component
+      name: '`<Form>`'
+      summary: client-side navigation for GET forms
+      lenses: [ux-a11y]
+      ref: /docs/app/api-reference/components/form
+    - id: script-component
+      name: '`<Script>`'
+      summary: third-party script loading strategies
+      lenses: [perf]
+      ref: /docs/app/api-reference/components/script
+  - id: api-file-conventions
+    title: File-system conventions
+    level: intermediate
+    requires: [routing-ui]
+    ref: /docs/app/api-reference/file-conventions
+    entries:
+    - id: page-js
+      name: page.js
+      summary: '`params`/`searchParams` are Promises; `PageProps` helper'
+      lenses: [typing-dx]
+      signature: 'export default async function Page(props: PageProps<''/route/[id]''>)'
+      ref: /docs/app/api-reference/file-conventions/page
+    - id: layout-js
+      name: layout.js
+      summary: root layout `<html>`/`<body>`, `LayoutProps` helper
+      lenses: [composability]
+      signature: 'export default function Layout(props: LayoutProps<''/''>)'
+      ref: /docs/app/api-reference/file-conventions/layout
+    - id: error-js
+      name: error.js / global-error.js
+      summary: client error boundary per segment with `retry()` recovery; global-error replaces the root layout
+      lenses: [reliability, ux-a11y]
+      signature: export default function Error({ error, retry, reset })
+      params:
+      - {name: error, type: "Error & {digest?: string}", default: null, desc: "Caught error; production Server Component messages are masked, digest matches server logs."}
+      - {name: retry, type: "() => void", default: null, desc: "Re-fetches and re-renders the segment in a Transition; prefer it over reset."}
+      - {name: reset, type: "() => void", default: null, desc: "Clears the error and re-renders children without re-fetching."}
+      notes:
+      - must be a Client Component; does not wrap the layout or template in the same segment
+      - global-error.js defines its own html/body, gets no global CSS or theme, and cannot export metadata
+      ref: /docs/app/api-reference/file-conventions/error
+    - id: loading-not-found
+      name: loading.js / not-found.js / template.js
+      summary: instant Suspense fallback, 404 UI, and re-mounting layout wrapper
+      lenses: [ux-a11y, reliability]
+      signature: loading, not-found, global-not-found, template
+      notes: [global-not-found is experimental]
+      ref: /docs/app/api-reference/file-conventions/not-found
+    - id: route-js
+      name: route.js
+      summary: handler exports, `RouteContext`, segment config
+      lenses: [best-practice, typing-dx]
+      notes: ['`req.signal` aborts on disconnect']
+      ref: /docs/app/api-reference/file-conventions/route
+    - id: proxy-js
+      name: proxy.js reference
+      summary: matcher grammar, `NextProxy` type, `waitUntil`, `skipProxyUrlNormalize`
+      lenses: [security]
+      import: next/server
+      signature: 'export const config = { matcher: [...] }'
+      options:
+      - {name: matcher, type: "string | string[] | {source, locale?, has?, missing?}[]", default: null, desc: "Static constants only; source starts with /, supports :param*, regex in parens; anchored at the start."}
+      - {name: has / missing, type: "array of {type: header|query|cookie, key, value?}", default: null, desc: "Condition matchers on request elements inside a matcher object."}
+      notes:
+      - execution order - config headers, redirects, Proxy, beforeFiles, filesystem, afterFiles, dynamic routes
+      - 'NextProxy type infers (request, event); `event.waitUntil(promise)` keeps background work alive'
+      - '`NextResponse.next({ request: { headers } })` forwards upstream; `next({ headers })` leaks to the client, avoid'
+      ref: /docs/app/api-reference/file-conventions/proxy
+    - id: instrumentation-js
+      name: instrumentation.js / instrumentation-client.js
+      summary: server `register()` and `onRequestError`; client file runs before hydration with `onRouterTransitionStart`
+      lenses: [observability]
+      signature: register(); onRequestError(err, request, context)
+      params:
+      - {name: onRequestError.context, type: "object", default: null, desc: "routerKind, routePath, routeType (render|route|action|proxy), renderSource, revalidateReason, renderType."}
+      notes:
+      - await async work inside onRequestError; err may be React-processed, use err.digest
+      - instrumentation-client.ts needs no exports; wrap tracking in try/catch
+      ref: /docs/app/api-reference/file-conventions/instrumentation
+    - id: advanced-routing
+      name: Advanced routing
+      summary: dynamic segments, parallel/intercepting routes, route groups, default.js, forbidden/unauthorized.js
+      lenses: [composability]
+      ref: /docs/app/api-reference/file-conventions/dynamic-routes
+    - id: metadata-files
+      name: Metadata files
+      summary: favicon/icon, manifest, opengraph-image, robots, sitemap
+      lenses: [best-practice]
+      ref: /docs/app/api-reference/file-conventions/metadata
+    - id: route-segment-config
+      name: Route Segment Config
+      summary: per-segment exports - instant, maxDuration, dynamicParams, runtime, prefetch
+      lenses: [perf]
+      signature: instant, maxDuration, dynamicParams, runtime, prefetch
+      options:
+      - {name: maxDuration, type: "number", default: null, desc: "Max server execution seconds; platforms read it from build output (page level covers Server Actions)."}
+      - {name: dynamicParams, type: "boolean", default: "true", desc: "false 404s segments absent from generateStaticParams; unavailable with Cache Components."}
+      - {name: runtime, type: "'nodejs' | 'edge'", default: "'nodejs'", desc: "edge is deprecated; omit the export; not allowed in Proxy."}
+      ref: /docs/app/api-reference/file-conventions/route-segment-config
+  - id: api-functions
+    title: Functions
+    level: intermediate
+    requires: [api-file-conventions]
+    ref: /docs/app/api-reference/functions
+    entries:
+    - id: next-request-response
+      name: NextRequest / NextResponse
+      summary: Web Request/Response extended with cookies and a parsed `nextUrl`; NextResponse static helpers
+      lenses: [typing-dx, security]
+      import: next/server
+      signature: NextResponse.json(body, init) / redirect(url) / rewrite(url) / next(init)
+      returns: NextResponse instances; request.cookies and response.cookies expose get/getAll/set/delete/has.
+      notes:
+      - '`nextUrl.origin` is not the Host header'
+      - 'NextResponse.next({ request: { headers } }) forwards upstream; avoid copying all incoming headers'
+      ref: /docs/app/api-reference/functions/next-request
+    - id: request-apis
+      name: headers() / cookies() / draftMode() / connection()
+      summary: async in 16; opt routes into dynamic rendering
+      lenses: [perf, best-practice]
+      import: next/headers
+      signature: const h = await headers(); const c = await cookies()
+      ref: /docs/app/api-reference/functions/headers
+    - id: after
+      name: after()
+      summary: run logging/analytics after the response, not a request-time API
+      lenses: [perf, observability]
+      import: next/server
+      signature: after(callback)
+      params:
+      - {name: callback, type: "() => void | Promise<void>", default: null, desc: "Runs after the response (or prerender) finishes, even when the response errored."}
+      notes:
+      - usable in Server Components, Server Functions, Route Handlers and Proxy
+      - cookies()/headers() work inside the callback only in Route Handlers and Server Functions
+      - runs up to the route's maxDuration; nestable
+      ref: /docs/app/api-reference/functions/after
+    - id: io
+      name: io() / connection()
+      summary: keep non-deterministic reads (`Date`, `Math.random`) out of the static shell
+      lenses: [best-practice]
+      import: next/cache
+      signature: await io()
+      returns: A Promise<void> that suspends during prerender and resolves at request time.
+      notes:
+      - 'with Cache Components prefer io(); connection() (next/server) also blocks prefetches and replaces unstable_noStore'
+      - in Client Components call `use(io())`
+      ref: /docs/app/api-reference/functions/io
+    - id: cache-invalidation
+      name: Cache invalidation
+      summary: tag/path revalidation and immediate expiry; updateTag and refresh are Server-Action-only
+      lenses: [perf]
+      import: next/cache
+      signature: revalidateTag(tag, 'max'); updateTag(tag); revalidatePath(path, type?); refresh()
+      params:
+      - {name: revalidateTag.profile, type: "'max' | cacheLife profile | {expire}", default: null, desc: "Stale window; 'max' recommended; omitting it is deprecated and acts like {expire: 0}."}
+      - {name: revalidatePath.type, type: "'page' | 'layout'", default: null, desc: "Required when path has a dynamic segment such as /product/[slug]."}
+      notes:
+      - 'updateTag: Server Actions only, expires immediately (read-your-writes); revalidateTag: Server Functions and Route Handlers'
+      - '`unstable_cache` and `unstable_noStore` are superseded in 16'
+      ref: /docs/app/api-reference/functions/revalidateTag
+    - id: redirect-notfound
+      name: Redirects and not-found
+      summary: throwing helpers that end rendering; call outside try/catch or `unstable_rethrow`
+      lenses: [reliability]
+      import: next/navigation
+      signature: redirect(path, type?); notFound(); unstable_rethrow(err)
+      notes:
+      - forbidden() and unauthorized() need the experimental authInterrupts config
+      - they throw internal errors; a catch block swallows them unless it calls unstable_rethrow(err)
+      ref: /docs/app/api-reference/functions/redirect
+    - id: catch-error
+      name: catchError
+      summary: component-level error boundary with `retry()`; handles redirect/notFound throws
+      lenses: [reliability, ux-a11y]
+      import: next/error
+      signature: catchError((props, { error, retry, reset }) => ReactNode)
+      returns: A wrapper component taking props plus children; it resets on client navigation.
+      notes:
+      - fallback must live in a Client Component module
+      - unlike a hand-rolled class boundary it lets redirect/notFound pass through and retries inside a Transition
+      ref: /docs/app/api-reference/functions/catchError
+    - id: generate-metadata
+      name: Generators
+      summary: metadata/viewport generators; use the static exports when nothing depends on the request
+      lenses: [best-practice]
+      import: next
+      signature: 'export const metadata: Metadata; export const viewport: Viewport'
+      notes:
+      - viewport (themeColor, colorScheme, width) is a separate export from metadata
+      - generateMetadata/generateViewport are Server Component only; also generateStaticParams, generateSitemaps, ImageResponse
+      ref: /docs/app/api-reference/functions/generate-metadata
+    - id: navigation-hooks
+      name: Navigation hooks
+      summary: client hooks for router, pathname, params and search params
+      lenses: [ux-a11y]
+      signature: useRouter, usePathname, useParams, useSearchParams, useSelectedLayoutSegment
+      ref: /docs/app/api-reference/functions/use-router
+    - id: fetch-extended
+      name: Extended fetch
+      summary: server fetch with Next cache and revalidate options
+      lenses: [perf]
+      signature: 'fetch(url, { cache, next: { revalidate, tags } })'
+      ref: /docs/app/api-reference/functions/fetch
+  - id: api-config
+    title: Configuration (next.config.ts)
+    level: intermediate
+    requires: [install-structure]
+    ref: /docs/app/api-reference/config/next-config-js
+    entries:
+    - id: next-config
+      name: next.config.ts
+      summary: '`NextConfig` type, async `headers()`, `poweredByHeader: false`'
+      lenses: [security, typing-dx]
+      import: next
+      signature: 'const nextConfig: NextConfig = { poweredByHeader: false, async headers() {} }'
+      options:
+      - {name: headers, type: "() => Promise<{source, headers: {key,value}[]}[]>", default: null, desc: "Response headers per path pattern; later matching rules override same keys; checked before the filesystem."}
+      - {name: poweredByHeader, type: "boolean", default: "true", desc: "false removes the X-Powered-By response header."}
+      notes: [export constants so tests can assert them]
+      ref: /docs/app/api-reference/config/next-config-js/headers
+    - id: react-compiler
+      name: reactCompiler
+      summary: automatic memoization via `babel-plugin-react-compiler`; opt-in per component with annotation mode
+      lenses: [perf, best-practice]
+      signature: 'reactCompiler: true | { compilationMode: ''annotation'' }'
+      options:
+      - {name: compilationMode, type: "'annotation'", default: null, desc: "Only compile components or hooks marked with the 'use memo' directive ('use no memo' opts out)."}
+      notes:
+      - needs babel-plugin-react-compiler as a dev dependency
+      - Next only runs the compiler on files with JSX or hooks, so builds slow slightly
+      ref: /docs/app/api-reference/config/next-config-js/reactCompiler
+    - id: typed-routes
+      name: typedRoutes
+      summary: statically typed `<Link href>` and route helpers
+      lenses: [typing-dx]
+      signature: 'typedRoutes: true'
+      notes: [stable (not experimental.typedRoutes); needs TypeScript]
+      ref: /docs/app/api-reference/config/next-config-js/typedRoutes
+    - id: cache-components-config
+      name: cacheComponents
+      summary: enables PPR-by-default + `use cache`; requires Node runtime; Activity-based navigation
+      lenses: [perf]
+      signature: 'cacheComponents: true'
+      since: "16.0.0"
+      notes: [replaces experimental.ppr, useCache and dynamicIO; cannot combine with runtime = 'edge']
+      ref: /docs/app/api-reference/config/next-config-js/cacheComponents
+    - id: allowed-dev-origins
+      name: allowedDevOrigins
+      summary: hostnames (no ports) allowed to hit dev assets/endpoints, `*`/`**` wildcards
+      lenses: [security]
+      signature: 'allowedDevOrigins: [''*.tunnel.example.com'']'
+      notes:
+      - localhost, its subdomains and the started hostname are always allowed
+      - '`*` is one hostname label, `**` one or more and only at the start; matched on the Origin (else Referer) hostname'
+      ref: /docs/app/api-reference/config/next-config-js/allowedDevOrigins
+    - id: server-actions-config
+      name: serverActions
+      summary: Server Actions CSRF origin allowlist and body size limit
+      lenses: [security]
+      signature: 'serverActions: { allowedOrigins, bodySizeLimit }'
+      ref: /docs/app/api-reference/config/next-config-js/serverActions
+    - id: proxy-body-size
+      name: Proxy limits
+      summary: caps the body Proxy buffers; `skipProxyUrlNormalize` exposes the raw URL
+      lenses: [security, reliability]
+      signature: experimental.proxyClientMaxBodySize, skipProxyUrlNormalize
+      options:
+      - {name: experimental.proxyClientMaxBodySize, type: "string | number", default: "'10mb'", desc: "Buffer cap when Proxy is used; over the cap the body is truncated, a warning logs and the request still proceeds."}
+      notes:
+      - applies only when a proxy.ts exists; it does not cap Route Handler bodies
+      ref: /docs/app/api-reference/config/next-config-js/proxyClientMaxBodySize
+    - id: images-config
+      name: images
+      summary: next/image allowlists, quality set and cache TTL
+      lenses: [security, perf]
+      signature: 'images: { remotePatterns, qualities, minimumCacheTTL, dangerouslyAllowLocalIP }'
+      ref: /docs/app/api-reference/config/next-config-js/images
+    - id: build-output
+      name: Build output options
+      summary: standalone output tracing, bundle externals and import optimization
+      lenses: [perf, cost]
+      signature: 'output: ''standalone''; serverExternalPackages; optimizePackageImports; transpilePackages'
+      options:
+      - {name: output, type: "'standalone' | 'export'", default: null, desc: "standalone writes .next/standalone with a traced minimal server.js; copy public/ and .next/static yourself."}
+      - {name: serverExternalPackages, type: "string[]", default: null, desc: "Packages left unbundled in Server Components and Route Handlers (native Node require)."}
+      - {name: experimental.optimizePackageImports, type: "string[]", default: null, desc: "Load only used modules of barrel-heavy packages; lucide-react is optimized by default."}
+      - {name: transpilePackages, type: "string[]", default: null, desc: "Compile node_modules packages shipping raw TS/JSX; names only, no paths or globs."}
+      ref: /docs/app/api-reference/config/next-config-js/output
+    - id: turbopack-config
+      name: turbopack / turbopackFileSystemCache / turbopackMemoryEviction
+      summary: Turbopack is the default bundler in 16, with a persistent disk cache for dev and build
+      lenses: [perf]
+      signature: experimental.turbopackFileSystemCacheForDev / ForBuild; experimental.turbopackMemoryEviction
+      options:
+      - {name: turbopackFileSystemCacheForDev, type: "boolean", default: "true", desc: "Cache dev compilation in .next/dev/cache/turbopack (default since 16.1)."}
+      - {name: turbopackFileSystemCacheForBuild, type: "boolean", default: "true", desc: "Cache build work in .next/cache/turbopack (default since 16.3); restore .next/cache in CI."}
+      - {name: turbopackMemoryEviction, type: "false | 'auto' | 'full'", default: "'auto'", desc: "Dev only: evict in-memory data once persisted; experimental."}
+      notes: ['`--webpack` opts out']
+      ref: /docs/app/api-reference/config/next-config-js/turbopack
+    - id: react-strict-mode
+      name: reactStrictMode
+      summary: default true under the App Router; dev-only double render and Effect re-run
+      lenses: [reliability, testing]
+      ref: /docs/app/api-reference/config/next-config-js/reactStrictMode
+    - id: config-misc
+      name: Other options
+      summary: logging, devIndicators, taint (experimental), authInterrupts (experimental), staleTimes
+      lenses: [reuse]
+      notes: ['also partialPrefetching, useOffline, adapterPath, agentRules']
+      ref: /docs/app/api-reference/config/next-config-js
+    - id: ts-config
+      name: TypeScript
+      summary: '`next-env.d.ts`, TS plugin `{ "name": "next" }`, `RouteContext`/`PageProps` generated
+        types; TypeScript 7 supported'
+      lenses: [typing-dx]
+      signature: 'next-env.d.ts, { "name": "next" }, RouteContext, PageProps'
+      notes:
+      - next-env.d.ts is managed by Next and should be gitignored
+      - 'TS 7: `next build` type-checks via the project-local tsc CLI; `experimental.useTypeScriptCli: false` restores the JS API'
+      - select the workspace TypeScript version in the editor to enable the Next plugin
+      ref: /docs/app/api-reference/config/typescript
+    - id: eslint-config
+      name: ESLint
+      summary: '`eslint-config-next`, `/core-web-vitals`, `/typescript`; flat config `defineConfig`; `next
+        lint` removed'
+      lenses: [best-practice, ux-a11y]
+      import: eslint-config-next/core-web-vitals
+      signature: defineConfig([...nextVitals, ...nextTs, globalIgnores([...])])
+      notes:
+      - includes react, react-hooks and @next/next recommended rules
+      - core-web-vitals promotes some @next/next rules from warnings to errors
+      - default ignores are .next/**, out/**, build/**, next-env.d.ts
+      ref: /docs/app/api-reference/config/eslint
+  - id: api-cli
+    title: CLI and adapters
+    level: intermediate
+    requires: [install-structure]
+    ref: /docs/app/api-reference/cli/next
+    entries:
+    - id: next-cli
+      name: next CLI
+      summary: dev, build, start, typegen, info, upgrade, experimental-analyze; bare `next` is `next dev`
+      lenses: [best-practice, reliability]
+      signature: next {dev|build|start|typegen|info|upgrade|experimental-analyze} [options]
+      options:
+      - {name: "-H, --hostname", type: "string", default: "0.0.0.0", desc: "dev/start bind host; bind 127.0.0.1 unless the network should reach it."}
+      - {name: "-p, --port", type: "number", default: "3000", desc: "dev/start port (env PORT)."}
+      - {name: --webpack, type: "flag", default: null, desc: "dev/build with webpack instead of default Turbopack."}
+      - {name: typegen, type: "command", default: null, desc: "Generates route types and next-env.d.ts without building; use before `tsc --noEmit` in CI."}
+      notes: [dev builds to .next/dev, builds to .next]
+      ref: /docs/app/api-reference/cli/next
+    - id: adapters
+      name: Build Adapters API (alpha)
+      summary: adapterPath, routing, output types, PPR in adapters
+      lenses: [composability]
+      ref: /docs/app/api-reference/adapters
+    - id: edge-runtime
+      name: Edge Runtime
+      summary: Edge Runtime
+      lenses: [reliability]
+      signature: runtime = 'edge'
+      deprecated: Edge runtime deprecated in 16; use Node
+      ref: /docs/app/api-reference/edge
+    - id: turbopack-ref
+      name: Turbopack reference
+      summary: supported features, loaders, debugIds
+      lenses: [perf]
+      ref: /docs/app/api-reference/turbopack
+  - id: api-fn-cache
+    title: Functions - caching and revalidation
+    level: intermediate
+    requires: [api-functions]
+    ref: /docs/app/api-reference/functions/cacheLife
+    entries:
+    - id: cache-life
+      name: cacheLife()
+      summary: set stale/revalidate/expire for a `use cache` scope from a preset, custom or inline profile
+      lenses: [perf, best-practice]
+      import: next/cache
+      signature: "cacheLife(profile: 'default' | 'seconds' | 'minutes' | 'hours' | 'days' | 'weeks' | 'max' | string | { stale?, revalidate?, expire? })"
+      params:
+      - {name: stale, type: "number (seconds)", default: "default profile (5 min)", desc: "How long the client router may reuse cached data without asking the server."}
+      - {name: revalidate, type: "number (seconds)", default: "default profile (15 min)", desc: "After this the next request serves stale and refreshes in the background."}
+      - {name: expire, type: "number (seconds)", default: "never", desc: "After this with no traffic the next request waits for fresh content; must exceed revalidate."}
+      notes:
+      - needs cacheComponents; only valid inside a cache directive scope, never at module scope
+      - set it in every `use cache` scope and in the same function (not a shared helper); at most one call runs per invocation
+      - preset profiles can be redefined, and custom names added, via cacheLife in next.config; types are generated by next dev/build/typegen
+      - 'cacheLife({}) applies the default profile; omitted keys of custom or inline profiles inherit from default'
+      ref: /docs/app/api-reference/functions/cacheLife
+    - id: cache-tag
+      name: cacheTag()
+      summary: tag a cache entry for on-demand invalidation with updateTag/revalidateTag
+      lenses: [perf]
+      import: next/cache
+      signature: 'cacheTag(...tags: string[])'
+      notes:
+      - 'limits: up to 128 tags per call, each at most 256 characters (longer tags are skipped)'
+      - tags are idempotent; call inside the `use cache` function or component, tag may derive from fetched data
+      - 'purge with updateTag (Server Actions, read-your-own-writes) or revalidateTag (Route Handlers, stale-while-revalidate)'
+      ref: /docs/app/api-reference/functions/cacheTag
+    - id: update-tag
+      name: updateTag()
+      summary: Server-Action-only immediate expiry of a tag so the next read waits for fresh data
+      lenses: [perf, ux-a11y]
+      import: next/cache
+      signature: 'updateTag(tag: string)'
+      notes:
+      - tag max 256 chars and case-sensitive; assigned via cacheTag or fetch `next.tags`
+      - unlike revalidateTag it serves no stale content; use revalidateTag from Route Handlers
+      ref: /docs/app/api-reference/functions/updateTag
+    - id: revalidate-path
+      name: revalidatePath()
+      summary: invalidate cached data for a path or a route pattern from Server Functions and Route Handlers
+      lenses: [perf]
+      import: next/cache
+      signature: 'revalidatePath(path: string, type?: ''page'' | ''layout'')'
+      notes:
+      - not callable from Client Components or Proxy
+      - in Server Functions the UI updates immediately; in Route Handlers it only marks the path for the next visit
+      - pass the destination path (route file location) when rewrites apply, not the browser-visible source
+      - a layout path also invalidates nested layouts and pages beneath it; a route-handler path invalidates its cached GET data
+      ref: /docs/app/api-reference/functions/revalidatePath
+    - id: refresh
+      name: refresh()
+      summary: refresh the client router from a Server Action without invalidating tagged cache data
+      lenses: [ux-a11y]
+      import: next/cache
+      signature: 'refresh(): void'
+      notes: [only callable inside Server Actions; elsewhere it throws]
+      ref: /docs/app/api-reference/functions/refresh
+    - id: connection
+      name: connection()
+      summary: await a real request before running non-deterministic or synchronous-driver code
+      lenses: [best-practice, perf]
+      import: next/server
+      signature: 'await connection(): Promise<void>'
+      notes:
+      - prerendering stops at the await; use before Math.random(), new Date() or synchronous drivers such as better-sqlite3
+      - for components that need per-request output without cookies()/headers()
+      ref: /docs/app/api-reference/functions/connection
+    - id: unstable-cache
+      name: unstable_cache()
+      summary: legacy function-result cache; replaced by the `use cache` directive in 16
+      lenses: [perf]
+      import: next/cache
+      signature: unstable_cache(fetchData, keyParts?, { tags?, revalidate? })
+      deprecated: replaced by the `use cache` directive with Cache Components
+      notes: [reading cookies()/headers() inside the cached function is not supported; pass them as arguments]
+      ref: /docs/app/api-reference/functions/unstable_cache
+    - id: unstable-nostore
+      name: unstable_noStore()
+      summary: opt a component out of prerendering and caching; use connection() instead
+      lenses: [perf]
+      import: next/cache
+      signature: unstable_noStore()
+      deprecated: deprecated in 15 for connection()
+      notes:
+      - "equivalent to fetch `cache: 'no-store'`; finer-grained than `dynamic = 'force-dynamic'`"
+      ref: /docs/app/api-reference/functions/unstable_noStore
+  - id: api-fn-request
+    title: Functions - request data and responses
+    level: intermediate
+    requires: [api-functions]
+    ref: /docs/app/api-reference/functions/cookies
+    entries:
+    - id: cookies-fn
+      name: cookies()
+      summary: async cookie store, read in Server Components and read/write in Server Functions and Route Handlers
+      lenses: [security, best-practice]
+      import: next/headers
+      signature: const store = await cookies(); store.get(name) / getAll() / has(name) / set(name, value, options) / delete(name)
+      params:
+      - {name: httpOnly, type: boolean, default: null, desc: "Keeps the cookie from client-side scripts."}
+      - {name: secure, type: boolean, default: null, desc: "Send only over HTTPS."}
+      - {name: sameSite, type: "boolean | 'lax' | 'strict' | 'none'", default: null, desc: "Cross-site request behavior."}
+      - {name: path, type: string, default: "'/'", desc: "Scope within the domain; the only option with a default."}
+      - {name: maxAge, type: number, default: null, desc: "Lifespan in seconds (alternatively expires: Date)."}
+      - {name: partitioned, type: boolean, default: null, desc: "CHIPS partitioned cookie."}
+      notes:
+      - async since 15; calling it in a layout or page makes the route dynamic
+      - with Cache Components call it inside Suspense or the route cannot prerender; not allowed inside `use cache` scopes
+      ref: /docs/app/api-reference/functions/cookies
+    - id: draft-mode-fn
+      name: draftMode()
+      summary: async handle to enable, disable and check Draft Mode (bypass cookie) for previews
+      lenses: [best-practice]
+      import: next/headers
+      signature: const { isEnabled, enable, disable } = await draftMode()
+      notes:
+      - enable()/disable() work in Route Handlers via the __prerender_bypass cookie; value regenerates each `next build`
+      - isEnabled is readable inside `use cache` scopes; enable()/disable() there throw, and cached scopes re-run per request while draft is on
+      ref: /docs/app/api-reference/functions/draft-mode
+    - id: next-response-api
+      name: NextResponse
+      summary: Response subclass with cookies helper and static json/redirect/rewrite/next constructors
+      lenses: [typing-dx]
+      import: next/server
+      signature: NextResponse.json(body, init?) / redirect(url, status?) / rewrite(url) / next()
+      notes:
+      - response.cookies mirrors the request cookies API (set/get/getAll/has/delete) over Set-Cookie
+      - redirect URLs can be built and mutated from request.nextUrl first
+      ref: /docs/app/api-reference/functions/next-response
+    - id: user-agent
+      name: userAgent()
+      summary: parse the request UA into isBot, browser, device, engine, os and cpu
+      lenses: [best-practice]
+      import: next/server
+      signature: const { isBot, browser, device, engine, os, cpu } = userAgent(request)
+      notes: [fields may be undefined when unidentifiable; usually called in Proxy]
+      ref: /docs/app/api-reference/functions/userAgent
+    - id: root-params
+      name: next/root-params
+      summary: generated async getters for dynamic segments above the root layout, usable anywhere in Server Components
+      lenses: [composability, typing-dx]
+      import: next/root-params
+      signature: import { lang } from 'next/root-params'; const l = await lang()
+      notes:
+      - export names come from root segment folder names and must be valid JS identifiers (no kebab-case)
+      - Server Components only (not Client Components, Server Actions or Route Handlers); types generated by dev/build/typegen
+      - under Cache Components a generateStaticParams returning root params is required
+      ref: /docs/app/api-reference/functions/next-root-params
+  - id: api-fn-errors
+    title: Functions - errors, redirects and status pages
+    level: intermediate
+    requires: [api-functions]
+    ref: /docs/app/api-reference/functions/not-found
+    entries:
+    - id: not-found-fn
+      name: notFound()
+      summary: throw to render the nearest not-found UI with a 404; works in Server Components, Server Functions, Route Handlers
+      lenses: [reliability, ux-a11y]
+      import: next/navigation
+      signature: 'notFound(): never'
+      notes:
+      - no `return` needed (never type); a surrounding try/catch swallows it, so rethrow with unstable_rethrow
+      - after streaming starts (inside Suspense) the status stays 200 while the not-found UI still renders
+      - in a Route Handler it serves a plain 404
+      ref: /docs/app/api-reference/functions/not-found
+    - id: forbidden-fn
+      name: forbidden()
+      summary: throw a 403 page via forbidden.tsx; needs experimental authInterrupts
+      lenses: [security, reliability]
+      import: next/navigation
+      signature: 'forbidden(): never'
+      since: "15.1.0"
+      notes:
+      - enable `experimental.authInterrupts`; cannot be called from the root layout
+      - put role checks in the data access layer; inside Suspense the response is already 200
+      - a try/catch or an un-awaited promise suppresses the UI (dev logs an unhandledRejection)
+      ref: /docs/app/api-reference/functions/forbidden
+    - id: unauthorized-fn
+      name: unauthorized()
+      summary: throw a 401 page via unauthorized.tsx, e.g. to show login UI; needs experimental authInterrupts
+      lenses: [security, reliability]
+      import: next/navigation
+      signature: 'unauthorized(): never'
+      notes:
+      - enable `experimental.authInterrupts`; cannot be called from the root layout
+      - usable in Server Components, Server Functions and Route Handlers; same try/catch caveats as forbidden()
+      ref: /docs/app/api-reference/functions/unauthorized
+    - id: permanent-redirect
+      name: permanentRedirect()
+      summary: 308 redirect (redirect() issues 307); throws NEXT_REDIRECT and replaces in Server Components, pushes in Server Actions
+      lenses: [best-practice]
+      import: next/navigation
+      signature: "permanentRedirect(path: string, type?: RedirectType.replace | RedirectType.push): never"
+      notes: [call outside try blocks in Server Actions and Route Handlers; type has no effect in Server Components]
+      ref: /docs/app/api-reference/functions/permanentRedirect
+    - id: unstable-rethrow
+      name: unstable_rethrow()
+      summary: re-throw Next.js control-flow errors (redirect, notFound, runtime-data bailouts) at the top of a catch block
+      lenses: [reliability]
+      import: next/navigation
+      signature: 'unstable_rethrow(error: unknown)'
+      notes:
+      - covers notFound, redirect, permanentRedirect and request-time API bailouts (cookies, headers, searchParams, no-store fetch)
+      - do cleanup before it or in finally; prefer wrapping throwing calls so the caller handles them
+      ref: /docs/app/api-reference/functions/unstable_rethrow
+  - id: api-fn-generators
+    title: Functions - generators and image responses
+    level: intermediate
+    requires: [api-functions]
+    ref: /docs/app/api-reference/functions/generate-static-params
+    entries:
+    - id: generate-static-params
+      name: generateStaticParams()
+      summary: return the param sets of dynamic segments to prerender at build time (pages, layouts, Route Handlers)
+      lenses: [perf]
+      signature: 'export async function generateStaticParams(): Promise<{ [segment]: string | string[] }[]>'
+      params:
+      - {name: options.params, type: "Promise<params>", default: null, desc: "Parent segment params; child runs once per parent param set."}
+      notes:
+      - runs before the layouts/pages build and not again on ISR; replaces getStaticPaths
+      - control unlisted params with the `dynamicParams` segment option; return [] or `dynamic = 'force-static'` to ISR everything on demand
+      - catch-all segments return string arrays
+      ref: /docs/app/api-reference/functions/generate-static-params
+    - id: generate-viewport
+      name: viewport / generateViewport()
+      summary: viewport object or function (themeColor, width, initialScale, colorScheme) separate from metadata
+      lenses: [best-practice, ux-a11y]
+      import: next
+      signature: 'export const viewport: Viewport; export function generateViewport({ params }): Viewport'
+      notes:
+      - Server Components only; cannot export both object and function from one segment
+      - prefer the static object when nothing depends on the request
+      - with Cache Components viewport cannot stream, so request-time data in it blocks the page
+      - themeColor accepts an array with media queries for light/dark
+      ref: /docs/app/api-reference/functions/generate-viewport
+    - id: generate-image-metadata
+      name: generateImageMetadata()
+      summary: return several image variants (id, alt, size, contentType) for icon/opengraph-image files
+      lenses: [best-practice]
+      import: next
+      signature: 'export function generateImageMetadata({ params }): { id: string | number; alt?; size?; contentType? }[]'
+      notes:
+      - the image function then receives `id` and `params` as promises
+      - ids become the URL suffix of each generated image
+      ref: /docs/app/api-reference/functions/generate-image-metadata
+    - id: generate-sitemaps
+      name: generateSitemaps()
+      summary: split a sitemap into several files at /sitemap/[id].xml
+      lenses: [perf]
+      import: next
+      signature: 'export async function generateSitemaps(): Promise<{ id: number }[]>'
+      since: "13.3.2"
+      notes: ['in 16 the sitemap function receives `id` as a promise resolving to a string']
+      ref: /docs/app/api-reference/functions/generate-sitemaps
+    - id: image-response
+      name: ImageResponse
+      summary: render JSX/CSS to PNG with Satori and Resvg for OG images; subset of CSS, 500KB bundle cap
+      lenses: [best-practice]
+      import: next/og
+      signature: 'new ImageResponse(element: ReactElement, options?: { width, height, fonts, status, headers })'
+      notes:
+      - flexbox only, no display:grid; fonts ttf/otf/woff (ttf/otf parse faster); read font files once at module scope
+      - usable in Route Handlers and in opengraph-image/twitter-image files
+      ref: /docs/app/api-reference/functions/image-response
+  - id: api-fn-hooks
+    title: Functions - client hooks
+    level: intermediate
+    requires: [api-functions]
+    ref: /docs/app/api-reference/functions/use-pathname
+    entries:
+    - id: use-pathname-hook
+      name: usePathname()
+      summary: current pathname in a Client Component; layout state survives navigation
+      lenses: [ux-a11y]
+      import: next/navigation
+      signature: 'const pathname: string = usePathname()'
+      notes:
+      - Client Components only; reading the URL in Server Components is deliberately unsupported
+      - with rewrites or Proxy on a prerendered page the value can differ between hydration and navigation
+      ref: /docs/app/api-reference/functions/use-pathname
+    - id: use-search-params-hook
+      name: useSearchParams()
+      summary: read-only URLSearchParams of the current query string in a Client Component
+      lenses: [ux-a11y, perf]
+      import: next/navigation
+      signature: 'const searchParams: ReadonlyURLSearchParams = useSearchParams()'
+      notes:
+      - on prerendered routes the tree up to the nearest Suspense boundary client-renders; wrap the consumer in <Suspense>
+      - use getAll() for repeated keys; null only appears when a pages/ directory coexists
+      ref: /docs/app/api-reference/functions/use-search-params
+    - id: use-params-hook
+      name: useParams()
+      summary: filled dynamic params of the current route in a Client Component
+      lenses: [typing-dx]
+      import: next/navigation
+      signature: 'const params = useParams<{ slug: string }>()'
+      notes: ['catch-all segments give string[]; empty object when no dynamic segments; may need Suspense under cacheComponents']
+      ref: /docs/app/api-reference/functions/use-params
+    - id: use-selected-layout-segment-hook
+      name: useSelectedLayoutSegment()
+      summary: active child segment one level below the calling layout, for tabs and nav styling
+      lenses: [ux-a11y]
+      import: next/navigation
+      signature: 'useSelectedLayoutSegment(parallelRouteKey?: string): string | null'
+      notes: [catch-all matches return one joined string; Layouts are Server Components so call it from a Client child]
+      ref: /docs/app/api-reference/functions/use-selected-layout-segment
+    - id: use-selected-layout-segments-hook
+      name: useSelectedLayoutSegments()
+      summary: all active segments below the calling layout, e.g. for breadcrumbs
+      lenses: [ux-a11y]
+      import: next/navigation
+      signature: 'useSelectedLayoutSegments(parallelRouteKey?: string): string[]'
+      notes: [includes route groups so filter them out; catch-all matches are one joined string]
+      ref: /docs/app/api-reference/functions/use-selected-layout-segments
+    - id: use-link-status-hook
+      name: useLinkStatus()
+      summary: pending state of a Link navigation from a descendant component, for inline feedback
+      lenses: [ux-a11y]
+      import: next/link
+      signature: 'const { pending } = useLinkStatus()'
+      notes:
+      - must render inside a Link; mostly useful with prefetch={false} or dynamic routes lacking loading.js
+      - skipped when the route is prefetched; only the last clicked link shows pending
+      - 'avoid layout shift: keep a fixed-size hint and toggle opacity'
+      ref: /docs/app/api-reference/functions/use-link-status
+    - id: use-offline-hook
+      name: useOffline()
+      summary: boolean connectivity hook; needs experimental.useOffline, else always false
+      lenses: [ux-a11y, reliability]
+      import: next/offline
+      signature: 'const isOffline: boolean = useOffline()'
+      notes: [false on the server and before hydration; turns on offline detection and automatic retry when the flag is set]
+      ref: /docs/app/api-reference/functions/use-offline
+    - id: use-report-web-vitals
+      name: useReportWebVitals()
+      summary: report Core Web Vitals metrics to analytics from a small Client Component
+      lenses: [observability, perf]
+      import: next/web-vitals
+      signature: 'useReportWebVitals((metric) => void)'
+      params:
+      - {name: metric, type: "{ id, name, delta, entries, navigationType, rating, value }", default: null, desc: "name is TTFB, FCP, LCP, FID, CLS or a Next-specific metric; rating is good, needs-improvement or poor."}
+      notes: [pass a stable callback to avoid duplicate reports; keep the hook in a dedicated 'use client' component rendered from the layout]
+      ref: /docs/app/api-reference/functions/use-report-web-vitals
+  - id: api-fc-routing
+    title: File conventions - routing and UI states
+    level: intermediate
+    requires: [api-file-conventions]
+    ref: /docs/app/api-reference/file-conventions/parallel-routes
+    entries:
+    - id: parallel-routes
+      name: Parallel routes (@slot)
+      summary: '@folder slots passed as layout props render several pages in one view with independent navigation'
+      lenses: [composability, ux-a11y]
+      signature: 'app/@analytics/page.tsx -> layout({ children, analytics })'
+      notes:
+      - slots are not URL segments; soft navigation keeps each slot's active state, hard load needs default.js per slot
+      - useSelectedLayoutSegment(s) accepts a parallelRouteKey to read a slot's active segment
+      - slots can hold their own loading.js and error.js for independent streaming and errors
+      ref: /docs/app/api-reference/file-conventions/parallel-routes
+    - id: default-file
+      name: default.js
+      summary: fallback rendered for an unmatched parallel slot (or children) after a hard navigation
+      lenses: [reliability]
+      signature: 'export default function Default({ params }: { params: Promise<...> })'
+      notes: [without it named slots return a 404; children is an implicit slot and also needs a default.js; params is a promise]
+      ref: /docs/app/api-reference/file-conventions/default
+    - id: intercepting-routes
+      name: Intercepting routes
+      summary: '(.) (..) (..)(..) (...) folders load another route inside the current layout, e.g. modals, keeping the shareable URL'
+      lenses: [ux-a11y, composability]
+      signature: 'app/feed/(..)photo/[id]/page.tsx'
+      notes:
+      - the convention is relative to route segments, not the file system (slots and groups do not count as levels)
+      - a refresh or direct visit renders the full route instead of the interception
+      - typically combined with a parallel-route slot for modals
+      ref: /docs/app/api-reference/file-conventions/intercepting-routes
+    - id: route-groups
+      name: Route groups (folder)
+      summary: parenthesised folders organize routes and layouts without affecting the URL
+      lenses: [composability]
+      signature: 'app/(marketing)/about/page.tsx -> /about'
+      notes:
+      - use for several root layouts or selective layout sharing; navigating between root layouts is a full page load
+      - routes in different groups must not resolve to the same URL; with multiple root layouts define / inside one
+      ref: /docs/app/api-reference/file-conventions/route-groups
+    - id: loading-file
+      name: loading.js
+      summary: Suspense fallback for a segment, prefetched so navigation is immediate; shared layouts stay interactive
+      lenses: [ux-a11y, perf]
+      signature: 'export default function Loading()'
+      notes:
+      - takes no props; a Server Component by default, wraps the page and children below the layout
+      - navigation is interruptible and the fallback is prefetched; a prerendered fallback makes loading states instant
+      ref: /docs/app/api-reference/file-conventions/loading
+    - id: template-file
+      name: template.js
+      summary: like a layout but remounts on navigation, resetting state and re-running effects
+      lenses: [best-practice]
+      signature: 'export default function Template({ children }: { children: React.ReactNode })'
+      notes:
+      - renders between layout and its children, getting a fresh key per segment level (dynamic params included)
+      - use for per-navigation effects, resetting client state, or Suspense fallbacks that must show on every navigation
+      ref: /docs/app/api-reference/file-conventions/template
+    - id: forbidden-file
+      name: forbidden.js
+      summary: UI rendered when forbidden() throws a 403; no props
+      lenses: [security, ux-a11y]
+      since: "15.1.0"
+      signature: 'export default function Forbidden()'
+      notes: [requires experimental.authInterrupts]
+      ref: /docs/app/api-reference/file-conventions/forbidden
+    - id: unauthorized-file
+      name: unauthorized.js
+      summary: UI rendered when unauthorized() throws a 401, typically a login prompt; no props
+      lenses: [security, ux-a11y]
+      since: "15.1.0"
+      signature: 'export default function Unauthorized()'
+      notes: [requires experimental.authInterrupts]
+      ref: /docs/app/api-reference/file-conventions/unauthorized
+  - id: api-fc-project
+    title: File conventions - project files and instrumentation
+    level: basic
+    requires: [install-structure]
+    ref: /docs/app/api-reference/file-conventions/src-folder
+    entries:
+    - id: src-folder
+      name: src folder
+      summary: move the app directory into a src folder to separate code from root config
+      lenses: [best-practice]
+      signature: '<root>/src/app and a proxy file inside src'
+      notes:
+      - public/, package.json, next.config and .env files stay at the root; Proxy and instrumentation go inside src
+      - a src app directory is ignored if a root app exists; update tsconfig `paths` and Tailwind content globs
+      ref: /docs/app/api-reference/file-conventions/src-folder
+    - id: public-folder
+      name: public folder
+      summary: static assets served from the site root; robots/favicon belong in app metadata files instead
+      lenses: [best-practice, perf]
+      signature: 'public/avatars/me.png -> /avatars/me.png'
+      notes: [files are not hashed so the default caching headers are conservative; use special metadata files for robots.txt and favicons]
+      ref: /docs/app/api-reference/file-conventions/public-folder
+    - id: instrumentation-client
+      name: instrumentation-client
+      summary: root-level client file that runs before hydration for analytics/monitoring; can export onRouterTransitionStart
+      lenses: [observability]
+      signature: 'export function onRouterTransitionStart(url: string, navigationType: "push" | "replace" | "traverse", event?)'
+      notes:
+      - lives at the project root or in src; no required exports, so top-level code just runs
+      - wrap monitoring code in try/catch so a tracking failure cannot break the app
+      - experimental.instrumentationClientRouterTransitionEvents adds a third event argument with transition metadata
+      ref: /docs/app/api-reference/file-conventions/instrumentation-client
+    - id: mdx-components-file
+      name: mdx-components
+      summary: required root file exporting useMDXComponents to use @next/mdx with the App Router
+      lenses: [composability]
+      signature: 'export function useMDXComponents(): MDXComponents'
+      since: "13.1.2"
+      ref: /docs/app/api-reference/file-conventions/mdx-components
+  - id: api-fc-segment-config
+    title: File conventions - route segment config
+    level: advanced
+    requires: [api-file-conventions]
+    ref: /docs/app/api-reference/file-conventions/route-segment-config
+    entries:
+    - id: seg-dynamic-params
+      name: dynamicParams
+      summary: true generates unlisted dynamic params on demand, false 404s them; unavailable with cacheComponents
+      lenses: [perf]
+      signature: 'export const dynamicParams = true | false'
+      notes: [replaces getStaticPaths fallback; works alongside generateStaticParams]
+      ref: /docs/app/api-reference/file-conventions/route-segment-config/dynamicParams
+    - id: seg-instant
+      name: instant
+      summary: opt a segment into dev validation that navigations into it can render instantly (cacheComponents only)
+      lenses: [perf, ux-a11y]
+      signature: 'export const instant = true | false | { level: "warning" }'
+      notes:
+      - 'level "warning" validates in development only and surfaces blocking code in the overlay; omitted level uses the global default'
+      - cannot be exported from Client Components; dev has no prefetch so navigations feel slower than production
+      ref: /docs/app/api-reference/file-conventions/route-segment-config/instant
+    - id: seg-prefetch
+      name: prefetch (segment)
+      summary: cap how a segment is prefetched with 'partial' or 'force-disabled' (cacheComponents only)
+      lenses: [perf]
+      signature: "export const prefetch = 'auto' | 'partial' | 'force-disabled'"
+      notes:
+      - 'partial opts one segment into Partial Prefetching without the global flag; force-disabled never fetches segment data (metadata still prefetches)'
+      - the segment caps what any Link prefetch={true} pulls; not usable from Client Components
+      ref: /docs/app/api-reference/file-conventions/route-segment-config/prefetch
+    - id: seg-max-duration
+      name: maxDuration
+      summary: max execution time in seconds for server logic of a segment; set on the page to cover its Server Actions
+      lenses: [reliability, cost]
+      signature: 'export const maxDuration = 5'
+      since: "13.4.10"
+      ref: /docs/app/api-reference/file-conventions/route-segment-config/maxDuration
+    - id: seg-runtime
+      name: runtime
+      summary: nodejs (default) or deprecated edge; remove the export, not usable in Proxy
+      lenses: [reliability]
+      signature: "export const runtime = 'nodejs' | 'edge'"
+      deprecated: Edge Runtime is deprecated; remove the runtime export
+      ref: /docs/app/api-reference/file-conventions/route-segment-config/runtime
+    - id: seg-preferred-region
+      name: preferredRegion
+      summary: deprecated region hint passed through to the deployment platform
+      lenses: [perf]
+      signature: "export const preferredRegion = 'auto' | 'global' | 'home' | string | string[]"
+      deprecated: remove the export; region behavior is platform specific
+      notes: [a child segment overrides the parent, values are not merged]
+      ref: /docs/app/api-reference/file-conventions/route-segment-config/preferredRegion
+  - id: api-fc-metadata
+    title: File conventions - metadata files
+    level: intermediate
+    requires: [api-file-conventions]
+    ref: /docs/app/api-reference/file-conventions/metadata
+    entries:
+    - id: app-icons
+      name: favicon, icon, apple-icon
+      summary: image files or code (icon.tsx) in app/ that add the matching head link tags automatically
+      lenses: [best-practice, ux-a11y]
+      signature: 'app/favicon.ico, app/icon.(ico|jpg|png|svg), app/apple-icon.(jpg|png), or icon.tsx default export'
+      notes:
+      - favicon must sit in the app/ root; icon and apple-icon work in any segment; number suffixes (icon1.png) set several
+      - rel, type and sizes are inferred from the file; generated icons can use ImageResponse and generateImageMetadata
+      ref: /docs/app/api-reference/file-conventions/metadata/app-icons
+    - id: manifest-file
+      name: manifest
+      summary: static manifest.json/webmanifest or manifest.ts returning a MetadataRoute.Manifest
+      lenses: [ux-a11y]
+      import: next
+      signature: 'export default function manifest(): MetadataRoute.Manifest'
+      notes: [manifest.ts is a cached Route Handler unless it uses request-time APIs or dynamic config]
+      ref: /docs/app/api-reference/file-conventions/metadata/manifest
+    - id: opengraph-image-file
+      name: opengraph-image, twitter-image
+      summary: image files (+ .alt.txt) or generated images per segment for social previews
+      lenses: [best-practice]
+      signature: 'export default async function Image({ params }): ImageResponse; export const alt, size, contentType'
+      notes:
+      - file limits are 8MB for opengraph-image and 5MB for twitter-image
+      - code-generated images typically return ImageResponse; with generateImageMetadata the function gets id and params as promises
+      ref: /docs/app/api-reference/file-conventions/metadata/opengraph-image
+    - id: robots-file
+      name: robots
+      summary: static robots.txt or robots.ts returning MetadataRoute.Robots (rules, sitemap, host)
+      lenses: [best-practice]
+      import: next
+      signature: 'export default function robots(): MetadataRoute.Robots'
+      notes:
+      - rules accepts an array per userAgent; `other` passes non-standard directives verbatim without validation
+      - robots.ts is a cached Route Handler unless it uses request-time APIs
+      ref: /docs/app/api-reference/file-conventions/metadata/robots
+    - id: sitemap-file
+      name: sitemap
+      summary: static sitemap.xml or sitemap.ts returning MetadataRoute.Sitemap with images, videos and alternates
+      lenses: [best-practice, perf]
+      import: next
+      signature: 'export default async function sitemap(props: { id: Promise<string> }): MetadataRoute.Sitemap'
+      notes:
+      - entries take url, lastModified, changeFrequency, priority, images, videos and localized alternates
+      - split large sitemaps with generateSitemaps; sitemap.ts is cached unless request-time APIs are used
+      ref: /docs/app/api-reference/file-conventions/metadata/sitemap
+    - id: use-cache-remote-directive
+      name: "'use cache: remote'"
+      summary: store a cached output in a remote cache handler instead of memory, for request-time content
+      lenses: [perf, cost]
+      signature: "'use cache: remote' inside an async function or component"
+      notes:
+      - needs cacheComponents and a configured remote handler; remote caches can nest inside remote caches, private ones cannot sit inside remote
+      - worth it for content deferred to request time on serverless; skip it when data is already fast, per-request unique, or changes every few seconds
+      ref: /docs/app/api-reference/directives/use-cache-remote
+  - id: api-cfg-caching
+    title: Config - caching and build output
+    level: advanced
+    requires: [api-config]
+    ref: /docs/app/api-reference/config
+    entries:
+    - id: cfg-cache-life
+      name: cacheLife (config)
+      summary: define named cache profiles (stale/revalidate/expire) used by cacheLife() under cacheComponents
+      lenses: [perf]
+      signature: 'cacheLife: { blog: { stale: 3600, revalidate: 900, expire: 86400 } }'
+      notes: [also overrides the built-in seconds/minutes/hours/days/weeks/max/default profiles]
+      ref: /docs/app/api-reference/config/next-config-js/cacheLife
+    - id: cfg-cache-handlers
+      name: cacheHandlers
+      summary: 'custom storage for `use cache` (default) and `use cache: remote` (remote), plus extra named handlers'
+      lenses: [perf, reliability]
+      since: "16.0.0"
+      signature: 'cacheHandlers: { default: require.resolve("./h.js"), remote: require.resolve("./r.js") }'
+      notes:
+      - handler API is get, set, refreshTags, getExpiration, updateTags with a CacheEntry that carries a stream
+      - default is an in-memory LRU per process; reach for custom handlers only to share cache across instances or change storage
+      - '''use cache: private'' cannot be customized; not supported on static export; adapter platforms decide'
+      ref: /docs/app/api-reference/config/next-config-js/cacheHandlers
+    - id: cfg-cache-handler
+      name: cacheHandler (incrementalCacheHandlerPath)
+      summary: custom server cache for ISR, route-handler responses and image optimization output
+      lenses: [perf, reliability]
+      signature: 'cacheHandler: require.resolve("./cache-handler.js"); cacheMaxMemorySize: 0'
+      notes:
+      - handler methods are get, set, revalidateTag, resetRequestCache (separate from cacheHandlers, which serves `use cache`)
+      - set cacheMaxMemorySize to 0 so reads go to your store; image optimization caching supported since 16.2
+      ref: /docs/app/api-reference/config/next-config-js/incrementalCacheHandlerPath
+    - id: cfg-cache-max-memory
+      name: cacheMaxMemorySize
+      summary: byte size of the in-memory cache per server instance (default 50 MB); 0 disables it
+      lenses: [perf, cost]
+      signature: 'cacheMaxMemorySize: 50 * 1024 * 1024'
+      notes:
+      - sizes the server cache (prerendered pages, route handlers, optimized images) and the built-in `use cache` handler; a custom cacheHandlers entry manages its own memory
+      - next dev keeps its own cache regardless; 0 mimics serverless behavior
+      ref: /docs/app/api-reference/config/next-config-js/cacheMaxMemorySize
+    - id: cfg-expire-time
+      name: expireTime
+      summary: stale-while-revalidate window (seconds) in Cache-Control for ISR pages
+      lenses: [perf]
+      signature: 'expireTime: 3600'
+      notes: ['revalidate 900 with expireTime 3600 emits s-maxage=900, stale-while-revalidate=2700']
+      ref: /docs/app/api-reference/config/next-config-js/expireTime
+    - id: cfg-static-generation
+      name: staticGeneration
+      summary: experimental build knobs for prerender workers - retry count, per-worker concurrency, minimum pages per worker
+      lenses: [perf, reliability]
+      signature: 'experimental: { staticGenerationRetryCount: 1, staticGenerationMaxConcurrency: 8, staticGenerationMinPagesPerWorker: 25 }'
+      notes: [retry count is how many times a failed page is retried before the build fails]
+      ref: /docs/app/api-reference/config/next-config-js/staticGeneration
+    - id: cfg-stale-times
+      name: staleTimes
+      summary: experimental override of client Router Cache lifetimes (seconds) for dynamic and static prefetches
+      lenses: [perf, ux-a11y]
+      signature: 'experimental: { staleTimes: { dynamic: 30, static: 180 } }'
+      params:
+      - {name: dynamic, type: "number (seconds)", default: "0", desc: "Pages that are neither statically generated nor fully prefetched."}
+      - {name: static, type: "number (seconds)", default: "300", desc: "Static pages, Link prefetch={true}, and router.prefetch."}
+      ref: /docs/app/api-reference/config/next-config-js/staleTimes
+    - id: cfg-generate-build-id
+      name: generateBuildId
+      summary: stable build id across containers when rebuilding per stage; ignored once deploymentId is set
+      lenses: [reliability]
+      signature: 'generateBuildId: async () => string | null'
+      ref: /docs/app/api-reference/config/next-config-js/generateBuildId
+    - id: cfg-deployment-id
+      name: deploymentId
+      summary: deployment identifier for version-skew protection and cache busting (also NEXT_DEPLOYMENT_ID)
+      lenses: [reliability]
+      signature: "deploymentId: 'my-deployment-id'"
+      notes:
+      - adds ?dpl= to static asset URLs, x-deployment-id on navigations, data-dpl-id on html, and joins the `use cache` key
+      - the config value wins over the env var; makes the build id constant
+      ref: /docs/app/api-reference/config/next-config-js/deploymentId
+    - id: cfg-output-hash-salt
+      name: outputHashSalt
+      summary: salt mixed into content-addressed output filenames, forcing new hashes; concatenates with NEXT_HASH_SALT
+      lenses: [security]
+      since: "16.3.0"
+      signature: "outputHashSalt: 'my-deployment-salt'"
+      ref: /docs/app/api-reference/config/next-config-js/outputHashSalt
+    - id: cfg-dist-dir
+      name: distDir
+      summary: custom build directory instead of .next; must stay inside the project
+      lenses: [best-practice]
+      signature: "distDir: 'build'"
+      ref: /docs/app/api-reference/config/next-config-js/distDir
+    - id: cfg-asset-prefix
+      name: assetPrefix
+      summary: CDN prefix for static assets; basePath is better for sub-path hosting
+      lenses: [perf]
+      signature: "assetPrefix: 'https://cdn.example.com'"
+      ref: /docs/app/api-reference/config/next-config-js/assetPrefix
+    - id: cfg-base-path
+      name: basePath
+      summary: sub-path deployment prefix inlined at build time and applied to next/link and images
+      lenses: [best-practice]
+      signature: "basePath: '/docs'"
+      notes: [build-time only; changing it needs a rebuild; fetch and static asset paths outside next/link need the prefix manually]
+      ref: /docs/app/api-reference/config/next-config-js/basePath
+    - id: cfg-env
+      name: env
+      summary: inline values into the JS bundle at build time (prefer NEXT_PUBLIC_ env vars)
+      lenses: [security]
+      signature: "env: { customKey: 'value' }"
+      notes: [values always ship in the client bundle]
+      ref: /docs/app/api-reference/config/next-config-js/env
+    - id: cfg-compress
+      name: compress
+      summary: gzip for rendered content and static files under next start; disable only when a proxy compresses
+      lenses: [perf]
+      signature: 'compress: false'
+      ref: /docs/app/api-reference/config/next-config-js/compress
+    - id: cfg-generate-etags
+      name: generateEtags
+      summary: toggle ETag generation for HTML pages (default on)
+      lenses: [perf]
+      signature: 'generateEtags: false'
+      ref: /docs/app/api-reference/config/next-config-js/generateEtags
+    - id: cfg-powered-by-header
+      name: poweredByHeader
+      summary: drop the x-powered-by response header
+      lenses: [security]
+      signature: 'poweredByHeader: false'
+      ref: /docs/app/api-reference/config/next-config-js/poweredByHeader
+    - id: cfg-http-agent-options
+      name: httpAgentOptions
+      summary: server-side fetch HTTP agent options such as keepAlive
+      lenses: [perf]
+      signature: 'httpAgentOptions: { keepAlive: false }'
+      ref: /docs/app/api-reference/config/next-config-js/httpAgentOptions
+    - id: cfg-cross-origin
+      name: crossOrigin
+      summary: crossOrigin attribute (anonymous or use-credentials) on script tags emitted by Next
+      lenses: [security]
+      signature: "crossOrigin: 'anonymous'"
+      ref: /docs/app/api-reference/config/next-config-js/crossOrigin
+    - id: cfg-react-max-headers-length
+      name: reactMaxHeadersLength
+      summary: cap on headers React emits at prerender for preloading; lower it behind proxies that truncate
+      lenses: [reliability]
+      signature: 'reactMaxHeadersLength: 1000'
+      ref: /docs/app/api-reference/config/next-config-js/reactMaxHeadersLength
+    - id: cfg-html-limited-bots
+      name: htmlLimitedBots
+      summary: user agents that receive blocking instead of streaming metadata; overrides the default bot list
+      lenses: [best-practice]
+      signature: 'htmlLimitedBots: /MyBot|OtherBot/'
+      ref: /docs/app/api-reference/config/next-config-js/htmlLimitedBots
+    - id: cfg-page-extensions
+      name: pageExtensions
+      summary: file extensions treated as routes and special files (e.g. add md/mdx)
+      lenses: [composability]
+      signature: "pageExtensions: ['mdx', 'md', 'jsx', 'js', 'tsx', 'ts']"
+      notes: [applies to every special file including proxy and instrumentation]
+      ref: /docs/app/api-reference/config/next-config-js/pageExtensions
+    - id: cfg-production-source-maps
+      name: productionBrowserSourceMaps
+      summary: emit and serve browser source maps in production builds; costs build time and memory
+      lenses: [observability, security]
+      signature: 'productionBrowserSourceMaps: true'
+      ref: /docs/app/api-reference/config/next-config-js/productionBrowserSourceMaps
+    - id: cfg-auth-interrupts
+      name: authInterrupts
+      summary: experimental flag enabling forbidden() and unauthorized() and their special files
+      lenses: [security]
+      signature: 'experimental: { authInterrupts: true }'
+      ref: /docs/app/api-reference/config/next-config-js/authInterrupts
+    - id: cfg-adapter-path
+      name: adapterPath
+      summary: path to a deployment adapter module hooking the build (also NEXT_ADAPTER_PATH)
+      lenses: [composability]
+      signature: "adapterPath: require.resolve('./my-adapter.js')"
+      ref: /docs/app/api-reference/config/next-config-js/adapterPath
+    - id: cfg-app-dir
+      name: appDir
+      summary: obsolete since 13.4; the App Router is stable and always on
+      lenses: [best-practice]
+      signature: 'appDir'
+      deprecated: no longer needed since 13.4
+      ref: /docs/app/api-reference/config/next-config-js/appDir
+    - id: cfg-export-path-map
+      name: exportPathMap
+      summary: legacy `next export` path mapping; use generateStaticParams instead
+      lenses: [best-practice]
+      signature: 'exportPathMap: async (defaultPathMap, ctx) => map'
+      deprecated: use generateStaticParams with app (getStaticPaths with pages)
+      ref: /docs/app/api-reference/config/next-config-js/exportPathMap
+  - id: api-cfg-perf-dev
+    title: Config - performance, dev and experimental
+    level: advanced
+    requires: [api-config]
+    ref: /docs/app/api-reference/config/next-config-js
+    entries:
+    - id: cfg-css-chunking
+      name: cssChunking
+      summary: 'CSS chunk strategy: true (default, merge), false, ''strict'' (webpack), ''graph'' (Turbopack)'
+      lenses: [perf]
+      signature: "experimental: { cssChunking: true | false | 'strict' | 'graph' }"
+      ref: /docs/app/api-reference/config/next-config-js/cssChunking
+    - id: cfg-inline-css
+      name: inlineCss
+      summary: experimental inlining of CSS as style tags to cut the first-load request waterfall
+      lenses: [perf]
+      signature: 'experimental: { inlineCss: true }'
+      notes: [good for atomic CSS such as Tailwind and new visitors; skip when returning visitors rely on cached stylesheets]
+      ref: /docs/app/api-reference/config/next-config-js/inlineCss
+    - id: cfg-optimize-package-imports
+      name: optimizePackageImports
+      summary: load only the used modules of large barrel packages; lucide-react, date-fns, lodash-es, ramda, antd are default
+      lenses: [perf]
+      signature: "experimental: { optimizePackageImports: ['package-name'] }"
+      ref: /docs/app/api-reference/config/next-config-js/optimizePackageImports
+    - id: cfg-partial-prefetching
+      name: partialPrefetching
+      summary: prefetch only the static parts of each route by default; Link prefetch={true} opts into per-link
+      lenses: [perf, ux-a11y]
+      signature: 'cacheComponents: true; partialPrefetching: true'
+      notes: [requires cacheComponents or dev/build throw at config validation]
+      ref: /docs/app/api-reference/config/next-config-js/partialPrefetching
+    - id: cfg-prefetch-inlining
+      name: prefetchInlining
+      summary: tune or disable bundling of small prefetch responses (maxSize, maxBundleSize); default on
+      lenses: [perf]
+      signature: 'experimental: { prefetchInlining: false | { maxSize: 2048, maxBundleSize: 10240 } }'
+      ref: /docs/app/api-reference/config/next-config-js/prefetchInlining
+    - id: cfg-dev-indicators
+      name: devIndicators
+      summary: position of the dev route indicator or false to hide it; errors still surface
+      lenses: [best-practice]
+      signature: "devIndicators: { position: 'bottom-right' } | false"
+      ref: /docs/app/api-reference/config/next-config-js/devIndicators
+    - id: cfg-on-demand-entries
+      name: onDemandEntries
+      summary: dev server page eviction (maxInactiveAge, pagesBufferLength)
+      lenses: [perf]
+      signature: 'onDemandEntries: { maxInactiveAge: 25000, pagesBufferLength: 2 }'
+      ref: /docs/app/api-reference/config/next-config-js/onDemandEntries
+    - id: cfg-instrumentation-client-inject
+      name: instrumentationClientInject
+      summary: modules imported on the client before instrumentation-client, mainly for config plugins (Sentry-style)
+      lenses: [observability, composability]
+      signature: "instrumentationClientInject: ['pkg', './local-module']"
+      notes: [entries run in array order, before the project's instrumentation-client file and React hydration]
+      ref: /docs/app/api-reference/config/next-config-js/instrumentationClientInject
+    - id: cfg-mdx-rs
+      name: mdxRs
+      summary: experimental Rust compiler for @next/mdx
+      lenses: [perf]
+      signature: 'experimental: { mdxRs: true }'
+      ref: /docs/app/api-reference/config/next-config-js/mdxRs
+  - id: api-cfg-routing-bundling
+    title: Config - routing, bundling and tooling
+    level: advanced
+    requires: [api-config]
+    ref: /docs/app/api-reference/config/next-config-js
+    entries:
+    - id: cfg-redirects
+      name: redirects
+      summary: async function of {source, destination, permanent, basePath?, has?, missing?} rules; 308 permanent or 307
+      lenses: [best-practice, security]
+      signature: 'async redirects() { return [{ source: "/about", destination: "/", permanent: true }] }'
+      notes: [basePath false allows external redirects only; evaluated before the filesystem and rewrites]
+      ref: /docs/app/api-reference/config/next-config-js/redirects
+    - id: cfg-rewrites
+      name: rewrites
+      summary: URL proxy mapping that masks the destination; applied to client-side navigation too
+      lenses: [composability]
+      signature: 'async rewrites() { return [{ source: "/about", destination: "/" }] }'
+      notes: ['an array runs after the filesystem and before dynamic routes; an object {beforeFiles, afterFiles, fallback} controls the phase; has/missing match header, cookie or query']
+      ref: /docs/app/api-reference/config/next-config-js/rewrites
+    - id: cfg-trailing-slash
+      name: trailingSlash
+      summary: redirect to add (true) or strip (false, default) trailing slashes; static files and .well-known excepted
+      lenses: [best-practice]
+      signature: 'trailingSlash: true'
+      notes: [with output export /about becomes /about/index.html]
+      ref: /docs/app/api-reference/config/next-config-js/trailingSlash
+    - id: cfg-skip-trailing-slash-redirect
+      name: skipTrailingSlashRedirect
+      summary: advanced Proxy flag turning off automatic trailing-slash redirects so Proxy handles them
+      lenses: [best-practice]
+      signature: 'skipTrailingSlashRedirect: true'
+      ref: /docs/app/api-reference/config/next-config-js/skipTrailingSlashRedirect
+    - id: cfg-skip-proxy-url-normalize
+      name: skipProxyUrlNormalize
+      summary: advanced Proxy flag giving Proxy the original, un-normalized request (formerly skipMiddlewareUrlNormalize)
+      lenses: [best-practice]
+      signature: 'skipProxyUrlNormalize: true'
+      notes: [also stops normalization of rewrite and redirect destinations returned by Proxy]
+      ref: /docs/app/api-reference/config/next-config-js/skipProxyUrlNormalize
+    - id: cfg-server-external-packages
+      name: serverExternalPackages
+      summary: opt dependencies out of server bundling so Node require loads them natively
+      lenses: [reliability]
+      signature: "serverExternalPackages: ['@acme/ui']"
+      notes: [a built-in list of popular native packages is already external; a package cannot also be in transpilePackages]
+      ref: /docs/app/api-reference/config/next-config-js/serverExternalPackages
+    - id: cfg-transpile-packages
+      name: transpilePackages
+      summary: compile and bundle workspace or node_modules packages that ship TS, JSX or modern syntax
+      lenses: [composability]
+      signature: "transpilePackages: ['package-name', '@scope/pkg']"
+      notes:
+      - Turbopack auto-transpiles monorepo workspace packages; webpack does too for the App Router
+      - needed for node_modules dependencies shipping raw TypeScript or JSX; replaces next-transpile-modules
+      ref: /docs/app/api-reference/config/next-config-js/transpilePackages
+    - id: cfg-webpack
+      name: webpack
+      summary: custom webpack config function; outside semver, check built-in CSS/Sass support first
+      lenses: [composability]
+      signature: 'webpack: (config, { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }) => config'
+      ref: /docs/app/api-reference/config/next-config-js/webpack
+    - id: cfg-sass-options
+      name: sassOptions
+      summary: configure the Sass compiler (additionalData, implementation e.g. sass-embedded)
+      lenses: [best-practice]
+      signature: "sassOptions: { implementation: 'sass-embedded', additionalData: '...' }"
+      notes: [only implementation is typed; custom functions work with webpack only, not Turbopack]
+      ref: /docs/app/api-reference/config/next-config-js/sassOptions
+    - id: cfg-use-lightningcss
+      name: useLightningcss
+      summary: experimental Lightning CSS on webpack (Turbopack always uses it); lightningCssFeatures forces include/exclude
+      lenses: [perf]
+      signature: "experimental: { useLightningcss: true, lightningCssFeatures: { include: ['light-dark'], exclude: ['nesting'] } }"
+      ref: /docs/app/api-reference/config/next-config-js/useLightningcss
+    - id: cfg-use-typescript-cli
+      name: useTypeScriptCli
+      summary: next build type-checks with the project-local tsc by default (enables TypeScript 7); false uses the compiler API
+      lenses: [typing-dx]
+      signature: 'experimental: { useTypeScriptCli: false }'
+      notes:
+      - tsc diagnostics print raw (no Next code frames); the whole tsconfig project is checked including tests
+      - typescript.tsconfigPath selects the project; typescript.ignoreBuildErrors skips the check
+      - opting out with TypeScript 7 makes next build exit because the JS API is unavailable
+      ref: /docs/app/api-reference/config/next-config-js/useTypeScriptCli
+    - id: cfg-typescript
+      name: typescript (config)
+      summary: next build fails on type errors; ignoreBuildErrors skips the check entirely, tsconfigPath picks the tsconfig
+      lenses: [typing-dx]
+      signature: "typescript: { ignoreBuildErrors: false, tsconfigPath: 'tsconfig.json' }"
+      options:
+      - {name: ignoreBuildErrors, type: boolean, default: "false", desc: "Bypasses the type-check step (does not suppress errors); only safe if CI type-checks separately."}
+      - {name: tsconfigPath, type: string, default: "'tsconfig.json'", desc: "Path to a custom tsconfig."}
+      ref: /docs/app/api-reference/config/next-config-js/typescript
+    - id: cfg-taint
+      name: taint
+      summary: enable React taint APIs to block marked objects and values (and process.env) from crossing to the client
+      lenses: [security]
+      signature: 'experimental: { taint: true }'
+      notes: [turns on the React experimental channel for app; a defensive layer only, never the sole protection]
+      ref: /docs/app/api-reference/config/next-config-js/taint
+    - id: cfg-url-imports
+      name: urlImports
+      summary: experimental import of modules from allow-listed external URL prefixes
+      lenses: [security]
+      signature: "experimental: { urlImports: ['https://example.com/assets/'] }"
+      notes: [only list trusted domains; downloaded code runs on your machine]
+      ref: /docs/app/api-reference/config/next-config-js/urlImports
+    - id: cfg-supports-immutable-assets
+      name: supportsImmutableAssets
+      summary: adapter-author flag; false opts out of immutable static assets that skip the ?dpl query under skew protection
+      lenses: [reliability]
+      signature: 'supportsImmutableAssets: false'
+      notes: [enabling it on a platform without support can break deployments]
+      ref: /docs/app/api-reference/config/next-config-js/supportsImmutableAssets
+    - id: cfg-web-vitals-attribution
+      name: webVitalsAttribution
+      summary: opt-in per-metric attribution (CLS, LCP and others) to pinpoint the element or resource behind a Web Vitals issue
+      lenses: [observability, perf]
+      signature: "experimental: { webVitalsAttribution: ['CLS', 'LCP'] }"
+      ref: /docs/app/api-reference/config/next-config-js/webVitalsAttribution
+    - id: cfg-use-offline
+      name: useOffline (config)
+      summary: experimental offline detection plus automatic retry of failed navigation, prefetch and Server Action requests
+      lenses: [reliability, ux-a11y]
+      signature: 'experimental: { useOffline: true }'
+      notes: [polls with HEAD requests and backoff while offline; exposes the useOffline hook from next/offline]
+      ref: /docs/app/api-reference/config/next-config-js/useOffline
+    - id: cfg-server-components-hmr-cache
+      name: serverComponentsHmrCache
+      summary: reuse server fetch responses across HMR refreshes in dev (default true, even for no-store fetches)
+      lenses: [perf, observability]
+      signature: 'experimental: { serverComponentsHmrCache: false }'
+      notes: [pair with logging.fetches to see hits and misses]
+      ref: /docs/app/api-reference/config/next-config-js/serverComponentsHmrCache
+    - id: cfg-turbopack-fs-cache
+      name: turbopackFileSystemCache
+      summary: persist Turbopack work under .next between runs, separately for dev and build (both default true)
+      lenses: [perf]
+      signature: 'experimental: { turbopackFileSystemCacheForDev: true, turbopackFileSystemCacheForBuild: true }'
+      notes: [dev cache lives in .next/dev/cache/turbopack, build cache in .next/cache/turbopack; build CI needs the cache restored to start warm]
+      ref: /docs/app/api-reference/config/next-config-js/turbopackFileSystemCache
+    - id: cfg-turbopack-memory-eviction
+      name: turbopackMemoryEviction
+      summary: reclaim memory after persistent-cache snapshots - false, 'auto' (default) or 'full'
+      lenses: [perf, cost]
+      signature: "experimental: { turbopackMemoryEviction: 'auto' }"
+      notes: [only matters in next dev with the FileSystem cache on]
+      ref: /docs/app/api-reference/config/next-config-js/turbopackMemoryEviction
+    - id: cfg-turbopack-chunking
+      name: turbopackChunking
+      summary: tune the production JS chunker (size thresholds, component chunks)
+      lenses: [perf]
+      signature: 'experimental: { turbopackChunking: { minChunkSize: 50000, maxChunkCountPerGroup: 40, maxMergeChunkSize: 200000, minComponentChunkSize: 20000, generateComponentChunks: false } }'
+      ref: /docs/app/api-reference/config/next-config-js/turbopackChunking
+    - id: cfg-turbopack-ignore-issue
+      name: turbopack.ignoreIssue
+      summary: filter Turbopack errors and warnings from CLI and overlay by path, title and description matchers
+      lenses: [observability]
+      signature: "turbopack: { ignoreIssue: [{ path: '**/vendor/**' }] }"
+      notes: [path is required (string or RegExp); title is optional]
+      ref: /docs/app/api-reference/config/next-config-js/turbopackIgnoreIssue
+    - id: cfg-turbopack-local-postcss
+      name: turbopackLocalPostcssConfig
+      summary: resolve postcss.config from the CSS file's directory before the project root
+      lenses: [composability]
+      signature: 'experimental: { turbopackLocalPostcssConfig: true }'
+      ref: /docs/app/api-reference/config/next-config-js/turbopackLocalPostcssConfig
+    - id: cfg-turbopack-rust-react-compiler
+      name: turbopackRustReactCompiler
+      summary: native Rust React Compiler inside Turbopack instead of the Babel plugin; needs reactCompiler
+      lenses: [perf]
+      signature: 'reactCompiler: true; experimental: { turbopackRustReactCompiler: true }'
+      notes: [Turbopack only (webpack throws); babel-plugin-react-compiler is not needed]
+      ref: /docs/app/api-reference/config/next-config-js/turbopackRustReactCompiler
+  - id: api-adapters
+    title: Adapters (deployment platform API)
+    level: advanced
+    requires: [api-config]
+    ref: /docs/app/api-reference/adapters
+    entries:
+    - id: adapters-configuration
+      name: Adapter configuration
+      summary: point adapterPath (or NEXT_ADAPTER_PATH for zero-config platforms) at a module implementing NextAdapter
+      lenses: [composability]
+      signature: "adapterPath: require.resolve('./my-adapter.js')"
+      ref: /docs/app/api-reference/adapters/configuration
+    - id: adapters-create
+      name: Creating an adapter
+      summary: export an object implementing the NextAdapter interface imported from next
+      lenses: [composability, typing-dx]
+      import: next
+      signature: 'import type { NextAdapter } from "next"; const adapter: NextAdapter = { name, modifyConfig?, onBuildComplete? }'
+      notes: [the interface types routes and per-kind outputs (pages, appPages, pagesApi, appRoutes, prerenders, staticFiles)]
+      ref: /docs/app/api-reference/adapters/creating-an-adapter
+    - id: adapters-api
+      name: NextAdapter hooks
+      summary: modifyConfig(config, {phase, nextVersion, projectDir}) edits config; onBuildComplete({routing, outputs, ...}) gets build data
+      lenses: [composability]
+      signature: 'modifyConfig(config, context): Promise<NextConfig>; onBuildComplete(context): Promise<void>'
+      notes: [modifyConfig runs for any CLI command that loads the config; onBuildComplete runs after the build with routing phases and outputs]
+      ref: /docs/app/api-reference/adapters/api-reference
+    - id: adapters-output-types
+      name: Output types
+      summary: outputs.pages, pagesApi, appPages, appRoutes, prerenders, staticFiles and middleware describe each build artifact
+      lenses: [composability]
+      signature: 'outputs: { pages, pagesApi, appPages, appRoutes, prerenders, staticFiles, middleware }'
+      notes:
+      - with output export only staticFiles is populated
+      - edge outputs carry edgeRuntime metadata; the Edge Runtime is deprecated
+      ref: /docs/app/api-reference/adapters/output-types
+    - id: adapters-routing-info
+      name: Routing information
+      summary: processed routing phases for deployment - beforeMiddleware, middlewareMatchers, beforeFiles, afterFiles, dynamicRoutes, onMatch, fallback
+      lenses: [composability]
+      signature: 'context.routing.{beforeMiddleware, middlewareMatchers, beforeFiles, afterFiles, dynamicRoutes, onMatch, fallback}'
+      ref: /docs/app/api-reference/adapters/routing-information
+    - id: adapters-next-routing
+      name: "Routing with @next/routing"
+      summary: reproduce Next.js route matching in an adapter from onBuildComplete data via resolveRoutes()
+      lenses: [reuse]
+      import: '@next/routing'
+      signature: 'resolveRoutes({ url, basePath, headers, routes, invokeMiddleware, ... })'
+      returns: 'resolveRoutes() reports middlewareResponded (skip the entrypoint) and externalRewrite (a URL for external destinations) among its result fields.'
+      ref: /docs/app/api-reference/adapters/routing-with-next-routing
+    - id: adapters-invoke
+      name: Invoking entrypoints
+      summary: Node and Edge entrypoints use handler(req, res, ctx) with ctx.waitUntil and requestMeta helpers
+      lenses: [reliability]
+      signature: 'handler(req: IncomingMessage, res: ServerResponse, ctx: { waitUntil?, requestMeta? })'
+      notes: ['requestMeta supports relativeProjectDir, hostname, revalidate and render404 hooks so adapters avoid internals']
+      ref: /docs/app/api-reference/adapters/invoking-entrypoints
+    - id: adapters-runtime
+      name: Runtime integration
+      summary: the adapter is build-time; cacheHandler and cacheHandlers are the runtime cache interfaces; ctx.waitUntil keeps functions alive
+      lenses: [reliability, perf]
+      notes:
+      - requestMeta.onCacheEntryV2 fires on every cache entry generation or lookup so a platform can propagate it
+      - PPR chain headers are covered on the same page
+      ref: /docs/app/api-reference/adapters/runtime-integration
+    - id: adapters-ppr
+      name: Implementing PPR in an adapter
+      summary: seed the fallback shell and postponed state at build time, then resume at request time
+      lenses: [perf]
+      signature: 'outputs.prerenders[].fallback.{filePath, postponedState, initialHeaders, initialStatus, initialRevalidate, initialExpiration}'
+      ref: /docs/app/api-reference/adapters/implementing-ppr-in-an-adapter
+    - id: adapters-immutable-assets
+      name: Supporting immutable static assets
+      summary: serve content-addressed files under /_next/static/immutable/* without ?dpl, shared across deployments
+      lenses: [perf, reliability]
+      signature: 'modifyConfig sets config.supportsImmutableAssets = true; onBuildComplete reads outputs.staticFiles[].immutableHash'
+      notes:
+      - 'keep serving non-immutable assets (public folder) with the ?dpl query; outputHashSalt rotates hashes'
+      ref: /docs/app/api-reference/adapters/immutable-static-assets
+    - id: adapters-testing
+      name: Testing adapters
+      summary: validate with the Next.js e2e deploy compatibility harness, typically in a GitHub Actions workflow
+      lenses: [testing]
+      notes: [the example workflow checks out vercel/next.js at a ref (default canary) and builds the adapter]
+      ref: /docs/app/api-reference/adapters/testing-adapters
+    - id: adapters-use-cases
+      name: Adapter use cases
+      summary: platform integration, asset processing, monitoring, custom bundling, build validation, route generation
+      lenses: [composability]
+      ref: /docs/app/api-reference/adapters/use-cases
+- title: Glossary
+  sections:
+  - id: glossary
+    title: Glossary of Next.js terms
+    level: basic
+    requires: []
+    ref: /docs/app/glossary
+    entries:
+    - id: glossary-terms
+      name: Terms
+      summary: static shell, App Shell, request-time APIs, prerendering, dynamic rendering, PPR
+      lenses: [reuse]
+      ref: /docs/app/glossary
+- title: Architecture
+  sections:
+  - id: architecture
+    title: Architecture pages
+    level: intermediate
+    requires: []
+    ref: /docs/architecture
+    entries:
+    - id: accessibility
+      name: Accessibility
+      summary: route announcements, `eslint-plugin-jsx-a11y` via eslint-config-next
+      lenses: [ux-a11y]
+      ref: /docs/architecture/accessibility
+    - id: fast-refresh
+      name: Fast Refresh
+      summary: edit-time state preservation rules
+      lenses: [perf, best-practice]
+      ref: /docs/architecture/fast-refresh
+    - id: compiler-browsers
+      name: Compiler and browsers
+      summary: Next.js Compiler (SWC), supported browsers
+      lenses: [perf, reliability]
+      ref: /docs/architecture/nextjs-compiler
+- title: Community
+  sections:
+  - id: community
+    title: Community and Rspack
+    level: basic
+    requires: []
+    ref: /docs/community
+    entries:
+    - id: rspack
+      name: Rspack (community)
+      summary: experimental alternative bundler
+      lenses: [perf]
+      ref: /docs/community/rspack

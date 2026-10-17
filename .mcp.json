@@ -1,0 +1,51 @@
+{
+  "mcpServers": {
+    "example-stdio": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "{{MCP_PACKAGE_NAME}}"],
+      "env": {
+        "EXAMPLE_API_KEY": "${EXAMPLE_API_KEY}",
+        "PROJECT_DIR": "${CLAUDE_PROJECT_DIR}"
+      },
+      "timeout": 600000
+    },
+    "example-http-oauth": {
+      "type": "http",
+      "url": "${EXAMPLE_MCP_URL:-https://mcp.example.com/mcp}",
+      "oauth": {
+        "clientId": "{{OAUTH_CLIENT_ID}}",
+        "callbackPort": 8080,
+        "scopes": "read write",
+        "authServerMetadataUrl": "https://auth.example.com/.well-known/openid-configuration"
+      },
+      "alwaysLoad": false
+    },
+    "example-http-headers": {
+      "type": "http",
+      "url": "https://api.example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${EXAMPLE_TOKEN}"
+      }
+    },
+    "example-http-dynamic-auth": {
+      "type": "http",
+      "url": "https://mcp.internal.example.com",
+      "headersHelper": "${CLAUDE_PROJECT_DIR}/.claude/hooks/mcp-auth-headers.sh"
+    },
+    "example-sse": {
+      "type": "sse",
+      "url": "https://legacy.example.com/sse",
+      "headers": {
+        "X-API-Key": "${EXAMPLE_SSE_KEY}"
+      }
+    },
+    "example-ws": {
+      "type": "ws",
+      "url": "wss://mcp.example.com/socket",
+      "headers": {
+        "Authorization": "Bearer ${EXAMPLE_WS_TOKEN}"
+      }
+    }
+  }
+}

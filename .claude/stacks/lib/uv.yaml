@@ -1,0 +1,857 @@
+stack: uv
+version: "0.12.15"
+docs_base: https://docs.astral.sh/uv
+source: https://docs.astral.sh/uv/llms.txt
+fetched: 2026-10-05
+verified: 2026-10-05
+toc:
+- index: 'https://docs.astral.sh/uv/llms.txt'
+  match: '^https://docs\.astral\.sh/uv/'
+groups:
+- title: AI tooling
+  sections:
+  - id: uv-ai-tooling
+    title: Docs-site and vendor agent entry points
+    level: basic
+    requires: []
+    ref: /llms.txt
+    entries:
+    - id: uv-llms-txt
+      name: llms.txt
+      summary: page index of the docs site; fetch any page as markdown via its `<dir>/index.md` path
+      lenses: [reuse]
+      notes: ['grep reference/settings and reference/cli, never load them whole (settings ~100 KB, cli ~800 KB)']
+      ref: /llms.txt
+    - id: uv-astral-plugin
+      name: Astral Claude Code plugin
+      summary: '`astral@astral-sh`, skills `/astral:uv`, `/astral:ruff`, `/astral:ty`'
+      lenses: [best-practice, reuse]
+      signature: astral@astral-sh, /astral:uv, /astral:ruff, /astral:ty
+      notes: ['Apache-2.0/MIT, last push 2026-02-27; not locked, so `skill?:` only']
+      ref: https://github.com/astral-sh/claude-code-plugins
+    - id: uv-no-mcp
+      name: Official MCP server
+      summary: none published by Astral
+      lenses: [reuse]
+      ref: /llms.txt
+- title: Project model and dependencies
+  sections:
+  - id: uv-project-model
+    title: Project files, lockfile, environment
+    level: basic
+    requires: []
+    ref: /concepts/projects/layout/index.md
+    entries:
+    - id: uv-pyproject
+      name: pyproject.toml
+      summary: project metadata plus uv config in `[tool.uv]`; uv finds the project root by this file
+      lenses: [best-practice]
+      signature: '[project], [tool.uv], [build-system]'
+      notes: ['a pyproject.toml without a `[tool.uv]` table is skipped when searching for config']
+      ref: /concepts/projects/layout/index.md
+    - id: uv-lockfile
+      name: uv.lock
+      summary: universal cross-platform TOML lock; commit it, never hand-edit, only uv can read it
+      lenses: [reliability, reuse]
+      notes:
+      - older uv rejects a newer schema `version`; the schema bumps only in minor releases
+      - '`revision` tracks backwards-compatible additions and never makes older uv error'
+      - not usable by other tools; `uv export` gives requirements.txt or pylock.toml instead
+      ref: /concepts/resolution/index.md
+    - id: uv-project-env
+      name: '`.venv` next to pyproject'
+      summary: persistent project environment kept next to pyproject.toml; relocate it with `UV_PROJECT_ENVIRONMENT`
+      lenses: [best-practice]
+      signature: UV_PROJECT_ENVIRONMENT, --active, [tool.uv] managed = false
+      options:
+      - {name: '--active', type: 'flag', default: 'off', desc: 'respect `VIRTUAL_ENV` instead of the project env; `--no-active` silences the mismatch warning'}
+      - {name: 'managed', type: 'bool', default: 'true', desc: 'when false uv ignores the project: no auto lock or sync on `uv run`'}
+      notes:
+      - never mutate with `uv pip install`; use `uv add`, `uvx`, or `uv run --with`
+      - an absolute UV_PROJECT_ENVIRONMENT shared across projects gets overwritten by each
+      ref: /concepts/projects/config/index.md
+    - id: uv-python-pin
+      name: '`.python-version` + `requires-python`'
+      summary: '`uv python pin` writes the default interpreter request; `requires-python` bounds resolution'
+      lenses: [reliability]
+      signature: uv python pin [--global] <version>
+      notes:
+      - file lookup stops at the project/workspace boundary
+      - '`--no-config` disables `.python-version` discovery'
+      - a plain version number is recommended for interop with other tools
+      ref: /concepts/python-versions/index.md
+    - id: uv-init
+      name: '`uv init`'
+      summary: scaffold an app, lib, or bare project; apps get a build system and `src/` layout since 0.12
+      lenses: [best-practice]
+      signature: uv init [--app|--lib|--package|--no-package|--bare] [--build-backend <name>] [path]
+      options:
+      - {name: '--app', type: 'flag', default: 'on (default template)', desc: 'application layout for servers, scripts, and CLIs'}
+      - {name: '--lib', type: 'flag', default: 'off', desc: 'library layout; always packaged, adds a `py.typed` marker'}
+      - {name: '--no-package', type: 'flag', default: 'off', desc: 'flat project without a build system; only dependencies are installed'}
+      - {name: '--bare', type: 'flag', default: 'off', desc: 'write only a minimal pyproject.toml'}
+      - {name: '--build-backend', type: 'str', default: uv_build, desc: 'pick another PEP 517 backend such as hatchling'}
+      ref: /concepts/projects/init/index.md
+    - id: uv-packaging
+      name: '`tool.uv.package`'
+      summary: force or skip building and installing the project itself, overriding the build-system check
+      lenses: [composability]
+      options:
+      - {name: 'package', type: 'bool', default: 'true', desc: 'true installs the project (legacy setuptools if no build-system); false installs only its dependencies'}
+      notes: ['`package = false` still lets an explicit `uv build` run']
+      ref: /reference/settings/index.md
+    - id: uv-entry-points
+      name: '`[project.scripts]`'
+      summary: console entry points that the build system installs into the project env
+      lenses: [best-practice]
+      notes: ['needs a build system; apps without one install no commands']
+      ref: /concepts/projects/config/index.md
+  - id: uv-deps
+    title: Declaring and changing dependencies
+    level: basic
+    requires: [uv-project-model]
+    ref: /concepts/projects/dependencies/index.md
+    entries:
+    - id: uv-add-remove
+      name: uv add/remove
+      summary: edit `pyproject.toml`, relock, and sync in one step; the sanctioned way to change dependencies
+      lenses: [best-practice, reliability]
+      signature: uv add [--dev|--group <g>|--optional <extra>] [--bounds <kind>] [--no-sync] <spec>...
+      options:
+      - {name: '--dev', type: 'flag', default: 'off', desc: 'add to the `dev` dependency group'}
+      - {name: '--group', type: 'str', default: null, desc: 'add to the named `[dependency-groups]` entry'}
+      - {name: '--optional', type: 'str', default: null, desc: 'add to the named `[project.optional-dependencies]` extra'}
+      - {name: '--bounds', type: 'str', default: lower, desc: 'constraint written for the new dep: lower, major, minor, exact'}
+      - {name: '--upgrade-package', type: 'str', default: null, desc: 'also raise that package to the newest version allowed by its constraints'}
+      - {name: '--no-sync', type: 'flag', default: 'off', desc: 'update pyproject and lock but skip installing into the env'}
+      returns: edited pyproject.toml and refreshed uv.lock; a non-registry source also adds a `tool.uv.sources` entry
+      notes:
+      - 'changing a constraint only moves the locked version when the old one no longer fits'
+      - '`uv remove` also drops a now-unused `tool.uv.sources` entry'
+      ref: /concepts/projects/dependencies/index.md
+    - id: uv-add-bounds
+      name: '`add-bounds` setting'
+      summary: default constraint style for `uv add`; default `lower` (`>=x`), alternatives pin tighter
+      lenses: [reliability]
+      signature: '[tool.uv] add-bounds = "major"'
+      options:
+      - {name: 'add-bounds', type: 'str', default: lower, desc: 'lower ">=1.2.3", major ">=1.2.3,<2", minor ">=1.2.3,<1.3", exact "==1.2.3"'}
+      notes:
+      - doc marks it preview (`add-bounds` feature) and subject to change
+      - '`--frozen` adds without constraints because no resolution runs'
+      - 'uv warns when a direct dependency has no lower bound'
+      ref: /reference/settings/index.md
+    - id: uv-dependency-groups
+      name: Dependency groups
+      summary: PEP 735 `[dependency-groups]` for local-only dev/test/lint deps, never published
+      lenses: [best-practice, composability]
+      signature: '[dependency-groups], {include-group = "x"}, default-groups, --group'
+      options:
+      - {name: 'default-groups', type: 'str | list[str]', default: '["dev"]', desc: 'groups installed by default; "all" enables every group'}
+      - {name: '--group / --no-group / --only-group', type: 'str', default: null, desc: 'include, exclude, or exclusively sync a group; exclusion beats inclusion, --only-group skips the project'}
+      - {name: '--no-default-groups', type: 'flag', default: 'off', desc: 'sync none of the default groups'}
+      - {name: '[tool.uv.dependency-groups] <g>.requires-python', type: 'str', default: null, desc: 'per-group Python range when it differs from the project'}
+      notes:
+      - '`dev` is special-cased: `--dev`, `--no-dev`, `--only-dev` equal `--group dev` etc.'
+      - all groups are resolved together, so incompatible ones fail unless declared in `conflicts`
+      - legacy `tool.uv.dev-dependencies` is merged into the `dev` group and will be removed
+      ref: /concepts/projects/dependencies/index.md
+    - id: uv-extras
+      name: '`[project.optional-dependencies]`'
+      summary: published extras; not synced by default (`--extra`, `--all-extras`)
+      lenses: [composability]
+      ref: /concepts/projects/dependencies/index.md
+    - id: uv-sources
+      name: '`tool.uv.sources`'
+      summary: 'dev-time alternative sources for a dependency: git, url, path, workspace, or a pinned index'
+      lenses: [composability]
+      signature: 'tool.uv.sources.<pkg> = { git | url | path | workspace | index = ... }'
+      options:
+      - {name: '--no-sources', type: 'flag', default: 'off', desc: 'ignore `tool.uv.sources` and resolve from the registry as a consumer would'}
+      notes:
+      - marker-gated lists allow different sources per platform
+      - Git deps keep the locked commit SHA until `--upgrade`/`--upgrade-package`
+      ref: /concepts/projects/dependencies/index.md
+    - id: uv-conflicts
+      name: '`tool.uv.conflicts`, `environments`, `required-environments`'
+      summary: declare mutually exclusive extras/groups, or restrict the solved platforms
+      lenses: [reliability]
+      options:
+      - {name: 'conflicts', type: 'list[list[dict]]', default: '[]', desc: 'sets of `{extra=..}` or `{group=..}` that cannot be active together'}
+      - {name: 'environments', type: 'list[str]', default: null, desc: 'PEP 508 markers the lock is limited to, e.g. macOS and Linux only'}
+      - {name: 'required-environments', type: 'list[str]', default: null, desc: 'platforms that must resolve; matters for packages shipping only wheels'}
+      ref: /concepts/projects/config/index.md
+    - id: uv-resolution-controls
+      name: Resolution controls
+      summary: constrain, override, or exclude transitive dependencies from `[tool.uv]`
+      lenses: [reliability]
+      signature: constraint-dependencies, override-dependencies, exclude-dependencies, dependency-metadata
+      options:
+      - {name: 'constraint-dependencies', type: 'list[str]', default: '[]', desc: 'narrow versions of packages that are already pulled in; never adds a dependency'}
+      - {name: 'override-dependencies', type: 'list[str | table]', default: '[]', desc: 'replace every declared requirement on a package; can widen bounds'}
+      - {name: 'exclude-dependencies', type: 'list[str | table]', default: '[]', desc: 'remove a package from the graph; wins over an override in the same scope'}
+      notes:
+      - overrides bypass transitive bounds, so document why
+      - overrides and exclusions can be scoped to one package version with `{ package = { name, version }, dependencies = [...] }`
+      ref: /concepts/resolution/index.md
+    - id: uv-resolution-strategy
+      name: '`resolution` strategy'
+      summary: test declared lower bounds by resolving the lowest versions, since default `highest` hides stale bounds
+      lenses: [testing, reliability]
+      signature: uv run --resolution lowest-direct pytest
+      options:
+      - {name: 'resolution', type: 'str', default: highest, desc: 'highest, lowest (all deps), or lowest-direct (direct deps lowest, transitive highest)'}
+      notes:
+      - docs recommend a CI job on lowest/lowest-direct when publishing libraries
+      - build dependencies always use the latest versions
+      ref: /concepts/resolution/index.md
+- title: Locking, syncing, running
+  sections:
+  - id: uv-lock-sync
+    title: Lock, sync and run semantics
+    level: intermediate
+    requires: [uv-project-model]
+    ref: /concepts/projects/sync/index.md
+    entries:
+    - id: uv-auto-lock
+      name: Automatic lock and sync
+      summary: '`uv run`/`uv sync`/`uv tree` relock and sync first; opt out per call to fail fast or run faster'
+      lenses: [reliability, perf]
+      signature: uv run [--locked|--frozen|--no-sync] <cmd>
+      options:
+      - {name: '--locked', type: 'flag', default: 'off', desc: 'error if uv.lock is outdated instead of updating it; env `UV_LOCKED`'}
+      - {name: '--frozen', type: 'flag', default: 'off', desc: 'use uv.lock without checking it is current; env `UV_FROZEN`'}
+      - {name: '--no-sync', type: 'flag', default: 'off', desc: 'run without checking the environment is current; env `UV_NO_SYNC`'}
+      notes:
+      - CI wants `--locked`
+      - Stop hooks that run in parallel should use `--no-sync` so they do not race on `.venv`
+      ref: /concepts/projects/sync/index.md
+    - id: uv-lock-check
+      name: '`uv lock --check`'
+      summary: exit non-zero if the lock is stale; same as `--locked` elsewhere
+      lenses: [reliability, testing]
+      signature: uv lock --check
+      notes:
+      - new package releases never make the lock stale, only changed project metadata does
+      - '`uv sync --check` asserts the environment matches instead'
+      ref: /concepts/projects/sync/index.md
+    - id: uv-env-vars
+      name: '`UV_LOCKED`, `UV_FROZEN`, `UV_NO_SYNC`, `UV_NO_DEV`, `UV_OFFLINE`, `UV_PYTHON_DOWNLOADS`'
+      summary: environment twins of the flags, handy in CI and Docker where editing command lines is awkward
+      lenses: [reliability]
+      ref: /reference/environment/index.md
+    - id: uv-upgrade
+      name: '`uv lock --upgrade-package <pkg>[==ver]` / `--upgrade`'
+      summary: bump one package or all within pyproject bounds; locked versions are preferred otherwise
+      lenses: [reliability]
+      signature: uv lock --upgrade-package <pkg>[==<ver>]
+      options:
+      - {name: '--upgrade-package', type: 'str', default: null, desc: 'upgrade one package, optionally to an exact version, leaving others locked'}
+      - {name: '--upgrade', type: 'flag', default: 'off', desc: 'upgrade every package to the newest version the constraints allow'}
+      notes:
+      - limited by pyproject bounds; Git deps keep the locked SHA unless upgraded
+      - also accepted by `uv sync` and `uv run`
+      ref: /concepts/projects/sync/index.md
+    - id: uv-sync-exactness
+      name: Exact vs inexact sync
+      summary: '`uv sync` removes extraneous packages, `uv run` does not'
+      lenses: [reliability]
+      signature: uv sync [--inexact]; uv run [--exact]
+      options:
+      - {name: '--inexact', type: 'flag', default: 'off', desc: '`uv sync` keeps packages not in the lock'}
+      - {name: '--exact', type: 'flag', default: 'off', desc: '`uv run` removes packages not in the lock'}
+      ref: /concepts/projects/sync/index.md
+    - id: uv-partial-install
+      name: '`--no-install-project`, `--no-install-workspace`, `--no-install-package`'
+      summary: install only dependencies, for layer caching; dependencies of the skipped target still install
+      lenses: [perf]
+      notes:
+      - misuse yields a broken env
+      - workspaces use `--frozen` for the first sync because uv cannot verify the lock without all members
+      ref: /concepts/projects/sync/index.md
+    - id: uv-run
+      name: '`uv run`'
+      summary: run a command in the synced project env, with per-call extra deps or isolation
+      lenses: [composability]
+      signature: uv run [--with <pkg>==<ver>] [--no-project] [--isolated] [--env-file <f>] <cmd>
+      options:
+      - {name: '--with', type: 'str', default: null, desc: 'add a dependency for this call only; overrides the project requirement'}
+      - {name: '--no-project', type: 'flag', default: 'off', desc: 'skip project discovery and sync'}
+      - {name: '--isolated', type: 'flag', default: 'off', desc: 'run in a temporary environment'}
+      - {name: '--env-file', type: 'path', default: null, desc: 'load a dotenv file; repeatable, later files override'}
+      notes:
+      - uv stays as parent process and forwards signals (not SIGKILL/SIGCHLD) to the child
+      - scripts with PEP 723 metadata run isolated from the project
+      ref: /concepts/projects/run/index.md
+    - id: uv-env-file
+      name: '`uv run --env-file` / `UV_ENV_FILE` / `UV_NO_ENV_FILE`'
+      summary: dotenv loading in `uv run`; real environment variables win over file values
+      lenses: [best-practice, security]
+      ref: /concepts/configuration-files/index.md
+    - id: uv-editable
+      name: '`--no-editable`'
+      summary: install the project as a regular package so the deployed env does not depend on the source tree
+      lenses: [reliability]
+      ref: /concepts/projects/config/index.md
+    - id: uv-export
+      name: '`uv export`'
+      summary: emit the lock as requirements.txt, pylock.toml (PEP 751), or CycloneDX 1.5 SBOM (preview)
+      lenses: [security, composability]
+      signature: uv export --format <fmt> [--output-file <path>]
+      options:
+      - {name: '--format', type: 'str', default: requirements.txt, desc: 'requirements.txt, pylock.toml, or cyclonedx1.5'}
+      - {name: '--output-file', type: 'path', default: stdout, desc: 'write to a file instead of stdout'}
+      notes: [docs advise against keeping lock and requirements.txt together]
+      ref: /concepts/projects/export/index.md
+    - id: uv-tree
+      name: '`uv tree`'
+      summary: print the dependency tree from the lock; find why a package is present or which are outdated
+      lenses: [reuse, reliability]
+      signature: uv tree [--invert --package <pkg>] [--outdated] [--depth <n>]
+      options:
+      - {name: '--invert', type: 'flag', default: 'off', desc: 'show reverse dependencies, i.e. what pulls the given package in'}
+      - {name: '--outdated', type: 'flag', default: 'off', desc: 'show the latest available version of each package'}
+      - {name: '--depth', type: 'int', default: null, desc: 'maximum tree depth to display'}
+      - {name: '--package', type: 'str', default: null, desc: 'show only the named packages'}
+      ref: /reference/cli/index.md
+- title: Build and publish
+  sections:
+  - id: uv-build-publish
+    title: Build backend, build, publish
+    level: intermediate
+    requires: [uv-project-model]
+    ref: /concepts/build-backend/index.md
+    entries:
+    - id: uv-build-backend
+      name: uv_build backend
+      summary: uv's native PEP 517 backend for pure-Python code; zero config with a `src/<name>/__init__.py` layout
+      lenses: [best-practice, reliability]
+      signature: 'requires = ["uv_build>=<ver>,<0.13"]; build-backend = "uv_build"'
+      notes:
+      - keep the upper bound so future minors cannot break builds
+      - uv ships a bundled copy and uses it for `uv build` when the version is compatible
+      - extension modules or build scripts need another backend such as hatchling
+      ref: /concepts/build-backend/index.md
+    - id: uv-build-includes
+      name: Module layout
+      summary: namespace packages, stub packages, `include`/`exclude` globs configured under `[tool.uv.build-backend]`
+      lenses: [best-practice]
+      notes: ['the package name is normalized to the module name: lowercase, dots and dashes become underscores']
+      ref: /concepts/build-backend/index.md
+    - id: uv-build-cmd
+      name: '`uv build`'
+      summary: build sdist and wheel into `dist/`; hash-pin build dependencies for reproducible builds
+      lenses: [security, reliability]
+      signature: uv build [--sdist] [--wheel] [--build-constraint <file> --require-hashes] [path]
+      options:
+      - {name: '--sdist', type: 'flag', default: 'off', desc: 'build only the source distribution'}
+      - {name: '--wheel', type: 'flag', default: 'off', desc: 'build only the wheel (default builds sdist first, then wheel from it)'}
+      - {name: '--build-constraint', type: 'path', default: null, desc: 'constrain build requirements; with `--require-hashes` enforces known hashes'}
+      notes: ['`build-constraint-dependencies` in `[tool.uv]` makes the constraint persistent']
+      ref: /concepts/projects/build/index.md
+    - id: uv-private-classifier
+      name: '`classifiers = ["Private :: Do Not Upload"]`'
+      summary: makes PyPI reject uploads of an internal package; does not affect other registries
+      lenses: [security]
+      notes: [docs also recommend per-project PyPI API tokens so accidental publish fails]
+      ref: /concepts/projects/build/index.md
+    - id: uv-version-bump
+      name: '`uv version --bump`'
+      summary: read or bump the project version; relocks and syncs unless `--frozen`/`--no-sync`
+      lenses: [reliability]
+      signature: uv version [<value> | --bump <major|minor|patch>] [--short] [--dry-run]
+      options:
+      - {name: '--bump', type: 'str', default: null, desc: 'increment a semver component, e.g. major, minor, patch'}
+      - {name: '--dry-run', type: 'flag', default: 'off', desc: 'do not write the new version to pyproject.toml'}
+      - {name: '--short', type: 'flag', default: 'off', desc: 'print only the version'}
+      ref: /guides/package/index.md
+    - id: uv-publish
+      name: '`uv publish`'
+      summary: upload dists to an index; trusted publishing, `UV_PUBLISH_TOKEN`, attestations, `--index` with `publish-url`
+      lenses: [security]
+      ref: /guides/package/index.md
+- title: Python versions, tools, scripts
+  sections:
+  - id: uv-python-tools
+    title: Interpreters, tools, scripts
+    level: intermediate
+    requires: []
+    ref: /concepts/python-versions/index.md
+    entries:
+    - id: uv-python-managed
+      name: Managed vs system Python
+      summary: uv downloads and manages interpreters; settings choose whether to prefer or require them
+      lenses: [reliability]
+      signature: uv python install|upgrade|pin; python-preference, python-downloads
+      options:
+      - {name: 'python-preference', type: 'str', default: managed, desc: 'only-managed, managed, system, or only-system'}
+      - {name: 'python-downloads', type: 'str', default: automatic, desc: 'automatic, manual (explicit install only), or never'}
+      notes:
+      - '`uv python upgrade` moves patch releases only (3.12.x), never across minors'
+      - upgrades apply only to uv-managed CPython, not PyPy/GraalPy/Pyodide
+      ref: /concepts/python-versions/index.md
+    - id: uv-tools
+      name: '`uvx` / `uv tool run|install`'
+      summary: run or install CLI tools in isolated envs; `uvx` is an alias of `uv tool run`
+      lenses: [reuse, security]
+      signature: uvx <tool>[@<version>|@latest] [args]
+      notes:
+      - first run caches the latest, later runs reuse the cache unless `@latest` or a different version
+      - runs PyPI code, so pin versions; tool commands ignore project config
+      - uvx envs are disposable cache entries; `uv tool install` envs persist in the tools dir
+      ref: /concepts/tools/index.md
+    - id: uv-scripts
+      name: PEP 723 inline metadata
+      summary: single-file scripts declare dependencies in a `# /// script` block and run isolated
+      lenses: [reuse, reliability]
+      signature: uv add --script <f> <pkg>; uv run --script <f>; uv lock --script <f>
+      notes:
+      - '`uv lock --script` writes `<script>.lock` next to the script'
+      - supports `requires-python` and `[[tool.uv.index]]` in the block
+      ref: /guides/scripts/index.md
+    - id: uv-script-cutoff
+      name: Script `[tool.uv] exclude-newer`
+      summary: freeze a script's resolution to an RFC 3339 cutoff inside its inline metadata
+      lenses: [reliability]
+      ref: /guides/scripts/index.md
+    - id: uv-pip
+      name: uv pip
+      summary: pip-compatible interface; not for projects with `uv.lock`
+      lenses: [reuse]
+      notes: ['`[tool.uv.pip]` settings apply only to `uv pip` commands']
+      ref: /pip/compatibility/index.md
+    - id: uv-workspaces
+      name: '`tool.uv.workspace`'
+      summary: one lock, shared `requires-python`, members via globs
+      lenses: [composability]
+      notes: [uv reads config only from the workspace root, ignoring members]
+      ref: /concepts/projects/workspaces/index.md
+- title: Configuration and supply chain
+  sections:
+  - id: uv-config
+    title: Settings, versions, cooldowns
+    level: intermediate
+    requires: []
+    ref: /concepts/configuration-files/index.md
+    entries:
+    - id: uv-config-files
+      name: Config files
+      summary: '`[tool.uv]` or `uv.toml` (wins if both), merged project > user > system; env beats file, CLI beats env'
+      lenses: [best-practice]
+      signature: '[tool.uv], uv.toml, --no-config, --config-file <uv.toml>'
+      options:
+      - {name: '--no-config', type: 'flag', default: 'off', desc: 'disable all persistent config discovery'}
+      - {name: '--config-file', type: 'path', default: null, desc: 'use this uv.toml in place of every discovered file'}
+      notes:
+      - arrays concatenate with project entries first, scalars are overridden
+      - user and system files must be `uv.toml`, never pyproject format
+      ref: /concepts/configuration-files/index.md
+    - id: uv-required-version
+      name: '`required-version`'
+      summary: PEP 440 specifier; uv exits if the running version does not match
+      lenses: [reliability]
+      options:
+      - {name: 'required-version', type: 'str', default: null, desc: 'specifier such as ">=0.12.15"; enforced at runtime'}
+      notes: [Homebrew uv floats between minors, so pinning matters]
+      ref: /reference/settings/index.md
+    - id: uv-exclude-newer
+      name: Dependency cooldown
+      summary: ignore releases newer than a timestamp or duration so malicious uploads age out before you lock them
+      lenses: [security, reliability]
+      signature: '[tool.uv] exclude-newer = "1 week"; exclude-newer-package = { pkg = "30 days" }'
+      options:
+      - {name: 'exclude-newer', type: 'str | false', default: null, desc: 'RFC 3339 timestamp, friendly ("1 week") or ISO 8601 ("P7D") duration; false disables'}
+      - {name: 'exclude-newer-package', type: 'table', default: null, desc: 'per-package cutoff, or `pkg = false` to opt out; beats global and index values'}
+      notes:
+      - compared with each artifact's upload time, not the release date; index needs PEP 700 `upload-time` (PyPI has it)
+      - a duration is resolved to a timestamp stored in uv.lock and refreshed only on a new resolution (`--upgrade`)
+      - months and years are not allowed in durations; days are fixed 24 hours
+      - Dependabot `cooldown` should match so PRs stay lockable
+      ref: /concepts/resolution/index.md
+    - id: uv-index-config
+      name: '`[[tool.uv.index]]`'
+      summary: declare package indexes; pin packages via `tool.uv.sources`; `first-index` strategy blocks dependency confusion
+      lenses: [security]
+      signature: '[[tool.uv.index]] name, url, explicit, default, exclude-newer'
+      options:
+      - {name: 'explicit', type: 'bool', default: 'false', desc: 'index is used only for packages pinned to it via sources'}
+      - {name: 'default', type: 'bool', default: 'false', desc: 'replace PyPI as the default index'}
+      - {name: 'index-strategy', type: 'str', default: first-index, desc: 'first-index, unsafe-first-match, unsafe-best-match'}
+      notes: ['`unsafe-best-match` opens dependency-confusion risk']
+      ref: /concepts/indexes/index.md
+    - id: uv-preview-flags
+      name: Preview features
+      summary: opt-in features that may change; enable per feature, never blanket `--preview`, to avoid surprise changes
+      lenses: [reliability]
+      signature: '--preview-features x[,y], preview-features = ["x"], UV_PREVIEW_FEATURES'
+      options:
+      - {name: 'preview-features', type: 'list[str] | bool', default: null, desc: 'feature names; true enables all; unknown names only warn'}
+      - {name: '--no-preview', type: 'flag', default: 'off', desc: 'disable preview features'}
+      notes:
+      - '`audit-command`, `format-command`, `check-command`, `malware-check`, `add-bounds`, `lockfile-format-check` are gated'
+      - '`lockfile-format-check` makes `--locked`/`--check` reject non-canonical lock formatting'
+      - some features act before config loads and cannot be enabled from config
+      ref: /concepts/preview/index.md
+    - id: uv-malware-check
+      name: On-sync malware scan
+      summary: check the lock against OSV MAL advisories on every sync and abort if a package matches
+      lenses: [security]
+      signature: '[tool.uv.audit] malware-check = true; UV_MALWARE_CHECK=1'
+      options:
+      - {name: 'audit.malware-check', type: 'bool', default: 'false', desc: 'scan locked packages during sync operations'}
+      - {name: 'audit.malware-check-url', type: 'str', default: 'https://api.osv.dev/', desc: 'alternative vulnerability service'}
+      notes: [preview; sync aborts on a match]
+      ref: /concepts/projects/sync/index.md
+    - id: uv-audit
+      name: '`uv audit`'
+      summary: scan the lock for known vulnerabilities and deprecated/quarantined packages
+      lenses: [security]
+      signature: uv audit [--ignore <id>] [--ignore-until-fixed <id>] [--no-default-groups] [--locked]
+      options:
+      - {name: '--ignore', type: 'str', default: null, desc: 'skip a vulnerability ID or alias; persistent form `[tool.uv.audit] ignore`'}
+      - {name: '--ignore-until-fixed', type: 'str', default: null, desc: 'skip an ID only while no fix version exists'}
+      - {name: '--no-default-groups', type: 'flag', default: 'off', desc: 'omit dependency groups; by default all extras and groups are audited'}
+      returns: non-clean exit when vulnerabilities are found, so it can gate CI
+      notes: ['preview (`audit-command`); needs network, fails offline']
+      ref: /reference/cli/index.md
+    - id: uv-cache
+      name: Cache
+      summary: global wheel/build cache; prune in CI, clear one package with `uv cache clean <pkg>`
+      lenses: [perf]
+      signature: uv cache prune --ci; --refresh; UV_CACHE_DIR; UV_LINK_MODE
+      options:
+      - {name: 'link-mode', type: 'str', default: 'clone (macOS/Linux), hardlink (Windows)', desc: 'clone, copy, hardlink, symlink; symlink breaks when the cache is cleared'}
+      - {name: '--refresh', type: 'flag', default: 'off', desc: 'revalidate cached data without discarding it'}
+      - {name: '--no-cache', type: 'flag', default: 'off', desc: 'use a temporary cache; prefer `--refresh` for correctness fixes'}
+      notes:
+      - keep cache on the venv filesystem or links fall back to copies; never edit the cache by hand
+      - '`uv cache prune --ci` drops pre-built wheels but keeps source-built ones; run it at the end of CI'
+      - concurrent uv commands are safe; cache-modifying commands wait up to 5 min (`UV_LOCK_TIMEOUT`)
+      - '`tool.uv.cache-keys` and `reinstall-package` handle dynamic metadata that the default rebuild heuristic misses'
+      ref: /concepts/cache/index.md
+    - id: uv-install
+      name: Installing and upgrading uv
+      summary: '`uv self update` works only for the standalone installer'
+      lenses: [reliability]
+      signature: uv self update
+      notes: ['Homebrew installs upgrade via `brew upgrade uv`']
+      ref: /getting-started/installation/index.md
+- title: CI and containers
+  sections:
+  - id: uv-ci
+    title: CI, Docker, update bots
+    level: intermediate
+    requires: [uv-lock-sync]
+    ref: /guides/integration/github/index.md
+    entries:
+    - id: uv-github-actions
+      name: setup-uv action
+      summary: install uv in GitHub Actions with a pinned version and optional cache, then `uv sync --locked`
+      lenses: [reliability, perf]
+      signature: astral-sh/setup-uv with version, enable-cache; uv sync --locked; uv cache prune --ci
+      options:
+      - {name: 'version', type: 'str', default: latest, desc: 'uv version to install; docs call pinning best practice'}
+      - {name: 'enable-cache', type: 'bool', default: null, desc: 'persist the uv cache across workflow runs'}
+      - {name: 'python-version', type: 'str', default: null, desc: 'overrides `.python-version`/`requires-python`, for matrices'}
+      notes:
+      - docs pin every action by commit SHA with a version comment
+      - '`UV_PYTHON` sets the interpreter when not using setup-uv'
+      ref: /guides/integration/github/index.md
+    - id: uv-docker
+      name: Docker layers
+      summary: sync dependencies in a cached layer before copying source, using `--locked` and a cache mount
+      lenses: [perf, reliability]
+      signature: uv sync --locked --no-install-project; then COPY . and uv sync --locked
+      options:
+      - {name: 'UV_COMPILE_BYTECODE', type: 'bool', default: 'false', desc: 'precompile .pyc for faster startup in production images'}
+      - {name: 'UV_LINK_MODE', type: 'str', default: null, desc: 'set `copy` when the cache mount and target are on different filesystems'}
+      - {name: 'UV_NO_DEV', type: 'bool', default: 'false', desc: 'skip dev groups in runtime images'}
+      notes:
+      - bind-mount `uv.lock` and `pyproject.toml` for the dependency layer; keep `.venv` in .dockerignore
+      - '`--no-editable` plus a multi-stage copy of the env avoids shipping source twice'
+      ref: /guides/integration/docker/index.md
+    - id: uv-update-bots
+      name: Dependabot/Renovate
+      summary: '`package-ecosystem: "uv"` updates uv.lock; add `cooldown` equal to `exclude-newer`'
+      lenses: [security]
+      signature: 'package-ecosystem: "uv", cooldown.default-days, exclude-newer'
+      notes: [Renovate page covers uv.lock and inline script metadata]
+      ref: /guides/integration/dependabot/index.md
+    - id: uv-pre-commit
+      name: '`astral-sh/uv-pre-commit`'
+      summary: pre-commit hooks that keep lock and exports in sync
+      lenses: [reliability]
+      signature: uv-lock, uv-export, pip-compile
+      ref: /guides/integration/pre-commit/index.md
+- title: Getting started and guides
+  sections:
+  - id: uv-getting-started
+    title: Feature map and guide walkthroughs
+    level: basic
+    requires: []
+    ref: /getting-started/features/index.md
+    entries:
+    - id: uv-features-overview
+      name: Feature map
+      summary: command families by area (python, scripts, projects, tools, pip interface, utility) and which replaces what
+      lenses: [reuse]
+      notes:
+      - 'utility commands: `uv cache clean|prune|dir`, `uv tool dir`, `uv python dir`, `uv self update`'
+      - the pip interface is for legacy workflows; it does not exactly replicate pip, pip-tools or venv behavior
+      ref: /getting-started/features/index.md
+    - id: uv-guide-projects
+      name: Working on projects guide
+      summary: init, add/remove, run, build and `uv version` walkthrough; `uv run` re-checks lock and env on every call
+      lenses: [best-practice]
+      signature: uv version [--short] [--output-format json]; uv lock --upgrade-package <pkg>; uv add -r requirements.txt -c constraints.txt
+      returns: '`uv version --output-format json` gives package_name, version, commit_info'
+      notes:
+      - '`uv run` does not remove extraneous packages from the env by default'
+      - '`uv add -r requirements.txt` migrates an existing requirements file into pyproject.toml'
+      ref: /guides/projects/index.md
+    - id: uv-guide-tools
+      name: Using tools guide
+      summary: '`uvx` runs a tool in a temporary env; `uv tool install` persists it; use `uv run` for tools needing the project'
+      lenses: [best-practice, reuse]
+      signature: uvx [--from <pkg>] [--with <pkg>] [--python <v>] <cmd>[@<version>|@latest]; uv tool install|upgrade [--all] <pkg>
+      options:
+      - {name: '--from', type: 'str', default: null, desc: 'package spec (version range, extras, git ref) when it differs from the command name'}
+      - {name: '--with', type: 'str', default: null, desc: 'extra packages in the tool environment, e.g. plugins'}
+      - {name: '--with-executables-from', type: 'str', default: null, desc: 'also expose executables of the listed packages when installing'}
+      notes:
+      - 'the `@` syntax accepts only an exact version or `latest`; use `--from` for ranges'
+      - 'pytest and mypy need the project installed, so run them with `uv run`, not `uvx`'
+      - '`uv tool upgrade` respects the constraints given at install time; reinstall to change them'
+      ref: /guides/tools/index.md
+    - id: uv-guide-install-python
+      name: Installing Python guide
+      summary: '`uv python install|list|upgrade`; missing interpreters download automatically unless disabled'
+      lenses: [reliability]
+      signature: uv python install [<version>...] [--default] [--reinstall]; uv python upgrade [<version>]
+      notes:
+      - 'only versioned executables are installed by default; `--default` (experimental) adds `python` and `python3`'
+      - '`--no-managed-python` forces the system interpreter'
+      - 'patch-version upgrades via `uv python upgrade` are preview'
+      ref: /guides/install-python/index.md
+- title: The pip interface
+  sections:
+  - id: uv-pip-interface
+    title: Legacy pip-compatible workflow
+    level: intermediate
+    requires: []
+    ref: /pip/compile/index.md
+    entries:
+    - id: uv-pip-compile
+      name: uv pip compile / sync
+      summary: lock `pyproject.toml` or `requirements.in` into `requirements.txt` or pylock.toml; `sync` makes the env match exactly
+      lenses: [reliability]
+      signature: uv pip compile <src>... -o <out> [--extra|--all-extras|--group <g>] [--upgrade|--upgrade-package <p>]; uv pip sync <lock>
+      options:
+      - {name: '-o/--output-file', type: 'path', default: null, desc: 'without it the result is only printed'}
+      - {name: '--constraint', type: 'path', default: null, desc: 'additive version bounds; does not trigger installs'}
+      - {name: '--override', type: 'path', default: null, desc: 'absolute replacement of a requirement, e.g. to drop a transitive upper bound'}
+      - {name: '--build-constraint', type: 'path', default: null, desc: 'bounds applied only to build-time dependencies'}
+      notes:
+      - an existing output file pins versions; use `--upgrade-package` or `--upgrade` to move them
+      - '`uv pip install` keeps undeclared packages; `uv pip sync` removes them'
+      - extras are not supported with the `requirements.in` format
+      ref: /pip/compile/index.md
+    - id: uv-pip-declare
+      name: Declaring dependencies for pip mode
+      summary: prefer static `pyproject.toml` (`dependencies`, optional-dependencies extras) or `requirements.in` over ad-hoc installs
+      lenses: [best-practice]
+      notes: ['optional dependency groups are not supported in `requirements.in`']
+      ref: /pip/dependencies/index.md
+    - id: uv-pip-environments
+      name: Virtual environments and discovery
+      summary: '`uv pip` requires a venv by default; discovery order is VIRTUAL_ENV, CONDA_PREFIX, then nearest `.venv`'
+      lenses: [reliability]
+      signature: uv venv [path] [--python <v>] [--seed]; uv pip install --system | --python <path>
+      options:
+      - {name: '--system', type: 'flag', default: 'off', desc: 'opt in to mutating the system interpreter; appropriate in CI and containers'}
+      - {name: '--python', type: 'str', default: null, desc: 'interpreter path, version request, or venv root to target'}
+      notes:
+      - 'a `VIRTUAL_ENV` that is not a PEP 405 venv is ignored'
+      - '`python -m uv` targets the parent interpreter env and adds startup overhead'
+      ref: /pip/environments/index.md
+    - id: uv-pip-inspection
+      name: Inspecting environments
+      summary: '`uv pip list|freeze|show|check`; `check` reports conflicting or missing dependencies'
+      lenses: [observability]
+      signature: uv pip list [--format json]; uv pip freeze; uv pip show <pkg>...; uv pip check
+      ref: /pip/inspection/index.md
+    - id: uv-pip-packages
+      name: Managing packages
+      summary: install from specs, git refs, local paths, editable, requirements or pyproject files, and dependency groups
+      lenses: [reuse]
+      signature: uv pip install [-e <path>] [-r <file>] [--extra <e>|--all-extras] [--group <path>:<g>]; uv pip uninstall <pkg>...
+      notes: ['`--group` flags do not apply to sources given with `-r` or `-e`']
+      ref: /pip/packages/index.md
+- title: Authentication and private registries
+  sections:
+  - id: uv-auth-registries
+    title: Credentials for indexes, git, and tools
+    level: advanced
+    requires: [uv-index-config]
+    ref: /concepts/authentication/index.md
+    entries:
+    - id: uv-authentication
+      name: Authentication overview
+      summary: index page for `uv auth` CLI, HTTP, Git and TLS certificate credentials, and third-party services
+      lenses: [security]
+      notes: ['sub-pages: cli, http, git, certificates, third-party']
+      ref: /concepts/authentication/index.md
+    - id: uv-index-credentials
+      name: Per-index credentials
+      summary: '`UV_INDEX_<NAME>_USERNAME` / `_PASSWORD` for an index named in `[[tool.uv.index]]`; publish uses `UV_PUBLISH_*`'
+      lenses: [security]
+      signature: UV_INDEX_<NAME>_USERNAME, UV_INDEX_<NAME>_PASSWORD, UV_PUBLISH_USERNAME, UV_PUBLISH_PASSWORD, UV_PUBLISH_URL
+      notes:
+      - '<NAME> must match the index name in pyproject.toml; publish variables carry no index name'
+      - 'set `publish-url` on the index and run `uv publish --index <name>`; `UV_PUBLISH_URL` alone cannot check for an existing upload'
+      ref: /guides/integration/aws/index.md
+    - id: uv-keyring-provider
+      name: keyring provider
+      summary: '`UV_KEYRING_PROVIDER=subprocess` (or `tool.uv.keyring-provider`) fetches tokens via the `keyring` CLI plus a vendor plugin'
+      lenses: [security]
+      signature: UV_KEYRING_PROVIDER=subprocess; uv tool install keyring --with <plugin>
+      notes:
+      - only subprocess mode; the `keyring` executable must be on PATH and installed from a source other than the private index
+      - 'required username: aws (CodeArtifact), VssSessionToken (Azure Artifacts), oauth2accesstoken (Google)'
+      ref: /guides/integration/google/index.md
+    - id: uv-aws-codeartifact
+      name: AWS CodeArtifact
+      summary: Basic auth with username `aws` and a token from `aws codeartifact get-authorization-token`, or keyrings.codeartifact
+      lenses: [security]
+      signature: UV_INDEX_PRIVATE_REGISTRY_USERNAME=aws; UV_INDEX_PRIVATE_REGISTRY_PASSWORD=$AWS_CODEARTIFACT_TOKEN
+      ref: /guides/integration/aws/index.md
+    - id: uv-azure-artifacts
+      name: Azure Artifacts
+      summary: Basic auth with any username and a PAT as password, or artifacts-keyring with username `VssSessionToken`
+      lenses: [security]
+      notes: ['publish-url ends in `/pypi/upload/`']
+      ref: /guides/integration/azure/index.md
+    - id: uv-google-artifact-registry
+      name: Google Artifact Registry
+      summary: Basic auth with username `oauth2accesstoken` and a gcloud access token, or keyrings.google-artifactregistry-auth
+      lenses: [security]
+      ref: /guides/integration/google/index.md
+    - id: uv-jfrog
+      name: JFrog Artifactory
+      summary: username and password or an empty username with a JWT; publishing needs an empty username, not `--token`
+      lenses: [security]
+      notes: ['`UV_PUBLISH_TOKEN` / `--token` gives a 401 on JFrog because uv sends `__token__` as the username']
+      ref: /guides/integration/jfrog/index.md
+    - id: uv-bazel-auth-helper
+      name: Bazel credential helper
+      summary: '`uv auth login <url>` then a Bazel `--credential_helper` wrapper that runs `uv auth helper --protocol=bazel`'
+      lenses: [security]
+      signature: uv auth login <url>; uv --preview-features auth-helper auth helper --protocol=bazel
+      notes: [needs Bazel 7 or newer; the helper subcommand is a preview feature]
+      ref: /guides/integration/bazel/index.md
+- title: Integrations and recipes
+  sections:
+  - id: uv-integrations
+    title: Frameworks, notebooks, serverless, CI
+    level: intermediate
+    requires: [uv-docker]
+    ref: /guides/integration/fastapi/index.md
+    entries:
+    - id: uv-fastapi
+      name: FastAPI project
+      summary: '`uv init --no-package` for a flat app, `uv add fastapi --extra standard`, run with `uv run fastapi dev`'
+      lenses: [reuse]
+      signature: uv init --no-package; uv add fastapi --extra standard; uv sync --frozen --no-cache
+      ref: /guides/integration/fastapi/index.md
+    - id: uv-aws-lambda
+      name: AWS Lambda deploy
+      summary: multi-stage image exporting a frozen requirements file into `${LAMBDA_TASK_ROOT}`, or a zip built per target platform
+      lenses: [perf, reliability]
+      signature: uv export --frozen --no-emit-workspace --no-dev --no-editable -o requirements.txt; uv pip install --target <dir> [--python-platform x86_64-manylinux2014]
+      options:
+      - {name: 'UV_COMPILE_BYTECODE', type: 'bool', default: null, desc: 'precompile bytecode to cut cold start in the container build'}
+      - {name: 'UV_NO_INSTALLER_METADATA', type: 'bool', default: null, desc: 'drop installer metadata for a deterministic layer'}
+      - {name: '--python-platform', type: 'str', default: null, desc: 'cross-target wheels for zip builds, e.g. aarch64-manylinux2014 for ARM'}
+      notes: ['zip archives are limited to 250 MB; larger apps need the container route']
+      ref: /guides/integration/aws-lambda/index.md
+    - id: uv-gitlab-ci
+      name: GitLab CI/CD
+      summary: use the `ghcr.io/astral-sh/uv` image, set `UV_LINK_MODE=copy`, cache on `uv.lock`, finish with `uv cache prune --ci`
+      lenses: [perf, reliability]
+      signature: UV_CACHE_DIR=.uv-cache; cache key files [uv.lock]; uv cache prune --ci
+      notes:
+      - 'distroless images need `entrypoint: [""]`'
+      - 'for `uv pip` jobs set `UV_SYSTEM_PYTHON=1`; `--no-system` opts out per call'
+      ref: /guides/integration/gitlab/index.md
+    - id: uv-jupyter
+      name: Jupyter
+      summary: '`uv run --with jupyter jupyter lab` in a project; add `ipykernel` as a dev dep and install a kernel to modify the project env'
+      lenses: [reuse]
+      signature: uv run --with jupyter jupyter lab; uv add --dev ipykernel; uv run ipython kernel install --user --env VIRTUAL_ENV $(pwd)/.venv --name=project
+      notes:
+      - 'in a notebook `!uv add` changes the project; `!uv pip install` hits the Jupyter env unless a kernel is used'
+      - '`uv venv --seed` makes `%pip` work inside the project env'
+      ref: /guides/integration/jupyter/index.md
+    - id: uv-marimo
+      name: marimo
+      summary: marimo notebooks are scripts, so they carry inline script metadata; `uvx marimo edit --sandbox` isolates them
+      lenses: [reuse]
+      signature: uv add --script nb.py <pkg>; uvx marimo edit --sandbox nb.py; uv run nb.py
+      ref: /guides/integration/marimo/index.md
+    - id: uv-pytorch
+      name: PyTorch accelerators
+      summary: route torch packages to a PyTorch index via `tool.uv.sources` with markers or extras; `--torch-backend=auto` for pip mode
+      lenses: [reliability, perf]
+      signature: '[[tool.uv.index]] name, url, explicit = true; [tool.uv.sources] torch = [{ index = "pytorch-cpu", marker = ... }]'
+      options:
+      - {name: 'explicit', type: 'bool', default: 'false', desc: 'restrict an index to packages pinned to it so generic deps keep coming from PyPI'}
+      - {name: '--torch-backend', type: 'str', default: null, desc: 'auto detects CUDA, ROCm or Intel GPU, or pass e.g. cu130; only in the uv pip interface'}
+      notes:
+      - 'gate on `sys_platform` because PyTorch ships no CUDA builds for macOS and no ROCm builds for macOS or Windows'
+      - 'extras markers let `uv sync --extra cpu` and `--extra cu130` choose different indexes (declare them in `tool.uv.conflicts`)'
+      - Astral GPU indexes at wheels.astral.sh carry prebuilt flash-attn, deepspeed and vllm wheels
+      ref: /guides/integration/pytorch/index.md
+    - id: uv-renovate
+      name: Renovate
+      summary: detects `uv.lock`, updates pyproject and lock together; `lockFileMaintenance` refreshes transitive deps
+      lenses: [security, reliability]
+      signature: lockFileMaintenance.enabled; pep723.managerFilePatterns; minimumReleaseAge
+      notes:
+      - 'inline-script files must be listed in `pep723.managerFilePatterns`; script lock files are not updated'
+      - 'set `minimumReleaseAge` equal to uv `exclude-newer` so PRs stay lockable'
+      ref: /guides/integration/renovate/index.md
+- title: Reference
+  sections:
+  - id: uv-reference
+    title: Storage directories and installer options
+    level: intermediate
+    requires: []
+    ref: /reference/storage/index.md
+    entries:
+    - id: uv-storage
+      name: Storage directories
+      summary: where uv keeps cache, managed Pythons, tools, config, executables, project venvs and script venvs, with env overrides
+      lenses: [reliability, perf]
+      signature: uv cache dir; uv python dir [--bin]; uv tool dir [--bin]
+      options:
+      - {name: 'UV_PYTHON_INSTALL_DIR', type: 'path', default: '$XDG_DATA_HOME/uv/python', desc: 'managed Python location; existing venvs keep the old path'}
+      - {name: 'UV_TOOL_DIR', type: 'path', default: '$XDG_DATA_HOME/uv/tools', desc: 'tool environments'}
+      - {name: 'UV_PROJECT_ENVIRONMENT', type: 'path', default: '.venv', desc: 'project venv location'}
+      notes:
+      - 'the cache must be on the same filesystem as venvs for best performance'
+      - 'the `centralized-project-envs` preview puts project venvs in the cache dir, where `uv cache clean|prune` removes them'
+      ref: /reference/storage/index.md
+    - id: uv-installer-options
+      name: Standalone installer options
+      summary: '`UV_INSTALL_DIR`, `UV_NO_MODIFY_PATH`, `UV_UNMANAGED_INSTALL` (CI; also disables `uv self update`)'
+      lenses: [reliability]
+      signature: curl -LsSf https://astral.sh/uv/install.sh | env UV_UNMANAGED_INSTALL=/path sh
+      notes: ['changing the install dir moves only the binary; data stays in the default storage dirs']
+      ref: /reference/installer/index.md
+skipped:
+- page: https://docs.astral.sh/uv/getting-started/first-steps
+  why: only says to run `uv` to confirm the install; no API (install covered by uv-install)
+- page: https://docs.astral.sh/uv/guides/integration/coiled
+  why: third-party cloud vendor walkthrough; the inline-script and `uv run` mechanics are covered by uv-scripts
+- page: https://docs.astral.sh/uv/reference/contributing
+  why: for uv contributors (Rust build, tests, releases), not for users of uv

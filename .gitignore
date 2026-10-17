@@ -1,5 +1,26 @@
+# --- Claude Code: personal / machine-local ---
+CLAUDE.local.md
+.claude/settings.local.json
+.claude/agent-memory-local/
+.claude/logs/
+context-pack.*.md
+
+# --- Secrets ---
+.env
+.env.*
+!.env.example
+
+# --- OS / editor ---
+.DS_Store
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# --- Python / project ---
 __pycache__/
 *.pyc
-.env
+.venv/
 fixtures/*.mp4
 fixtures/probe.json
+fixtures/search_*.json

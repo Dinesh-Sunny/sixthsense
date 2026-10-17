@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Deploy SixthFrame to the team's K8s namespace (repo skill: deployment/deploy-app-no-registry).
-# Run ON THE LAB VM from the sixthframe/ folder:  bash deploy.sh
+# Deploy SixthSense to the team's K8s namespace (repo skill: deployment/deploy-app-no-registry).
+# Run ON THE LAB VM from the sixthsense/ folder:  bash deploy.sh
 set -euo pipefail
 CFG=$(ls /config/*.config | head -1)
 get(){ grep "^$1=" "$CFG" | cut -d= -f2- ; }
 USERNAME=$(get USERNAME); INGRESS_URL=$(get INGRESS_URL); PASSWORD=$(get PASSWORD)
 NS="$USERNAME"; export KUBECONFIG=/config/${NS}-k8s.yaml
-APP_HOST="video-lab-team-${USERNAME#team-}.cosmos.vastdata.com"; APP=sixthframe; PORT=8080
+APP_HOST="video-lab-team-${USERNAME#team-}.cosmos.vastdata.com"; APP=sixthsense; PORT=8080
 BUILD=$(mktemp -d); cp app/main.py app/index.html app/incidents.json app/metrics.json pipeline/vss.py "$BUILD/"
 du -sh "$BUILD"
 kubectl -n "$NS" create configmap ${APP}-code --from-file="$BUILD" --dry-run=client -o yaml | kubectl apply -f -

@@ -1,0 +1,36 @@
+# Paths synced between this template and projects by ai-playbook/bin/playbook-sync.sh.
+# Only shared MACHINERY belongs here. Never project content (AGENTS.md, filled rules, agent memory).
+.claude/scripts/
+.claude/templates/
+.claude/hooks/docs-lint.sh
+.claude/hooks/_lib.sh
+.claude/hooks/log-event.sh
+.claude/hooks/statusline.sh
+.claude/skills/learn/
+.claude/skills/docs-garden/
+.claude/skills/context-pack/
+.claude/skills/playbook-sync/
+.claude/agents/context-curator.md
+.claude/agents/data-architect.md
+.claude/skills/data-model/
+.claude/skills/data-review/
+.claude/rules/context-hygiene.md
+.claude/SETTINGS_REFERENCE.md
+.github/workflows/ai-context.yml
+.claude/hooks/post-edit-format.sh
+.claude/hooks/stop-check.sh
+.claude/skills/direct-response-copywriting/
+.claude/skills/humanizer/
+.claude/hooks/copy-gate.sh
+.claude/hooks/voice-check.sh
+# /feature pipeline kit (from agentic-teams): skill, agents, outline tooling, shared outlines.
+.claude/skills/feature/
+.claude/agents/feature-architect.md
+.claude/agents/feature-reviewer.md
+.claude/agents/stack-expert.md
+.claude/agents/advocate.md
+.claude/agents/judge.md
+.claude/rules/stacks.md
+.claude/hooks/stack-drift.sh
+.claude/stacks/lib/
+.claude/stacks/catalog.md

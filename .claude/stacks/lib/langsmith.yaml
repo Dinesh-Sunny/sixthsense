@@ -1,0 +1,1950 @@
+stack: langsmith
+version: "0.14.4"
+docs_base: https://docs.langchain.com
+source: https://docs.langchain.com/_llms/agent-development-lifecycle/monitor.md
+fetched: 2026-10-05
+verified: 2026-10-05
+toc:
+- index: 'https://docs.langchain.com/_llms/agent-development-lifecycle/monitor.md'
+  match: '^https://docs\.langchain\.com/langsmith/'
+- index: 'https://docs.langchain.com/_llms/agent-development-lifecycle/monitor/reference.md'
+  match: '^https://docs\.langchain\.com/langsmith/'
+- index: 'https://docs.langchain.com/_llms/agent-development-lifecycle/deploy.md'
+  match: '^https://docs\.langchain\.com/langsmith/'
+- index: 'https://docs.langchain.com/_llms/agent-development-lifecycle/deploy/get-started.md'
+  match: '^https://docs\.langchain\.com/langsmith/'
+  exclude: '/langsmith/agent-server-api/'
+  why: 'one generated page per Agent Server endpoint (about 60); the same API is the agent-server-openapi.json spec and the /docs route of every server, covered by the agent-server-api entries'
+- index: 'https://docs.langchain.com/_llms/products-and-setup/lang-smith-setup.md'
+  match: '^https://docs\.langchain\.com/langsmith/'
+  exclude: '/langsmith/(self-host|byoc|script-|aws-self|azure-self|gcp-self|kubernetes|hybrid-legacy|llm-auth-proxy|langsmith-managed-clickhouse|langsmith-collector|observability-stack|export-backend|self-hosted-mission|self-hosted-changelog|deploy-self-hosted-full|engine-self-hosted|scalability|shared-responsibility|data-storage|data-purging|regions-faq|faq$|troubleshooting$|abac|rbac|audit-logs|authentication-methods|jit-invite|user-management|administration-overview|organization-workspace|manage-organization|set-up-hierarchy|workload-isolation|migrate-to-agent-based|govern-overview|enterprise|billing|pricing-plans|status)'
+  why: 'operator runbooks for self-hosting, BYOC, Terraform and organization administration (SSO, RBAC, audit, billing, compliance); run by LangSmith admins, not coded against by the SDK or an Agent Server app'
+groups:
+- title: AI tooling
+  sections:
+  - id: ai-tooling
+    title: Agent access to LangSmith
+    level: basic
+    requires: []
+    ref: /langsmith/langsmith-remote-mcp.md
+    entries:
+    - id: mcp-langsmith
+      name: LangSmith remote MCP
+      summary: Hosted MCP server that lets a coding agent query runs, threads, datasets, experiments and prompts
+      lenses: [observability, reuse]
+      notes:
+      - 'URL https://api.smith.langchain.com/mcp (eu./apac./aws. host prefixes per region); tools surface as mcp__langsmith__<tool>'
+      - 'OAuth 2.1 with dynamic registration (run /mcp in Claude Code to log in); headless clients send an X-Api-Key header'
+      - 'tools: fetch_runs, list_projects, get_thread_history, list_prompts, get_prompt_by_name, push_prompt, get_billing_usage'
+      - 'tools: list_datasets, list_examples, read_dataset, read_example, create_dataset, update_examples, list_experiments, run_experiment'
+      - OpenAI Codex CLI is incompatible (omits the RFC 8707 resource parameter)
+      ref: /langsmith/langsmith-remote-mcp.md
+    - id: cli-langsmith
+      name: LangSmith CLI
+      summary: Terminal and agent access to projects, traces, runs, threads, datasets and experiments with JSON output
+      lenses: [observability, reuse]
+      notes:
+      - 'install: curl -fsSL https://cli.langsmith.com/install.sh | sh (or brew install langchain-ai/tap/langsmith-cli); langsmith self-update'
+      - 'auth: langsmith auth login (OAuth, tokens in ~/.langsmith/config.json, needs v0.2.30+) or LANGSMITH_API_KEY; --profile selects a workspace'
+      - '--format json for scripting; querying SmithDB-backed deployments needs v0.2.44+'
+      ref: /langsmith/langsmith-cli.md
+    - id: skills-langsmith
+      name: LangSmith agent skills
+      summary: langsmith-trace, langsmith-dataset and langsmith-evaluator skills for coding agents
+      lenses: [reuse]
+      notes:
+      - "npx skills add langchain-ai/langsmith-skills --skill '*' --yes (add --agent claude-code --global for user scope)"
+      - needs LANGSMITH_API_KEY; optional LANGSMITH_PROJECT and LANGSMITH_WORKSPACE_ID
+      - repo is langchain-ai/langsmith-skills; review the SKILL.md diff before re-locking
+      ref: /langsmith/skills.md
+    - id: mcp-docs-langchain
+      name: docs-langchain MCP
+      summary: Search and read the Docs by LangChain site, including every LangSmith guide
+      lenses: [reuse]
+      notes: ['https://docs.langchain.com/mcp; pages also serve .md and per-product llms shards']
+      ref: /use-these-docs.md
+    - id: llms-txt
+      name: llms.txt shards
+      summary: Root index pointing at per-lifecycle shards (monitor, test, deploy) that list every page
+      lenses: [reuse]
+      notes: ['/_llms/agent-development-lifecycle/monitor.md lists tracing pages; grep it instead of crawling']
+      ref: /llms.txt
+- title: Tracing setup
+  sections:
+  - id: trace-basics
+    title: Enable and scope tracing
+    level: basic
+    requires: []
+    ref: /langsmith/trace-with-langchain.md
+    entries:
+    - id: env-tracing
+      name: Tracing env vars
+      summary: Env vars that switch LangChain and LangGraph tracing on and point it at a workspace and project
+      lenses: [observability, security]
+      options:
+      - {name: LANGSMITH_TRACING, type: bool, default: null, desc: 'true enables tracing for LangChain runnables and @traceable; unset or false disables'}
+      - {name: LANGSMITH_API_KEY, type: str, default: null, desc: 'Workspace API key; keep it in a secret store and out of browser bundles'}
+      - {name: LANGSMITH_PROJECT, type: str, default: '"default"', desc: 'Tracing project; auto-created when the first trace arrives'}
+      - {name: LANGSMITH_ENDPOINT, type: str, default: US API URL, desc: 'Required for EU/APAC/AWS/self-hosted; no trailing slash or auth fails'}
+      - {name: LANGSMITH_WORKSPACE_ID, type: str, default: null, desc: 'Needed when the API key spans several workspaces'}
+      notes:
+      - precedence for toggling is tracing_context > ls.configure > env
+      - 'SDK 0.14.4: V2 names (LANGSMITH_TRACING_V2, LANGCHAIN_TRACING_V2) beat LANGSMITH_TRACING, which beats LANGCHAIN_TRACING; only "true" enables'
+      - 'langgraph-api 0.15.1 sets LANGSMITH_TRACING=true at startup when a key is set and no tracing var is defined'
+      - 'key aliases: LANGSMITH_API_KEY, legacy LANGCHAIN_API_KEY, LANGSMITH_CONTROL_PLANE_API_KEY'
+      - a key also makes the Agent Server report run/node counts and dependency versions (no payloads) to LangSmith, even with tracing false
+      ref: /langsmith/trace-with-langchain.md#1-configure-your-environment
+    - id: tracing-context
+      name: tracing_context
+      summary: 'Scoped override of tracing for a block: enable/disable, project, tags, metadata, client, parent, replicas'
+      lenses: [observability, cost, composability]
+      import: langsmith
+      signature: tracing_context(*, enabled=None, project_name=None, tags=None, metadata=None, client=None, parent=None, replicas=None, address=None)
+      params:
+      - {name: enabled, type: 'bool | "local" | None', default: null, desc: 'False skips tracing in the block; True opts in even when LANGSMITH_TRACING is unset; innermost block wins'}
+      - {name: project_name, type: 'str | None', default: null, desc: 'Route runs in the block to this project'}
+      - {name: client, type: 'Client | None', default: null, desc: 'Client with its own key, endpoint, anonymizer or sampling rate; also honoured by LangChain tracing'}
+      - {name: parent, type: 'RunTree | Mapping | str | False', default: null, desc: 'Parent run, dotted-order string or inbound request headers (distributed tracing)'}
+      - {name: replicas, type: 'Sequence[WriteReplica | str]', default: null, desc: 'Extra destinations; each may carry updates that override run fields (see replicas)'}
+      returns: A context manager; use it as a with block around invoke calls
+      notes: [accepts tags and metadata that every run inside the block inherits]
+      ref: /langsmith/conditional-tracing.md
+    - id: tracing-off-tests
+      name: Tracing off in tests
+      summary: Set LANGSMITH_TRACING=false before imports, or wrap with tracing_context(enabled=False)
+      lenses: [testing]
+      notes:
+      - 'langsmith registers a pytest11 plugin (langsmith_plugin) on install; -p no:langsmith_plugin disables it'
+      - 'SDK 0.14.4 (verified): LANGSMITH_TRACING=false loses to LANGCHAIN_TRACING_V2=true or LANGSMITH_TRACING_V2=true'
+      - 'pin LANGSMITH_TRACING_V2=false too: the LANGSMITH_ namespace is read before LANGCHAIN_'
+      ref: /langsmith/conditional-tracing.md
+    - id: project-routing
+      name: Project routing
+      summary: Pick the tracing project statically by env var or dynamically per call, decorator or context
+      lenses: [observability]
+      options:
+      - {name: LANGSMITH_PROJECT, type: env, default: '"default"', desc: 'Static project for the whole process'}
+      - {name: tracing_context(project_name=), type: arg, default: null, desc: 'Per-block override of the env var'}
+      - {name: '@traceable(project_name=)', type: arg, default: null, desc: 'Per-function; langsmith_extra={"project_name":...} overrides it per call'}
+      notes: [workspace routing needs one Client(workspace_id=) per workspace passed via tracing_context(client=)]
+      ref: /langsmith/log-traces-to-project.md
+    - id: agent-addressing
+      name: Agent addressing (beta)
+      summary: Send traces to a named agent and environment instead of a project in agent-based workspaces
+      lenses: [observability]
+      since: "0.14.4"
+      options:
+      - {name: LANGSMITH_AGENT_ID, type: str, default: null, desc: 'Agent identifier (not display name); required with the environment var'}
+      - {name: LANGSMITH_AGENT_ENVIRONMENT, type: str, default: null, desc: 'local, development, staging or production (lowercase)'}
+      notes:
+      - 'address string is lrn:agents/{id}/environments/{env}; build with ls.address.agent(id, env); accepted by traceable, trace and tracing_context'
+      - cannot be combined with a project in the same call; workspaces not enabled for it reject the runs and tracing is lost
+      ref: /langsmith/log-traces-to-agent.md
+    - id: metadata-tags
+      name: Metadata and tags
+      summary: Attach tags and metadata through the invoke config; child runs inherit them
+      lenses: [observability]
+      signature: 'agent.invoke(input, config={"tags": [...], "metadata": {...}})'
+      notes:
+      - also accepted by tracing_context and @traceable; get_current_run_tree().metadata[...] sets them dynamically
+      - metadata keys prefixed ls_ (ls_provider, ls_model_name, ...) are reserved for LangSmith features
+      ref: /langsmith/add-metadata-tags.md
+    - id: run-name
+      name: Run name
+      summary: Name the root run via config run_name or with_config
+      lenses: [observability]
+      signature: 'runnable.invoke(input, {"run_name": "MyChain"})'
+      notes: [does not rename the nested LLM run; wrap the model in a named runnable for that]
+      ref: /langsmith/trace-with-langchain.md#customize-run-name
+    - id: run-id
+      name: Run ID
+      summary: Pass config run_id to know a run's id up front (feedback, links); a root id becomes the trace_id
+      lenses: [observability]
+      signature: 'runnable.invoke(input, {"run_id": uuid})'
+      notes: [not supported directly on LLM objects]
+      ref: /langsmith/trace-with-langchain.md#customize-run-id
+    - id: ls-model-name
+      name: Model name override
+      summary: Metadata ls_model_name (and ls_provider) relabels the model in traces and maps it to cost
+      lenses: [observability, cost]
+      signature: 'ChatModel(..., metadata={"ls_model_name": "...", "ls_provider": "..."})'
+      notes:
+      - useful when a gateway alias hides the real model
+      - inherited by every run of that model instance
+      ref: /langsmith/trace-with-langchain.md#override-model-name-in-traces
+    - id: ls-metadata-params
+      name: ls_ metadata reference
+      summary: Catalog of reserved ls_ metadata keys for cost, model config, trajectory view and interrupted errors
+      lenses: [observability, cost]
+      ref: /langsmith/ls-metadata-parameters.md
+    - id: flush-before-exit
+      name: Flush before exit
+      summary: Block until background trace uploads finish so short-lived processes lose nothing
+      lenses: [reliability]
+      import: langchain_core.tracers.langchain
+      signature: wait_for_all_tracers()
+      notes:
+      - LangChain Python traces from a background thread; LANGCHAIN_CALLBACKS_BACKGROUND=false makes callbacks synchronous
+      - for the SDK client directly use Client.flush(timeout=None)
+      ref: /langsmith/trace-with-langchain.md#ensure-all-traces-are-submitted-before-exiting
+    - id: sampling
+      name: Sampling
+      summary: Log only a fraction of traces globally or per Client
+      lenses: [cost, perf]
+      options:
+      - {name: LANGSMITH_TRACING_SAMPLING_RATE, type: float, default: '1', desc: 'Global rate between 0 and 1; applies to traceable and RunTree'}
+      - {name: 'Client(tracing_sampling_rate=)', type: float, default: null, desc: 'Per-client rate; pass the client via tracing_context(client=)'}
+      notes: [probabilistic; use conditional tracing when a request must never or always be traced]
+      ref: /langsmith/sample-traces.md
+    - id: client-no-env
+      name: Client without env vars
+      summary: Build a Client with explicit key and URL and pass it through tracing_context
+      lenses: [security, composability]
+      signature: Client(api_key=, api_url=, workspace_id=, anonymizer=, hide_inputs=, tracing_sampling_rate=)
+      notes: [fetch the key from a secrets manager; one Client per workspace for dynamic workspace routing]
+      ref: /langsmith/trace-without-env-vars.md
+    - id: replicas
+      name: Trace replicas
+      summary: Write each trace to several projects, workspaces or endpoints, optionally rewriting run fields
+      lenses: [reliability, security]
+      notes:
+      - LANGSMITH_RUNS_ENDPOINTS configures replicas by env; cannot be combined with LANGSMITH_ENDPOINT
+      - 'replica updates such as {inputs: {}, outputs: {}} redact per request; set project_name on the replica or the update may be dropped'
+      ref: /langsmith/trace-replicas.md
+    - id: trace-nesting
+      name: Trace nesting
+      summary: contextvars propagation; pass parent config on Python <3.11
+      lenses: [reliability]
+      ref: /langsmith/nest-traces.md
+- title: Custom instrumentation
+  sections:
+  - id: instrument
+    title: Instrument non-LangChain code
+    level: intermediate
+    requires: [trace-basics]
+    ref: /langsmith/annotate-code.md
+    entries:
+    - id: traceable
+      name: '@traceable'
+      summary: Decorator that records a function call as a run; nested decorated calls nest automatically
+      lenses: [observability, composability]
+      import: langsmith
+      signature: '@traceable(run_type="chain", name=None, metadata=None, tags=None, client=None, project_name=None, process_inputs=None, process_outputs=None, reduce_fn=None, enabled=None)'
+      params:
+      - {name: run_type, type: str, default: '"chain"', desc: 'llm, tool, chain, retriever, prompt, embedding, parser; picks the UI rendering'}
+      - {name: process_inputs, type: Callable, default: null, desc: 'Transform or redact inputs before upload; overrides client-level hide_inputs'}
+      - {name: process_outputs, type: Callable, default: null, desc: 'Transform or redact outputs before upload'}
+      - {name: reduce_fn, type: Callable, default: null, desc: 'Fold a generator into one logged output; an unexhausted generator leaves the run pending'}
+      - {name: exceptions_to_handle, type: tuple, default: null, desc: 'Exception types logged without an error (run still recorded)'}
+      - {name: enabled, type: bool, default: null, desc: 'Per-function switch; None follows the current tracing context'}
+      returns: The wrapped callable; per-call overrides go in langsmith_extra={...}
+      notes: [requires LANGSMITH_TRACING=true or an enclosing tracing_context(enabled=True)]
+      ref: /langsmith/annotate-code.md
+    - id: trace-ctx
+      name: trace context manager
+      summary: Trace an arbitrary block as a run with explicit inputs and outputs
+      lenses: [observability]
+      import: langsmith
+      signature: 'trace(name, run_type="chain", *, inputs=None, project_name=None, parent=None, tags=None, metadata=None, client=None, run_id=None)'
+      returns: The run tree; set rt.outputs or call rt.end(outputs=...) before leaving the block
+      notes: [Python only; sync and async context manager; honours LANGSMITH_TRACING since SDK 0.1.95]
+      ref: /langsmith/annotate-code.md#use-the-trace-context-manager-python-only
+    - id: wrappers
+      name: Provider wrappers
+      summary: Wrap raw provider SDK clients so their calls are traced as llm runs
+      lenses: [observability, reuse]
+      import: langsmith.wrappers
+      signature: wrap_openai(client)
+      notes: [wrap_anthropic and wrap_gemini exist; unnecessary for models called through LangChain]
+      ref: /langsmith/trace-with-openai-compatible.md
+    - id: current-run
+      name: get_current_run_tree
+      summary: Read the active run (id, trace_id, metadata) from inside traced code
+      lenses: [observability]
+      import: langsmith
+      signature: get_current_run_tree()
+      returns: The active RunTree or None; mutate .metadata and .tags to enrich the run
+      ref: /langsmith/access-current-span.md
+    - id: distributed-tracing
+      name: Distributed tracing
+      summary: Propagate a run across services with to_headers() and tracing_context(parent=headers)
+      lenses: [observability]
+      signature: 'get_current_run_tree().to_headers() / tracing_context(parent=headers)'
+      notes:
+      - langsmith.middleware.TracingMiddleware (ASGI) adopts an inbound langsmith-trace header
+      - only trust inbound trace headers from internal callers
+      ref: /langsmith/distributed-tracing.md
+    - id: otel
+      name: OpenTelemetry
+      summary: Export LangChain and LangGraph traces over OTel, or send OTLP spans to LangSmith
+      lenses: [observability, composability]
+      options:
+      - {name: LANGSMITH_OTEL_ENABLED, type: bool, default: null, desc: 'true makes the SDK emit OTel spans; needs pip install "langsmith[otel]"'}
+      - {name: OTEL_EXPORTER_OTLP_ENDPOINT, type: str, default: null, desc: 'Base URL such as https://api.smith.langchain.com/otel; exporter appends /v1/traces'}
+      - {name: OTEL_EXPORTER_OTLP_HEADERS, type: str, default: null, desc: 'x-api-key=<key>[,Langsmith-Project=<name>]'}
+      ref: /langsmith/trace-with-opentelemetry.md
+    - id: trace-claude-code
+      name: Trace Claude Code sessions
+      summary: Plugin that sends Claude Code session traces to a LangSmith project
+      lenses: [observability]
+      notes: [CC_LANGSMITH_API_KEY, CC_LANGSMITH_PROJECT; CC_LANGSMITH_METADATA tags runs; applies the secret preset by default]
+      ref: /langsmith/trace-claude-code.md
+- title: Privacy and security
+  sections:
+  - id: privacy
+    title: Redaction and masking
+    level: intermediate
+    requires: [trace-basics]
+    ref: /langsmith/mask-inputs-outputs.md
+    entries:
+    - id: hide-io
+      name: Hide inputs and outputs
+      summary: Drop run payloads entirely by env var or per-client callback
+      lenses: [security]
+      options:
+      - {name: LANGSMITH_HIDE_INPUTS, type: bool, default: null, desc: 'true replaces run inputs with empty objects; also hide_inputs= on Client'}
+      - {name: LANGSMITH_HIDE_OUTPUTS, type: bool, default: null, desc: 'true replaces run outputs with empty objects; also hide_outputs= on Client'}
+      - {name: LANGSMITH_HIDE_METADATA, type: bool, default: null, desc: 'Also strips run metadata'}
+      notes: [when set, the anonymizer is skipped for that side]
+      ref: /langsmith/mask-inputs-outputs.md#hide-inputs-and-outputs
+    - id: secret-anonymizer
+      name: Secret redaction preset
+      summary: Client-side redaction of API keys, tokens, JWTs and private keys before upload
+      lenses: [security]
+      import: langsmith.anonymizer
+      signature: create_secret_anonymizer(*, extra_rules=None, max_depth=24)
+      params:
+      - {name: extra_rules, type: 'list[StringNodeRule]', default: null, desc: 'Extra patterns appended after the defaults'}
+      - {name: max_depth, type: int, default: '24', desc: 'Nesting depth traversed; create_anonymizer defaults to 10'}
+      returns: Callable to pass as Client(anonymizer=...); matches become [SECRET_DETECTED]
+      since: "0.9.0"
+      notes: [covers provider key prefixes, lsv2_ keys, Bearer and Authorization headers, URL credentials, NAME=value assignments]
+      ref: /langsmith/redact-secrets.md
+    - id: rule-anonymizer
+      name: Rule-based masking
+      summary: Mask regex matches or run a custom string function over every payload
+      lenses: [security]
+      import: langsmith.anonymizer
+      signature: create_anonymizer(replacer, *, max_depth=None)
+      notes: [serializes payloads to JSON so heavy regexes cost CPU; default depth 10 per docs]
+      ref: /langsmith/mask-inputs-outputs.md#rule-based-masking-of-inputs-and-outputs
+    - id: process-io
+      name: Per-function processing
+      summary: traceable process_inputs and process_outputs reshape one function's payloads
+      lenses: [security, perf]
+      notes: [take precedence over client-level hide_inputs and hide_outputs]
+      ref: /langsmith/mask-inputs-outputs.md#processing-inputs-and-outputs-for-a-single-function
+    - id: middleware-trace-policy
+      name: Middleware span payloads
+      summary: TracePolicy and omit_payload shape what agent middleware hook spans record
+      lenses: [security, perf]
+      import: langchain.agents.middleware
+      signature: 'TracePolicy(process_inputs=omit_payload); configure_trace_policy(policy)'
+      since: "1.3.15"
+      notes:
+      - a middleware's own trace_policy overrides the global default; configure_trace_policy(None) clears
+      - 'wrap_model_call/wrap_tool_call hook spans are langsmith.traceable-only (langchain 1.4.3)'
+      - before/after hook nodes use node trace_policy through callbacks, so other tracers see them
+      ref: /oss/python/langchain/middleware/custom.md#configure-tracing
+    - id: replica-redaction
+      name: Per-request redaction via replicas
+      summary: Keep run structure and timing but blank payloads for selected tenants
+      lenses: [security]
+      signature: 'tracing_context(replicas=[{"project_name": p, "updates": {"inputs": {}, "outputs": {}}}])'
+      notes: [set project_name on the replica or the update may be dropped and raw data is sent]
+      ref: /langsmith/conditional-tracing.md#conditionally-redact-inputs-and-outputs
+    - id: otel-redaction
+      name: OTel gateway redaction
+      summary: Collector scrubs spans before they reach LangSmith
+      lenses: [security]
+      ref: /langsmith/otel-gateway-trace-redaction.md
+- title: Threads, cost and feedback
+  sections:
+  - id: trace-data
+    title: Threads, cost and feedback
+    level: intermediate
+    requires: [trace-basics]
+    ref: /langsmith/threads.md
+    entries:
+    - id: threads
+      name: Threads
+      summary: Group traces into a conversation via metadata thread_id or session_id
+      lenses: [observability, ux-a11y]
+      import: langsmith
+      signature: uuid7()
+      notes:
+      - 'value is any string, UUID v7 recommended (uuid7 helper since Python SDK 0.4.43)'
+      - 'set on ALL runs incl. child runs or thread filtering, tokens and cost miss them'
+      ref: /langsmith/threads.md
+    - id: cost-tracking
+      name: Cost tracking
+      summary: Token usage and price map give per-run cost; automatic for LangChain models
+      lenses: [cost, observability]
+      params:
+      - {name: usage_metadata, type: dict, default: null, desc: 'input_tokens, output_tokens, total_tokens, input_token_details (cache_read, ...); on run metadata or in outputs'}
+      - {name: ls_provider, type: str, default: null, desc: 'Matches the model price map provider (openai, anthropic, ...)'}
+      - {name: ls_model_name, type: str, default: null, desc: 'Matches the model price map entry; needed for custom or self-hosted models'}
+      notes:
+      - custom price entries live in the UI; non-linear pricing needs client-computed costs sent directly
+      ref: /langsmith/cost-tracking.md
+    - id: user-feedback
+      name: Feedback
+      summary: Attach scores or comments to any run, including child runs; presigned tokens serve browsers
+      lenses: [observability, ux-a11y]
+      import: langsmith
+      signature: Client.create_feedback(run_id=None, key="unnamed", *, score=None, value=None, trace_id=None, comment=None, correction=None, session_id=None)
+      params:
+      - {name: trace_id, type: 'str | UUID', default: null, desc: 'Required for batched, backgrounded ingestion; recommended for latency-sensitive paths'}
+      - {name: score, type: 'float | int | bool', default: null, desc: 'Numeric rating for the key'}
+      - {name: value, type: 'float | int | bool | str | dict', default: null, desc: 'Categorical or display value'}
+      - {name: session_id, type: 'str | UUID', default: null, desc: 'Project UUID; needed for run-level feedback (omitting it is deprecated)'}
+      - {name: extend_trace_retention, type: bool, default: 'True', desc: 'False avoids upgrading the trace to extended retention'}
+      returns: The created Feedback object
+      notes: [presigned feedback tokens let browsers submit without the API key]
+      ref: /langsmith/attach-user-feedback.md
+    - id: run-data-format
+      name: Run data format
+      summary: run and feedback schema
+      lenses: [typing-dx]
+      ref: /langsmith/run-data-format.md
+- title: Querying and debugging
+  sections:
+  - id: query
+    title: Query traces and threads
+    level: intermediate
+    requires: [trace-basics]
+    ref: /langsmith/smithdb-sdk-migration.md
+    entries:
+    - id: smithdb-migration
+      name: SmithDB SDK migration
+      summary: Query, retrieve, thread, trace and experiment methods moved to async v2 resources; old ones removed 31 Jan 2027
+      lenses: [reliability, best-practice]
+      since: "0.10.15"
+      notes:
+      - 'old methods: list_runs, read_run, list_threads, get_experiment_results, share_run; new Python exceptions live in langsmith (RateLimitError, NotFoundError, ...)'
+      - self-hosted needs LangSmith 0.16+; new queries default to a 1-day window unless min_start_time is passed
+      ref: /langsmith/smithdb-sdk-migration.md
+    - id: runs-query
+      name: Query runs (v2)
+      summary: Async-iterate runs of a project with filters, field projection and cursor pagination
+      lenses: [observability, perf]
+      import: langsmith
+      signature: 'client.runs.query(project_ids=[...], filter=None, trace_filter=None, tree_filter=None, is_root=None, run_type=None, selects=None, min_start_time=None, page_size=100)'
+      params:
+      - {name: project_ids, type: 'list[str]', default: null, desc: 'Project UUIDs; resolve a name with await client.aread_project(project_name=)'}
+      - {name: selects, type: 'list[str]', default: '["ID"]', desc: 'Uppercase field names (NAME, STATUS, INPUTS, ...); only selected fields are populated'}
+      - {name: min_start_time, type: datetime, default: 1 day ago, desc: 'Pass it explicitly or older runs are silently excluded'}
+      - {name: run_type, type: str, default: null, desc: 'Uppercase: LLM, CHAIN, TOOL, RETRIEVER, EMBEDDING, PROMPT, PARSER'}
+      - {name: page_size, type: int, default: '100', desc: 'Per-request batch size, max 1000; iteration pages through cursors'}
+      returns: Async iterator of Run objects (use async for)
+      notes: [replaces list_runs; filter, trace_filter and tree_filter syntax is unchanged; no project_name, query, parent_run_id or limit]
+      ref: /langsmith/smithdb-sdk-migration-query-runs.md
+    - id: threads-query
+      name: Query threads (v2)
+      summary: Async-iterate the threads of a project with latency, token, cost and feedback stats
+      lenses: [observability]
+      import: langsmith
+      signature: 'client.threads.query(project_id=, min_start_time=None, max_start_time=None, filter=None, page_size=None)'
+      returns: Async iterator of Thread objects (thread_id, count, first/last trace ids, stats); list_traces gives per-turn detail
+      notes: [replaces list_threads; takes a project UUID only; default window is the last day]
+      ref: /langsmith/smithdb-sdk-migration-threads.md
+    - id: traces-query
+      name: Query traces (v2)
+      summary: Async-iterate root runs of one project with token and cost aggregates
+      lenses: [observability, cost]
+      import: langsmith
+      signature: 'client.traces.query(project_id=, trace_filter=None, tree_filter=None, trace_ids=None, selects=None, min_start_time=None)'
+      notes: [replaces list_runs(is_root=True); aggregates total_tokens, total_cost, first_token_time come via selects]
+      ref: /langsmith/smithdb-sdk-migration-traces.md
+    - id: list-runs
+      name: Query runs (legacy list_runs)
+      summary: Synchronous run iterator over a project; deprecated in favour of runs.query
+      lenses: [observability]
+      deprecated: Deprecated in the SDK (removal after 31 Jan 2027); use client.runs.query. export-traces still documents it.
+      signature: Client.list_runs(*, project_name=None, run_type=None, filter=None, trace_filter=None, tree_filter=None, is_root=None, select=None, limit=None)
+      notes: [select without inputs and outputs shrinks payloads; no start_time means all history]
+      ref: /langsmith/export-traces.md
+    - id: trace-query-syntax
+      name: Trace query syntax
+      summary: Filter query language (comparator functions) shared by filter, trace_filter and tree_filter
+      lenses: [observability]
+      notes: [trace_filter targets the root run, tree_filter any run in the tree]
+      ref: /langsmith/trace-query-syntax.md
+    - id: query-threads
+      name: Query threads (legacy)
+      summary: list_threads and read_thread guide; list_threads is deprecated for threads.query
+      lenses: [observability]
+      deprecated: list_threads is deprecated (removal after 31 Jan 2027); use client.threads.query.
+      ref: /langsmith/query-threads.md
+    - id: bulk-export
+      name: Bulk export
+      summary: S3-compatible Parquet export
+      lenses: [cost]
+      notes: [Enterprise only for workspaces created after 2026-08-03]
+      ref: /langsmith/data-export.md
+- title: Evaluation
+  sections:
+  - id: eval-run
+    title: Offline evaluation
+    level: intermediate
+    requires: [trace-basics]
+    ref: /langsmith/evaluate-llm-application.md
+    entries:
+    - id: evaluate
+      name: Run an evaluation
+      summary: Run a target over a dataset, score with evaluators and record an experiment
+      lenses: [testing, observability]
+      import: langsmith
+      signature: evaluate(target, /, data=None, evaluators=None, summary_evaluators=None, metadata=None, experiment_prefix=None, max_concurrency=0, num_repetitions=1, upload_results=True, error_handling="log")
+      params:
+      - {name: data, type: 'str | list | Iterable', default: null, desc: 'Dataset name, example list or generator'}
+      - {name: max_concurrency, type: 'int | None', default: '0', desc: '0 runs serially, None is unlimited; default changed from None in 0.2.0'}
+      - {name: num_repetitions, type: int, default: '1', desc: 'Runs each example this many times to average out noise'}
+      - {name: upload_results, type: bool, default: 'True', desc: 'False evaluates locally without writing an experiment'}
+      - {name: error_handling, type: str, default: '"log"', desc: 'log traces target errors into the experiment; ignore drops those runs'}
+      - {name: disable_evaluator_tracing, type: bool, default: 'False', desc: 'True skips evaluator traces; feedback is kept but cannot be corrected in the UI'}
+      returns: ExperimentResults to iterate or convert to a DataFrame
+      ref: https://reference.langchain.com/python/langsmith/evaluation/_runner/evaluate
+    - id: aevaluate
+      name: Async evaluation
+      summary: Same as evaluate for an async target; returns an async iterator of results
+      lenses: [perf, testing]
+      import: langsmith
+      signature: aevaluate(target, /, data=None, evaluators=None, max_concurrency=0, num_repetitions=1, upload_results=True)
+      returns: AsyncExperimentResults
+      since: "0.2.0"
+      notes: [matches an async graph target; accepts sync or async evaluators]
+      ref: /langsmith/evaluation-async.md
+    - id: target-function
+      name: Target function
+      summary: Callable taking the example inputs dict and returning an outputs dict, wrapping the agent
+      lenses: [testing, composability]
+      signature: 'def target(inputs: dict) -> dict'
+      notes: [a LangChain Runnable is also accepted as target]
+      ref: /langsmith/define-target-function.md
+    - id: eval-graph
+      name: Evaluate a graph
+      summary: Evaluate a LangGraph app end to end or at intermediate node steps
+      lenses: [testing]
+      notes: [intermediate-step evals read node outputs from the run tree]
+      ref: /langsmith/evaluate-graph.md
+    - id: datasets-sdk
+      name: Datasets via SDK
+      summary: Create datasets and add examples with inputs, reference outputs, metadata and attachments
+      lenses: [testing, reuse]
+      import: langsmith
+      signature: 'Client.create_dataset(name); Client.create_examples(dataset_name=, examples=[{"inputs":..., "outputs":..., "metadata":...}])'
+      returns: create_examples returns the example ids and count
+      notes: [examples= replaced the split inputs/outputs args in SDK 0.3.11; datasets can be built from traces]
+      ref: /langsmith/manage-datasets-programmatically.md
+    - id: code-evaluator
+      name: Code evaluators
+      summary: Plain functions that score outputs; arguments are picked by name
+      lenses: [testing]
+      signature: 'def evaluator(inputs, outputs, reference_outputs) -> bool | float | str | dict | list[dict]'
+      notes:
+      - legacy (run, example) signature still works
+      - 'return {"key":..., "score"|"value":...} to name the metric; a list returns several metrics'
+      ref: /langsmith/code-evaluator-sdk.md
+    - id: llm-judge-evaluator
+      name: LLM-as-judge evaluators
+      summary: openevals prebuilt or custom LLM judges usable as evaluate evaluators
+      lenses: [testing]
+      import: openevals.llm
+      signature: create_llm_as_judge(prompt=, model=, feedback_key=)
+      notes: ['needs the openevals package; pass the result in evaluators=[...] on langsmith>=0.3.11']
+      ref: /langsmith/openevals.md
+    - id: trajectory-evals
+      name: Trajectory evals
+      summary: Match an agent's tool-call trajectory against a reference or judge it with an LLM
+      lenses: [testing]
+      import: agentevals.trajectory.match
+      signature: 'create_trajectory_match_evaluator(trajectory_match_mode="strict")'
+      options:
+      - {name: trajectory_match_mode, type: str, default: '"strict"', desc: 'strict (exact order), unordered, subset (no extra tools), superset (at least the reference tools)'}
+      notes: [needs the agentevals package]
+      ref: /langsmith/trajectory-evals.md
+    - id: pytest-plugin
+      name: pytest integration
+      summary: '@pytest.mark.langsmith turns tests into dataset examples and experiment runs with pass feedback'
+      lenses: [testing]
+      import: langsmith
+      signature: '@pytest.mark.langsmith(output_keys=None, test_suite_name=None); inside the test: t.log_inputs / log_outputs / log_reference_outputs / log_feedback'
+      options:
+      - {name: LANGSMITH_TEST_SUITE, type: str, default: null, desc: 'Dataset name grouping tests; recommended so all files land in one suite'}
+      - {name: LANGSMITH_EXPERIMENT, type: str, default: null, desc: 'Experiment name for the run'}
+      - {name: LANGSMITH_TEST_CACHE, type: path, default: null, desc: 'Caches HTTP calls to disk (needs langsmith[pytest] extra); commit cassettes for CI'}
+      notes:
+      - needs langsmith>=0.3.4; repeating a t.log_* call overwrites the earlier value
+      - t.trace_feedback() traces an LLM judge call and links it to the feedback
+      ref: /langsmith/pytest.md
+    - id: eval-local
+      name: Local evaluation
+      summary: evaluate(upload_results=False) scores without recording an experiment
+      lenses: [testing, cost]
+      since: "0.2.0"
+      ref: /langsmith/local.md
+    - id: eval-repetitions
+      name: Repetitions and limits
+      summary: Keep evaluation within provider rate limits via max_concurrency, a rate limiter and retries
+      lenses: [reliability, cost]
+      notes:
+      - 'langchain InMemoryRateLimiter(requests_per_second, max_bucket_size) on the target and evaluator models'
+      - model.with_retry(stop_after_attempt=) adds backoff; free-tier gateways need low max_concurrency
+      ref: /langsmith/handle-model-rate-limiting.md
+    - id: eval-retry
+      name: Retry failed examples
+      summary: Re-run evaluate against the same experiment to fill in failed examples
+      lenses: [reliability]
+      ref: /langsmith/evaluate-with-retry.md
+    - id: multi-turn-sim
+      name: Multi-turn simulation
+      summary: Simulated user converses with the agent to test whole conversations
+      lenses: [testing]
+      ref: /langsmith/multi-turn-simulation.md
+    - id: online-evaluators
+      name: Online evaluators
+      summary: LLM judge, code, multi-turn and composite evaluators scoring production traces continuously
+      lenses: [observability, cost]
+      notes: [a run scored by an online evaluator upgrades its trace to extended retention, which costs more]
+      ref: /langsmith/online-evaluations-llm-as-judge.md
+    - id: annotation-queues
+      name: Annotation queues
+      summary: Human review queues with feedback configs managed through the SDK
+      lenses: [testing, ux-a11y]
+      notes: ['add_runs_to_annotation_queue prefers runs=[{run_id, session_id, start_time}] over deprecated run_ids']
+      ref: /langsmith/annotation-queues-sdk.md
+- title: Monitoring and improvement
+  sections:
+  - id: observe
+    title: Dashboards, alerts, Engine
+    level: advanced
+    requires: [trace-basics]
+    ref: /langsmith/dashboards.md
+    entries:
+    - id: dashboards
+      name: Dashboards
+      summary: 'Prebuilt per-project or per-environment charts for cost, latency and errors, plus custom dashboards'
+      lenses: [observability, cost]
+      ref: /langsmith/dashboards.md
+    - id: alerts
+      name: Alerts
+      summary: Metric thresholds (errors, latency, feedback) with notification channels
+      lenses: [reliability, observability]
+      notes: [self-hosted needs Helm chart 0.10.3 or later]
+      ref: /langsmith/alerts.md
+    - id: insights
+      name: Insights
+      summary: Automatic clustering of usage patterns and failure modes across traces
+      lenses: [observability]
+      ref: /langsmith/insights.md
+    - id: engine
+      name: LangSmith Engine
+      summary: Detects recurring issues from production traces, diagnoses them and drives fixes
+      lenses: [reliability, observability]
+      notes: [billed in LSU; per-project opt-in]
+      ref: /langsmith/engine.md
+    - id: automation-rules
+      name: Automation rules
+      summary: Filter plus sampling rate triggers dataset adds, annotation queues, webhooks or retention extension
+      lenses: [composability]
+      ref: /langsmith/rules.md
+- title: Prompts, Studio and deployment
+  sections:
+  - id: platform
+    title: Prompt hub, Studio, Agent Server
+    level: intermediate
+    requires: [trace-basics]
+    ref: /langsmith/prompt-context-hub.md
+    entries:
+    - id: prompt-hub
+      name: Prompt Hub via SDK
+      summary: Push and pull versioned prompts from LangSmith
+      lenses: [reuse, best-practice]
+      import: langsmith
+      signature: 'Client.push_prompt(name, object=); Client.pull_prompt(name)'
+      notes: [replaces the deprecated langchainhub package]
+      ref: /langsmith/manage-prompts-programmatically.md
+    - id: studio
+      name: Studio traces
+      summary: Local agent in Studio with remote traces; edit prompts, run dataset experiments, import traced runs
+      lenses: [observability, ux-a11y]
+      notes:
+      - prompt fields are tied to nodes via langgraph_nodes and langgraph_type in config json_schema_extra
+      - 'langgraph dev (langgraph-api 0.15.1) serves runs with no LangSmith key; the Studio URL omits organizationId when tracing is off'
+      - Studio UI login without a server-side key is unverified
+      ref: /langsmith/observability-studio.md
+    - id: agent-server-tracing
+      name: Agent Server distributed tracing
+      summary: Unify traces when a service calls a deployed Agent Server via RemoteGraph or the SDK
+      lenses: [observability, security]
+      notes:
+      - client and server both opt in; server reads langsmith-trace and langsmith-project from config.configurable
+      - inbound trace headers are trusted context; enable only for internal callers
+      ref: /langsmith/agent-server-distributed-tracing.md
+    - id: server-tracing-context
+      name: Per-user tracing in graph factories
+      summary: Wrap the yielded graph in tracing_context to disable tracing or pick a project per user
+      lenses: [observability, security]
+      signature: 'async with a graph factory(runtime: ServerRuntime): with ls.tracing_context(...): yield graph'
+      notes: [runtime.user.identity selects the project or turns tracing off]
+      ref: /langsmith/conditional-tracing.md#customize-tracing-in-deployed-agents
+    - id: coding-agent-contract
+      name: Coding agent metadata contract
+      summary: schema coding agents must emit as trace metadata
+      lenses: [observability]
+      ref: /langsmith/coding-agent-metadata-contract.md
+- title: Studio and local development
+  sections:
+  - id: studio-local
+    title: LangSmith Studio and local server
+    level: basic
+    requires: []
+    ref: /langsmith/studio-deploy.md
+    entries:
+    - id: studio-ide
+      name: LangSmith Studio
+      summary: Agent IDE that visualizes, runs and debugs any server implementing the Agent Server API, local or deployed
+      lenses:
+      - observability
+      - ux-a11y
+      notes:
+      - Graph mode shows nodes traversed and intermediate state and offers add-to-dataset and Playground
+      - Chat mode is a simpler UI that needs state that includes or extends MessagesState
+      - 'features: manage assistants and threads, iterate on prompts, run dataset experiments, edit long-term memory, time travel'
+      - deploys to LangSmith Cloud in one click from Studio
+      - 'prerequisites listed: LangSmith, Agent Server, LangGraph CLI'
+      ref: /langsmith/studio-deploy.md
+    - id: local-dev-testing
+      name: Local development and testing
+      summary: langgraph dev for fast iteration, langgraph up for production-like validation with Docker, Postgres and Redis
+      lenses:
+      - testing
+      - best-practice
+      notes:
+      - 'dev: no Docker, port 2024, hot reload on by default, state in memory pickled to a local directory, built-in DAP debugger support, needs langgraph-cli[inmem]'
+      - 'up: Docker required, port 8123, PostgreSQL state, reload only with --watch, custom auth needs a license key'
+      - 'recommended: dev daily, up for major changes, up --recreate before deploy'
+      - 'scaffold: uvx --from langgraph-cli@latest langgraph new <path> --template new-langgraph-project-python'
+      ref: /langsmith/local-dev-testing.md
+  - id: app-setup
+    title: Prepare an application for deployment
+    level: basic
+    requires:
+    - studio-local
+    ref: /langsmith/setup-pyproject.md
+    entries:
+    - id: setup-pyproject
+      name: App with pyproject.toml
+      summary: Declare dependencies in pyproject.toml plus langgraph.json graphs and an optional .env
+      lenses:
+      - reuse
+      - best-practice
+      notes:
+      - dependencies may live in pyproject.toml, setup.py or requirements.txt, or be listed in langgraph.json
+      - uv and pip skip prereleases; allow them with allow-prereleases = true in [tool.uv]
+      - env vars come from .env or the env key of langgraph.json
+      ref: /langsmith/setup-pyproject.md
+    - id: setup-requirements-txt
+      name: App with requirements.txt
+      summary: Same deployable layout as pyproject.toml but dependencies come from requirements.txt
+      lenses:
+      - reuse
+      notes:
+      - langgraph.json graphs map graph id to ./path.py:variable
+      - prerelease handling follows uv and pip defaults
+      ref: /langsmith/setup-app-requirements-txt.md
+    - id: setup-javascript
+      name: JavaScript application
+      summary: 'Deployable JS or TS app: package.json dependencies, langgraph.json graphs and an optional .env'
+      lenses:
+      - reuse
+      notes:
+      - graphs map to ./src/agent.ts:graph; node_version in langgraph.json selects the Node runtime
+      ref: /langsmith/setup-javascript.md
+    - id: custom-docker
+      name: Customize the Dockerfile
+      summary: dockerfile_lines in langgraph.json appends Dockerfile lines after the parent image import
+      lenses:
+      - best-practice
+      notes:
+      - example installs system packages such as jpeg and png libraries for Pillow
+      - lines run after the FROM of the langchain/langgraph-api base image
+      ref: /langsmith/custom-docker.md
+    - id: monorepo-support
+      name: Monorepo deployment
+      summary: Build an agent that depends on shared packages elsewhere in the repo; context is the dir where langgraph build runs
+      lenses:
+      - reuse
+      - best-practice
+      notes:
+      - keep langgraph.json in each agent directory, not at the monorepo root
+      - Python dependencies use relative paths such as ../../shared-package
+      - JS shared packages use workspace syntax in package.json
+      - keep .env files in the agent directories
+      ref: /langsmith/monorepo-support.md
+- title: Deployment and platform operations
+  sections:
+  - id: deploy-concepts
+    title: Deployment architecture
+    level: basic
+    requires: []
+    ref: /langsmith/deployment.md
+    entries:
+    - id: deployment-overview
+      name: LangSmith Deployment
+      summary: 'Agent runtime for production: Cloud, hybrid, self-hosted with control plane, or standalone Agent Server'
+      lenses:
+      - reliability
+      - best-practice
+      notes:
+      - 'framework agnostic: LangGraph or LangChain, Google ADK via deployments-wrap-sdk, other frameworks via the Functional API'
+      - Cloud needs a Plus plan or above, self-hosted with control plane needs Enterprise
+      - 'standalone: Docker or Kubernetes with your own PostgreSQL, Redis and license, no control plane'
+      ref: /langsmith/deployment.md
+    - id: components
+      name: Deployment components
+      summary: Agent Server, LangGraph CLI, Studio, SDKs, RemoteGraph, control plane and data plane
+      lenses:
+      - best-practice
+      ref: /langsmith/components.md
+    - id: agent-server-overview
+      name: Agent Server operations map
+      summary: 'Hub for building on the Agent Server runtime: capabilities, tutorials, securing and customizing, operations'
+      lenses:
+      - reuse
+      notes:
+      - 'three primitives once deployed: assistants (configuration), threads (state), runs (workloads)'
+      ref: /langsmith/agent-server-overview.md
+    - id: control-plane
+      name: Control plane
+      summary: UI and APIs that create and manage deployments, revisions and git integrations
+      lenses:
+      - reliability
+      notes:
+      - an integration abstracts a git provider such as GitHub
+      - a tracing project named after the deployment is created automatically
+      - builds and updates are asynchronous
+      ref: /langsmith/control-plane.md
+    - id: data-plane
+      name: Data plane
+      summary: Agent Servers, PostgreSQL, Redis and a listener that polls the control plane for changes
+      lenses:
+      - reliability
+      notes:
+      - PostgreSQL holds resources and checkpoints; Redis is ephemeral pub/sub and queue signaling only
+      - listener polls the control plane over HTTP and reconciles deployments
+      - 'features: autoscaling, MongoDB checkpointing, tracing, telemetry, licensing'
+      ref: /langsmith/data-plane.md
+    - id: cloud-hosting
+      name: Cloud (SaaS) hosting
+      summary: LangChain-run LangSmith on GCP or AWS with regional storage, static egress IPs and API rate limits
+      lenses:
+      - security
+      - reliability
+      notes:
+      - 'rate limits are per category: ingest, run query, repository, charts, generation, deletion and others'
+      - 'Enterprise gets private connectivity: AWS PrivateLink and GCP Private Service Connect'
+      - 'region endpoints: api.smith, eu., apac., aws. prefixes'
+      ref: /langsmith/cloud.md
+    - id: cloud-platform-features
+      name: Cloud deployment features
+      summary: Cloud-only data regions, static IPs, 25 MB payload cap, serverless vs dedicated deployment types, scaling
+      lenses:
+      - cost
+      - reliability
+      notes:
+      - requests above 25 MB return 413 Payload Too Large
+      - deployments are billed on resources consumed, not on agents served
+      - older Development and Production types remain until October 1, 2026 and have no scale to zero
+      ref: /langsmith/cloud-platform-features.md
+    - id: hybrid-deployment
+      name: Hybrid
+      summary: LangChain-managed control plane with Agent Servers in your own infrastructure
+      lenses:
+      - security
+      notes:
+      - 'traces go where LANGSMITH_ENDPOINT points: omit for GCP US, set a region host, or point at self-hosted LangSmith'
+      ref: /langsmith/hybrid.md
+    - id: deploy-self-hosted-overview
+      name: Deploy to self-hosted
+      summary: Topologies and responsibilities for running Agent Server, control plane and data plane yourself
+      lenses:
+      - reliability
+      ref: /langsmith/deploy-to-self-hosted-overview.md
+    - id: self-hosted-platform-features
+      name: Self-hosted platform features
+      summary: Custom PostgreSQL and Redis, listeners and resource customization
+      lenses:
+      - reliability
+      notes:
+      - POSTGRES_URI_CUSTOM and REDIS_URI_CUSTOM replace the control-plane provisioned stores
+      - deployments may share an instance but each needs a distinct database name or Redis database number
+      ref: /langsmith/self-hosted-platform-features.md
+    - id: deploy-with-control-plane
+      name: Self-hosted deploy with control plane
+      summary: Test locally, langgraph build an image, push to a registry, then deploy from the control plane UI
+      lenses:
+      - reliability
+      signature: langgraph build -t <tag> [--platform linux/amd64,linux/arm64] [--pull/--no-pull] [-c langgraph.json]
+      notes:
+      - private registries need image pull credentials configured
+      - requires Enterprise with LangSmith Deployment enabled
+      ref: /langsmith/deploy-with-control-plane.md
+  - id: deploy-cloud
+    title: Deploy to LangSmith Cloud
+    level: basic
+    requires:
+    - deploy-concepts
+    ref: /langsmith/deploy-to-cloud-overview.md
+    entries:
+    - id: deploy-cloud-overview
+      name: Deploy to Cloud
+      summary: Managed deployments from GitHub in the UI or from your machine with langgraph deploy
+      lenses:
+      - reliability
+      notes:
+      - Plus plan or above; verify the app runs under langgraph dev first
+      ref: /langsmith/deploy-to-cloud-overview.md
+    - id: deploy-cloud-create
+      name: Create a deployment
+      summary: UI path via the hosted-langserve GitHub app, or langgraph deploy build-and-push from the local project
+      lenses:
+      - best-practice
+      signature: langgraph deploy [--name <n>] [--deployment-type dedicated]
+      notes:
+      - langgraph deploy is beta, needs Docker (Buildx on Apple silicon) and LANGSMITH_API_KEY in .env
+      - an org owner or admin must authorize the hosted-langserve GitHub app once per workspace
+      - manage env vars in the UI or via the env field of langgraph.json
+      ref: /langsmith/deploy-to-cloud.md
+    - id: deployment-revisions
+      name: Revisions
+      summary: A revision releases code changes to an existing deployment without creating another
+      lenses:
+      - reliability
+      notes:
+      - langgraph deploy again finds the deployment by name and creates a revision
+      - langgraph deploy only updates deployments it created; UI or GitHub deployments are updated in the UI
+      - a revision can be interrupted
+      ref: /langsmith/deployment-revisions.md
+    - id: manage-deployment
+      name: Manage a deployment
+      summary: Branch and auto-update settings, deletion with langgraph deploy delete
+      lenses:
+      - reliability
+      signature: langgraph deploy delete [--force] <DEPLOYMENT_ID>
+      ref: /langsmith/manage-deployment.md
+    - id: monitor-deployment
+      name: Monitor a deployment
+      summary: Build and server logs plus runtime metrics; forward logs to Datadog
+      lenses:
+      - observability
+      signature: langgraph deploy logs [--type build] [--follow] [--level ERROR] [--start-time <iso>] [--name <n>]
+      notes:
+      - Datadog forwarding needs DD_API_KEY and DD_LOGS_ENABLED=true; add DD_LOGS_INJECTION=true to correlate with traces
+      ref: /langsmith/monitor-deployment.md
+    - id: preview-builds
+      name: Preview builds
+      summary: Temporary preview deployments per pull request to test Agent Server changes before merging
+      lenses:
+      - testing
+      notes:
+      - enable per deployment; secrets and deletion of previews are managed from the deployment
+      ref: /langsmith/preview-builds.md
+    - id: deploy-agent-environment
+      name: Deploy to an agent environment
+      summary: Bind a deployment to one agent and environment with --agent-id and --agent-environment
+      lenses:
+      - observability
+      notes:
+      - environment is development, staging or production; local is not allowed
+      - pass both flags or neither; they conflict with --name and --deployment-id
+      - flags also read LANGSMITH_AGENT_ID and LANGSMITH_AGENT_ENVIRONMENT
+      - needs langgraph-cli v0.4.32 or later in Python; org-scoped keys also need LANGSMITH_TENANT_ID
+      ref: /langsmith/deploy-to-agent-environment.md
+    - id: control-plane-api
+      name: Control plane API
+      summary: REST API to create and manage deployments and revisions, authenticated with X-Api-Key and X-Tenant-Id
+      lenses:
+      - reliability
+      notes:
+      - 'flow: POST /v2/deployments, then poll GET /v2/deployments/{id}/revisions/{latest_revision_id} until status is DEPLOYED'
+      - self-hosted instances serve it under /api-host
+      - paths are version prefixed (v1, v2)
+      ref: /langsmith/api-ref-control-plane.md
+    - id: env-var-cloud
+      name: Cloud Agent Server env vars
+      summary: 'Server tuning variables for Cloud deployments: background jobs, Postgres pool, logging, Redis, checkpointer backend'
+      lenses:
+      - perf
+      - reliability
+      options:
+      - name: BG_JOB_ISOLATED_LOOPS
+        type: bool
+        default: 'False'
+        desc: run background runs on isolated event loops; set true when graph code blocks synchronously
+      - name: BG_JOB_MAX_RETRIES
+        type: int
+        default: '3'
+        desc: retries per background run
+      - name: BG_JOB_SHUTDOWN_GRACE_PERIOD_SECS
+        type: int
+        default: '180'
+        desc: wait for jobs after a shutdown signal
+      - name: N_JOBS_PER_WORKER
+        type: int
+        default: '10'
+        desc: concurrent runs per queue worker
+      - name: LS_DEFAULT_CHECKPOINTER_BACKEND
+        type: str
+        default: default
+        desc: default (Postgres), mongo or custom; langgraph.json checkpointer.backend wins
+      - name: LANGSMITH_TRACING
+        type: bool
+        default: null
+        desc: set false to disable tracing from the server
+      notes:
+      - Cloud enforces a 1 hour API request timeout; reconnect with the join stream endpoint for longer runs
+      - 'also: LOG_LEVEL, LOG_JSON, LOG_COLOR, CORS_ALLOW_ORIGINS, LANGGRAPH_POSTGRES_POOL_MAX_SIZE, LS_CHECKPOINT_DELETE, LS_MONGODB_URI, REDIS_KEY_PREFIX, REDIS_MAX_CONNECTIONS, RESUMABLE_STREAM_TTL_SECONDS'
+      ref: /langsmith/env-var-cloud.md
+  - id: deploy-frameworks
+    title: Deploy web apps and other frameworks
+    level: intermediate
+    requires:
+    - deploy-cloud
+    ref: /langsmith/deploy-frameworks-and-platforms.md
+    entries:
+    - id: deploy-fullstack-overview
+      name: Deploy full-stack web apps
+      summary: Reference apps running a deep agent behind the Agent Streaming Protocol on JS frameworks and hosts
+      lenses:
+      - reuse
+      notes:
+      - examples live in the langchain-ai/deployment-cookbook repo
+      - pair with LangSmith Deployment or embed the agent runtime in the web framework
+      ref: /langsmith/deploy-frameworks-and-platforms.md
+    - id: deploy-nextjs
+      name: Deploy with Next.js
+      summary: Deep agent inside Next.js route handlers on Vercel with an SSE stream and Redis checkpointing
+      lenses:
+      - reuse
+      notes:
+      - 'minimum endpoints under /api/threads/:threadId: POST commands, POST stream (SSE), GET or POST state'
+      - consumed by @langchain/react HttpAgentServerAdapter
+      - routes set runtime nodejs and dynamic force-dynamic so Vercel streams
+      - production persistence via RedisSaver.fromUrl(REDIS_URL)
+      ref: /langsmith/deploy-nextjs.md
+    - id: deploy-vite-langsmith
+      name: Deploy with LangSmith and Vite
+      summary: Deep agent on LangSmith Deployment with a Vite React UI using the LangGraph SDK and @langchain/react
+      lenses:
+      - reuse
+      notes:
+      - langgraph.json graphs point at ./agent/index.ts:agent
+      - pnpm dev starts the LangGraph dev server and Vite together
+      - frontend is built and served from a static host
+      ref: /langsmith/deploy-vite-langsmith.md
+    - id: deploy-cloudflare-workers
+      name: Deploy with Cloudflare Workers
+      summary: Deep agent on Cloudflare Workers with streaming chat, subagents and thread history over the protocol
+      lenses:
+      - reuse
+      notes:
+      - same endpoint contract as the Next.js example; persistence is a production concern
+      ref: /langsmith/deploy-cloudflare-workers.md
+    - id: deploy-deno
+      name: Deploy with Deno Deploy
+      summary: Deep agent served from Deno Deploy with the Agent Streaming Protocol
+      lenses:
+      - reuse
+      ref: /langsmith/deploy-deno.md
+    - id: deploy-nuxt
+      name: Deploy with Nuxt
+      summary: Deep agent in a Nuxt 4 Nitro backend with subagent views and reasoning-token streaming
+      lenses:
+      - reuse
+      ref: /langsmith/deploy-nuxt.md
+    - id: deploy-sveltekit
+      name: Deploy with SvelteKit
+      summary: Deep agent in SvelteKit built for the Cloudflare adapter
+      lenses:
+      - reuse
+      ref: /langsmith/deploy-sveltekit.md
+    - id: deploy-google-adk
+      name: Deploy Google ADK agents
+      summary: Wrap an ADK Runner as a graph with the deployments-wrap-sdk package
+      lenses:
+      - reuse
+      notes:
+      - PyPI name deployments-wrap-sdk, import path saf_sdk
+      - wrap(runner) needs LangsmithSessionService as the session_service or raises TypeError
+      - export the wrapped agent as a module-level variable
+      - token events stream through stream_mode messages
+      ref: /langsmith/deploy-google-adk.md
+    - id: deploy-other-frameworks
+      name: Deploy other frameworks
+      summary: Functional API wrapper to serve Claude Agent SDK, Strands, CrewAI or AutoGen agents
+      lenses:
+      - reuse
+      notes:
+      - entrypoint calls a task that delegates to the framework agent and returns entrypoint.final(value=, save=)
+      - saved state returns as previous on the next turn of the same thread
+      - deployments-wrap-sdk is the alternative to hand-written wrappers
+      ref: /langsmith/deploy-other-frameworks.md
+  - id: ops
+    title: Production operations
+    level: advanced
+    requires:
+    - deploy-concepts
+    ref: /langsmith/agent-server-scale.md
+    entries:
+    - id: agent-server-scale
+      name: Configure Agent Server for scale
+      summary: Separate request concurrency from run concurrency and tune workers, checkpointing and TTLs
+      lenses:
+      - perf
+      - cost
+      notes:
+      - 'N_JOBS_PER_WORKER default 10: lower for CPU or memory bound graphs, raise for IO bound'
+      - run blocking calls in asyncio.to_thread; use durability with the minimum value that keeps data safe
+      - use /join instead of polling and TTLs to bound read load
+      - enable queue workers and autoscale for bursty writes
+      ref: /langsmith/agent-server-scale.md
+    - id: agent-server-metrics
+      name: Agent Server metrics
+      summary: OTel metrics with lg_api_ prefix, scraped from GET /metrics or pushed to Datadog
+      lenses:
+      - observability
+      notes:
+      - tiers CRITICAL 1, INFO 2 (production default), DEBUG 3 via METRIC_MAX_EMITTING_TIER
+      - EXPOSE_INTERNAL_METRICS_PROMETHEUS=true exposes internal metrics on the Prometheus endpoint
+      - Datadog push uses LSD_DD_API_KEY and LSD_DD_ENDPOINT
+      - METRIC_PREFIX overrides the prefix
+      ref: /langsmith/self-hosted-agent-server-metrics.md
+    - id: diagnostics-self-hosted
+      name: Troubleshoot self-hosted deployments
+      summary: kubectl steps to identify components, enable debug logs and inspect pods
+      lenses:
+      - reliability
+      notes:
+      - 'components: langsmith-frontend, langsmith-host-backend, langsmith-listener, langsmith-redis and lgps resources'
+      ref: /langsmith/diagnostics-self-hosted.md
+    - id: configure-iam-auth
+      name: IAM auth for data stores
+      summary: Workload identity yields short-lived PostgreSQL and Redis credentials instead of static passwords
+      lenses:
+      - security
+      notes:
+      - needs langgraph-api 0.12.0 or later
+      - providers aws (RDS or Aurora, ElastiCache), azure (Entra), gcp (Cloud SQL, Memorystore)
+      - AGENT_POSTGRES_IAM_AUTH_PROVIDER and AGENT_REDIS_IAM_AUTH_PROVIDER select the provider
+      - use sslmode=require and rediss://; REDIS_CLUSTER=true for cluster mode
+      ref: /langsmith/configure-iam-auth.md
+    - id: encryption-at-rest
+      name: Encryption at rest
+      summary: AES for checkpoint blobs and JSON fields, or a custom encryption module with per-tenant keys
+      lenses:
+      - security
+      notes:
+      - 'basic: LANGGRAPH_AES_KEY of 16, 24 or 32 bytes plus pycryptodome in dependencies'
+      - LANGGRAPH_AES_JSON_KEYS lists JSON keys to encrypt; system fields cannot be encrypted
+      - custom needs Agent Server 0.6.22 and langgraph-sdk 0.3.1 or later; tenant context arrives via the X-Encryption-Context header
+      ref: /langsmith/encryption.md
+    - id: configurable-headers
+      name: Configurable headers
+      summary: http.configurable_headers includes and excludes decide which request headers reach config.configurable
+      lenses:
+      - security
+      notes:
+      - patterns accept exact names or * wildcards only
+      - exclude authorization and api-key headers
+      ref: /langsmith/configurable-headers.md
+    - id: configurable-logs
+      name: Headers in server logs
+      summary: http.logging_headers includes and excludes add request or correlation IDs to server logs
+      lenses:
+      - observability
+      - security
+      notes:
+      - excludes beat includes; matching is case-insensitive globs
+      - headers are omitted from logs by default
+      ref: /langsmith/configurable-logs.md
+    - id: custom-store
+      name: Custom store
+      summary: Replace the Postgres store with your own BaseStore via an async context manager in langgraph.json
+      lenses:
+      - composability
+      notes:
+      - the store key points at an async context manager yielding a BaseStore
+      - example uses AsyncSqliteStore with IndexConfig for semantic search; call store.setup()
+      ref: /langsmith/custom-store.md
+    - id: custom-checkpointer
+      name: Custom checkpointer
+      summary: Replace the Postgres checkpointer with a BaseCheckpointSaver factory and pass the conformance suite
+      lenses:
+      - composability
+      - testing
+      notes:
+      - required methods include aput, aput_writes, aget_tuple, alist, adelete_thread
+      - adelete_for_runs is optional; without it the rollback multitask strategy is unavailable
+      - configure checkpointer.backend custom with path in langgraph.json
+      ref: /langsmith/custom-checkpointer.md
+    - id: semantic-search-store
+      name: Semantic search in the store
+      summary: store.index in langgraph.json sets embed, dims and fields for pgvector backed search
+      lenses:
+      - reuse
+      signature: store.asearch(namespace, query=...) returns SearchItem with a score
+      notes:
+      - one embedding model per deployment
+      - string embed format needs langchain 0.3.8 or later
+      - fields ["$"] indexes everything
+      ref: /langsmith/semantic-search.md
+    - id: server-cache-swr
+      name: Server-side cache (swr)
+      summary: Stale-while-revalidate cache inside deployed graphs with fresh_for and max_age
+      lenses:
+      - perf
+      signature: await swr(key, loader, fresh_for=timedelta(...), max_age=timedelta(...))
+      notes:
+      - swr is beta and needs server v0.7.79 or later; cache_get and cache_set need v0.7.29
+      - max_age defaults to 1 day and is capped there
+      - supports Pydantic models and caching auth credentials
+      ref: /langsmith/caching.md
+- title: Agent Server runtime
+  sections:
+  - id: runtime-resources
+    title: Assistants, threads and runs
+    level: intermediate
+    requires:
+    - deploy-concepts
+    ref: /langsmith/assistants.md
+    entries:
+    - id: assistants
+      name: Assistants
+      summary: Named configurations (prompt, model, tools) of one graph, versioned separately from graph code
+      lenses:
+      - composability
+      notes:
+      - a run targets a graph id (default assistant) or an assistant id
+      - each configuration change creates a new assistant version
+      ref: /langsmith/assistants.md
+    - id: manage-assistants
+      name: Manage assistants
+      summary: Create assistants with context values, version them and pin runs to a previous version
+      lenses:
+      - composability
+      - reuse
+      signature: client.assistants.create(graph_id, context={...})
+      notes:
+      - graph reads values via runtime.context against a context_schema
+      - works from the SDK or the LangSmith UI
+      ref: /langsmith/configuration-cloud.md
+    - id: runs-concept
+      name: Runs
+      summary: A run invokes an assistant on a thread; hub for background, stateless, streaming and cancel guides
+      lenses:
+      - reuse
+      ref: /langsmith/runs.md
+    - id: background-runs
+      name: Background runs
+      summary: Kick off long jobs with client.runs.create, poll status and join later
+      lenses:
+      - reliability
+      signature: client.runs.create(thread_id, assistant_id, input=...) then client.runs.list(thread_id)
+      notes:
+      - polled status starts as pending
+      ref: /langsmith/background-run.md
+    - id: use-threads
+      name: Use threads
+      summary: Create, copy, search and inspect threads; filter by status, metadata and graph
+      lenses:
+      - reuse
+      notes:
+      - 'thread status values: idle, busy, interrupted, error'
+      - supersteps in threads.create seed a prepopulated state; threads.copy clones history
+      - set thread_id on every run, parent and child, for thread filtering and token counts
+      - inspect with get, get_state and get_history
+      ref: /langsmith/use-threads.md
+    - id: same-thread-assistants
+      name: Several assistants on one thread
+      summary: A thread is not bound to an assistant, so another assistant can continue from its checkpoint
+      lenses:
+      - composability
+      signature: 'client.assistants.create(graph_id="agent", config={"configurable": {"model_name": "openai"}})'
+      ref: /langsmith/same-thread.md
+    - id: multitask-enqueue
+      name: 'Double texting: enqueue'
+      summary: Queue new input and run it after the current run, in arrival order
+      lenses:
+      - reliability
+      notes:
+      - multitask_strategy="enqueue"
+      ref: /langsmith/enqueue-concurrent.md
+    - id: multitask-interrupt
+      name: 'Double texting: interrupt'
+      summary: Interrupt the running run and start the new one; the first run is kept, not deleted
+      lenses:
+      - reliability
+      notes:
+      - multitask_strategy="interrupt"
+      ref: /langsmith/interrupt-concurrent.md
+    - id: multitask-reject
+      name: 'Double texting: reject'
+      summary: Reject the new run with an error and let the original finish
+      lenses:
+      - reliability
+      notes:
+      - multitask_strategy="reject"
+      ref: /langsmith/reject-concurrent.md
+    - id: multitask-rollback
+      name: 'Double texting: rollback'
+      summary: Like interrupt, but the first run is deleted from the database and cannot be restarted
+      lenses:
+      - reliability
+      notes:
+      - multitask_strategy="rollback"; needs a checkpointer that supports adelete_for_runs
+      ref: /langsmith/rollback-concurrent.md
+    - id: server-hitl
+      name: Human in the loop via server API
+      summary: interrupt() surfaces a payload; resume with Command(resume=...); static interrupt_before and interrupt_after
+      lenses:
+      - best-practice
+      signature: client.runs.wait(thread_id, assistant_id, command=Command(resume=...))
+      notes:
+      - 'JS resumes with { resume: ... }'
+      ref: /langsmith/add-human-in-the-loop.md
+    - id: server-time-travel
+      name: Time travel via server API
+      summary: Pick a checkpoint from threads.get_history, update state, resume from the new checkpoint
+      lenses:
+      - testing
+      notes:
+      - update_state creates a new checkpoint on the same thread
+      - resume with client.runs.wait or client.runs.stream using the checkpoint
+      ref: /langsmith/human-in-the-loop-time-travel.md
+    - id: generative-ui
+      name: Generative UI
+      summary: Emit UI components from graph nodes with typedUi and render them with LoadExternalComponent
+      lenses:
+      - ux-a11y
+      notes:
+      - ui key in langgraph.json maps a graph name to a .tsx file
+      - server bundles component code and styles; Tailwind 4 and shadcn/ui work
+      - components render in a shadow DOM for style isolation
+      - client side uses useStream() with LoadExternalComponent
+      ref: /langsmith/generative-ui-react.md
+    - id: agent-server-feedback
+      name: Feedback tokens on server runs
+      summary: feedback_keys on a run request return pre-signed URLs that attach user feedback to the run's trace
+      lenses:
+      - observability
+      notes:
+      - pass feedback_keys on POST /threads/{id}/runs/stream; read the streamed feedback event
+      - submit with POST /api/v1/feedback/tokens/{token_id}
+      ref: /langsmith/agent-server-feedback.md
+    - id: server-a2a
+      name: A2A endpoint
+      summary: Agent Server exposes Agent2Agent JSON-RPC at /a2a/{assistant_id}
+      lenses:
+      - composability
+      notes:
+      - 'methods: SendMessage, SendStreamingMessage (SSE), GetTask, CancelTask, ListTasks and v0.3 names such as message/send'
+      - pick one protocol family per client; envelope shape differs per method
+      - A2A_A2UI_ENABLED toggles A2UI output per deployment (server 0.16 rc)
+      ref: /langsmith/server-a2a.md
+  - id: server-auth
+    title: Agent Server authentication
+    level: intermediate
+    requires:
+    - runtime-resources
+    ref: /langsmith/set-up-custom-auth.md
+    entries:
+    - id: custom-auth-tutorial
+      name: Set up custom authentication
+      summary: 'Tutorial: token check in an auth module, tested in Studio and with the SDK'
+      lenses:
+      - security
+      notes:
+      - Studio is allowed through even with custom auth
+      - 'allow_langsmith_api_keys: true accepts x-api-key beside the custom handler; needs Agent Server 0.14.0rc2 or later'
+      ref: /langsmith/set-up-custom-auth.md
+    - id: auth-provider-jwt
+      name: Connect an authentication provider
+      summary: Replace hard-coded tokens with JWT validation against an identity provider (Supabase example)
+      lenses:
+      - security
+      notes:
+      - keeps the same Auth object and resource-level handlers; only @auth.authenticate changes
+      ref: /langsmith/add-auth-server.md
+    - id: store-auth
+      name: Isolate store data per user
+      summary: '@auth.on.store either validates that a namespace starts with the user identity or rewrites it'
+      lenses:
+      - security
+      notes:
+      - handlers receive a mutable value dict; changing value["namespace"] takes effect
+      - automatic prefix rewriting stores ("memories",) at ("user-123", "memories")
+      - combine with thread isolation handlers
+      ref: /langsmith/store-auth.md
+    - id: agent-auth
+      name: Agent Auth (OAuth for tools)
+      summary: LangSmith client authenticate() runs OAuth flows against configured providers for agent tools
+      lenses:
+      - security
+      notes:
+      - 'self-hosted: set LANGSMITH_API_URL to the /api-host path or callbacks return 405'
+      - register providers with client.create_oauth_provider()
+      ref: /langsmith/agent-auth.md
+    - id: openapi-security
+      name: OpenAPI security schema
+      summary: auth.openapi in langgraph.json customizes the security scheme shown on /docs
+      lenses:
+      - security
+      notes:
+      - documentation only; the auth handler must still enforce it
+      - default scheme is an x-api-key header
+      ref: /langsmith/openapi-security.md
+- title: Clients, SDKs and releases
+  sections:
+  - id: remote-clients
+    title: Calling deployments
+    level: intermediate
+    requires:
+    - runtime-resources
+    ref: /langsmith/use-remote-graph.md
+    entries:
+    - id: use-remote-graph
+      name: Use RemoteGraph
+      summary: Call a deployed graph as if local, or embed it as a subgraph
+      lenses:
+      - composability
+      notes:
+      - RemoteGraph(name_or_assistant_id, url=, client=, sync_client=) ; a graph name selects the default assistant
+      - 'never point RemoteGraph at its own deployment: deadlocks and resource exhaustion'
+      - persists state per thread_id in config
+      ref: /langsmith/use-remote-graph.md
+    - id: remote-graph-ref
+      name: RemoteGraph reference
+      summary: Constructor and methods of RemoteGraph
+      lenses:
+      - typing-dx
+      import: from langgraph.pregel.remote import RemoteGraph
+      notes:
+      - api_key falls back to LANGGRAPH_API_KEY, LANGSMITH_API_KEY or LANGCHAIN_API_KEY
+      - headers adds extra request headers
+      ref: /langsmith/remote-graph.md
+    - id: server-api-ref
+      name: Agent Server API reference
+      summary: Interactive API docs served at /docs on every deployment; X-Api-Key required on LangSmith deployments
+      lenses:
+      - reuse
+      ref: /langsmith/server-api-ref.md
+    - id: agent-server-openapi
+      name: Agent Server OpenAPI spec
+      summary: Machine-readable spec of 50 Agent Server paths (title LangSmith Deployment, version 0.1.0)
+      lenses:
+      - typing-dx
+      - reuse
+      notes:
+      - per-endpoint docs are generated from this spec
+      ref: /langsmith/agent-server-openapi.json
+    - id: platform-openapi
+      name: LangSmith platform OpenAPI spec
+      summary: Machine-readable spec of the LangSmith REST API at https://api.smith.langchain.com, authenticated with X-Api-Key
+      lenses:
+      - typing-dx
+      - reuse
+      notes:
+      - regional hosts eu., apac., aws. prefixes
+      ref: /langsmith/langsmith-platform-openapi.json
+  - id: sdk-refs
+    title: SDK reference
+    level: intermediate
+    requires:
+    - remote-clients
+    ref: /langsmith/reference.md
+    entries:
+    - id: reference-hub
+      name: LangSmith reference
+      summary: Index of LangSmith SDKs, LangGraph SDKs and APIs
+      lenses:
+      - reuse
+      ref: /langsmith/reference.md
+    - id: deploy-reference-hub
+      name: Deployment reference
+      summary: Index of SDKs, CLI, APIs and release notes for the Agent Server runtime
+      lenses:
+      - reuse
+      ref: /langsmith/deploy-reference-overview.md
+    - id: sdk-python
+      name: langsmith Python SDK reference
+      summary: Classes, functions and types of the langsmith package
+      lenses:
+      - typing-dx
+      notes:
+      - api reference lives at reference.langchain.com/python/langsmith
+      ref: /langsmith/smith-python-sdk.md
+    - id: sdk-js
+      name: langsmith JS and TS SDK reference
+      summary: Classes, functions, interfaces and types of the langsmith npm package
+      lenses:
+      - typing-dx
+      ref: /langsmith/smith-js-ts-sdk.md
+    - id: sdk-go
+      name: langsmith Go SDK reference
+      summary: Generated client for the LangSmith API in Go
+      lenses:
+      - typing-dx
+      notes:
+      - go package github.com/langchain-ai/langsmith-go
+      ref: /langsmith/smith-go-sdk.md
+    - id: sdk-java
+      name: langsmith Java SDK reference
+      summary: Generated client for the LangSmith API in Java
+      lenses:
+      - typing-dx
+      notes:
+      - maven artifact com.langchain.smith:langsmith-java
+      ref: /langsmith/smith-java-sdk.md
+    - id: sdk-deployments
+      name: Deployment SDK (langgraph-sdk)
+      summary: Python clients for assistants, threads, runs, crons and auth utilities of an Agent Server
+      lenses:
+      - typing-dx
+      signature: get_client(url=, api_key=) returns an async LangGraphClient
+      notes:
+      - formerly LangGraph Platform SDK
+      ref: /langsmith/smith-deployments-sdk.md
+    - id: sdk-langgraph-python
+      name: langgraph_sdk package reference
+      summary: Classes, functions and schema types of langgraph_sdk (Config, Checkpoint, GraphSchema and more)
+      lenses:
+      - typing-dx
+      ref: /langsmith/langgraph-python-sdk.md
+    - id: sdk-langgraph-js
+      name: '@langchain/langgraph-sdk reference'
+      summary: Classes, functions, interfaces and types of the JS Agent Server client
+      lenses:
+      - typing-dx
+      ref: /langsmith/langgraph-js-ts-sdk.md
+  - id: releases
+    title: Releases and deprecations
+    level: intermediate
+    requires: []
+    ref: /langsmith/agent-server-changelog.md
+    entries:
+    - id: agent-server-changelog
+      name: Agent Server changelog
+      summary: Per-release notes with an RSS feed; v0.16 is a release candidate while 0.15.1 is the last stable
+      lenses:
+      - reliability
+      notes:
+      - 'new in 0.16 rc: GET /threads/{thread_id}/storage reports checkpoint bytes (501 with a custom checkpointer)'
+      - 'cancelled runs report why: UserInterrupt message names API cancel, on_disconnect cancel and others'
+      ref: /langsmith/agent-server-changelog.md
+    - id: agent-server-changelog-link
+      name: Agent Server changelog (linked)
+      summary: Alias page of the Agent Server changelog under the deploy navigation
+      lenses:
+      - reliability
+      ref: /langsmith/agent-server-changelog-link.md
+    - id: cloud-changelog
+      name: LangSmith Cloud changelog
+      summary: 'Weekly platform updates grouped by area: datasets and experiments, feedback, tracing, Engine, automations'
+      lenses:
+      - reliability
+      ref: /langsmith/changelog.md
+    - id: release-stages
+      name: Release stages
+      summary: Alpha, beta and GA definitions with support expectations
+      lenses:
+      - best-practice
+      notes:
+      - 'alpha: design partners only, breaking changes expected, no SLA'
+      - 'beta: public or private group, functional end to end, GA expected within a few months'
+      - 'GA: stable, breaking changes need a deprecation period'
+      ref: /langsmith/release-stages.md
+    - id: release-versions
+      name: Release policy
+      summary: Self-hosted release channels and cadence
+      lenses:
+      - reliability
+      notes:
+      - new stable major roughly every 6 weeks; patches weekly, usually Friday
+      - chart version (Helm) differs from the LangSmith appVersion
+      ref: /langsmith/release-versions.md
+    - id: endpoint-deprecation
+      name: API and SDK deprecation policy
+      summary: Announce, mark with Deprecation and Sunset headers, support, remove
+      lenses:
+      - reliability
+      notes:
+      - 'minimum window: 6 months on Cloud, at least one major release on self-hosted'
+      - deprecated fields are removed only at the next endpoint version or major SDK version
+      - undocumented endpoints are not covered
+      ref: /langsmith/endpoint-deprecation.md
+    - id: smithdb-migrate-runs
+      name: 'SmithDB: run retrieval'
+      summary: read_run becomes client.runs.retrieve (async in Python); Java uses retrieveV2
+      lenses:
+      - reliability
+      notes:
+      - 'TS: readRun becomes client.runs.retrieve()'
+      - get-run-URL helpers also have SmithDB equivalents
+      ref: /langsmith/smithdb-sdk-migration-runs.md
+    - id: smithdb-migrate-feedback
+      name: 'SmithDB: feedback and sharing'
+      summary: add_runs_to_annotation_queue keeps its name; session_id is required when creating feedback
+      lenses:
+      - reliability
+      notes:
+      - Java and Go switch to createByKey and NewByKey for annotation queue runs
+      - public run share and read methods also change
+      ref: /langsmith/smithdb-sdk-migration-feedback.md
+    - id: smithdb-migrate-experiments
+      name: 'SmithDB: experiment runs'
+      summary: get_experiment_results becomes client.datasets.experiment_runs.query (async)
+      lenses:
+      - reliability
+      notes:
+      - 'TS: client.datasets.experimentRuns.query(); Java: datasets().experimentRuns().query()'
+      ref: /langsmith/smithdb-sdk-migration-experiments.md
+- title: Tracing concepts and quickstarts
+  sections:
+  - id: trace-concepts
+    title: Observability model and quickstarts
+    level: basic
+    requires: []
+    ref: /langsmith/observability-concepts.md
+    entries:
+    - id: observability-hub
+      name: LangSmith Observability
+      summary: 'Landing page: traces to debug failures, monitor production and evaluate behavior'
+      lenses:
+      - observability
+      ref: /langsmith/observability.md
+    - id: observability-concepts
+      name: Observability concepts
+      summary: Runs, traces, threads, trajectories, trace containers (agents, environments, projects), feedback, tags, metadata
+      lenses:
+      - observability
+      notes:
+      - a thread is a series of traces for one multi-turn session; each turn is its own trace
+      - 'manual instrumentation: @traceable, trace context manager (Python), RunTree'
+      - data retention is covered on this page
+      ref: /langsmith/observability-concepts.md
+    - id: observability-quickstart
+      name: Observability quickstart
+      summary: Set LANGSMITH_TRACING and LANGSMITH_API_KEY, wrap the provider client, add @traceable
+      lenses:
+      - observability
+      - reuse
+      notes:
+      - non-US accounts also set LANGSMITH_ENDPOINT, no trailing slash
+      - Python wrap_openai(OpenAI()), traceable in TS and Kotlin, Java via com.langchain.smith:langsmith-java
+      ref: /langsmith/observability-quickstart.md
+    - id: observability-llm-tutorial
+      name: Trace an LLM app tutorial
+      summary: wrap_openai, then @traceable around retriever and pipeline, then feedback linked by run_id
+      lenses:
+      - reuse
+      notes:
+      - LANGCHAIN_* names still work; LANGSMITH_TRACING and LANGSMITH_API_KEY are recommended
+      - retriever traced with run_type="retriever"; model name goes in metadata
+      ref: /langsmith/observability-llm-tutorial.md
+    - id: trajectory-view-integrations
+      name: Trajectory view metadata
+      summary: thread_id and ls_agent_type on runs drive grouping and the main vs subagent view
+      lenses:
+      - observability
+      notes:
+      - thread_id groups runs into a conversation
+      - ls_agent_type "root" marks the main conversation, "subagent" renders as a subagent action
+      - several integrations set both automatically
+      ref: /langsmith/trajectory-view-integrations.md
+  - id: trace-more
+    title: Instrumentation details
+    level: intermediate
+    requires:
+    - trace-concepts
+    ref: /langsmith/log-llm-trace.md
+    entries:
+    - id: log-llm-trace
+      name: Log custom LLM traces
+      summary: run_type llm plus ls_provider, ls_model_name and usage_metadata give token counts, cost and Playground selection
+      lenses:
+      - observability
+      - cost
+      notes:
+      - messages in OpenAI format with typed content blocks
+      - usage_metadata carries input_tokens and output_tokens; set it via get_current_run_tree() inside the traced function
+      - streaming wrappers pass reduce_fn to rebuild the final message
+      - the same rules apply to RunTree
+      ref: /langsmith/log-llm-trace.md
+    - id: log-retriever-trace
+      name: Log retriever traces
+      summary: run_type retriever and documents shaped as page_content, type Document, metadata
+      lenses:
+      - observability
+      signature: '@traceable(run_type="retriever") returning [{"page_content": str, "type": "Document", "metadata": {...}}]'
+      notes:
+      - metadata such as source URL, chunk ID or score shows beside the document
+      ref: /langsmith/log-retriever-trace.md
+    - id: log-multimodal-traces
+      name: Log multimodal traces
+      summary: wrap_openai or wrapOpenAI records image_url or base64 image inputs automatically
+      lenses:
+      - observability
+      ref: /langsmith/log-multimodal-traces.md
+    - id: upload-files-with-traces
+      name: Upload files with traces
+      summary: Attach binary files to runs as Attachment objects with mime_type and data
+      lenses:
+      - observability
+      notes:
+      - Python Attachment(mime_type, data bytes or Path) or a (mime_type, data) tuple
+      - passing a Path needs dangerously_allow_filesystem=True on @traceable, a guard for multi-tenant servers
+      ref: /langsmith/upload-files-with-traces.md
+    - id: trace-with-api
+      name: Trace with the REST API
+      summary: POST and PATCH /runs for simple tracing, POST /runs/multipart for batch ingest with higher rate limits
+      lenses:
+      - reuse
+      - perf
+      notes:
+      - 'headers: x-api-key, plus x-tenant-id when the key spans workspaces'
+      - use UUID v7 run ids (uuid7() from the SDK) to keep time ordering
+      - basic route fills dotted_order and trace_id for you
+      - set parent_run_id on child runs
+      ref: /langsmith/trace-with-api.md
+    - id: trace-generator-functions
+      name: Trace generator functions
+      summary: Streamed generator outputs are traced natively; reduce_fn customizes how chunks aggregate
+      lenses:
+      - observability
+      notes:
+      - default output is an array of chunks; reduce_fn=concatenate_strings stores one string
+      ref: /langsmith/trace-generator-functions.md
+    - id: serverless-environments
+      name: Tracing in serverless runtimes
+      summary: Ensure traces flush before the function exits
+      lenses:
+      - reliability
+      notes:
+      - 'JS: LANGSMITH_TRACING_BACKGROUND=false waits for each trace, or await client.awaitPendingTraceBatches()'
+      - 'manualFlushMode: true plus client.flush() avoids rate limits but hides runs until flushed'
+      ref: /langsmith/serverless-environments.md
+    - id: troubleshooting-variable-caching
+      name: Environment variable caching
+      summary: SDK caches env var reads; clear the cache after changing them at runtime
+      lenses:
+      - reliability
+      notes:
+      - utils.get_env_var.cache_clear() then load_dotenv(path, override=True)
+      ref: /langsmith/troubleshooting-variable-caching.md
+    - id: feedback-data-format
+      name: Feedback data format
+      summary: 'Fields of a feedback record: key, score, value, run_id, session_id and more'
+      lenses:
+      - typing-dx
+      notes:
+      - session_id is required when creating feedback for a run
+      - start_time of the run is optional but speeds processing
+      ref: /langsmith/feedback-data-format.md
+  - id: trace-ui
+    title: Viewing, filtering and managing traces
+    level: intermediate
+    requires:
+    - trace-concepts
+    ref: /langsmith/view-traces.md
+    entries:
+    - id: view-traces
+      name: View traces
+      summary: Trajectory view for the conversation, Details view for run internals; Threads tab needs thread_id
+      lenses:
+      - observability
+      - ux-a11y
+      notes:
+      - 'ls_agent_type metadata: root or subagent controls where agent messages render'
+      - 'ls_message_format overrides detection: langchain or completions'
+      - Threads tab and Turns view exist only for runs with thread_id
+      ref: /langsmith/view-traces.md
+    - id: filter-traces
+      name: Filter traces
+      summary: Search bar with field:value, -field:value and field:~value (full text) at thread, trace or run scope
+      lenses:
+      - observability
+      notes:
+      - scope decides which runs a clause applies to; extra Filter rows combine with AND
+      - 'examples: turn_count:>20 on threads, run_type:tool AND status:error on any run'
+      ref: /langsmith/filter-traces.md
+    - id: filter-traces-in-application
+      name: Filter traces in the app (legacy)
+      summary: Structured filters on inputs, outputs and nested keys such as documents.page_content
+      lenses:
+      - observability
+      notes:
+      - tokens shorter than 2 characters are not indexed for text search
+      - numeric fields take > and <
+      ref: /langsmith/filter-traces-in-application.md
+    - id: manage-trace
+      name: Manage traces
+      summary: Log via logging or structlog, delete projects or runs by trace id or metadata
+      lenses:
+      - security
+      - cost
+      notes:
+      - delete_runs accepts session_id, trace_ids and metadata
+      - delete_project() or deleteProject() removes a tracing project
+      ref: /langsmith/manage-trace.md
+    - id: configure-input-output-preview
+      name: Run input and output preview
+      summary: Choose which JSON path fills the Input and Output columns of the Runs table
+      lenses:
+      - ux-a11y
+      notes:
+      - set a path per trace type in the Runs tab settings; default is a heuristic
+      ref: /langsmith/configure-input-output-preview.md
+  - id: trace-integrations
+    title: Provider and framework tracing
+    level: intermediate
+    requires:
+    - trace-basics
+    ref: /langsmith/trace-with-langgraph.md
+    entries:
+    - id: trace-langgraph
+      name: Trace LangGraph without LangChain
+      summary: LangSmith tracing works for LangGraph with only LANGSMITH_TRACING, API key and workspace id
+      lenses:
+      - observability
+      notes:
+      - set LANGSMITH_WORKSPACE_ID when the key spans workspaces
+      - non-US accounts set LANGSMITH_ENDPOINT
+      ref: /langsmith/trace-with-langgraph.md
+    - id: trace-deep-agents
+      name: Trace Deep Agents
+      summary: deepagents runs on LangGraph, so the tracing env vars are enough; langsmith package is optional
+      lenses:
+      - observability
+      notes:
+      - install langsmith only for tracing_context, custom metadata or run queries
+      ref: /langsmith/trace-deep-agents.md
+    - id: trace-openai
+      name: Trace OpenAI
+      summary: wrap_openai and wrapOpenAI log every OpenAI client call; LANGSMITH_TRACING still gates it
+      lenses:
+      - observability
+      signature: client = wrap_openai(openai.Client())
+      notes:
+      - combine with @traceable(run_type="tool") for non-LLM steps
+      ref: /langsmith/trace-openai.md
+    - id: trace-anthropic
+      name: Trace Anthropic
+      summary: wrap_anthropic and wrapAnthropic log Anthropic client calls
+      lenses:
+      - observability
+      signature: client = wrap_anthropic(anthropic.Anthropic())
+      ref: /langsmith/trace-anthropic.md
+    - id: trace-gemini
+      name: Trace Google Gemini
+      summary: wrap_gemini wraps the google-genai client; tracing_extra adds tags and metadata
+      lenses:
+      - observability
+      notes:
+      - 'tracing_extra={"tags": [...], "metadata": {...}} applies to every call'
+      ref: /langsmith/trace-with-google-gemini.md
+    - id: trace-bedrock
+      name: Trace AWS Bedrock
+      summary: '@traceable around boto3 bedrock-runtime converse calls'
+      lenses:
+      - observability
+      ref: /langsmith/trace-bedrock.md
+    - id: trace-mistral
+      name: Trace Mistral
+      summary: LANGSMITH_TRACING plus the Mistral client with traceable wrapping
+      lenses:
+      - observability
+      notes:
+      - needs MISTRAL_API_KEY
+      ref: /langsmith/trace-with-mistral.md
+    - id: trace-deepseek
+      name: Trace DeepSeek
+      summary: 'OpenAI-compatible API: point the OpenAI client at DeepSeek and wrap it'
+      lenses:
+      - observability
+      notes:
+      - models deepseek-chat and deepseek-reasoner
+      ref: /langsmith/trace-deepseek.md
+    - id: trace-litellm
+      name: Trace LiteLLM
+      summary: Either LangSmith SDK tracing with traceable or LiteLLM's langsmith callback, not both
+      lenses:
+      - observability
+      notes:
+      - enabling both for the same calls duplicates traces
+      ref: /langsmith/trace-litellm.md
+    - id: trace-vercel-ai-sdk
+      name: Trace Vercel AI SDK
+      summary: LangSmithTelemetry for AI SDK v7 (langsmith 0.7.2+) or wrapAISDK for v6 (0.3.63+)
+      lenses:
+      - observability
+      notes:
+      - registerTelemetry(LangSmithTelemetry()) once
+      - older SDKs use the OpenTelemetry route
+      ref: /langsmith/trace-with-vercel-ai-sdk.md
+    - id: trace-openai-agents-sdk
+      name: Trace OpenAI Agents SDK
+      summary: Register OpenAIAgentsTracingProcessor; it posts traces even without LANGSMITH_TRACING
+      lenses:
+      - observability
+      - security
+      notes:
+      - Python needs langsmith 0.3.15 or later, JS 0.5.25 or later
+      ref: /langsmith/trace-with-openai-agents-sdk.md
+    - id: trace-claude-agent-sdk
+      name: Trace Claude Agent SDK
+      summary: Call configure_claude_agent_sdk() at startup
+      lenses:
+      - observability
+      ref: /langsmith/trace-claude-agent-sdk.md
+    - id: trace-google-adk
+      name: Trace Google ADK
+      summary: Call configure_google_adk() once before creating agents
+      lenses:
+      - observability
+      notes:
+      - project_name defaults to LANGSMITH_PROJECT
+      - Gemini Live voice agents use a separate guide
+      ref: /langsmith/trace-with-google-adk.md
+    - id: trace-pydantic-ai
+      name: Trace Pydantic AI
+      summary: configure() then Agent.instrument_all(), OTel based
+      lenses:
+      - observability
+      notes:
+      - needs langsmith 0.4.26 or later
+      ref: /langsmith/trace-with-pydantic-ai.md
+    - id: trace-instructor
+      name: Trace Instructor
+      summary: Patch a wrap_openai client with instructor.patch
+      lenses:
+      - observability
+      notes:
+      - wrap the client first, then patch
+      - add @traceable on callers for nested traces
+      ref: /langsmith/trace-with-instructor.md
+    - id: trace-strands
+      name: Trace Strands Agents
+      summary: OTLP exporter configured through setup_langsmith_telemetry()
+      lenses:
+      - observability
+      notes:
+      - pass console=True to also print spans locally
+      ref: /langsmith/trace-with-strands-agents.md
+    - id: trace-claude-managed-agents
+      name: Trace Claude Managed Agents
+      summary: wrapAnthropic traces agent creation, sessions and events of hosted agents
+      lenses:
+      - observability
+      ref: /langsmith/trace-with-claude-managed-agents.md

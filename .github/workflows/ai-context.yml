@@ -1,0 +1,23 @@
+# Keeps AI context lean, fresh, and in sync. Fails when budgets, references, secrets, or generated adapters drift.
+name: ai-context
+on:
+  pull_request:
+    paths: ["AGENTS.md", "CLAUDE.md", ".claude/**", "docs/knowledge/**", ".github/copilot-instructions.md", ".github/instructions/**", ".cursor/rules/**", "GEMINI.md", "context-pack.md"]
+  schedule:
+    - cron: "0 6 * * 1"   # weekly freshness check (Mondays 06:00 UTC)
+  workflow_dispatch:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with: { fetch-depth: 0 }   # full history for churn-based staleness
+      - uses: actions/setup-python@v7
+        with: { python-version: "3.12" }
+      - run: python3 .claude/scripts/ctx.py check
+      - uses: astral-sh/setup-uv@v10.3.0
+      - name: Stack registry guards (N1-N5)
+        run: if [ -f .claude/stacks/README.md ]; then .claude/skills/feature/scripts/stacks.sh guards; fi
+      - name: Freshness report (non-blocking)
+        if: always()
+        run: python3 .claude/scripts/ctx.py stale || true

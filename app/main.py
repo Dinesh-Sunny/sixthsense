@@ -1,4 +1,4 @@
-"""SixthFrame web app - stdlib only (no pip needed in the pod).
+"""SixthSense web app - stdlib only (no pip needed in the pod).
 
 Serves index.html, the incidents/metrics JSON, an alerts feed, an "ask the footage" proxy
 and a /clip proxy that streams segments from VSS (with Range support, so <video> can seek).
@@ -84,7 +84,7 @@ class H(BaseHTTPRequestHandler):
             hook = os.environ.get("DISCORD_WEBHOOK_URL")
             if hook:
                 try:
-                    msg = f"SixthFrame alert - risk {body.get('risk')} on {body.get('camera_id')}: {body.get('what_next')}"
+                    msg = f"SixthSense alert - risk {body.get('risk')} on {body.get('camera_id')}: {body.get('what_next')}"
                     urllib.request.urlopen(urllib.request.Request(hook, data=json.dumps({"content": msg}).encode(),
                                                                   headers={"Content-Type": "application/json"}), timeout=10)
                 except Exception as e:
@@ -121,5 +121,5 @@ class H(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "8080"))
-    print(f"SixthFrame on :{port}")
+    print(f"SixthSense on :{port}")
     ThreadingHTTPServer(("0.0.0.0", port), H).serve_forever()

@@ -1,0 +1,18 @@
+# .worktreeinclude: gitignored files to COPY into each new git worktree
+# (claude --worktree, the EnterWorktree tool, subagents with isolation: worktree, desktop parallel sessions).
+# Uses .gitignore syntax. A file is copied only if it matches here AND is gitignored, so tracked files are never duplicated.
+# Docs: https://code.claude.com/docs/en/worktrees#copy-gitignored-files-into-worktrees
+
+# Local environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+
+# Personal Claude config for this project
+.claude/settings.local.json
+CLAUDE.local.md
+
+# TODO(stub): local credentials / config the app needs to boot
+# config/secrets.json
+# *.pem

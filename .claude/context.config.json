@@ -1,0 +1,37 @@
+{
+  "$comment": "Single source of truth for context budgets and style limits. Read by .claude/scripts/ctx.py. Tokens are estimated as chars/4 after HTML comments are stripped, since Claude never sees comments.",
+  "hot_max_tokens": 4000,
+  "classes": {
+    "agents_md":    { "globs": ["AGENTS.md"],                         "tier": "hot",  "max_lines": 120, "max_tokens": 2200 },
+    "claude_md":    { "globs": ["CLAUDE.md", "CLAUDE.local.md"],      "tier": "hot",  "max_lines": 60,  "max_tokens": 900 },
+    "rule":         { "globs": [".claude/rules/**/*.md"],             "tier": "auto", "max_lines": 40,  "max_tokens": 700 },
+    "skill":        { "globs": [".claude/skills/*/SKILL.md"],         "tier": "warm", "max_lines": 90,  "max_tokens": 1500 },
+    "skill_ref":    { "globs": [".claude/skills/*/*.md"],             "tier": "cold", "max_lines": 200, "max_tokens": 3000 },
+    "agent":        { "globs": [".claude/agents/**/*.md"],            "tier": "warm", "max_lines": 80,  "max_tokens": 1200 },
+    "agent_memory": { "globs": [".claude/agent-memory/*/MEMORY.md"],  "tier": "warm", "max_lines": 120, "max_tokens": 2000 },
+    "output_style": { "globs": [".claude/output-styles/*.md"],        "tier": "warm", "max_lines": 40,  "max_tokens": 600 },
+    "knowledge":    { "globs": ["docs/knowledge/**/*.md"],            "tier": "cold", "max_lines": 300, "max_tokens": 5000 },
+    "inbox":        { "globs": [".claude/inbox.md"],                  "tier": "cold", "max_lines": 80,  "max_tokens": 3000 }
+  },
+  "exclude": [".claude/templates/**", "docs/knowledge/archive/**", ".claude/SETTINGS_REFERENCE.md", ".claude/skills/design-system/catalog/**", ".agents/skills/**"],
+  "style": {
+    "max_bullet_words": 30,
+    "max_line_chars": 240,
+    "max_paragraph_lines": 3,
+    "max_inbox_words": 35,
+    "duplicate_similarity": 0.88
+  },
+  "freshness": {
+    "stale_days": 60,
+    "stale_commit_threshold": 10
+  },
+  "adapters": {
+    "copilot": true,
+    "cursor": true,
+    "gemini": true,
+    "pack": true
+  },
+  "pack_max_tokens": 6000,
+  "playbook_dir": "~/CodeProjects/ai-playbook",
+  "builtin_slash_commands": ["config", "memory", "hooks", "mcp", "workflows", "reload-skills", "plugin", "schedule", "model", "fast", "status", "doctor", "clear", "compact", "init", "agents", "permissions", "rewind", "add-dir", "statusline", "copy", "help", "login", "logout", "review", "security-review", "loop", "simplify", "code-review", "subtask", "btw", "usage", "skill-doctor"]
+}

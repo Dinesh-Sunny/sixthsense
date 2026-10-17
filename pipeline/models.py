@@ -13,13 +13,13 @@ YOLO_URL = CFG.get("YOLO_URL") or f"http://{GPU_HOST}:8002"
 GPU_AUTH = {"Authorization": f"Bearer {CFG.get('GPU_BEARER_TOKEN', '')}"}
 LLM_BASE = CFG.get("LLM_BASE_URL", "https://api.inference.wandb.ai/v1")
 LLM_MODEL = CFG.get("LLM_MODEL", "")  # pick one from `python pipeline/probe.py` output
-WANDB_PROJECT_PATH = f"{CFG.get('WANDB_TEAM', '')}/{CFG.get('WANDB_PROJECT', 'sixthframe')}".strip("/")
+WANDB_PROJECT_PATH = f"{CFG.get('WANDB_TEAM', '')}/{CFG.get('WANDB_PROJECT', 'sixthsense')}".strip("/")
 
 try:  # optional tracing
     import weave
     if CFG.get("WANDB_API_KEY"):
         os.environ.setdefault("WANDB_API_KEY", CFG["WANDB_API_KEY"])
-        weave.init(WANDB_PROJECT_PATH or "sixthframe")
+        weave.init(WANDB_PROJECT_PATH or "sixthsense")
     op = weave.op
 except Exception:  # weave missing or init failed -> plain functions
     def op(fn=None, **_):

@@ -1,4 +1,4 @@
-"""SixthFrame engine: watch -> verify -> foresee -> self-check -> store.
+"""SixthSense engine: watch -> verify -> foresee -> self-check -> store.
 
     python3 pipeline/run.py --mode road --limit 12
     python3 pipeline/run.py --mode street --limit 12

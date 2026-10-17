@@ -1,0 +1,803 @@
+stack: react-bits
+version: "12.43.0"
+docs_base: https://reactbits.dev
+docs_bases:
+  motion: https://motion.dev
+source: https://reactbits.dev/llms.txt; https://motion.dev/llms.txt; mcp:motion
+fetched: 2026-10-05
+verified: 2026-10-05
+toc:
+- index: 'https://reactbits.dev/llms.txt'
+  match: '^https://(www\.)?reactbits\.dev(/|$)'
+  exclude: '^https://(www\.)?reactbits\.dev/((text-animations|animations|backgrounds|components|micro)/|r(/|$))'
+  why: 'the ~213 free catalog pages are SPA demos of single vendored items and /r/<Name> are per-item install JSON; the catalog is enumerated by /llms.txt and /r/registry.json (rb-catalog) and a component gets its own entry when this repo adopts it. pro.reactbits.dev is paid and licence-gated, so it is not indexed.'
+- index: 'https://motion.dev/llms.txt'
+  match: '^https://motion\.dev/docs/react'
+groups:
+- title: AI tooling
+  sections:
+  - id: rb-ai-tooling
+    title: Official agent entry points
+    level: basic
+    requires: []
+    ref: motion:/docs/ai-kit-install
+    entries:
+    - id: rb-motion-mcp
+      name: Motion MCP server
+      summary: hosted, free docs and examples search for Motion; one tool, no account; wired as `motion` in `.mcp.json`
+      lenses: [reuse]
+      signature: search-motion-docs({platform, searchTerm})
+      params:
+      - {name: "platform", type: "js|react|vue", default: null, desc: "platform of the file being edited; react means motion/react"}
+      - {name: "searchTerm", type: "string", default: null, desc: "what is built or looked up, e.g. \"drag to reorder\"; generic words like animation are stripped"}
+      returns: up to 3 doc resource_links (read with resources/read), up to 5 examples; Motion+ items come back as metadata only
+      notes:
+      - '`.mcp.json` entry `{"type":"http","url":"https://mcp.motion.dev"}`; initialize works without a session header'
+      - 'resources/list is empty; read pages with resources/read on the `motion://docs/react/react-<slug>` URIs returned by search (the bare slug without the `react-` prefix fails with No such doc); Motion+ pages are readable too'
+      - 'the paid Motion+ MCP server (source search, MotionScore audits) is a separate server, not wired'
+      ref: motion:/docs/ai-kit-install
+    - id: rb-motion-skill
+      name: Motion AI Kit
+      summary: '`npx motion-ai` installs the free MIT `/motion` skill (React and Radix best practices) and configures the hosted MCP'
+      lenses: [best-practice, reuse]
+      signature: npx motion-ai, /motion
+      notes:
+      - 'installer unpinned and writes agent config; review the skill diff before locking'
+      - '`/motion upgrade` runs the version upgrade guide; MotionScore audits need Motion+'
+      ref: https://github.com/motiondivision/ai-kit
+    - id: rb-motion-llms
+      name: Motion llms.txt
+      summary: index of docs, tutorials and AI Kit pages
+      lenses: [reuse]
+      notes:
+      - 'llms-full.txt and AGENTS.md are 404; `/docs/<slug>.md` is not served (returns the SPA), use the MCP for page text'
+      ref: motion:/llms.txt
+    - id: rb-bits-llms
+      name: React Bits llms.txt
+      summary: component index with CLI names, categories, dependencies and Pro notes
+      lenses: [reuse]
+      notes:
+      - 'llms-full.txt, AGENTS.md, agent-skills index return SPA HTML, not content'
+      - 'free items install via `/r/<Name>-<LANG>-<STYLE>.json`; docs pages are SPA; read the page sources in the react-bits GitHub repo'
+      ref: /llms.txt
+    - id: rb-shadcn-mcp
+      name: React Bits via shadcn MCP
+      summary: 'components.json `registries: {"@react-bits": "https://reactbits.dev/r/{name}.json"}` plus `shadcn mcp`'
+      lenses: [reuse]
+      notes:
+      - 'React Bits ships no MCP of its own; its MCP page points at the shadcn MCP (`shadcn mcp init --client claude`)'
+      - see shadcn-ui outline sh-mcp
+      ref: https://www.reactbits.dev/get-started/mcp
+    - id: rb-pro
+      name: React Bits Pro registry, skills and agent kit
+      summary: paid, license-gated `@reactbits-starter/<slug>` items; separate from the free registry
+      lenses: [cost]
+      notes: ['free /r/<Name> URLs never serve Pro items; do not guess Pro item names']
+      ref: /llms.txt
+- title: Installing React Bits components
+  sections:
+  - id: rb-install
+    title: Registry install and licensing
+    level: basic
+    requires: ['shadcn-ui:sh-add']
+    ref: https://www.reactbits.dev/get-started/installation
+    entries:
+    - id: rb-url-install
+      name: shadcn URL install
+      summary: copies a React Bits item's source into the project by registry URL and installs its npm deps; no registry config needed
+      lenses: [reuse, reliability]
+      signature: shadcn add https://reactbits.dev/r/<Name>-TS-TW --yes --path components/react-bits
+      options:
+      - {name: "--path", type: "dir", default: null, desc: "install directory; without it registry:component files land flat in components/<Name>.tsx"}
+      - {name: "--yes", type: "flag", default: null, desc: "skip prompts so the command runs non-interactively"}
+      returns: a vendored `<Name>.tsx` the repo owns and edits; no runtime dependency on reactbits.dev
+      ref: /llms.txt
+    - id: rb-namespace-install
+      name: Namespace install
+      summary: '`shadcn add @react-bits/<Name>-TS-TW` once `@react-bits` is in components.json registries'
+      lenses: [reuse, security]
+      signature: shadcn add @react-bits/<Name>-TS-TW
+      notes:
+      - 'needs components.json `registries: {"@react-bits": "https://reactbits.dev/r/{name}.json"}`; the installation page shows this form'
+      - '/r/registry.json lists 852 items (2026-10-05)'
+      ref: https://www.reactbits.dev/get-started/installation
+    - id: rb-variants
+      name: Variants
+      summary: '`<Name>-<JS|TS>-<CSS|TW>`, all four kept in sync; jsrepo works too'
+      lenses: [best-practice]
+      signature: <Name>-<JS|TS>-<CSS|TW>
+      notes:
+      - '`npx jsrepo@latest add https://reactbits.dev/r/<Name>-<variant>` fetches the same source'
+      - 'TW variants need Tailwind; CSS variants ship a stylesheet; pick one per repo'
+      ref: /llms.txt
+    - id: rb-item-deps
+      name: Per-item dependencies
+      summary: registry item JSON `dependencies` (motion, ogl, gsap, @gsap/react, @hugeicons/*) are installed by shadcn add
+      lenses: [cost, reuse]
+      returns: 'JSON `dependencies`, `registryDependencies`, `files[].content` (the source, readable before adding)'
+      notes:
+      - 'read before add; gsap items add a second engine, prefer motion or no-dep items'
+      - 'BlurText motion@^12.23.12; Aurora ogl@^1.0.11; LatticeLoader none; CallChip, RefineFrame hugeicons only'
+      - 'ThoughtLine, PromptBar, SwipeToast motion + hugeicons; StatusMark motion; WarmTooltip motion + react-dom'
+      - 'caret ranges on 12.x keep motion on 12, not 14'
+      ref: /r/BlurText-TS-TW.json
+    - id: rb-license
+      name: License
+      summary: 'MIT + Commons Clause: free in an app, no resale or redistribution'
+      lenses: [security]
+      notes:
+      - 'LICENSE.md: use "as part of an application, website, or product"; no selling, sublicensing, or porting the components'
+      - keep NOTICE.md; never publish vendored files
+      ref: https://github.com/davidhdev/react-bits/blob/main/LICENSE.md
+    - id: rb-introduction
+      name: Introduction and usage guidance
+      summary: 'principles (you own the code, prop-first, modular, JS or TS and CSS or Tailwind) and the author''s performance advice'
+      lenses: [perf, ux-a11y]
+      notes:
+      - 'not an npm dependency: install only the items you need'
+      - 'performance tips: more than 2-3 components per page can overload it, replace heavy effects with static placeholders on mobile, test on several devices'
+      ref: https://www.reactbits.dev/get-started/introduction
+    - id: rb-catalog
+      name: Component catalog and registry index
+      summary: 'free catalog in five categories (text-animations, animations, backgrounds, components, micro); /r/registry.json lists every item'
+      lenses: [reuse, security]
+      returns: 'registry index `items[]` of `{name, title, description, type, dependencies, registryDependencies, files[{type, path}]}` per variant; each item JSON under /r/<Name> adds `files[].content`'
+      notes:
+      - 'catalog page URLs are kebab-case (/text-animations/split-text) and CLI names PascalCase (SplitText); component pages are SPA, read props from the item JSON'
+      - 'llms.txt lists about 213 free pages: text-animations 33, animations 40, backgrounds 59, components 47, micro 34 (2026-10-05)'
+      ref: https://reactbits.dev/r/registry.json
+- title: Components in use
+  sections:
+  - id: rb-in-use
+    title: Vendored components
+    level: basic
+    requires: [rb-install]
+    ref: /llms.txt
+    entries:
+    - id: rb-blur-text
+      name: BlurText
+      summary: per-word or per-letter blur-in text reveal, started once by an IntersectionObserver; dependency motion
+      lenses: [ux-a11y]
+      import: default export from the vendored BlurText file
+      signature: <BlurText text delay animateBy direction threshold rootMargin animationFrom animationTo easing stepDuration onAnimationComplete className />
+      options:
+      - {name: "text", type: "string", default: "''", desc: "text split into segments"}
+      - {name: "animateBy", type: "words|letters", default: "words", desc: "segment unit"}
+      - {name: "delay", type: "number (ms)", default: "200", desc: "stagger between segments"}
+      - {name: "direction", type: "top|bottom", default: "top", desc: "side the text drops in from"}
+      - {name: "stepDuration", type: "number (s)", default: "0.35", desc: "time per keyframe step"}
+      - {name: "threshold", type: "number", default: "0.1", desc: "IntersectionObserver threshold that starts the reveal"}
+      - {name: "animationFrom", type: "Record<string, string|number>", default: null, desc: "override the start keyframe"}
+      - {name: "animationTo", type: "Array<Record<string, string|number>>", default: null, desc: "override the keyframe steps"}
+      - {name: "onAnimationComplete", type: "() => void", default: null, desc: "fires when the last segment finishes"}
+      notes:
+      - ignores prefers-reduced-motion itself; gate it in the caller
+      - renders one `<p class="blur-text flex flex-wrap">` with a motion.span per segment; reveals once, then unobserves
+      ref: https://www.reactbits.dev/text-animations/blur-text
+    - id: rb-aurora
+      name: Aurora
+      summary: flowing aurora gradient background drawn by an ogl WebGL2 shader; decoration only
+      lenses: [reliability, perf]
+      import: default export from the vendored Aurora file
+      signature: <Aurora colorStops amplitude blend time speed lightMode />
+      options:
+      - {name: "colorStops", type: "string[]", default: "['#5227FF', '#7cff67', '#5227FF']", desc: "three hex gradient stops"}
+      - {name: "amplitude", type: "number", default: "1.0", desc: "wave height"}
+      - {name: "blend", type: "number", default: "0.5", desc: "softness of the gradient edges"}
+      - {name: "speed", type: "number", default: "1.0", desc: "animation speed multiplier"}
+      - {name: "time", type: "number", default: null, desc: "fixed shader time; defaults to an internal clock"}
+      - {name: "lightMode", type: "boolean", default: "false", desc: "switch the shader to a light-surface blend"}
+      notes:
+      - 'throws without WebGL2, ignores reduced motion; probes leak contexts'
+      - 'effect cleanup cancels the frame loop and calls WEBGL_lose_context.loseContext(); props are read live via a ref'
+      ref: https://www.reactbits.dev/backgrounds/aurora
+    - id: rb-lattice-loader
+      name: LatticeLoader
+      summary: inline agent-status row, a 3x3 or 4x4 lattice wave beside a verb and stopwatch that resolves to a check or cross
+      lenses: [ux-a11y, reuse]
+      import: default export plus `LatticeStatus` type from the vendored file
+      signature: <LatticeLoader status label doneLabel errorLabel pattern grid shape showTimer elapsed />
+      options:
+      - {name: "status", type: "working|done|error", default: "working", desc: "drives the animation and the final glyph"}
+      - {name: "label", type: "string", default: "Thinking", desc: "verb shown while working"}
+      - {name: "doneLabel", type: "string", default: "Done in", desc: "label when done, followed by the timer"}
+      - {name: "errorLabel", type: "string", default: "Failed after", desc: "label when status is error"}
+      - {name: "pattern", type: "arrow|dots|orbit|ripple|snake|spiral|sweep|spin|rain|pulse|LatticePattern", default: "orbit", desc: "wave preset or custom cells"}
+      - {name: "grid", type: "3|4", default: "3", desc: "lattice size"}
+      - {name: "shape", type: "square|round", default: "round", desc: "cell shape"}
+      - {name: "showTimer", type: "boolean", default: "true", desc: "show the live stopwatch"}
+      - {name: "elapsed", type: "number (s)", default: null, desc: "drive the timer externally instead of the internal clock"}
+      notes:
+      - 'no deps; the root is role="status" and honors prefers-reduced-motion in CSS'
+      - cells, label and timer are aria-hidden; the status text is announced from the root
+      ref: https://www.reactbits.dev/micro/lattice-loader
+- title: Agent-UI candidates (micro)
+  sections:
+  - id: rb-agent-ui
+    title: React Bits micro components shaped like agent UI
+    level: intermediate
+    requires: [rb-install]
+    ref: /llms.txt
+    entries:
+    - id: rb-call-chip
+      name: CallChip
+      summary: inline tool-call chip with a live ms counter, success wash or shaking error with retry
+      lenses: [ux-a11y, reuse]
+      signature: <CallChip icon name argument status expectedMs showTimer onRetry />
+      options:
+      - {name: "status", type: "idle|running|done|error", default: "running", desc: "drives fill wipe, success wash or error shake"}
+      - {name: "name", type: "string", default: "bash", desc: "tool name"}
+      - {name: "argument", type: "string", default: "npm test", desc: "tool argument text"}
+      - {name: "expectedMs", type: "number", default: "2500", desc: "expected duration that paces the fill wipe"}
+      - {name: "onRetry", type: "() => void", default: null, desc: "shows a retry button on error when set"}
+      notes:
+      - 'deps hugeicons only, already installed; compare with SubagentCall first'
+      - 'role="status" with aria-busy while running; reads matchMedia reduced motion at call time'
+      ref: https://www.reactbits.dev/micro/call-chip
+    - id: rb-thought-line
+      name: ThoughtLine
+      summary: reasoning-trace header that settles into "Thought for 4.2s" and folds its steps
+      lenses: [ux-a11y]
+      signature: <ThoughtLine label steps working settleAfter collapsible collapseOnSettle elapsed onSettle />
+      options:
+      - {name: "working", type: "boolean", default: "true", desc: "false triggers the settle into the done label"}
+      - {name: "steps", type: "string[]", default: "[]", desc: "trace lines shown beneath the header"}
+      - {name: "collapseOnSettle", type: "boolean", default: "true", desc: "fold the trace once settled"}
+      - {name: "onSettle", type: "(seconds: number) => void", default: null, desc: "fires with the final duration"}
+      notes:
+      - deps motion + hugeicons; overlaps assistant-ui reasoning; uses useReducedMotion
+      - has an sr-only role="status" span and aria-expanded on the toggle
+      ref: https://www.reactbits.dev/micro/thought-line
+    - id: rb-status-mark
+      name: StatusMark
+      summary: 20px task glyph morphing between pending, running (spinner or real progress), done, failed and cancelled
+      lenses: [ux-a11y]
+      signature: <StatusMark status progress label strike />
+      options:
+      - {name: "status", type: "pending|running|done|failed|cancelled", default: "pending", desc: "current task state"}
+      - {name: "progress", type: "number (0-1)", default: null, desc: "when status is running, switches the arc from spinner to determinate"}
+      notes:
+      - dep motion only; uses useReducedMotion
+      - without `label` it is role="img" with an aria-label such as "In progress, 40%"
+      ref: https://www.reactbits.dev/micro/status-mark
+    - id: rb-prompt-bar
+      name: PromptBar
+      summary: chat composer with @ sources, / commands, model picker, dictation, attachments
+      lenses: [ux-a11y, composability]
+      notes:
+      - 'overlaps assistant-ui composer; heavy a11y markup (roles, aria)'
+      - deps motion + hugeicons
+      ref: https://www.reactbits.dev/micro/prompt-bar
+    - id: rb-swipe-toast
+      name: SwipeToast
+      summary: single swipe-to-dismiss toast with a fuse timer for its remaining time
+      lenses: [ux-a11y]
+      notes:
+      - uses useReducedMotion; alternative to sonner
+      - 'hover pauses the fuse; an inline mode keeps it inside a container'
+      ref: https://www.reactbits.dev/micro/swipe-toast
+    - id: rb-refine-frame
+      name: RefineFrame
+      summary: reserved-aspect media frame, queued to generating to refining to complete without layout shift
+      lenses: [ux-a11y, perf]
+      notes: [deps hugeicons only]
+      ref: https://www.reactbits.dev/micro/refine-frame
+    - id: rb-warm-tooltip
+      name: WarmTooltip
+      summary: tooltip group with one shared delay
+      lenses: [ux-a11y]
+      notes:
+      - shadcn Tooltip already covers basics; deps motion + react-dom
+      ref: https://www.reactbits.dev/micro/warm-tooltip
+- title: Motion for React
+  sections:
+  - id: rb-motion-core
+    title: Core animation APIs
+    level: basic
+    requires: []
+    ref: motion:/docs/react
+    entries:
+    - id: rb-motion-import
+      name: Import and versions
+      summary: '`import { motion } from "motion/react"`; 13 and 14 add only `MotionConfig isValidProp`'
+      lenses: [best-practice]
+      signature: import { motion } from "motion/react"
+      notes:
+      - 'installed 12.43.0, latest 14.0.0 (npm, 2026-10-05); 14 has no breaking changes, deprecates internals, pins internal deps strictly'
+      - '13 dropped optional @emotion/is-prop-valid; styled-components or Emotion apps pass `MotionConfig isValidProp`'
+      - '`framer-motion` is the former package name; move imports to `motion/react`'
+      ref: motion:/docs/react-upgrade-guide
+    - id: rb-motion-client
+      name: motion/react-client
+      summary: '`import * as motion from "motion/react-client"` renders motion elements from Server Components (Next.js)'
+      lenses: [perf, best-practice]
+      signature: import * as motion from "motion/react-client"
+      notes: ['hooks and AnimatePresence still need a client component; pairs with LazyMotion `motion/react-m`']
+      ref: motion:/docs/react-motion-component
+    - id: rb-motion-component
+      name: motion component
+      summary: animated element for every HTML and SVG tag; declarative animate, exit, variants, gestures, viewport and layout props
+      lenses: [composability]
+      signature: <motion.div initial animate exit transition variants whileHover whileTap whileInView viewport layout />
+      options:
+      - {name: "initial", type: "target|variant|false", default: null, desc: "start state; false skips the enter animation and renders `animate` values"}
+      - {name: "animate", type: "target|variant|string[]", default: null, desc: "target animated to on enter and whenever it changes"}
+      - {name: "exit", type: "target|variant", default: null, desc: "target on removal; the element must be a direct child of AnimatePresence"}
+      - {name: "transition", type: "Transition", default: null, desc: "default transition for animation props without their own"}
+      - {name: "variants", type: "Record<string, Variant>", default: null, desc: "named targets propagated to child motion components"}
+      - {name: "viewport", type: "{once, root, margin, amount}", default: "{amount: \"some\"}", desc: "options for whileInView; once avoids re-animating on leave"}
+      - {name: "layout", type: "boolean|\"position\"|\"size\"", default: "false", desc: "animate layout changes with transforms"}
+      notes:
+      - 'bundle about 34kb; style motion values (useMotionValue) update without React re-render'
+      - '`motion.create(Component, {forwardMotionProps})` wraps custom components; they must forward ref; never call it inside render'
+      ref: motion:/docs/react-motion-component
+    - id: rb-presence
+      name: AnimatePresence
+      summary: keeps removed direct children mounted until their exit animation finishes
+      lenses: [ux-a11y]
+      signature: <AnimatePresence mode initial custom onExitComplete propagate>
+      options:
+      - {name: "mode", type: "sync|wait|popLayout", default: "sync", desc: "wait runs exit before enter (one child only); popLayout pops exiting nodes out of flow"}
+      - {name: "initial", type: "boolean", default: null, desc: "false disables enter animations of children present on first render"}
+      - {name: "custom", type: "any", default: null, desc: "data for dynamic exit variants, read by children with usePresenceData"}
+      - {name: "onExitComplete", type: "() => void", default: null, desc: "fires when all exiting nodes finished"}
+      - {name: "propagate", type: "boolean", default: "false", desc: "also run children exit animations when a parent AnimatePresence exits"}
+      notes:
+      - 'children need stable unique keys (not index); AnimatePresence must stay mounted outside the conditional'
+      - 'layout animations under sync need LayoutGroup; under popLayout the animating parent needs a non-static position'
+      - 'popLayout: custom component children must forward ref'
+      ref: motion:/docs/react-animate-presence
+    - id: rb-presence-hooks
+      name: Presence hooks
+      summary: '`useIsPresent`, `usePresenceData` and `usePresence` let a child read or control its own exit'
+      lenses: [ux-a11y, composability]
+      signature: useIsPresent(), usePresenceData(), usePresence()
+      returns: 'usePresence gives [isPresent, safeToRemove]; call safeToRemove after a manual exit (useAnimate) to unmount'
+      ref: motion:/docs/react-animate-presence
+    - id: rb-layout
+      name: Layout animation
+      summary: '`layout` animates size and position changes with transforms; `layoutId` morphs between elements'
+      lenses: [ux-a11y]
+      signature: layout, layoutId, layoutDependency, LayoutGroup
+      options:
+      - {name: "layout", type: "boolean|\"position\"|\"size\"", default: "false", desc: "animate layout changes, or only position or size"}
+      - {name: "layoutId", type: "string", default: null, desc: "shared id; a new element animates out of a previous element with the same id"}
+      - {name: "layoutDependency", type: "any", default: null, desc: "measure only when this value changes, cheaper than every render"}
+      notes:
+      - 'disabled by reducedMotion "user"'
+      - 'scrollable ancestors need `layoutScroll`, fixed containers `layoutRoot`'
+      ref: motion:/docs/react-layout-animations
+    - id: rb-motion-values
+      name: Motion values
+      summary: '`useMotionValue`, `useTransform`, `useSpring`, `useVelocity` update styles without re-render'
+      lenses: [perf]
+      signature: useMotionValue(initial), useTransform(source, inputRange, outputRange), useSpring(source)
+      returns: a MotionValue with get(), set(), getVelocity() and on(); pass it in `style` or an SVG attribute
+      notes:
+      - 'useTransform also takes a function form, `useTransform(() => x.get() * 2)`'
+      - 'the same motion value can feed several components; renders batch to the next frame'
+      ref: motion:/docs/react-motion-value
+    - id: rb-use-animate
+      name: useAnimate
+      summary: scoped imperative `animate` with auto cleanup; mini (2.3kb, WAAPI only) and hybrid (17kb) variants
+      lenses: [perf]
+      import: 'motion/react-mini (2.3kb) or motion/react (hybrid, 17kb)'
+      signature: const [scope, animate] = useAnimate()
+      returns: a `scope` ref for the root element and an `animate` whose selectors are scoped to it; animations stop on unmount
+      notes: ['compose exit animations with usePresence, or scroll triggers with useInView']
+      ref: motion:/docs/react-use-animate
+    - id: rb-scroll
+      name: Scroll-linked animation
+      summary: '`useScroll` returns scroll motion values; with opacity, transform or filter they run hardware-accelerated'
+      lenses: [perf]
+      signature: useScroll({container, target, axis, offset})
+      options:
+      - {name: "target", type: "RefObject", default: null, desc: "element whose position in the viewport is tracked"}
+      - {name: "container", type: "RefObject", default: "viewport", desc: "scrollable element to track"}
+      - {name: "axis", type: "x|y", default: "y", desc: "axis for the progress values"}
+      - {name: "offset", type: "string[]", default: "[\"start start\", \"end end\"]", desc: "intersections that map to progress 0 and 1"}
+      returns: '{scrollX, scrollY, scrollXProgress, scrollYProgress} motion values'
+      ref: motion:/docs/react-use-scroll
+    - id: rb-use-in-view
+      name: useInView and whileInView
+      summary: '`useInView(ref, options)` flips React state when an element enters the viewport; `whileInView` does it declaratively'
+      lenses: [perf]
+      signature: useInView(ref, {root, margin, once, initial, amount})
+      options:
+      - {name: "once", type: "boolean", default: "false", desc: "stop observing after the first entry"}
+      - {name: "amount", type: "some|all|number", default: "some", desc: "fraction of the element that counts as in view"}
+      - {name: "margin", type: "string", default: "0px", desc: "margin added to the viewport detection area"}
+      - {name: "initial", type: "boolean", default: "false", desc: "value returned before the first observation"}
+      returns: boolean, true while in view; the hook is about 0.6kb and uses a pooled IntersectionObserver
+      ref: motion:/docs/react-use-in-view
+    - id: rb-transitions
+      name: Transitions
+      summary: tween, spring or inertia timing set per animation or per value, with variants-based delay and stagger
+      lenses: [best-practice]
+      signature: 'transition={{type, duration, ease, delay, bounce, stiffness, damping}}'
+      options:
+      - {name: "type", type: "tween|spring|inertia", default: "dynamic", desc: "animation type, chosen by the animated value when unset"}
+      - {name: "duration", type: "number (s)", default: "0.3", desc: "tween length (0.8 with multiple keyframes); with bounce it sets a duration-based spring"}
+      - {name: "bounce", type: "number", default: "0.25", desc: "spring bounciness for duration-based springs"}
+      - {name: "delay", type: "number (s)", default: null, desc: "wait before starting; negative values start partway in"}
+      notes:
+      - 'variants: `delayChildren: stagger(0.1, {from})`, `when: "afterChildren"`'
+      - 'physics springs use stiffness, damping, mass and keep gesture velocity; duration springs do not'
+      ref: motion:/docs/react-transitions
+  - id: rb-motion-hooks
+    title: Motion value and frame hooks
+    level: intermediate
+    requires: [rb-motion-core]
+    ref: motion:/docs/react-motion-value
+    entries:
+    - id: rb-use-spring
+      name: useSpring
+      summary: spring-powered motion value, set directly or tracking another motion value
+      lenses: [perf, ux-a11y]
+      import: useSpring from motion/react
+      signature: useSpring(source, {stiffness, damping, mass, skipInitialAnimation})
+      options:
+      - {name: "source", type: "number|unit string|MotionValue", default: null, desc: "initial value, or a numeric/unit-string motion value to spring towards"}
+      - {name: "skipInitialAnimation", type: "boolean", default: "false", desc: "jump to the first measured value (for example useScroll output) instead of springing to it"}
+      returns: 'a MotionValue; `.set(n)` springs to n, `.jump(n)` updates immediately without the spring'
+      notes:
+      - 'also accepts the usual spring transition options, for example `{stiffness: 300}`'
+      - 'smooth scroll progress: `useSpring(scrollYProgress, {skipInitialAnimation: true})`'
+      ref: motion:/docs/react-use-spring
+    - id: rb-use-transform
+      name: useTransform
+      summary: derive a motion value from a function of other motion values, or map an input range to an output range
+      lenses: [perf]
+      import: useTransform from motion/react
+      signature: 'useTransform(() => x.get() * 2) | useTransform(source, inputRange, outputRange, {clamp, ease, mixer}) | useTransform(source, inputRange, {name: outputRange})'
+      options:
+      - {name: "clamp", type: "boolean", default: "true", desc: "false keeps mapping past the ends of the range, for perpetual rotation"}
+      - {name: "ease", type: "Easing|Easing[]", default: null, desc: "JS easing function(s) used between output values"}
+      - {name: "mixer", type: "(from, to) => (progress) => value", default: null, desc: "custom interpolator, for example Flubber for SVG path morphing"}
+      returns: a MotionValue; the named-map form returns an object of MotionValues from one call
+      notes:
+      - 'function form auto-subscribes to every motion value read with get() and reruns on the next frame'
+      - 'input and output ranges must be the same length; input is monotonic; outputs share one value type (numbers, units, colors, strings)'
+      ref: motion:/docs/react-use-transform
+    - id: rb-use-time
+      name: useTime
+      summary: motion value of elapsed milliseconds, updated each frame, for perpetual animations
+      lenses: [perf]
+      import: useTime from motion/react
+      signature: useTime()
+      returns: 'a MotionValue of ms since creation; compose with useTransform and `clamp: false`'
+      notes: ['example: `useTransform(time, [0, 4000], [0, 360], {clamp: false})` rotates a full turn every 4s without a React render']
+      ref: motion:/docs/react-use-time
+    - id: rb-use-velocity
+      name: useVelocity
+      summary: motion value that outputs the velocity of another numeric motion value
+      lenses: [perf]
+      import: useVelocity from motion/react
+      signature: useVelocity(motionValue)
+      returns: a MotionValue updating with the source's velocity; apply it twice for acceleration
+      ref: motion:/docs/react-use-velocity
+    - id: rb-use-motion-template
+      name: useMotionTemplate
+      summary: tagged template that combines motion values into one interpolated string value
+      lenses: [perf, composability]
+      import: useMotionTemplate from motion/react
+      signature: 'useMotionTemplate`drop-shadow(${x}px ${y}px 20px rgba(0,0,0,0.3))`'
+      returns: a MotionValue holding the template with each embedded motion value replaced by its latest value; use for filter, shadow, gradient and transform strings
+      ref: motion:/docs/react-use-motion-template
+    - id: rb-use-motion-value-event
+      name: useMotionValueEvent
+      summary: subscribes to a motion value event for the component lifetime, with automatic cleanup
+      lenses: [reliability]
+      import: useMotionValueEvent from motion/react
+      signature: useMotionValueEvent(motionValue, event, callback)
+      options:
+      - {name: "event", type: "change|animationStart|animationComplete|animationCancel", default: null, desc: "which motion value event to listen for; change receives the latest value"}
+      notes:
+      - 'a helper over `motionValue.on(event, cb)`; with raw `on`, unsubscribe in an effect cleanup'
+      ref: motion:/docs/react-use-motion-value-event
+    - id: rb-use-animation-frame
+      name: useAnimationFrame
+      summary: runs a callback every animation frame with total time and frame delta
+      lenses: [perf]
+      import: useAnimationFrame from motion/react
+      signature: useAnimationFrame((time, delta) => void)
+      returns: callback arguments `time` (total duration since first call) and `delta` (duration since the last frame)
+      notes:
+      - 'write to a ref (`ref.current.style.transform = ...`) rather than React state to avoid re-rendering per frame'
+      - 'pass `isPageInView ? update : undefined` to pause the loop on hidden tabs'
+      ref: motion:/docs/react-use-animation-frame
+    - id: rb-use-page-in-view
+      name: usePageInView
+      summary: true while the tab is visible; pause videos and frame loops when hidden, SSR-safe
+      lenses: [perf, ux-a11y]
+      import: usePageInView from motion/react
+      signature: usePageInView()
+      returns: boolean; true on the server and the first client render
+      ref: motion:/docs/react-use-page-in-view
+  - id: rb-motion-gestures
+    title: Gestures, drag and reorder
+    level: intermediate
+    requires: [rb-motion-core]
+    ref: motion:/docs/react-gestures
+    entries:
+    - id: rb-gestures
+      name: Gesture props
+      summary: '`whileHover`, `whileTap`, `whileFocus`, `whileDrag`, `whileInView` animate to a target while a gesture is active; variants flow to children'
+      lenses: [ux-a11y, composability]
+      signature: <motion.button whileHover whileTap whileFocus whileDrag onTap onPan onHoverStart propagate />
+      options:
+      - {name: "propagate", type: "{tap: boolean}", default: null, desc: "`{tap: false}` stops a child tap from also triggering the parent tap; only tap is supported"}
+      notes:
+      - 'tap is keyboard-accessible: Enter down fires onTapStart and whileTap, release fires onTap, blur before release fires onTapCancel'
+      - 'focus follows :focus-visible; pan has no while- prop and needs `touch-action` disabled on an axis for touch input'
+      - 'React children block parent gestures with `onPointerDownCapture={e => e.stopPropagation()}`'
+      - 'gestures are not recognised on SVG filter elements; put the while- prop on a parent and animate the filter through variants'
+      ref: motion:/docs/react-gestures
+    - id: rb-hover
+      name: Hover animation
+      summary: '`whileHover`, `onHoverStart/End` and the under-1kb `hover()` function; filters out touch-emulated hover'
+      lenses: [ux-a11y, perf]
+      signature: whileHover={{scale, transition}}, hover(element, onStart => onEnd)
+      import: hover from motion
+      notes:
+      - 'unlike CSS :hover there is no sticky hover state after a touch; the events never fire from touch'
+      - 'transition inside whileHover applies when the gesture starts; the outer `transition` applies when it ends'
+      - '`hover()` returns a cleanup function, so return it from useEffect without importing the full motion component'
+      ref: motion:/docs/react-hover-animation
+    - id: rb-drag
+      name: Drag
+      summary: 'physics-based drag on any motion component with momentum, axis lock, elastic constraints and drag events'
+      lenses: [ux-a11y, composability]
+      signature: <motion.div drag="x|y" dragConstraints dragElastic dragMomentum dragTransition dragDirectionLock whileDrag onDragStart onDrag onDragEnd />
+      options:
+      - {name: "drag", type: "boolean|\"x\"|\"y\"", default: "false", desc: "enable drag, optionally locked to one axis"}
+      - {name: "dragConstraints", type: "{top,left,right,bottom}|RefObject", default: null, desc: "pixel bounds, or a ref whose bounding box constrains the element"}
+      - {name: "dragElastic", type: "number (0-1)", default: null, desc: "0 allows no movement past constraints, 1 full movement"}
+      - {name: "dragMomentum", type: "boolean", default: "true", desc: "inertia after release from pointer velocity"}
+      - {name: "dragTransition", type: "{bounceStiffness, bounceDamping}", default: null, desc: "tune the inertia and bounce physics"}
+      - {name: "dragDirectionLock", type: "boolean", default: "false", desc: "lock to the first axis dragged; onDirectionLock reports it"}
+      returns: 'drag callbacks get (event, info) with info.point, delta, offset and velocity'
+      notes:
+      - 'a parent with a CSS transform skews drag distance and Reorder thresholds: pass `correctParentTransform(ref)` to `MotionConfig transformPagePoint`; for an SVG viewBox use `transformViewBoxPoint(ref)`'
+      - 'inside a scaled parent drive the parent transform with a motion value so layout animation can account for it'
+      - '`<img>` children stay natively draggable and show a ghost image: set `draggable={false}`'
+      - 'native HTML dropzones are not provided'
+      ref: motion:/docs/react-drag
+    - id: rb-use-drag-controls
+      name: useDragControls
+      summary: starts a drag on a motion component from any element, for handles and scrubbers
+      lenses: [ux-a11y, composability]
+      import: useDragControls from motion/react
+      signature: const controls = useDragControls(); controls.start(event, {snapToCursor, distanceThreshold})
+      options:
+      - {name: "snapToCursor", type: "boolean", default: "false", desc: "make the component jump to the pointer when the drag starts"}
+      - {name: "distanceThreshold", type: "number (px)", default: "3", desc: "pointer travel before the drag (and direction lock) begins"}
+      returns: 'controls with start(event), stop() and cancel(); cancel skips onDragEnd'
+      notes:
+      - 'pair `dragControls={controls}` with `dragListener={false}` so only the handle starts a drag'
+      - 'the trigger element needs `touch-action: none` for touch screens'
+      ref: motion:/docs/react-use-drag-controls
+    - id: rb-reorder
+      name: Reorder
+      summary: drag-to-reorder lists and grids; `Reorder.Group` detects the axis and `Reorder.Item` wraps each value
+      lenses: [ux-a11y, composability]
+      import: Reorder from motion/react
+      signature: <Reorder.Group values onReorder axis as><Reorder.Item key value as dragListener dragControls /></Reorder.Group>
+      options:
+      - {name: "values", type: "T[]", default: null, desc: "the array being reordered; each entry matches a Reorder.Item `value`"}
+      - {name: "onReorder", type: "(newOrder: T[]) => void", default: null, desc: "must update the `values` state or items do not move"}
+      - {name: "axis", type: "x|y|xy", default: "auto-detected", desc: "override the detected row, column or grid axis"}
+      - {name: "as", type: "string", default: "ul (Group), li (Item)", desc: "element to render"}
+      notes:
+      - 'Item takes every motion component prop; wrap items in AnimatePresence for enter and exit'
+      - 'a drag handle uses useDragControls with `dragListener={false}`; Item sets z-index on the dragged item, so position must not be static'
+      - 'scrollable ancestors auto-scroll while dragging near an edge'
+      ref: motion:/docs/react-reorder
+  - id: rb-motion-scroll-svg
+    title: Scroll recipes and SVG
+    level: intermediate
+    requires: [rb-scroll, rb-motion-hooks]
+    ref: motion:/docs/react-scroll-animations
+    entries:
+    - id: rb-scroll-guide
+      name: Scroll animation recipes
+      summary: triggered (`whileInView`, `useInView`) versus linked (`useScroll`) effects, with progress bar, parallax, reveal and sticky horizontal scroll
+      lenses: [perf, ux-a11y]
+      signature: useScroll({target, offset}) + useTransform + useSpring
+      notes:
+      - 'linked animations run on native ScrollTimeline when possible (hardware accelerated), falling back to JS; triggered ones use a pooled IntersectionObserver'
+      - 'progress bar: `style={{scaleX: scrollYProgress, originX: 0}}`; smooth it with `useSpring(scrollYProgress, {stiffness: 100, damping: 30, restDelta: 0.001})`'
+      - 'scroll direction: `useMotionValueEvent(scrollY, "change", c => c - scrollY.getPrevious())`'
+      - 'element progress through the viewport: `useScroll({target: ref, offset: ["start end", "end start"]})`'
+      - 'parallax: `useTransform(scrollY, [0, 1], {foregroundY: [0, 2], backgroundY: [0, 0.5]}, {clamp: false})`'
+      - 'horizontal section: a `300vh` container, a sticky `100vh` child, and `x = useTransform(scrollYProgress, [0, 1], ["0%", "-75%"])`'
+      ref: motion:/docs/react-scroll-animations
+    - id: rb-svg
+      name: SVG animation
+      summary: a motion component per SVG element; animates attributes, viewBox, line drawing (`pathLength`) and path morphing (`d`)
+      lenses: [perf]
+      signature: '<motion.path initial={{pathLength: 0}} animate={{pathLength: 1}} />'
+      options:
+      - {name: "pathLength", type: "number (0-1)", default: null, desc: "drawn fraction of the line; 1 is the full length"}
+      - {name: "pathSpacing", type: "number (0-1)", default: null, desc: "gap between dashed segments"}
+      - {name: "pathOffset", type: "number (0-1)", default: null, desc: "where the segment starts"}
+      - {name: "attrX / attrY / attrScale", type: "number", default: null, desc: "animate the SVG x, y, scale attributes instead of the style transform"}
+      notes:
+      - 'path drawing works on path, circle, ellipse, line, polygon, polyline and rect'
+      - 'Motion makes SVG transforms rotate about the element centre; `transformBox: "view-box"` restores the SVG default'
+      - '`d` morphs natively only between paths with the same instructions; use a mixer such as Flubber for different shapes'
+      - 'a viewBox that differs from the rendered size breaks drag: pass `transformViewBoxPoint(ref)` to `MotionConfig transformPagePoint`'
+      ref: motion:/docs/react-svg-animation
+  - id: rb-motion-animation
+    title: Animation fundamentals
+    level: basic
+    requires: [rb-motion-core]
+    ref: motion:/docs/react-animation
+    entries:
+    - id: rb-installation
+      name: Install and framework setup
+      summary: '`npm install motion`, import from `motion/react`; React 18.2+; Next.js App Router needs "use client" or `motion/react-client`'
+      lenses: [best-practice]
+      signature: npm install motion
+      notes:
+      - 'Vite needs no configuration; a CDN import exists (`cdn.jsdelivr.net/npm/motion@<version>/react/+esm`), pin the version instead of `latest`'
+      ref: motion:/docs/react-installation
+    - id: rb-animatable-values
+      name: Animatable values
+      summary: 'any CSS value, every transform axis independently, colors, complex strings, `height: auto` and CSS variables'
+      lenses: [perf]
+      signature: <motion.div animate={{x, scale, rotate, filter, height, "--var"}} style={{originX}} />
+      notes:
+      - 'transform shorthands: x y z, scale scaleX scaleY, rotate rotateX/Y/Z, skewX skewY, transformPerspective; setting `transform` directly keeps hardware acceleration'
+      - 'x, y, width, height, top, left, right, bottom can animate between unit types; animate height to and from "auto" (not with display none, which cannot be measured)'
+      - 'originX and originY numbers are 0-1 progress, originZ is pixels'
+      - 'animating a CSS variable always triggers paint; a MotionValue is cheaper for many children'
+      - 'non-browser-animatable values such as maskImage and background-image work; display and visibility toggles animate'
+      ref: motion:/docs/react-animation
+    - id: rb-keyframes
+      name: Keyframes
+      summary: array targets animate through a series of values; `null` wildcards hold or reuse the current value
+      lenses: [ux-a11y]
+      signature: 'animate={{x: [null, 100, null, 0]}} transition={{times: [0, 0.2, 1]}}'
+      options:
+      - {name: "times", type: "number[] (0-1)", default: null, desc: "progress position of each keyframe; evenly spaced when unset"}
+      notes:
+      - 'a leading null starts from the current value, so an interrupting keyframe animation feels natural'
+      ref: motion:/docs/react-animation
+    - id: rb-motion-variants
+      name: Variants
+      summary: named animation targets that propagate to child motion components, with orchestration and per-element dynamic resolution
+      lenses: [composability]
+      signature: <motion.ul variants initial="hidden" whileInView="visible"><motion.li variants custom /></motion.ul>
+      options:
+      - {name: "variants", type: "Record<string, Target | (custom) => Target>", default: null, desc: "named targets; functions resolve with the `custom` prop"}
+      - {name: "when", type: "beforeChildren|afterChildren", default: null, desc: "transition orchestration relative to children"}
+      - {name: "delayChildren", type: "number|stagger()", default: null, desc: "delay or stagger the children animations, for example `stagger(0.3)`"}
+      notes:
+      - 'children inherit the active variant label with no props of their own; arrays combine labels: `animate={["visible", "danger"]}`'
+      ref: motion:/docs/react-animation
+    - id: rb-motion-value-content
+      name: MotionValue as child
+      summary: a MotionValue rendered as the child of a motion element writes its latest value to the DOM text node with no React re-render
+      lenses: [perf]
+      signature: '<motion.pre>{count}</motion.pre> with animate(count, 100, {duration: 5})'
+      notes: ['suits counters and live data; `animate()` returns controls, stop it in the effect cleanup']
+      ref: motion:/docs/react-animation
+    - id: rb-motion-arc
+      name: arc() path transition
+      summary: '`transition.path: arc()` bends an x/y or layout animation into a curve'
+      lenses: [ux-a11y]
+      import: arc from motion/react
+      signature: 'transition={{duration: 0.6, path: arc()}}'
+      notes: ['for a fixed path use CSS `offsetPath` with an animated `offsetDistance`; arc() is for dynamic curves']
+      ref: motion:/docs/react-animation
+    - id: rb-layout-group
+      name: LayoutGroup
+      summary: coordinates layout animations between sibling components that render separately, and namespaces `layoutId`
+      lenses: [composability]
+      import: LayoutGroup from motion/react
+      signature: <LayoutGroup id>
+      options:
+      - {name: "id", type: "string", default: null, desc: "prefix that scopes `layoutId` values, since layoutId is global across the site"}
+      notes:
+      - 'wrap accordion items or tab rows so one item''s state change triggers its siblings'' layout animation'
+      ref: motion:/docs/react-layout-group
+    - id: rb-animate-view
+      name: AnimateView
+      summary: native View Transition API animations with Motion transitions; enter, exit, update and shared-element animations
+      lenses: [perf, ux-a11y]
+      import: AnimateView from motion/react-animate-view
+      signature: <AnimateView name transition enter exit update share onAnimationStart onAnimationComplete>
+      options:
+      - {name: "name", type: "string", default: null, desc: "pairs an exiting and an entering element for a shared-element animation; unique per view"}
+      - {name: "transition", type: "Transition", default: null, desc: "default for all animation types; `type: spring` needs `import {spring} from \"motion\"`; `layout` sets size and position timing"}
+      - {name: "enter / exit / update / share", type: "Target | (types) => Target", default: "browser crossfade", desc: "custom values replace the crossfade; add `opacity` to keep it; functions receive React transition types"}
+      notes:
+      - 'requires React and React DOM 19.3 or later; the entry point is `motion/react-animate-view`, not `motion/react`; it was Motion+ early access and is now free'
+      - 'state changes must run inside React `startTransition`; `addTransitionType` adds context such as navigation direction'
+      - 'view transitions are not interruptible and snapshot-based; layout animations suit micro-interactions, view transitions suit route-level swaps'
+      - 'wraps React ViewTransition with no extra DOM node; a Suspense boundary inside crossfades fallback and content'
+      ref: motion:/docs/react-animate-view
+- title: Performance and composition
+  sections:
+  - id: rb-motion-perf
+    title: Bundle size and UI-library composition
+    level: intermediate
+    requires: [rb-motion-core]
+    ref: motion:/docs/react-reduce-bundle-size
+    entries:
+    - id: rb-lazy-motion
+      name: LazyMotion
+      summary: '`<LazyMotion features={domAnimation|domMax}>` with `m` components cuts motion from 34kb to about 4.6kb'
+      lenses: [perf, cost]
+      import: 'LazyMotion, domAnimation, domMax from motion/react; m from motion/react-m'
+      signature: <LazyMotion features strict>
+      options:
+      - {name: "features", type: "domAnimation|domMax|() => Promise", default: null, desc: "feature bundle, loaded sync or by async import"}
+      - {name: "strict", type: "boolean", default: "false", desc: "throw if a full `motion` component renders inside, which defeats code-splitting"}
+      notes:
+      - 'domAnimation +15kb: animations, variants, exit, tap/hover/focus; domMax +25kb adds drag, pan and layout'
+      - 'async features let the page hydrate before animation code loads'
+      ref: motion:/docs/react-lazy-motion
+    - id: rb-tailwind
+      name: Motion with Tailwind
+      summary: Tailwind for static and responsive styling, Motion props for animation; animate CSS variables
+      lenses: [composability]
+      notes:
+      - Motion inline styles override Tailwind classes
+      - 'responsive: set `[--d:20px] md:[--d:50px]` classes and animate `y: "var(--d)"`'
+      ref: motion:/docs/react-tailwind
+    - id: rb-radix
+      name: Motion with Radix
+      summary: '`asChild` on a motion child, `AnimatePresence` + `forceMount` Portal, hoisted open state'
+      lenses: [composability, ux-a11y]
+      signature: asChild, AnimatePresence, forceMount
+      notes:
+      - 'exit animations for Dialog, Tooltip, Toast; see shadcn-ui sh-radix-composition'
+      - 'hoist `open`/`onOpenChange` or tab value into state, and pass it to `layoutDependency` for layout animations'
+      ref: motion:/docs/radix
+- title: Accessibility
+  sections:
+  - id: rb-a11y
+    title: Reduced motion
+    level: basic
+    requires: [rb-motion-core]
+    ref: motion:/docs/react-accessibility
+    entries:
+    - id: rb-reduced-config
+      name: MotionConfig
+      summary: '`<MotionConfig reducedMotion="user|always|never">` sets a site-wide reduced-motion policy; also default transition and CSP nonce'
+      lenses: [ux-a11y, best-practice]
+      signature: <MotionConfig reducedMotion transition nonce>
+      options:
+      - {name: "reducedMotion", type: "user|always|never", default: "never", desc: "user follows the device setting; always forces it (debugging)"}
+      - {name: "transition", type: "Transition", default: null, desc: "fallback transition for all child motion components"}
+      - {name: "nonce", type: "string", default: null, desc: "CSP nonce applied to style blocks Motion generates"}
+      - {name: "isValidProp", type: "(key: string) => boolean", default: null, desc: "since 13, prop filter for styled motion components"}
+      notes:
+      - '"user" drops transform and layout animation; opacity, filter, backgroundColor still animate'
+      - 'it is a client component, mount it inside a "use client" provider in Next'
+      ref: motion:/docs/react-motion-config
+    - id: rb-use-reduced-motion
+      name: useReducedMotion
+      summary: '`useReducedMotion()` returns true when the device prefers reduced motion, for bespoke fallbacks'
+      lenses: [ux-a11y]
+      signature: useReducedMotion()
+      returns: boolean, null during server render; branch x/y and parallax to opacity or off
+      notes:
+      - 'docs: live-reactive; 12.43.0 source is `useState(prefersReducedMotion.current)`, so it holds the mount-time value only'
+      - 'dev builds warn "Reduced Motion enabled" once when it is on'
+      ref: motion:/docs/react-use-reduced-motion
+skipped:
+- {page: 'https://www.reactbits.dev', why: 'Marketing landing page of the catalog, no installable or codable content'}
+- {page: 'https://www.reactbits.dev/pro', why: 'React Bits Pro catalogue previews; paid and licence-gated (see rb-pro)'}
+- {page: 'https://www.reactbits.dev/pro-manifest.json', why: 'Machine-readable manifest of the paid Pro catalogue; paid and licence-gated (see rb-pro)'}
+- {page: 'motion:/docs/react-courses', why: 'Directory of third-party courses and community links, no API'}
+- {page: 'motion:/docs/react-motion-plus-installation', why: 'Motion+ (paid) private-registry install steps and token handling; not part of the free motion package'}
+- {page: 'motion:/docs/react-use-curtains', why: 'Motion+ (paid): useCurtains is exported from motion-plus, not the free motion package'}
+- {page: 'motion:/docs/react-animate-activity', why: 'Motion+ early access (paid): AnimateActivity is exported from motion-plus'}
+- {page: 'motion:/docs/react-animate-number', why: 'Motion+ (paid): AnimateNumber is exported from motion-plus'}
+- {page: 'motion:/docs/react-carousel', why: 'Motion+ (paid): Carousel is exported from motion-plus'}
+- {page: 'motion:/docs/react-scramble-text', why: 'Motion+ (paid): ScrambleText is exported from motion-plus'}
+- {page: 'motion:/docs/react-ticker', why: 'Motion+ (paid): Ticker is exported from motion-plus'}
+- {page: 'motion:/docs/react-typewriter', why: 'Motion+ (paid): Typewriter is exported from motion-plus'}

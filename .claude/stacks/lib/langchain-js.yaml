@@ -1,0 +1,894 @@
+stack: langchain-js
+version: "1.12.1"
+docs_base: https://docs.langchain.com
+docs_bases:
+  react-sdk: https://github.com/langchain-ai/langgraphjs/blob/main/libs/sdk-react/docs
+  sdk: https://github.com/langchain-ai/langgraphjs/blob/main/libs/sdk/docs
+source: https://docs.langchain.com/_llms/agent-development-lifecycle/build/type-script.md
+fetched: 2026-10-05
+verified: 2026-10-05
+toc:
+- index: 'https://docs.langchain.com/_llms/agent-development-lifecycle/build/type-script.md'
+  match: '^https://docs\.langchain\.com/oss/javascript/(langchain/frontend/|langgraph/)'
+  exclude: '/oss/javascript/langgraph/(overview|install|quickstart|choosing-apis|thinking-in-langgraph|workflows-agents|agentic-rag|graph-api|use-graph-api|functional-api|use-functional-api|pregel|application-structure|test|fault-tolerance|add-memory)(\.md)?$'
+  why: in-process JS graph authoring (StateGraph, Functional API, Pregel, node retries and timeouts, memory trimming, graph tests, langgraph.json); these packages are only the browser client of a Python Agent Server and the server-side concepts live in the langgraph stack
+- index: 'https://api.github.com/repos/langchain-ai/langgraphjs/git/trees/main?recursive=1'
+  match: '/blob/main/libs/(sdk|sdk-react)/docs/.*\.md$'
+  base: 'https://github.com/langchain-ai/langgraphjs/blob/main'
+groups:
+- title: AI tooling
+  sections:
+  - id: ai-tooling
+    title: Docs access for coding agents
+    level: basic
+    requires: []
+    ref: /use-these-docs.md
+    entries:
+    - id: mcp-docs-langchain
+      name: docs-langchain MCP
+      summary: https://docs.langchain.com/mcp (search_docs_by_lang_chain, query_docs_filesystem); covers /oss/javascript pages
+      lenses: [best-practice]
+      notes: ["guides and how-tos; pair with reference-langchain"]
+      ref: /use-these-docs.md
+    - id: mcp-reference-langchain
+      name: reference-langchain MCP
+      summary: https://reference.langchain.com/mcp (search_api, get_symbol) for JS class/function signatures
+      lenses: [typing-dx]
+      notes: ['JS reference lags the SDK: no threads.stream or streamProtocol yet; read the sdk and sdk-react guides in the langgraphjs repo']
+      ref: /use-these-docs.md
+    - id: skills-langchain-js
+      name: LangChain agent skills (TypeScript)
+      summary: langchain-ai/langchain-skills ships langchain/langgraph/deepagents TypeScript quickstart skills
+      lenses: [best-practice]
+      notes: ["backend-side (createAgent) guidance only; no frontend useStream skill"]
+      ref: https://github.com/langchain-ai/langchain-skills
+    - id: llms-txt
+      name: llms.txt
+      summary: https://docs.langchain.com/llms.txt index; every docs page also serves raw markdown by appending .md
+      lenses: [reuse]
+      ref: /use-these-docs.md
+    - id: sdk-guides-in-repo
+      name: Upstream SDK guides (langgraphjs repo)
+      summary: libs/sdk/docs and libs/sdk-react/docs in langchain-ai/langgraphjs are the version-matched guides for the v1 hooks
+      lenses: [best-practice, typing-dx]
+      notes: ["main matched sdk 1.12.1 and react 1.2.1 on 2026-10-05; read from a gh clone"]
+      ref: https://github.com/langchain-ai/langgraphjs/tree/main/libs
+- title: React streaming hook (@langchain/react)
+  sections:
+  - id: use-stream-core
+    title: useStream root hook
+    level: basic
+    requires: [ai-tooling]
+    ref: react-sdk:/use-stream.md
+    entries:
+    - id: use-stream
+      name: useStream
+      summary: Mount once per thread; owns transport, thread lifecycle and always-on values/messages/toolCalls/interrupts projections
+      lenses: [best-practice, composability]
+      import: '@langchain/react'
+      signature: useStream<T, InterruptType, ConfigurableType>(options)
+      returns: UseStreamReturn with messages (BaseMessage[]), values, toolCalls, interrupt(s), isLoading, error, submit, stop, respond
+      notes: ["v2 protocol only; legacy aliases are no longer re-exported and live in @langchain/langgraph-sdk/ui"]
+      ref: react-sdk:/use-stream.md
+    - id: use-stream-options
+      name: useStream common options
+      summary: assistantId, threadId, initialValues, messagesKey, onThreadId, onCreated, onCompleted, tools, onTool, optimistic
+      lenses: [typing-dx, ux-a11y]
+      options:
+      - {name: "assistantId", type: "string", default: null, desc: "Graph or assistant id; required on the Agent Server branch (defaults to \"_\" on custom adapters)"}
+      - {name: "threadId", type: "string | null", default: null, desc: "Bind to an existing thread; null starts a new one on next submit; changing it re-hydrates"}
+      - {name: "onThreadId", type: "(id) => void", default: null, desc: "Fires when the server mints a new thread id; persist it for rejoin"}
+      - {name: "onCompleted", type: "(info) => void", default: null, desc: "Run end with reason success, error, interrupt or stopped"}
+      - {name: "optimistic", type: "boolean", default: "true", desc: "Echo submit() input into messages immediately and reconcile by id"}
+      ref: react-sdk:/use-stream.md#common-options
+    - id: use-stream-server-options
+      name: Agent Server branch options
+      summary: apiUrl or client, apiKey, defaultHeaders, callerOptions, transport sse|websocket, fetch, webSocketFactory
+      lenses: [security, reliability]
+      options:
+      - {name: "apiUrl", type: "string", default: null, desc: "Base URL of the LangGraph-compatible server; the SDK Client needs an absolute URL"}
+      - {name: "client", type: "Client", default: null, desc: "Pre-built SDK Client, alternative to apiUrl"}
+      - {name: "fetch", type: "typeof fetch", default: null, desc: "fetch override for SSE; the way to add auth headers or route through a proxy"}
+      - {name: "transport", type: "\"sse\" | \"websocket\" | AgentServerAdapter", default: "\"sse\"", desc: "Wire transport; a string selects the Agent Server branch, an adapter the custom branch"}
+      notes: ["passing apiUrl/apiKey/fetch with a custom adapter is a compile error (discriminated union)"]
+      ref: react-sdk:/use-stream.md#agent-server-branch-agentserveroptions
+    - id: use-stream-reconnect
+      name: Reconnect and idle options
+      summary: maxReconnectAttempts, reconnectDelayMs, streamIdleReconnect, onReconnect, onConnected on the built-in transports
+      lenses: [reliability, observability]
+      options:
+      - {name: "maxReconnectAttempts", type: "number", default: "5", desc: "Reconnect tries after an unexpected disconnect; 0 disables"}
+      - {name: "reconnectDelayMs", type: "(attempt) => number", default: "exp backoff 1s..5s + jitter", desc: "Delay before each reconnect attempt"}
+      - {name: "streamIdleReconnect", type: "\"auto\" | number", default: "\"auto\"", desc: "Re-open a half-open SSE after idle; auto arms once server heartbeats are seen; 0 disables"}
+      - {name: "onReconnect", type: "(info: {attempt, cause, delayMs}) => void", default: null, desc: "Called before each reconnect attempt"}
+      - {name: "onConnected", type: "(info: {kind, attempt}) => void", default: null, desc: "Called after the initial and every reconnected connection (kind initial|reconnected)"}
+      notes: ["present in sdk 1.12.1 types (stream/types.ts) but absent from the sdk-react guide; custom adapters reject them"]
+      ref: https://github.com/langchain-ai/langgraphjs/blob/main/libs/sdk/src/stream/types.ts
+    - id: use-stream-return
+      name: useStream return shape
+      summary: values, messages, toolCalls, interrupt(s), isLoading, isThreadLoading, error, threadId, subagents, subgraphs, client, getThread
+      lenses: [typing-dx]
+      notes: ["error is the latest transport or hydrate error; getThread() exposes the low-level ThreadStream"]
+      ref: react-sdk:/use-stream.md#return-values
+    - id: stream-submit
+      name: submit
+      summary: stream.submit(input, options) dispatches a run on the bound thread; input is Partial state, messages widen to class instances
+      lenses: [best-practice, reliability]
+      signature: stream.submit(input, options?)
+      options:
+      - {name: "config", type: "{configurable, tags, recursion_limit}", default: null, desc: "Run config forwarded to the server"}
+      - {name: "multitaskStrategy", type: "\"rollback\" | \"interrupt\" | \"reject\" | \"enqueue\"", default: "\"rollback\"", desc: "What to do when a run is active; \"interrupt\" currently behaves as rollback client-side"}
+      - {name: "forkFrom", type: "string", default: null, desc: "Checkpoint id to fork the run from (edit and retry flows)"}
+      - {name: "threadId", type: "string | null", default: null, desc: "Per-submit thread override; rebinds the hook, used for New chat without remount"}
+      - {name: "onError", type: "(error) => void", default: null, desc: "Per-submit error callback; stream.error is still set"}
+      - {name: "durability", type: "\"async\" | \"sync\" | \"exit\"", default: null, desc: "Checkpoint policy for the run"}
+      notes: ["v1 StreamSubmitOptions has no command option; resume interrupts with respond()"]
+      ref: react-sdk:/use-stream.md#submit-options
+    - id: stream-stop
+      name: stop and disconnect
+      summary: stop() cancels the run server-side and disconnects; disconnect() or stop({cancel:false}) only leaves the stream
+      lenses: [reliability, ux-a11y]
+      signature: 'stream.stop(options?: {cancel?: boolean})'
+      notes: ["stop() issues client.runs.cancel so a path-allowlisting proxy must permit the cancel route; safe no-op when idle"]
+      ref: react-sdk:/use-stream.md#stop
+    - id: stream-respond
+      name: respond and respondAll
+      summary: Resume one interrupt (or all pending at one checkpoint) with a payload; replaces submit(null, {command})
+      lenses: [best-practice, reliability]
+      signature: stream.respond(response, options?)
+      options:
+      - {name: "interruptId", type: "string", default: null, desc: "Target interrupt; omitted resumes the newest unresolved one (may be a subgraph interrupt)"}
+      - {name: "namespace", type: "string[]", default: null, desc: "Override the namespace resolved from getThread().interrupts"}
+      - {name: "update", type: "Record | [key, value][]", default: null, desc: "State update applied in the same superstep as the resume (Command(resume, update))"}
+      - {name: "goto", type: "string | {node, input} | array", default: null, desc: "Directed jump applied with the resume"}
+      - {name: "config", type: "object", default: null, desc: "Run config and metadata folded into the resumed run"}
+      notes: ["use respondAll for parallel interrupts; sequential respond fails because the first resume starts a run"]
+      ref: react-sdk:/use-stream.md#respondresponse-options
+    - id: hydration-promise
+      name: hydrationPromise
+      summary: Promise that settles when the active thread's initial hydrate resolves; reinstalled on every threadId change
+      lenses: [ux-a11y]
+      ref: react-sdk:/use-stream.md#hydrationpromise
+  - id: use-stream-typing
+    title: Typing, sharing and suspense
+    level: intermediate
+    requires: [use-stream-core]
+    ref: react-sdk:/type-safety.md
+    entries:
+    - id: agent-brand-inference
+      name: Agent-brand type inference
+      summary: useStream<typeof agent>() infers state, tool-call union and subagent state maps from a compiled agent type
+      lenses: [typing-dx]
+      notes: ["plain state generics also work; slots 2 and 3 are InterruptType and ConfigurableType; a Python backend needs a hand-written state interface"]
+      ref: react-sdk:/type-safety.md
+    - id: any-stream-type
+      name: AnyStream and UseStreamReturn types
+      summary: AnyStream is a type-erased handle for children that only forward the stream into selector hooks
+      lenses: [typing-dx, composability]
+      import: '@langchain/react'
+      ref: react-sdk:/type-safety.md#prop-drilling-the-stream
+    - id: stream-provider
+      name: StreamProvider and useStreamContext
+      summary: Share one useStream instance across a subtree via context instead of prop drilling
+      lenses: [composability, reuse]
+      import: '@langchain/react'
+      signature: <StreamProvider {...useStreamOptions}>
+      ref: react-sdk:/context.md
+    - id: use-suspense-stream
+      name: useSuspenseStream
+      summary: Same handle but hydration suspends and non-streaming errors throw to Error Boundaries; adds isStreaming
+      lenses: [ux-a11y, composability]
+      import: '@langchain/react'
+      notes: ["removes isLoading, isThreadLoading and hydrationPromise; a threadId change re-suspends"]
+      ref: react-sdk:/suspense.md
+  - id: use-stream-transport
+    title: Transports and adapters
+    level: advanced
+    requires: [use-stream-core]
+    ref: react-sdk:/transports.md
+    entries:
+    - id: transport-sse-ws
+      name: SSE vs WebSocket transport
+      summary: SSE is the default; WebSocket is opt-in and cannot attach custom headers in browsers
+      lenses: [security, reliability]
+      notes: ["for header auth use sse plus a fetch override, never websocket"]
+      ref: react-sdk:/transports.md#header-based-auth
+    - id: http-agent-server-adapter
+      name: HttpAgentServerAdapter
+      summary: v2 transport semantics against a custom HTTP/SSE backend with configurable commands and stream paths
+      lenses: [composability]
+      import: '@langchain/react'
+      signature: new HttpAgentServerAdapter({apiUrl, threadId?, paths, defaultHeaders, fetch})
+      ref: react-sdk:/transports.md#httpagentserveradapter
+    - id: custom-agent-server-adapter
+      name: Custom AgentServerAdapter
+      summary: Implement open/send/events/close to bridge any backend or an in-memory test transport into useStream
+      lenses: [testing, composability]
+      notes: ["the Client is not constructed with a custom adapter, so the built-in SSE/WS stack tree-shakes away"]
+      ref: react-sdk:/custom-transport.md
+    - id: server-queue
+      name: Server-backed enqueue
+      summary: queue "server" backs multitaskStrategy enqueue with durable server runs instead of the client-only queue
+      lenses: [reliability]
+      options:
+      - {name: "queue", type: "\"local\" | \"server\"", default: "\"local\"", desc: "server needs POST/GET /threads/{id}/runs and the run cancel route on the backend"}
+      ref: https://github.com/langchain-ai/langgraphjs/blob/main/libs/sdk/src/stream/types.ts
+  - id: use-stream-interrupts
+    title: Interrupts and headless tools in React
+    level: intermediate
+    requires: [use-stream-core]
+    ref: react-sdk:/interrupts.md
+    entries:
+    - id: interrupt-namespace-targeting
+      name: Interrupt targeting and namespaces
+      summary: stream.interrupts holds root interrupts only; getThread().interrupts holds all (interruptId, payload, namespace) including subgraph ones
+      lenses: [reliability, best-practice]
+      notes: ["respond() with no target resumes the newest unresolved entry of getThread().interrupts, which may not be stream.interrupt; pass interruptId when several are pending", "the namespace is resolved from the thread stream by interruptId; forward it verbatim because the server validates it"]
+      ref: react-sdk:/interrupts.md#multiple-pending-interrupts
+    - id: respond-atomic-update
+      name: Atomic resume with state update
+      summary: respond(response, {update, goto}) maps to Command(resume, update, goto) in one superstep, so one checkpoint and no flicker
+      lenses: [ux-a11y, reliability]
+      signature: stream.respond(response, {interruptId?, namespace?, update?, goto?, config?, metadata?})
+      notes: ["canonical use: push the interrupt card (an AIMessage) into state while answering so it persists without the backend re-emitting it", "update messages may be plain dicts or @langchain/core BaseMessage instances; config and metadata are folded into the resumed run like submit()"]
+      ref: react-sdk:/interrupts.md#changing-state-while-resuming
+    - id: headless-tool-helpers
+      name: Headless tool registration and helpers
+      summary: tools plus onTool auto-resume matching tool interrupts with the handler result; onTool events are start, success, error
+      lenses: [composability, testing]
+      notes: ["dedupes the same interrupt seen twice (StrictMode)", "lower-level exports: flushPendingHeadlessToolInterrupts, findHeadlessTool, handleHeadlessToolInterrupt for custom routers and tests"]
+      ref: react-sdk:/interrupts.md#headless-tools
+  - id: use-stream-migration
+    title: Migrating from the pre-v1 hook
+    level: advanced
+    requires: [use-stream-core]
+    ref: react-sdk:/v1-migration.md
+    entries:
+    - id: react-v1-migration
+      name: v1 migration map
+      summary: Same useStream import but new option bag, return shape and protocol; legacy callbacks and history/branch/queue helpers are gone
+      lenses: [best-practice, typing-dx]
+      notes: ["removed callbacks (onUpdateEvent, onCustomEvent, onFinish, onStop...) become selector hooks, useChannelEffect for per-event side effects, onCompleted ({runId, reason}) or stream.stop()/disconnect()", "branch/history flows use useMessageMetadata plus submit({}, {forkFrom}); stream.queue becomes useSubmissionQueue; switchThread becomes a new threadId prop", "FetchStreamTransport is replaced by HttpAgentServerAdapter; multitaskStrategy interrupt currently behaves as rollback"]
+      ref: react-sdk:/v1-migration.md#2-tldr-migration-checklist
+
+- title: Selector hooks
+  sections:
+  - id: selector-hooks
+    title: Companion selector hooks
+    level: intermediate
+    requires: [use-stream-core]
+    ref: react-sdk:/selectors.md
+    entries:
+    - id: selector-targeting
+      name: Selector targeting and ref counting
+      summary: Hooks take a target (root, subagent, subgraph or {namespace}); each (channel, namespace) subscription is ref-counted
+      lenses: [perf, composability]
+      notes: ["root calls are free reads; scoped calls open a subscription on mount and close on last unmount"]
+      ref: react-sdk:/selectors.md#how-targeting-works
+    - id: use-messages
+      name: useMessages
+      summary: Message stream for root or a subagent/subgraph target, as BaseMessage class instances
+      lenses: [perf, composability]
+      import: '@langchain/react'
+      signature: useMessages(stream, target?)
+      returns: BaseMessage[]
+      ref: react-sdk:/selectors.md#full-hook-list
+    - id: use-tool-calls
+      name: useToolCalls
+      summary: Assembled tool calls with per-call status running|finished|error, scoped like useMessages
+      lenses: [ux-a11y]
+      import: '@langchain/react'
+      signature: useToolCalls(stream, target?)
+      returns: AssembledToolCall[] (name, callId, input, output, status, error, namespace)
+      ref: react-sdk:/selectors.md#full-hook-list
+    - id: use-values
+      name: useValues
+      summary: Arbitrary state or a scoped snapshot, typed by agent brand or an explicit generic
+      lenses: [typing-dx]
+      import: '@langchain/react'
+      signature: useValues<T>(stream, target?)
+      ref: react-sdk:/selectors.md#full-hook-list
+    - id: use-message-metadata
+      name: useMessageMetadata
+      summary: Returns {parentCheckpointId} for a message id; powers edit and regenerate forks via submit({forkFrom})
+      lenses: [ux-a11y]
+      import: '@langchain/react'
+      signature: useMessageMetadata(stream, messageId)
+      returns: '{ parentCheckpointId } or undefined while loading'
+      ref: react-sdk:/fork-from-checkpoint.md
+    - id: use-submission-queue
+      name: useSubmissionQueue
+      summary: Reactive client-side queue for multitaskStrategy enqueue with cancel(id) and clear()
+      lenses: [ux-a11y]
+      import: '@langchain/react'
+      returns: '{ entries, size, cancel, clear }'
+      notes: ["a threadId switch clears the queue; clear() does not stop the active run"]
+      ref: react-sdk:/submission-queue.md
+    - id: use-extension
+      name: useExtension
+      summary: Latest payload of a named custom:<name> server extension channel (progress, score, status)
+      lenses: [composability]
+      import: '@langchain/react'
+      signature: useExtension<T>(stream, name, target?)
+      ref: react-sdk:/selectors.md#useextension
+    - id: use-channel
+      name: useChannel
+      summary: Raw buffered protocol events for chosen channels; an event log, not current value
+      lenses: [observability]
+      import: '@langchain/react'
+      signature: useChannel(stream, channels, target?, options?)
+      ref: react-sdk:/selectors.md#usechannel
+    - id: use-channel-effect
+      name: useChannelEffect
+      summary: Per-event side effect (analytics, logging) with no re-render; replaces onLangChainEvent and onCustomEvent
+      lenses: [observability, perf]
+      import: '@langchain/react'
+      signature: useChannelEffect(stream, channels, {onEvent, onError?, replay?, enabled?})
+      notes: ["replay defaults false (live only), opposite of useChannel; handlers are read from a ref"]
+      ref: react-sdk:/selectors.md#usechanneleffect
+    - id: subagent-subgraph-discovery
+      name: Subagent and subgraph discovery
+      summary: stream.subagents/subgraphs are cheap identity maps; pass a snapshot to a selector hook to stream its content lazily
+      lenses: [perf, ux-a11y]
+      notes: ["subagent discovery is deepagents-oriented (the task tool); snapshots carry id, name, namespace, status"]
+      ref: react-sdk:/subagents.md
+    - id: media-hooks
+      name: Media hooks and players
+      summary: useAudio, useImages, useVideo, useFiles assemble multimodal blocks; useMediaURL and players render them
+      lenses: [ux-a11y]
+      import: '@langchain/react'
+      ref: react-sdk:/multimodal.md
+- title: Frontend patterns
+  sections:
+  - id: fe-render
+    title: Render messages and output
+    level: basic
+    requires: [use-stream-core]
+    ref: /oss/javascript/langchain/frontend/overview.md
+    entries:
+    - id: fe-overview
+      name: Frontend architecture and pattern map
+      summary: createAgent streams state to useStream (React, Vue, Svelte; Angular uses injectStream); pick the pattern by UX need
+      lenses: [best-practice]
+      notes: ["the same protocol serves any UI library; durable threads, interrupts, checkpoints and nested execution are the differentiators"]
+      ref: /oss/javascript/langchain/frontend/overview.md
+    - id: fe-markdown
+      name: Markdown messages
+      summary: Render streamed LLM markdown with a parser; sanitize output and enable GFM and breaks
+      lenses: [security, ux-a11y]
+      notes: ["always run parsed HTML through dompurify when injecting HTML; handle empty content; compact chat styling"]
+      ref: /oss/javascript/langchain/frontend/markdown-messages.md#best-practices
+    - id: fe-reasoning
+      name: Reasoning tokens
+      summary: Read reasoning from AIMessage contentBlocks (type reasoning) and show it collapsed, visually distinct
+      lenses: [ux-a11y]
+      notes: ["handle messages without reasoning, empty reasoning and multiple reasoning-text cycles; use aria-expanded on the toggle"]
+      ref: /oss/javascript/langchain/frontend/reasoning-tokens.md#best-practices
+    - id: fe-structured-output
+      name: Structured output rendering
+      summary: Render typed agent responses as components; validate required fields because streaming delivers partial objects
+      lenses: [typing-dx, ux-a11y]
+      notes: ["keep schemas flat, render progressively, keep a plain-text fallback field"]
+      ref: /oss/javascript/langchain/frontend/structured-output.md#best-practices
+  - id: fe-actions
+    title: Display agent actions
+    level: intermediate
+    requires: [fe-render]
+    ref: /oss/javascript/langchain/frontend/tool-calling.md
+    entries:
+    - id: fe-tool-calling
+      name: Tool-call cards
+      summary: Render stream.toolCalls (AssembledToolCall) per message as cards that handle running, finished and error
+      lenses: [ux-a11y, typing-dx]
+      notes: ["output is unknown until narrowed per tool; always provide a generic JSON fallback card; show name and args while running"]
+      ref: /oss/javascript/langchain/frontend/tool-calling.md#best-practices
+    - id: fe-headless-tools
+      name: Headless tools
+      summary: Schema-only tool on the agent, .implement(fn) in the browser, passed via useStream tools; interrupts auto-resume
+      lenses: [security, composability]
+      notes: ["share definitions, keep browser-only impl in a client module, return JSON-serializable results, review sensitive ones with HITL"]
+      ref: /oss/javascript/langchain/frontend/headless-tools.md
+    - id: fe-hitl
+      name: Human-in-the-loop approval UI
+      summary: stream.interrupt carries an HITLRequest; resume with approve, reject, edit or respond decisions
+      lenses: [security, reliability, ux-a11y]
+      notes: ["the docs page still shows submit(null, {command: {resume}}); use stream.respond() (v1) and respond(decision, {update}) to keep the card on screen"]
+      ref: /oss/javascript/langchain/frontend/human-in-the-loop.md
+    - id: fe-hitl-decisions
+      name: HITL decision payloads
+      summary: HITLResponse is {decisions:[{type:approve|reject|edit|respond, message?, editedAction?}]} aligned to actionRequests
+      lenses: [typing-dx]
+      notes: ["reject without message uses a default telling the model not to retry; respond returns the human text as the tool result"]
+      ref: /oss/javascript/langchain/frontend/human-in-the-loop.md#decision-types
+  - id: fe-conversation
+    title: Manage conversations and streams
+    level: intermediate
+    requires: [fe-actions]
+    ref: /oss/javascript/langchain/frontend/branching-chat.md
+    entries:
+    - id: fe-branching
+      name: Branching chat (edit and regenerate)
+      summary: Fork from a message's parentCheckpointId with submit({forkFrom}); refresh history only when rendering a timeline
+      lenses: [ux-a11y]
+      notes: ["disable edit and regenerate while stream.isLoading; preserve edit text on cancel"]
+      ref: /oss/javascript/langchain/frontend/branching-chat.md#best-practices
+    - id: fe-message-queues
+      name: Message queues
+      summary: submit with multitaskStrategy enqueue plus useSubmissionQueue to queue follow-ups while a run is active
+      lenses: [ux-a11y]
+      notes: ["show queue position, keep input focus, surface a failed entry without blocking the rest"]
+      ref: /oss/javascript/langchain/frontend/message-queues.md#best-practices
+    - id: fe-join-rejoin
+      name: Join and rejoin streams
+      summary: Persist threadId, call disconnect() when leaving, and re-bind to the same thread to re-attach to the running run
+      lenses: [reliability]
+      notes: ["use disconnect() to leave and stop() to cancel; fall back to thread history if rejoin is slow; clear stale thread ids"]
+      ref: /oss/javascript/langchain/frontend/join-rejoin.md#best-practices
+    - id: fe-time-travel
+      name: Time travel
+      summary: Read checkpoint history with client.threads.getHistory, inspect state, resume from an older checkpoint
+      lenses: [observability, ux-a11y]
+      notes: ["load history lazily; resume replaces the current path so confirm first; docs pass forkFrom as {checkpointId} but v1 submit takes a string id"]
+      ref: /oss/javascript/langchain/frontend/time-travel.md#best-practices
+  - id: fe-generative-ui
+    title: Generative UI
+    level: advanced
+    requires: [fe-actions]
+    ref: /oss/javascript/langchain/frontend/generative-ui-overview.md
+    entries:
+    - id: genui-spectrum
+      name: Generative UI spectrum
+      summary: Controlled (you author components), declarative (agent emits a UI spec), open-ended (UI created externally)
+      lenses: [best-practice, security]
+      notes: ["more agent autonomy buys expressive range and costs predictability"]
+      ref: /oss/javascript/langchain/frontend/generative-ui-overview.md
+    - id: genui-controlled
+      name: Controlled generative UI
+      summary: Components as tools, tool-call rendering, state rendering and reasoning; agent only picks from components you ship
+      lenses: [security, ux-a11y]
+      ref: /oss/javascript/langchain/frontend/controlled-generative-ui.md
+    - id: genui-declarative
+      name: Declarative generative UI
+      summary: Compose agent-generated interfaces from a registered component catalog using json-render
+      lenses: [composability, security]
+      ref: /oss/javascript/langchain/frontend/declarative-generative-ui.md
+    - id: genui-open-ended
+      name: Open-ended generative UI
+      summary: Render UI created outside the app, such as sandboxed MCP Apps
+      lenses: [security]
+      ref: /oss/javascript/langchain/frontend/open-ended-generative-ui.md
+  - id: fe-deep-agents
+    title: Deep agent and custom-state patterns
+    level: advanced
+    requires: [selector-hooks]
+    ref: /oss/javascript/deepagents/frontend/overview.md
+    entries:
+    - id: fe-subagent-streaming
+      name: Subagent streaming cards
+      summary: Render each subagent as a card using stream.subagents plus scoped useMessages and useToolCalls
+      lenses: [ux-a11y, perf]
+      ref: /oss/javascript/deepagents/frontend/subagent-streaming.md
+    - id: fe-todo-list
+      name: Todo list from agent state
+      summary: Bind a live todo list to the deep agent's typed state values
+      lenses: [ux-a11y]
+      ref: /oss/javascript/deepagents/frontend/todo-list.md
+    - id: fe-custom-stream-channels
+      name: Custom stream channels
+      summary: Server StreamTransformer/StreamChannel projections read on the client with useExtension (latest) and useChannel (log)
+      lenses: [composability, observability]
+      ref: /oss/javascript/langgraph/frontend/custom-stream-channels.md
+    - id: fe-graph-execution
+      name: Graph execution view
+      summary: Visualize multi-step graph pipelines with per-node status from stream.subgraphs and scoped useMessages
+      lenses: [observability]
+      ref: /oss/javascript/langgraph/frontend/graph-execution.md
+    - id: fe-graph-overview
+      name: LangGraph frontend architecture
+      summary: Map graph nodes to cards, state keys to UI regions, interrupts to input via stream.subgraphs and node-scoped useMessages
+      lenses: [observability, ux-a11y]
+      notes: ["the same stream API works for createAgent, createDeepAgent and a custom StateGraph"]
+      ref: /oss/javascript/langgraph/frontend/overview.md
+  - id: fe-integrations
+    title: UI library integrations
+    level: intermediate
+    requires: [use-stream-core]
+    ref: /oss/javascript/langchain/frontend/integrations/overview.md
+    entries:
+    - id: int-assistant-ui
+      name: assistant-ui integration
+      summary: Bridge useStream into assistant-ui with useExternalStoreRuntime and convert BaseMessage to ThreadMessageLike
+      lenses: [reuse, composability]
+      notes: ["docs show the manual external-store bridge; @assistant-ui/react-langchain useStreamRuntime wraps the same hook, see the assistant-ui stack"]
+      ref: /oss/javascript/langchain/frontend/integrations/assistant-ui.md
+    - id: int-ai-elements
+      name: AI Elements integration
+      summary: Composable shadcn/ui chat components (Conversation, Message, Tool, Reasoning) driven by useStream
+      lenses: [reuse]
+      ref: /oss/javascript/langchain/frontend/integrations/ai-elements.md
+    - id: int-copilotkit
+      name: CopilotKit integration
+      summary: CopilotKit with LangGraph and Deep Agents over custom endpoints or the Python AG-UI bridge
+      lenses: [composability]
+      ref: /oss/javascript/langchain/frontend/integrations/copilotkit.md
+    - id: int-openui
+      name: OpenUI integration
+      summary: Generate interactive dashboards and reports with OpenUI components and openui-lang
+      lenses: [composability]
+      ref: /oss/javascript/langchain/frontend/integrations/openui.md
+    - id: agent-chat-ui
+      name: Agent Chat UI
+      summary: Open-source Next.js chat app (hosted or npx create-agent-chat-app) that connects to an agent by graph id and deployment URL
+      lenses: [reuse, testing]
+      notes: ["useful as a reference client or smoke test against a local Agent Server (http://localhost:2024); renders tool calls and interrupts out of the box"]
+      ref: /oss/javascript/langgraph/ui.md
+
+- title: LangGraph SDK client (@langchain/langgraph-sdk)
+  sections:
+  - id: sdk-client
+    title: Client and configuration
+    level: basic
+    requires: [ai-tooling]
+    ref: sdk:/getting-started.md
+    entries:
+    - id: sdk-client-ctor
+      name: Client
+      summary: Entry point to assistants, threads, runs, crons and store sub-clients of a LangGraph API server
+      lenses: [best-practice, composability]
+      import: '@langchain/langgraph-sdk'
+      signature: new Client<State, Update, CustomEvent>(config?)
+      notes: ["with no args it targets http://localhost:8123 and reads an API key from env; apiUrl must be absolute in a browser"]
+      ref: mcp:reference-langchain/javascript/langchain-langgraph-sdk/client/Client
+    - id: sdk-client-config
+      name: ClientConfig
+      summary: apiUrl, apiKey, timeoutMs, defaultHeaders, onRequest hook, callerOptions (retries, concurrency) and streamProtocol
+      lenses: [reliability, security]
+      options:
+      - {name: apiKey, type: "string | null", default: "env LANGGRAPH_API_KEY, LANGSMITH_API_KEY, LANGCHAIN_API_KEY", desc: "undefined auto-loads from env (a browser bundle must not); null sends no x-api-key header"}
+      - {name: timeoutMs, type: number, default: null, desc: Per-request timeout for unary REST calls; streaming requests are exempt}
+      - {name: callerOptions, type: AsyncCallerParams, default: "{ maxRetries: 4, maxConcurrency: 4 }", desc: Retry and concurrency for REST calls; also accepts a fetch implementation and onFailedResponseHook}
+      - {name: onRequest, type: "(url, init) => RequestInit", default: null, desc: Last-mile hook for signing or auth rotation; applies to REST and SSE reconnects (not WebSocket handshake)}
+      - {name: streamProtocol, type: "\"legacy\" | \"v2\" | \"v2-websocket\"", default: "\"legacy\"", desc: Default transport for threads.stream only; the per-call transport option wins}
+      ref: sdk:/configuration.md
+    - id: sdk-abort
+      name: Abort and custom fetch
+      summary: Every method takes signal (AbortSignal); callerOptions.fetch swaps REST fetch and threads.stream({fetch}) swaps streaming fetch
+      lenses: [reliability, testing]
+      notes: ["streaming is aborted via thread.close(); fetch overrides are the seam for test mocks and auth proxies"]
+      ref: sdk:/configuration.md#aborting-requests
+    - id: local-server-api-test
+      name: Calling a local Agent Server
+      summary: langgraph dev serves http://localhost:2024; a threadless client.runs.stream(null, assistantId, {...}) or POST /runs/stream tests it
+      lenses: [testing]
+      notes: ["the docs example uses the legacy runs.stream with streamMode messages-tuple; prefer threads.stream for new client code", "only pass apiUrl when the default port changed"]
+      ref: /oss/javascript/langgraph/local-server.md#7-test-the-api
+  - id: sdk-threads
+    title: Threads, state and history
+    level: basic
+    requires: [sdk-client]
+    ref: sdk:/threads.md
+    entries:
+    - id: threads-create
+      name: threads.create
+      summary: Create a thread with metadata, optional graphId, explicit threadId, ifExists policy and TTL
+      lenses: [best-practice]
+      signature: client.threads.create(payload?)
+      options:
+      - {name: metadata, type: "Record<string, unknown>", default: null, desc: Free-form tags filterable via search (graph_id by convention)}
+      - {name: ifExists, type: "\"raise\" | \"do_nothing\"", default: null, desc: Behavior when the supplied threadId already exists}
+      - {name: ttl, type: "number | {ttl, strategy}", default: null, desc: Expiry in seconds; a number means delete on expiry}
+      ref: sdk:/threads.md#createpayload
+    - id: threads-search
+      name: threads.search
+      summary: List threads by metadata, ids, status, sort, limit/offset and select to cut payload
+      lenses: [perf, best-practice]
+      signature: client.threads.search(query?)
+      options:
+      - {name: select, type: "ThreadSelectField[]", default: null, desc: "Limit returned fields; omit and every row includes full values (history)"}
+      - {name: status, type: "\"idle\" | \"busy\" | \"interrupted\" | \"error\"", default: null, desc: Filter by execution state}
+      - {name: sortBy, type: "\"created_at\" | \"updated_at\"", default: null, desc: Sort field (pair with sortOrder)}
+      - {name: extract, type: "Record<string, string>", default: null, desc: Server-side JSONPath projections returned per row}
+      notes: ["paging is limit/offset, not cursor-based"]
+      ref: sdk:/threads.md#searchquery
+    - id: threads-get-update
+      name: threads.get, update, delete
+      summary: Fetch a thread record (status, metadata; include limits fields), patch metadata or TTL, hard-delete with checkpoints
+      lenses: [best-practice]
+      signature: client.threads.get(threadId, {include?})
+      returns: Thread record whose status is idle, busy, interrupted or error
+      ref: sdk:/threads.md#getthreadid
+    - id: threads-state-history
+      name: Thread state and history
+      summary: getState (latest or checkpoint), updateState (new checkpoint, branch), patchState (metadata only), getHistory (checkpoints)
+      lenses: [observability, reliability]
+      signature: client.threads.getHistory(threadId, {limit, before, checkpoint, metadata})
+      notes: ["each history entry is a ThreadState with values, next, tasks, checkpoint and parent_checkpoint"]
+      ref: sdk:/threads.md#state-and-history
+    - id: threads-prune-copy
+      name: threads.prune, copy, count
+      summary: prune with strategy delete or keep_latest for retention; copy deep-clones history; count filters like search
+      lenses: [cost, reliability]
+      ref: sdk:/threads.md#prunethreadids-options
+  - id: sdk-runs
+    title: Assistants, runs, store, crons
+    level: intermediate
+    requires: [sdk-client]
+    ref: sdk:/runs.md
+    entries:
+    - id: runs-crud
+      name: runs create, wait, cancel, join
+      summary: Non-streaming run control; cancel(threadId, runId, wait?, action) stops with interrupt (default) or rollback
+      lenses: [reliability]
+      signature: client.runs.cancel(threadId, runId, wait?, action?)
+      notes: ["create/wait/list/get/cancel/join/delete are current; only the streaming generators are deprecated"]
+      ref: sdk:/runs.md#cancelthreadid-runid-wait-action
+    - id: runs-stream-legacy
+      name: runs.stream and joinStream (legacy)
+      summary: v1 streaming generators kept for compatibility; new features exist only on threads.stream
+      lenses: [best-practice]
+      deprecated: use client.threads.stream(...) (v2 ThreadStream) for new streaming code
+      ref: sdk:/runs.md#why-the-change
+    - id: assistants-client
+      name: assistants
+      summary: get, getGraph, getSchemas, getSubgraphs, search, create, update, versions for graph assistants
+      lenses: [reuse]
+      signature: client.assistants.search({graphId, metadata, limit, offset, select})
+      notes: ["each graph in langgraph.json auto-creates an assistant whose id equals the graph id"]
+      ref: sdk:/assistants.md
+    - id: store-client
+      name: store
+      summary: "Cross-thread KV store: putItem, getItem, deleteItem, searchItems (semantic query), listNamespaces"
+      lenses: [reuse]
+      signature: client.store.putItem(namespace, key, value, {index?, ttl?})
+      ref: sdk:/store.md
+    - id: crons-client
+      name: crons
+      summary: Schedule recurring runs with cron expression, timezone, input, webhook, multitaskStrategy and endTime
+      lenses: [cost]
+      signature: client.crons.create(assistantId, payload)
+      ref: sdk:/crons.md
+- title: Streaming (ThreadStream)
+  sections:
+  - id: thread-stream
+    title: client.threads.stream
+    level: intermediate
+    requires: [sdk-client]
+    ref: sdk:/streaming.md
+    entries:
+    - id: threads-stream
+      name: threads.stream
+      summary: "Recommended v2 streaming primitive: a ThreadStream with lazy typed projections, auto reconnect, dedup and replay"
+      lenses: [best-practice, perf]
+      import: '@langchain/langgraph-sdk'
+      signature: client.threads.stream(threadId?, {assistantId, transport?, fetch?, webSocketFactory?})
+      returns: ThreadStream; pass an existing threadId to re-attach to an in-flight run
+      notes: ["wire connection opens lazily on first command or projection access; always await thread.close()"]
+      ref: sdk:/streaming.md#opening-a-stream
+    - id: thread-run-start
+      name: thread.run.start
+      summary: Start a run (or resume an interrupted one) with input, config and metadata on the bound assistant
+      lenses: [best-practice]
+      signature: thread.run.start({input, config?, metadata?})
+      ref: sdk:/streaming.md#submitting-work
+    - id: thread-projections
+      name: Lazy projections
+      summary: messages, values, output, toolCalls, subgraphs, subagents, extensions.<name>, media; each opens a subscription on first access
+      lenses: [perf, composability]
+      notes: ["every for-await gets an independent cursor so late consumers replay history; unread projections cost no wire traffic"]
+      ref: sdk:/streaming.md#the-lazy-projection-pattern
+    - id: streaming-message
+      name: StreamingMessage
+      summary: Per-message handle with text and reasoning (iterate tokens or await full), usage, blocks, namespace and node
+      lenses: [ux-a11y]
+      ref: sdk:/streaming-messages.md
+    - id: thread-interrupts
+      name: Interrupts on ThreadStream
+      summary: thread.interrupted and thread.interrupts (interruptId, payload, namespace); resume with input.respond, push with input.inject
+      lenses: [reliability]
+      signature: thread.input.respond({namespace, interrupt_id, response})
+      notes: ["subscriptions pause at a terminal lifecycle state and auto-resume on respond; forward the interrupt namespace verbatim"]
+      ref: sdk:/streaming-interrupts.md
+    - id: thread-subgraphs-subagents
+      name: Subgraphs and subagents
+      summary: thread.subgraphs yields handles with cause metadata; thread.subagents (deepagents task tool) adds taskInput and output
+      lenses: [observability, ux-a11y]
+      ref: sdk:/streaming-subgraphs.md
+    - id: thread-subagents-handle
+      name: SubagentHandle
+      summary: thread.subagents yields handles (name, callId, namespace, taskInput, output) with scoped messages, toolCalls and subgraphs; deepagents only
+      lenses: [observability, ux-a11y]
+      signature: 'sub.subscribe(channels, {depth}) opens a raw subscription scoped to the subagent namespace'
+      ref: sdk:/streaming-subagents.md
+    - id: thread-extensions
+      name: Extensions (custom transformers)
+      summary: Server StreamTransformer projections arrive as thread.extensions.<name>, both AsyncIterable and PromiseLike
+      lenses: [composability, typing-dx]
+      notes: ["type end to end with InferExtensions from @langchain/langgraph as the threads.stream generic"]
+      ref: sdk:/streaming-extensions.md
+    - id: thread-media
+      name: Media blocks
+      summary: audio, images, video, files handles per (messageId, blockType) with url, bytes and revoke
+      lenses: [ux-a11y]
+      notes: ["thread.close() revokes minted object URLs as a safety net"]
+      ref: sdk:/streaming-media.md
+    - id: thread-raw-subscribe
+      name: Raw subscriptions
+      summary: subscribe(), onEvent() and channel filters for protocol events no projection covers
+      lenses: [observability]
+      ref: sdk:/streaming-advanced.md
+    - id: thread-transports
+      name: ThreadStream transports
+      summary: sse default, websocket, or a custom AgentServerAdapter; fetch override applies to SSE only
+      lenses: [security, reliability]
+      ref: sdk:/transports.md
+
+- title: Server protocol concepts (events, interrupts, persistence)
+  sections:
+  - id: event-streaming-concepts
+    title: Event streaming and stream modes
+    level: intermediate
+    requires: [thread-stream]
+    ref: /oss/javascript/langgraph/event-streaming.md
+    entries:
+    - id: event-stream-projections
+      name: Run stream projections
+      summary: 'graph.streamEvents(..., {version v3}) returns messages, values, output, subgraphs, interrupts, extensions; consumers read independently'
+      lenses: [composability, best-practice]
+      signature: 'graph.streamEvents(input, {version: "v3", transformers?, subgraphs?})'
+      notes: ["server-side JS API whose projections the client ThreadStream mirrors; against an Agent Server use threads.stream instead", "resume by calling streamEvents again with new Command({resume}) and a thread id; loop until stream.interrupted is false"]
+      ref: /oss/javascript/langgraph/event-streaming.md#what-event-streaming-provides
+    - id: event-channels
+      name: Protocol channels
+      summary: Raw events flow on channels (values, updates, messages, tools, lifecycle, checkpoints, input, tasks, custom, custom:<name>)
+      lenses: [observability]
+      notes: ["the same channel names feed thread.subscribe and the useChannel/useChannelEffect filters", "input carries human-in-the-loop requests and responses; checkpoints carry envelopes for branching and time travel"]
+      ref: /oss/javascript/langgraph/event-streaming.md#channels-and-event-lifecycle
+    - id: event-content-blocks
+      name: Message content-block events
+      summary: messages channel emits message-start, content-block-start/delta/finish, message-finish; usage rides on message-finish
+      lenses: [ux-a11y]
+      notes: ["blocks never interleave within one message, so text, reasoning, tool-call and media blocks render independently of provider format"]
+      ref: /oss/javascript/langgraph/event-streaming.md#messages
+    - id: event-stream-transformers
+      name: Stream transformers
+      summary: StreamTransformer (init, process, finalize, fail) plus StreamChannel publish projections under extensions; named ones emit custom:<name>
+      lenses: [composability, typing-dx]
+      signature: new StreamChannel<T>(name?); graph.compile({transformers}) or streamEvents(..., {transformers})
+      notes: ["requiredStreamModes must list every Pregel mode a transformer reads or the graph never emits it", "named channel payloads must be serializable; keep promises and class instances in unnamed channels"]
+      ref: /oss/javascript/langgraph/event-streaming.md#build-your-own-projection
+    - id: stream-modes
+      name: Stream modes
+      summary: graph.stream streamMode values, updates, messages, custom, tools, debug (plus checkpoints, tasks); an array yields [mode, chunk] tuples
+      lenses: [perf, observability]
+      signature: 'graph.stream(input, {streamMode: mode | mode[]})'
+      notes: ["lower-level than event streaming; v1.2 docs recommend event streaming for new application code", "custom mode carries data emitted via the writer config parameter"]
+      ref: /oss/javascript/langgraph/streaming.md#stream-modes
+    - id: stream-subgraph-state
+      name: Subgraph state and streaming
+      summary: Subgraph state needs persistence and a statically discoverable subgraph (a node or called in a node), not one called from a tool or subagent
+      lenses: [observability, reliability]
+      notes: ["checkpointer=false (stateless subgraph) saves no subgraph checkpoints so its state is unavailable", "interrupts propagate to the top-level graph regardless of nesting"]
+      ref: /oss/javascript/langgraph/use-subgraphs.md#view-subgraph-state
+  - id: interrupt-contract
+    title: Interrupts (server contract)
+    level: intermediate
+    requires: [event-streaming-concepts]
+    ref: /oss/javascript/langgraph/interrupts.md
+    entries:
+    - id: interrupt-resume-command
+      name: interrupt and Command resume
+      summary: interrupt(value) pauses and surfaces as __interrupt__; resume with Command({resume}) on the same thread id; it becomes interrupt()'s return
+      lenses: [best-practice, reliability]
+      signature: interrupt(value, {responseSchema?}); new Command({resume})
+      notes: ["requires a checkpointer and a thread id; the node restarts from its beginning on resume, so code before interrupt() re-runs", "Command({resume}) is the only Command form meant as run input; update, goto and graph are for returning from nodes"]
+      ref: /oss/javascript/langgraph/interrupts.md#resuming-interrupts
+    - id: interrupt-multi-resume
+      name: Resuming several interrupts
+      summary: 'Parallel branches that interrupt together are resumed in one invocation with Command({resume: {interruptId: value}})'
+      lenses: [reliability]
+      notes: ["pairs each answer to its interrupt id; client counterpart is respondAll"]
+      ref: /oss/javascript/langgraph/interrupts.md#handling-multiple-interrupts
+    - id: interrupt-response-schema
+      name: Interrupt response schema
+      summary: responseSchema (Zod) validates resume values and is exposed as Interrupt.response_schema so clients can render typed forms
+      lenses: [typing-dx, ux-a11y]
+      since: "1.4.16"
+      notes: ["requires @langchain/langgraph 1.4.16 or later; also present on checkpoint task interrupts"]
+      ref: /oss/javascript/langgraph/interrupts.md#define-an-interrupt-response-schema
+    - id: interrupt-rules
+      name: Rules of interrupts
+      summary: No try/catch around interrupt(), stable call order within a node, JSON-serializable payloads, idempotent side effects before it
+      lenses: [reliability, best-practice]
+      notes: ["interrupt works by raising an exception the runtime catches; a subgraph invoked inside a node resumes from the parent node's start too"]
+      ref: /oss/javascript/langgraph/interrupts.md#rules-of-interrupts
+    - id: interrupt-static-breakpoints
+      name: Static breakpoints
+      summary: interruptBefore and interruptAfter at compile time or run time pause around named nodes; for debugging, not HITL
+      lenses: [testing]
+      ref: /oss/javascript/langgraph/interrupts.md#debugging-with-interrupts
+  - id: persistence-concepts
+    title: Threads, checkpoints and stores
+    level: intermediate
+    requires: [sdk-threads]
+    ref: /oss/javascript/langgraph/persistence.md
+    entries:
+    - id: persistence-checkpointer-vs-store
+      name: Checkpointer versus store
+      summary: Checkpointers keep per-thread state snapshots (memory, HITL, time travel, recovery); stores keep cross-thread key-value memory
+      lenses: [best-practice]
+      notes: ["Agent Server provisions both automatically, so a client never configures them", "thread_id is the checkpointer primary key and must be set before a run can save state or resume"]
+      ref: /oss/javascript/langgraph/persistence.md#checkpointer-vs-store
+    - id: state-snapshot
+      name: StateSnapshot
+      summary: values, next (empty means done), config ids, metadata (source, writes, step), createdAt, parentConfig, tasks
+      lenses: [typing-dx, observability]
+      notes: ["tasks carry id, name, error, interrupts and a subgraph state when requested with subgraphs: true", "history is ordered newest first"]
+      ref: /oss/javascript/langgraph/checkpointers.md#statesnapshot-fields
+    - id: update-state
+      name: updateState semantics
+      summary: Creates a new checkpoint (never edits one); values pass through channel reducers so reducer channels accumulate
+      lenses: [reliability]
+      signature: graph.updateState(config, values, {asNode?})
+      notes: ["asNode picks which node the update is attributed to and so which node runs next"]
+      ref: /oss/javascript/langgraph/checkpointers.md#update-state
+    - id: durability-modes
+      name: Durability modes
+      summary: durability exit, async or sync controls when checkpoints are written during a run
+      lenses: [perf, reliability]
+      signature: 'graph.stream(input, {durability: "exit" | "async" | "sync"})'
+      notes: ["exit loses mid-run state on a crash; sync writes every checkpoint before the next step; useStream submit exposes the same option"]
+      ref: /oss/javascript/langgraph/checkpointers.md#durability-modes
+    - id: store-namespace-semantics
+      name: Store namespace search rules
+      summary: search with no query or filter lists a namespace prefix; matching is by prefix, results past limit are silently truncated
+      lenses: [reliability]
+      signature: store.search(prefix, {query?, filter?, limit?, offset?}); store.listNamespaces({prefix, maxDepth})
+      notes: ["client.store mirrors these operations against the Agent Server; set limit above the expected maximum or page with offset", "put with index false keeps an item retrievable but out of semantic search"]
+      ref: /oss/javascript/langgraph/stores.md#listing-items-in-a-namespace
+  - id: time-travel
+    title: Time travel (replay and fork)
+    level: advanced
+    requires: [persistence-concepts]
+    ref: /oss/javascript/langgraph/use-time-travel.md
+    entries:
+    - id: time-travel-replay
+      name: Replay
+      summary: Invoke with a prior checkpoint's config to re-run from there; later nodes re-execute, including LLM calls and interrupts
+      lenses: [testing, reliability]
+      notes: ["replay is not a cache read and replaying from the final checkpoint (no next nodes) is a no-op"]
+      ref: /oss/javascript/langgraph/use-time-travel.md#replay
+    - id: time-travel-fork
+      name: Fork
+      summary: updateState on a prior checkpoint creates a branch with edited state, then invoke(null, forkConfig) continues; history stays intact
+      lenses: [ux-a11y, best-practice]
+      notes: ["updateState does not roll the thread back; client edit and retry flows use submit({}, {forkFrom})"]
+      ref: /oss/javascript/langgraph/use-time-travel.md#fork
+    - id: time-travel-as-node
+      name: Fork as a specific node
+      summary: Updates apply through the named node's writers and reducers; set asNode for parallel branches, fresh threads, or skipping nodes
+      lenses: [reliability]
+      notes: ["inference from checkpoint history is almost always right when forking; parallel branches that wrote in the same step raise InvalidUpdateError without asNode"]
+      ref: /oss/javascript/langgraph/use-time-travel.md#from-a-specific-node
+    - id: time-travel-interrupts-subgraphs
+      name: Time travel with interrupts and subgraphs
+      summary: Interrupts re-trigger on replay or fork; an inherited-checkpointer subgraph is one parent super-step (parent-level travel only)
+      lenses: [reliability]
+      notes: ["fork from between two interrupts to change a later answer without re-asking earlier ones"]
+      ref: /oss/javascript/langgraph/use-time-travel.md#interrupts
+skipped:
+- page: https://docs.langchain.com/oss/javascript/langgraph/backward-compatibility
+  why: how to change deployed graph code without breaking in-flight threads; server-side graph authoring, nothing the client calls
+- page: https://docs.langchain.com/oss/javascript/langgraph/case-studies
+  why: customer list and marketing links, no API
+- page: https://docs.langchain.com/oss/javascript/langgraph/changelog-js
+  why: release changelog (rendered page, not an API); version drift is tracked through the lockfile and the verified date
+- page: https://docs.langchain.com/oss/javascript/langgraph/deploy
+  why: hosting options (LangSmith Cloud, JS frameworks and platforms) for graph deployments; this repo's server is the Python langgraph dev Agent Server
+- page: https://docs.langchain.com/oss/javascript/langgraph/observability
+  why: LangSmith tracing setup for JS graphs; tracing here is Langfuse on the Python side, covered by the langsmith and langfuse stacks
+- page: https://docs.langchain.com/oss/javascript/langgraph/studio
+  why: LangSmith Studio setup for a local JS Agent Server; Studio runs against the Python server and is covered in the langgraph stack
+- page: https://github.com/langchain-ai/langgraphjs/blob/main/libs/sdk-react/docs/README
+  why: index of the react-sdk guides, each already an outline section
+- page: https://github.com/langchain-ai/langgraphjs/blob/main/libs/sdk/docs/README
+  why: index of the sdk guides plus a which-streaming-API chooser already captured by threads-stream and runs-stream-legacy

@@ -160,11 +160,11 @@ The Builders Challenge maps to VAST's **CAMP** stack. SixthSense uses every laye
 
 | Mode | Camera | Candidates | Verified | Checked | Came true | Accuracy |
 |---|---|---|---|---|---|---|
-| 🚦 City | NYC + SF intersection cams (6) | 10 | 7 | 6 | **4** | **4 of 6 (67%)** |
+| 🚦 City | NYC + SF intersection cams (6) | 10 | 9 | 8 | **5** | **5 of 8 (63%)** |
 | 🛣️ Road | `i24_cam-1` (Nashville I-24 highway) | 10 | 0 | 0 | - | - |
 | 🏘️ Street | `neighborhood_cam-1` (2 days) | 10 | 0 | 0 | - | - |
 
-Live run, 17 Oct 2026, 10 clips per mode, stored in VastDB (schema `sixthsense`, tables `incidents` + `runs`).
+Latest live run, 17 Oct 2026, 10 clips per mode. An earlier 10-clip city run scored 4 of 6, so across both runs 9 of 14 checked forecasts came true. Results are stored in VastDB (schema `sixthsense`, tables `incidents` + `runs`).
 Road and Street raised no warnings: no clip showed a vehicle pair closing in fast enough to pass the box check. That is the filter doing its job - SixthSense stays quiet rather than guessing.
 
 Every forecast and grade is traced in Weave: [wandb.ai/vastdata/team-43/weave](https://wandb.ai/vastdata/team-43/weave)

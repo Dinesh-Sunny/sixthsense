@@ -2,7 +2,9 @@
 
 import { Popover } from "radix-ui";
 import type { Layers, Scene, Theme } from "@/components/map/BusMap";
+import { INVOLVED_LABEL, Icon, OUTCOME_LABEL, type Involved, type Outcome } from "@/components/map/icons";
 import { MAP_COPY } from "@/components/map/mapCopy";
+import { BUS_STATE, type BusState } from "@/lib/copy";
 import { cn } from "@/lib/utils";
 
 const SCENES: { id: Scene; label: string }[] = [
@@ -61,6 +63,39 @@ function Check({ checked, label, onChange }: { checked: boolean; label: string; 
   );
 }
 
+const LEGEND_STATES: BusState[] = ["look", "watching", "filed"];
+const LEGEND_OUTCOMES: Outcome[] = ["watching", "came-true", "missed"];
+const LEGEND_INVOLVED: Involved[] = ["bike", "person", "car", "truck"];
+
+function Legend() {
+  return (
+    <div className="flex flex-col gap-2 border-t border-hairline pt-3">
+      <div className="text-eye">Legend</div>
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-ink">
+        {LEGEND_STATES.map((s) => (
+          <li key={s} className="flex items-center gap-1.5">
+            <span aria-hidden className="size-2.5 rounded-full" style={{ background: `var(${BUS_STATE[s].cssVar})` }} />
+            {BUS_STATE[s].label}
+          </li>
+        ))}
+        {LEGEND_OUTCOMES.map((o) => (
+          <li key={o} className="flex items-center gap-1.5">
+            <Icon name={o} className="size-3.5 text-ink-muted" />
+            {OUTCOME_LABEL[o]}
+          </li>
+        ))}
+        {LEGEND_INVOLVED.map((i) => (
+          <li key={i} className="flex items-center gap-1.5">
+            <Icon name={i} className="size-3.5 text-ink-muted" />
+            {INVOLVED_LABEL[i]}
+          </li>
+        ))}
+      </ul>
+      <p className="text-data text-ink-muted">Numbers show the order to look at them.</p>
+    </div>
+  );
+}
+
 /** One "Map" button: view, layers and theme folded into a popover. */
 export function MapControls({
   scene,
@@ -103,6 +138,7 @@ export function MapControls({
             <Check checked={layers.all} label={MAP_COPY.allBuses} onChange={() => onLayers({ ...layers, all: !layers.all })} />
           </div>
           <Choice label={MAP_COPY.theme} value={theme} options={THEMES} onChange={onTheme} />
+          <Legend />
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>

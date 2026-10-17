@@ -5,6 +5,7 @@ import type { GeoJSONSource, Map as MapboxMap, MapMouseEvent, Marker } from "map
 import { useEffect, useRef, useState } from "react";
 import type { RouteDetail, Vehicle } from "@/lib/api/types";
 import { BUS_STATE, type BusState } from "@/lib/copy";
+import { INVOLVED_LABEL, OUTCOME_LABEL, busSvg, iconSvg, type Involved, type Outcome } from "@/components/map/icons";
 
 export type Scene = "2d" | "3d" | "drone";
 export type Theme = "light" | "dark" | "satellite" | "night";
@@ -20,7 +21,25 @@ export interface AttentionBus {
   n: number;
   lon: number;
   lat: number;
+  bearing: number | null;
   state: BusState;
+  involved: Involved;
+  outcome: Outcome;
+}
+
+/** A route line to draw: thin and faded in its bus's state colour, bold when its bus is selected. */
+export interface RouteLine {
+  detail: RouteDetail;
+  cssVar: string;
+  bold: boolean;
+}
+
+/** Rotate the right-facing side view to the bearing; flip instead of drawing it upside down. */
+function busTransform(bearing: number | null): string {
+  if (bearing === null) return "";
+  let a = (((bearing - 90) % 360) + 360) % 360;
+  if (a > 180) a -= 360;
+  return Math.abs(a) > 90 ? `rotate(${a > 0 ? a - 180 : a + 180}deg) scaleX(-1)` : `rotate(${a}deg)`;
 }
 
 const LONDON: [number, number] = [-0.1276, 51.5072];
@@ -43,14 +62,37 @@ function styleUrl(theme: Theme) {
 
 // Mapbox Standard basemap config (docs.mapbox.com/map-styles/standard/api): theme default|faded|monochrome|custom,
 // lightPreset dawn|day|dusk|night, showPointOfInterestLabels / showTransitLabels / showPlaceLabels booleans.
-function basemapConfig(theme: Theme): Record<string, string | boolean> {
-  const labels = { showPointOfInterestLabels: false, showTransitLabels: false, showPlaceLabels: true };
-  if (theme === "satellite") return { lightPreset: PRESET[theme], ...labels };
-  return { lightPreset: PRESET[theme], theme: theme === "light" ? "faded" : "monochrome", ...labels };
+// showRoadLabels (GL JS 3.0+) and show3dObjects (3.5.2+) are listed in the same Standard config table.
+// The base must recede: monochrome, place labels only, no 3D in 2D.
+function basemapConfig(theme: Theme, scene: Scene): Record<string, string | boolean> {
+  const quiet = {
+    showPointOfInterestLabels: false,
+    showTransitLabels: false,
+    showRoadLabels: false,
+    showPlaceLabels: true,
+    show3dObjects: scene !== "2d",
+  };
+  if (theme === "satellite") return { lightPreset: PRESET[theme], ...quiet };
+  return { lightPreset: PRESET[theme], theme: "monochrome", ...quiet };
 }
 
-function applyBasemap(map: MapboxMap, theme: Theme) {
-  for (const [key, value] of Object.entries(basemapConfig(theme))) {
+// Soft veil over the basemap (slot "middle": above roads, under our layers) so streets read pale.
+const VEIL: Record<Theme, { cssVar: string; opacity: number }> = {
+  light: { cssVar: "--surface", opacity: 0.45 },
+  satellite: { cssVar: "--surface", opacity: 0.3 },
+  dark: { cssVar: "--ink", opacity: 0.3 },
+  night: { cssVar: "--ink", opacity: 0.3 },
+};
+
+function applyVeil(map: MapboxMap, theme: Theme) {
+  if (!map.getLayer("veil")) return;
+  map.setPaintProperty("veil", "fill-color", cssVar(VEIL[theme].cssVar));
+  map.setPaintProperty("veil", "fill-opacity", VEIL[theme].opacity);
+}
+
+function applyBasemap(map: MapboxMap, theme: Theme, scene: Scene) {
+  applyVeil(map, theme);
+  for (const [key, value] of Object.entries(basemapConfig(theme, scene))) {
     try {
       map.setConfigProperty("basemap", key, value);
     } catch {
@@ -74,6 +116,20 @@ const STROKE_W = ["interpolate", ["linear"], ["zoom"], 9, 0.5, 15, 1.5];
 /** Adds our sources and layers; runs again after every style swap (satellite <-> standard). */
 function addLayers(map: MapboxMap) {
   const empty = { type: "FeatureCollection" as const, features: [] };
+  map.addSource("veil", {
+    type: "geojson",
+    data: {
+      type: "Feature",
+      properties: {},
+      geometry: { type: "Polygon", coordinates: [[[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]]] },
+    },
+  });
+  try {
+    map.addLayer({ id: "veil", type: "fill", source: "veil", slot: "middle", paint: { "fill-color": cssVar("--surface"), "fill-opacity": 0.45 } });
+  } catch {
+    // Styles without slots: put the veil under our own layers instead.
+    map.addLayer({ id: "veil", type: "fill", source: "veil", paint: { "fill-color": cssVar("--surface"), "fill-opacity": 0.45 } });
+  }
   map.addSource("traffic", { type: "vector", url: "mapbox://mapbox.mapbox-traffic-v1" });
   map.addLayer({
     id: "traffic",
@@ -100,7 +156,11 @@ function addLayers(map: MapboxMap) {
     type: "line",
     source: "routes",
     layout: { "line-cap": "round", "line-join": "round" },
-    paint: { "line-color": cssVar("--ink"), "line-width": 3, "line-opacity": 0.7 },
+    paint: {
+      "line-color": ["get", "color"],
+      "line-width": ["case", ["get", "bold"], 4, 2.5],
+      "line-opacity": ["case", ["get", "bold"], 0.95, 0.6],
+    },
   });
   map.addSource("buses", { type: "geojson", data: empty });
   // Context buses ("Show all buses" or the chosen route): small and faint.
@@ -128,6 +188,7 @@ export function BusMap({
   selectedId,
   followId,
   routes,
+  fitRouteIds,
   scene,
   theme,
   layers,
@@ -139,7 +200,9 @@ export function BusMap({
   attention: AttentionBus[];
   selectedId: string | null;
   followId: string | null;
-  routes: RouteDetail[];
+  routes: RouteLine[];
+  /** Routes the person picked: the map frames these when they change. */
+  fitRouteIds: string[];
   scene: Scene;
   theme: Theme;
   layers: Layers;
@@ -152,6 +215,7 @@ export function BusMap({
   const onSelectRef = useRef(onSelect);
   const onErrorRef = useRef(onError);
   const themeRef = useRef(theme);
+  const sceneRef = useRef(scene);
   const followIdRef = useRef(followId);
   // Bumped on every style load so data effects re-apply to the fresh style.
   const [styleVersion, setStyleVersion] = useState(0);
@@ -163,6 +227,7 @@ export function BusMap({
     onSelectRef.current = onSelect;
     onErrorRef.current = onError;
     themeRef.current = theme;
+    sceneRef.current = scene;
     followIdRef.current = followId;
     routesRef.current = routes;
   });
@@ -178,7 +243,7 @@ export function BusMap({
       map = new mapboxgl.Map({
         container: box.current,
         style: styleRef.current,
-        config: { basemap: basemapConfig(theme) },
+        config: { basemap: basemapConfig(theme, scene) },
         center: LONDON,
         zoom: 10.6,
         ...SCENE[scene],
@@ -187,7 +252,7 @@ export function BusMap({
       map.on("style.load", () => {
         if (!map) return;
         addLayers(map);
-        applyBasemap(map, themeRef.current);
+        applyBasemap(map, themeRef.current, sceneRef.current);
         setStyleVersion((v) => v + 1);
       });
       for (const layer of ["buses"]) {
@@ -225,9 +290,9 @@ export function BusMap({
       styleRef.current = url;
       map.setStyle(url);
     } else if (map.isStyleLoaded()) {
-      applyBasemap(map, theme);
+      applyBasemap(map, theme, scene);
     }
-  }, [theme, styleVersion]);
+  }, [theme, scene, styleVersion]);
 
   useEffect(() => {
     mapRef.current?.easeTo({ ...SCENE[scene], duration: 800 });
@@ -266,7 +331,7 @@ export function BusMap({
         const el = document.createElement("button");
         el.type = "button";
         el.className =
-          "grid size-6 place-items-center rounded-full border-2 border-white font-mono text-[11px] font-semibold text-white shadow-float transition-transform duration-150 hover:scale-110 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50";
+          "relative block h-[34px] w-[40px] cursor-pointer rounded-md transition-transform duration-150 hover:scale-110 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50";
         el.addEventListener("click", (e) => {
           e.stopPropagation();
           onSelectRef.current(a.id);
@@ -275,13 +340,20 @@ export function BusMap({
         markers.current.set(a.id, entry);
       }
       entry.m.setLngLat([a.lon, a.lat]);
-      entry.el.textContent = String(a.n);
-      entry.el.setAttribute("aria-label", `Bus ${a.n} of ${attention.length}: ${a.id}, ${BUS_STATE[a.state].label}`);
-      entry.el.style.background = cssVar(BUS_STATE[a.state].cssVar);
-      entry.el.style.zIndex = String(1000 - a.n);
-      entry.el.style.transform = "";
-      entry.el.dataset.sel = String(a.id === selectedId);
-      entry.el.style.boxShadow = a.id === selectedId ? `0 0 0 3px ${cssVar("--ink")}` : "";
+      const tint = cssVar(BUS_STATE[a.state].cssVar);
+      const sel = a.id === selectedId;
+      // Static markup from our own constants only (no API text is injected).
+      entry.el.innerHTML = `
+        <span class="absolute inset-x-[3px] top-[6px] grid place-items-center" style="transform:${busTransform(a.bearing)}">${busSvg(tint, cssVar("--illus-glass"), cssVar("--illus-tyre"))}</span>
+        ${a.n === 1 ? `<span class="absolute inset-0 animate-ping rounded-full opacity-40" style="background:${tint}"></span>` : ""}
+        <span class="absolute -top-1 -left-1 grid size-[18px] place-items-center rounded-full border-[1.5px] border-white bg-pill font-mono text-[10px] font-semibold text-on-ink">${a.n}</span>
+        <span class="absolute -right-1.5 -bottom-1 flex items-center gap-0.5 rounded-full bg-surface px-1 py-0.5 text-ink shadow-float">${iconSvg(a.involved, 10)}<span style="color:${tint}">${iconSvg(a.outcome, 10)}</span></span>`;
+      entry.el.setAttribute(
+        "aria-label",
+        `Bus ${a.n} of ${attention.length}: ${a.id}, ${BUS_STATE[a.state].label}, ${INVOLVED_LABEL[a.involved]}, ${OUTCOME_LABEL[a.outcome]}`,
+      );
+      entry.el.style.zIndex = String(sel ? 2000 : 1000 - a.n);
+      entry.el.style.filter = sel ? `drop-shadow(0 0 0 ${cssVar("--ink")}) drop-shadow(0 2px 6px rgb(0 0 0 / 0.35))` : "drop-shadow(0 1px 2px rgb(0 0 0 / 0.25))";
     }
     for (const [id, entry] of markers.current) {
       if (!seen.has(id)) {
@@ -313,26 +385,30 @@ export function BusMap({
     );
   }, [attention, selectedId, mapboxReady]);
 
-  // Both directions of every chosen route, under the buses.
-  const routeKey = routes.map((r) => `${r.id}:${r.directions.map((d) => d.coords.length).join("/")}`).join(",");
+  // Both directions of each route, under the buses. Frame the picked routes when that set changes.
+  const routeKey = routes
+    .map((r) => `${r.detail.id}:${r.cssVar}:${r.bold}:${r.detail.directions.map((d) => d.coords.length).join("/")}`)
+    .join(",");
+  const fitKey = fitRouteIds.join(",");
   const fittedKey = useRef("");
   useEffect(() => {
     const map = mapRef.current;
     const src = map?.getSource("routes") as GeoJSONSource | undefined;
     if (!map || !src) return;
     const lines = routesRef.current.flatMap((r) =>
-      r.directions
+      r.detail.directions
         .filter((d) => d.coords.length > 1)
         .map((d) => ({
           type: "Feature" as const,
           geometry: { type: "LineString" as const, coordinates: d.coords },
-          properties: { id: r.id, dir: d.dir },
+          properties: { id: r.detail.id, color: cssVar(r.cssVar), bold: r.bold },
         })),
     );
     src.setData({ type: "FeatureCollection", features: lines });
-    if (lines.length === 0 || fittedKey.current === routeKey || followIdRef.current) return;
-    fittedKey.current = routeKey;
-    const all = lines.flatMap((l) => l.geometry.coordinates);
+    const picked = lines.filter((l) => fitKey.split(",").includes(l.properties.id));
+    if (picked.length === 0 || fittedKey.current === fitKey || followIdRef.current) return;
+    fittedKey.current = fitKey;
+    const all = picked.flatMap((l) => l.geometry.coordinates);
     const lons = all.map((c) => c[0]);
     const lats = all.map((c) => c[1]);
     map.fitBounds(
@@ -347,7 +423,7 @@ export function BusMap({
         duration: 900,
       },
     );
-  }, [routeKey, styleVersion]);
+  }, [routeKey, fitKey, styleVersion]);
 
   // Follow (or jump to) the bus each time the fleet updates.
   const targetId = followId ?? selectedId;

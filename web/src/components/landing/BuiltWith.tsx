@@ -13,9 +13,6 @@ const BRANDS: { name: string; href: string; logo?: string }[] = [
   { name: "Weights & Biases", href: "https://wandb.ai/site/", logo: "weightsandbiases" },
   { name: "Mapbox", href: "https://www.mapbox.com/", logo: "mapbox" },
   { name: "Socket.IO", href: "https://socket.io/", logo: "socketdotio" },
-  { name: "FastAPI", href: "https://fastapi.tiangolo.com/", logo: "fastapi" },
-  { name: "Next.js", href: "https://nextjs.org/", logo: "nextdotjs" },
-  { name: "Kubernetes", href: "https://kubernetes.io/", logo: "kubernetes" },
   { name: "TfL Open Data", href: "https://tfl.gov.uk/info-for/open-data-users/" },
 ];
 
@@ -37,14 +34,14 @@ export function BuiltWith() {
         <h2 id="built-with-h" className={`text-eye ${rise}`}>
           Built with
         </h2>
-        <ul className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3">
+        <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
           {BRANDS.map((b, n) => (
             <li key={b.name} className={rise} style={stagger(n, 80)}>
               <a
                 href={b.href}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 text-[15px] font-medium tracking-[0.01em] whitespace-nowrap text-ink-muted transition-colors duration-150 hover:text-ink"
+                className="inline-flex items-center gap-2 text-sm font-medium whitespace-nowrap text-ink-muted transition-colors duration-150 hover:text-ink"
               >
                 {b.logo && <Mark logo={b.logo} />}
                 {b.name}

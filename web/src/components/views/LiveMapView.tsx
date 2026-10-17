@@ -7,7 +7,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { AskFootage } from "@/components/map/AskFootage";
 import { BusDrawer } from "@/components/map/BusDrawer";
-import { BusMap, type AttentionBus, type Layers, type Scene, type Theme } from "@/components/map/BusMap";
+import { BusMap, type AttentionBus, type Layers, type RouteLine, type Scene, type Theme } from "@/components/map/BusMap";
+import { INVOLVED_LABEL, Icon, involvedFrom, outcomeOf } from "@/components/map/icons";
 import { rankPairings } from "@/components/map/rank";
 import { MapControls } from "@/components/map/MapControls";
 import { MAP_COPY } from "@/components/map/mapCopy";
@@ -95,15 +96,27 @@ export function LiveMapView() {
   const vehicleById = useMemo(() => new Map(vehicles.map((v) => [v.id, v])), [vehicles]);
   const needsLook = useMemo(() => rankPairings(pairings.data ?? []), [pairings.data]);
   // Numbered 1..N in attention order; only live buses can be placed on the map.
+  const incidentById = useMemo(() => new Map((incidents.data ?? []).map((i) => [i.id, i])), [incidents.data]);
   const attention = useMemo<AttentionBus[]>(
     () =>
       needsLook.flatMap((p, i) => {
         const v = vehicleById.get(p.vehicle_id);
-        return v ? [{ id: v.id, n: i + 1, lon: v.lon, lat: v.lat, state: busState(p) }] : [];
+        if (!v) return [];
+        return [
+          {
+            id: v.id,
+            n: i + 1,
+            lon: v.lon,
+            lat: v.lat,
+            bearing: v.bearing,
+            state: busState(p),
+            involved: involvedFrom(incidentById.get(p.incident_id)),
+            outcome: outcomeOf(p),
+          },
+        ];
       }),
-    [needsLook, vehicleById],
+    [needsLook, vehicleById, incidentById],
   );
-  const incidentById = useMemo(() => new Map((incidents.data ?? []).map((i) => [i.id, i])), [incidents.data]);
   // Faint context dots: every bus only on request, otherwise just the chosen routes' buses (attention buses are markers).
   const faint = useMemo(
     () =>
@@ -114,9 +127,21 @@ export function LiveMapView() {
       ),
     [vehicles, pairByBus, layers.all, chosenRoutes, selectedId],
   );
-  const routeDetails = useQueries({ queries: chosenRoutes.map((id) => routeOptions(id)) })
-    .map((q) => q.data)
-    .filter((d) => d !== undefined);
+  // Route lines: every shown bus's route (state colour of its most urgent bus) plus routes the person picked.
+  const lineStyle = useMemo(() => {
+    const m = new Map<string, { cssVar: string; bold: boolean }>();
+    for (const p of needsLook) {
+      if (!m.has(p.route)) m.set(p.route, { cssVar: BUS_STATE[busState(p)].cssVar, bold: false });
+    }
+    for (const id of chosenRoutes) if (!m.has(id)) m.set(id, { cssVar: "--ink", bold: true });
+    const selRoute = selectedId ? (vehicleById.get(selectedId)?.route ?? pairByBus.get(selectedId)?.route) : undefined;
+    if (selRoute && m.has(selRoute)) m.set(selRoute, { ...m.get(selRoute)!, bold: true });
+    return m;
+  }, [needsLook, chosenRoutes, selectedId, vehicleById, pairByBus]);
+  const routeIds = [...lineStyle.keys()];
+  const routeLines: RouteLine[] = useQueries({ queries: routeIds.map((id) => routeOptions(id)) }).flatMap((q, i) =>
+    q.data ? [{ detail: q.data, ...lineStyle.get(routeIds[i])! }] : [],
+  );
 
   const addRoute = (raw: string) => {
     const typed = raw.trim();
@@ -149,7 +174,8 @@ export function LiveMapView() {
             attention={attention}
             selectedId={selectedId}
             followId={followId}
-            routes={routeDetails}
+            routes={routeLines}
+            fitRouteIds={chosenRoutes}
             scene={scene}
             theme={theme}
             layers={layers}
@@ -322,7 +348,14 @@ export function LiveMapView() {
                             {n + 1}
                           </span>
                           <StatusPill tone={riskTone(p.risk)}>{riskLabel(p.risk)}</StatusPill>
-                          <StatusPill tone={pill.tone}>{pill.label}</StatusPill>
+                          <StatusPill tone={pill.tone}>
+                            <Icon name={outcomeOf(p)} className="size-3" />
+                            {pill.label}
+                          </StatusPill>
+                          <span className="inline-flex items-center gap-1 text-data text-ink-muted">
+                            <Icon name={involvedFrom(inc)} className="size-3.5 text-ink" />
+                            {INVOLVED_LABEL[involvedFrom(inc)]}
+                          </span>
                         </span>
                         <span className="flex items-baseline gap-2">
                           <span className="text-body-sm font-medium">Route {p.route}</span>

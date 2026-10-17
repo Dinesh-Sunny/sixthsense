@@ -12,13 +12,13 @@ import { Panel, PanelHeading } from "@/components/Panel";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LostPanel } from "@/components/StatePanels";
 import { StatusPill } from "@/components/StatusPill";
-import { Wordmark } from "@/components/Wordmark";
+import { AppNav } from "@/components/AppNav";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/lib/api/client";
-import { alertsOptions, incidentOptions, queryKeys, sendAlert } from "@/lib/api/queries";
+import { alertsOptions, incidentOptions, pairingsOptions, queryKeys, sendAlert } from "@/lib/api/queries";
 import type { Incident } from "@/lib/api/types";
-import { COPY, SAMPLE, VERDICT, cameraLine, cameraName, riskLabel, riskTone, timeOfDay } from "@/lib/copy";
+import { BUS_COPY, COPY, SAMPLE, VERDICT, cameraLine, cameraName, riskLabel, riskTone, timeOfDay } from "@/lib/copy";
 import { cn } from "@/lib/utils";
 
 function Timeline({ incident: i }: { incident: Incident }) {
@@ -45,6 +45,9 @@ function Timeline({ incident: i }: { incident: Incident }) {
 
 function NextStep({ incident: i }: { incident: Incident }) {
   const queryClient = useQueryClient();
+  const pairings = useQuery(pairingsOptions());
+  const busId = pairings.data?.find((p) => p.incident_id === i.id)?.vehicle_id;
+  const verdict = VERDICT[i.came_true];
   const alerts = useQuery(alertsOptions());
   const existing = alerts.data?.find((a) => a.incident_id === i.id);
   const [copied, setCopied] = useState(false);
@@ -59,12 +62,22 @@ function NextStep({ incident: i }: { incident: Incident }) {
   return (
     <Panel className="flex flex-col gap-3" aria-labelledby="next-h">
       <PanelHeading id="next-h" className="mb-0">
-        {COPY.nextStep}
+        Outcome
       </PanelHeading>
+      {!i.fixture && (
+        <p className="text-body-sm text-ink">
+          {i.came_true === "unknown" ? "Not checked yet." : `Prediction: ${verdict.label.toLowerCase()}.`}
+        </p>
+      )}
       <div className="flex flex-wrap gap-3">
         {!i.fixture && (
           <Button onClick={() => alert.mutate()} disabled={sent}>
             {sent ? (sentAt ? `Sent at ${timeOfDay(sentAt)}` : "Sending…") : COPY.sendAlert}
+          </Button>
+        )}
+        {busId && (
+          <Button asChild variant="glass">
+            <Link href={{ pathname: "/dashboard", query: { bus: busId } }}>{BUS_COPY.showOnMap}</Link>
           </Button>
         )}
         <Button
@@ -102,13 +115,15 @@ function Forecast({ incident: i }: { incident: Incident }) {
   return (
     <>
         <Panel className="flex flex-col gap-2.5">
-          <div className="text-eye">{COPY.prediction}</div>
-          <h1 className="font-serif text-[28px] leading-[1.12] text-balance md:text-[34px]">{i.what_next}</h1>
+          <div className="text-eye">Near-miss report</div>
           {i.what_happens && (
-            <p className="text-body-sm text-ink-muted">
-              <b className="font-medium text-ink">{COPY.now}</b> {i.what_happens}
-            </p>
+            <>
+              <div className="text-eye mt-1">Before</div>
+              <p className="text-body-sm text-ink">{i.what_happens}</p>
+            </>
           )}
+          <div className="text-eye mt-1">{COPY.prediction}</div>
+          <h1 className="font-serif text-[28px] leading-[1.12] text-balance md:text-[34px]">{i.what_next}</h1>
           {i.why && (
             <p className="text-body-sm text-ink-muted">
               <b className="font-medium text-ink">{COPY.why}</b> {i.why}
@@ -202,16 +217,12 @@ export function DetailView() {
 
   return (
     <Atmosphere variant="soft">
-      <header className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-5 md:px-8">
+      <AppNav right={i && <span className="text-data text-ink-muted">{cameraLine(i)}</span>} />
+      <div className="px-4 pb-4 md:px-8">
         <Button asChild variant="glass" size="sm">
-          <Link href={i ? { pathname: "/dashboard", query: { mode: i.mode } } : "/dashboard"}>← {COPY.allMoments}</Link>
+          <Link href={i ? { pathname: "/reports", query: { mode: i.mode } } : "/reports"}>← All reports</Link>
         </Button>
-        <Link href="/" aria-label="SixthSense home">
-          <Wordmark />
-        </Link>
-        <div className="flex-1" />
-        {i && <span className="text-data text-ink-muted">{cameraLine(i)}</span>}
-      </header>
+      </div>
       {notFound ? (
         <div className="px-4 md:px-8">
           <LostPanel title={COPY.notFound} body={COPY.notFoundBody} onRetry={() => void q.refetch()} />

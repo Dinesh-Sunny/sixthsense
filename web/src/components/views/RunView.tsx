@@ -9,7 +9,7 @@ import { Panel } from "@/components/Panel";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LostPanel } from "@/components/StatePanels";
 import { StatusPill } from "@/components/StatusPill";
-import { Wordmark } from "@/components/Wordmark";
+import { AppNav } from "@/components/AppNav";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { metricsOptions, queryKeys, runOptions, startRun } from "@/lib/api/queries";
@@ -99,14 +99,7 @@ export function RunView() {
 
   return (
     <Atmosphere variant="soft">
-      <header className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-5 md:px-8">
-        <Button asChild variant="glass" size="sm">
-          <Link href="/dashboard">← {COPY.allMoments}</Link>
-        </Button>
-        <Link href="/" aria-label="SixthSense home">
-          <Wordmark />
-        </Link>
-      </header>
+      <AppNav />
 
       {run.isError && !status ? (
         <div className="px-4 md:px-8">
@@ -193,7 +186,7 @@ export function RunView() {
                 <AccuracyMeter metrics={m} showLabel={false} />
                 <p className="text-body-sm text-ink-muted">{m.checked > 0 ? scoreDetail(m) : COPY.scoreNothingBody}</p>
                 <Button asChild className="self-start">
-                  <Link href={{ pathname: "/dashboard", query: { mode: runMode } }}>{COPY.runSee}</Link>
+                  <Link href={{ pathname: "/reports", query: { mode: runMode } }}>{COPY.runSee}</Link>
                 </Button>
               </Panel>
             ) : (

@@ -4,17 +4,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AccuracyMeter } from "@/components/AccuracyMeter";
+import { AppHeader } from "@/components/AppHeader";
 import { Atmosphere } from "@/components/Atmosphere";
 import { Panel } from "@/components/Panel";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LostPanel } from "@/components/StatePanels";
 import { StatusPill } from "@/components/StatusPill";
-import { AppNav } from "@/components/AppNav";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { metricsOptions, queryKeys, runOptions, startRun } from "@/lib/api/queries";
 import { MODES, type Mode, type RunStatus, type StepName, type StepProgress } from "@/lib/api/types";
-import { COPY, MODE_INFO, STEP_LABEL, STEP_ORDER, momentsHeadline, scoreDetail, watchingHeadline } from "@/lib/copy";
+import { COPY, MODE_INFO, REPORT_COPY, STEP_LABEL, STEP_ORDER, momentsHeadline, scoreDetail, watchingHeadline } from "@/lib/copy";
 import { cn } from "@/lib/utils";
 
 const RUN_LIMIT = 5;
@@ -99,18 +99,26 @@ export function RunView() {
 
   return (
     <Atmosphere variant="soft">
-      <AppNav />
+      <AppHeader />
+      <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-2 px-4 pt-6 pb-8 md:px-8 md:pt-10">
+        <nav aria-label="Breadcrumb" className="text-body-sm text-ink-muted">
+          <Link href="/reports" className="rounded-sm underline-offset-2 outline-none hover:text-ink hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50">
+            ← {REPORT_COPY.title}
+          </Link>
+        </nav>
+        <h1 className="font-serif text-[40px] leading-none md:text-[52px]">{REPORT_COPY.checkFootage}</h1>
+      </div>
 
       {run.isError && !status ? (
-        <div className="px-4 md:px-8">
+        <div className="mx-auto w-full max-w-[1200px] px-4 md:px-8">
           <LostPanel onRetry={() => void run.refetch()} />
         </div>
       ) : (
-        <div className="grid grid-cols-1 content-start gap-6 px-4 pb-8 md:px-8 lg:grid-cols-3">
+        <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 content-start gap-6 px-4 pb-12 md:px-8 lg:grid-cols-3">
           <section className="flex flex-col gap-3">
             <span className={stateCls}>1 · Pick what to watch</span>
             <Panel className="flex flex-col gap-4 p-6">
-              <h1 className={headingCls}>{COPY.runPickTitle}</h1>
+              <h2 className={headingCls}>{COPY.runPickTitle}</h2>
               <fieldset className="flex flex-col gap-2" disabled={running}>
                 <legend className="sr-only">Camera</legend>
                 {MODES.map((m2) => (
@@ -186,7 +194,7 @@ export function RunView() {
                 <AccuracyMeter metrics={m} showLabel={false} />
                 <p className="text-body-sm text-ink-muted">{m.checked > 0 ? scoreDetail(m) : COPY.scoreNothingBody}</p>
                 <Button asChild className="self-start">
-                  <Link href={{ pathname: "/reports", query: { mode: runMode } }}>{COPY.runSee}</Link>
+                  <Link href="/reports">{COPY.runSee}</Link>
                 </Button>
               </Panel>
             ) : (

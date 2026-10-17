@@ -2,8 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { AppNav } from "@/components/AppNav";
+import { useSearchParams } from "next/navigation";
+import { AppHeader } from "@/components/AppHeader";
 import { Atmosphere } from "@/components/Atmosphere";
+import { ReportRow, ReportRowSkeleton } from "@/components/ReportRow";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LostPanel } from "@/components/StatePanels";
 import { StatusPill } from "@/components/StatusPill";
@@ -11,94 +13,180 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { allIncidentsOptions, pairingsOptions } from "@/lib/api/queries";
 import type { Incident, Pairing } from "@/lib/api/types";
-import { BUS_COPY, plural, riskLabel, riskTone } from "@/lib/copy";
+import { COACHING_COPY, REPORT_COPY, plural, riskLabel, riskTone, typeLabel } from "@/lib/copy";
+import { useSignedOff } from "@/lib/signoff";
 
-interface RouteCard {
+interface RouteGroup {
   route: string;
   items: { pairing: Pairing; incident: Incident | undefined }[];
+  top: number;
 }
 
-function groupByRoute(pairings: Pairing[], incidents: Map<string, Incident>): RouteCard[] {
-  const byRoute = new Map<string, RouteCard>();
+function groupByRoute(pairings: Pairing[], incidents: Map<string, Incident>): RouteGroup[] {
+  const byRoute = new Map<string, RouteGroup>();
   for (const p of pairings) {
-    const card = byRoute.get(p.route) ?? { route: p.route, items: [] };
-    card.items.push({ pairing: p, incident: incidents.get(p.incident_id) });
-    byRoute.set(p.route, card);
+    const g = byRoute.get(p.route) ?? { route: p.route, items: [], top: 0 };
+    g.items.push({ pairing: p, incident: incidents.get(p.incident_id) });
+    g.top = Math.max(g.top, p.risk);
+    byRoute.set(p.route, g);
   }
-  return [...byRoute.values()].sort(
-    (a, b) => Math.max(...b.items.map((i) => i.pairing.risk)) - Math.max(...a.items.map((i) => i.pairing.risk)),
+  for (const g of byRoute.values()) g.items.sort((a, b) => b.pairing.risk - a.pairing.risk);
+  return [...byRoute.values()].sort((a, b) => b.top - a.top || a.route.localeCompare(b.route, "en", { numeric: true }));
+}
+
+/** The route's pattern in one line: the most common kind of moment, else its riskiest forecast. */
+function patternLine(g: RouteGroup): string {
+  const known = g.items.map((x) => x.incident).filter((i): i is Incident => Boolean(i));
+  const counts = new Map<string, number>();
+  for (const i of known) if (i.type) counts.set(i.type, (counts.get(i.type) ?? 0) + 1);
+  const [type, n] = [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? ["", 0];
+  if (n > 1) return `${typeLabel(type)} in ${n} of ${g.items.length} clips`;
+  return known[0]?.what_next ?? `${plural(g.items.length, "clip")} on this route`;
+}
+
+function scoreLineFor(g: RouteGroup): string {
+  const checked = g.items.filter((x) => x.pairing.came_true !== "unknown");
+  const yes = checked.filter((x) => x.pairing.came_true === "yes").length;
+  const lead = plural(g.items.length, "clip");
+  return checked.length > 0 ? `${lead} · ${yes} of ${checked.length} came true` : `${lead} · not checked yet`;
+}
+
+function habit(g: RouteGroup): string | null {
+  return g.items.find((x) => x.incident?.fix)?.incident?.fix ?? null;
+}
+
+function PromiseLine() {
+  return <p className="text-body-sm text-ink-muted">{COACHING_COPY.promise}</p>;
+}
+
+function RouteCard({ group: g }: { group: RouteGroup }) {
+  return (
+    <li className="group relative flex flex-col gap-3 rounded-lg border border-hairline bg-surface p-6 transition-colors duration-150 hover:border-ink-muted has-[a:focus-visible]:ring-[3px] has-[a:focus-visible]:ring-ring/50">
+      <div className="flex items-center gap-3">
+        <h2 className="font-serif text-[30px] leading-none">
+          <Link
+            href={{ pathname: "/coaching", query: { route: g.route } }}
+            className="outline-none after:absolute after:inset-0 after:rounded-lg after:content-['']"
+          >
+            Route {g.route}
+          </Link>
+        </h2>
+        <div className="flex-1" />
+        <StatusPill tone={riskTone(g.top)}>{riskLabel(g.top)}</StatusPill>
+      </div>
+      <p className="text-body-sm text-ink">{patternLine(g)}</p>
+      <div className="mt-auto flex items-center justify-between gap-3 text-data text-ink-muted">
+        <span>{scoreLineFor(g)}</span>
+        <span aria-hidden className="transition-transform duration-150 group-hover:translate-x-0.5">
+          →
+        </span>
+      </div>
+    </li>
+  );
+}
+
+function RouteList({ groups }: { groups: RouteGroup[] }) {
+  return (
+    <>
+      <div className="flex flex-col gap-2">
+        <h1 className="font-serif text-[40px] leading-none md:text-[52px]">{COACHING_COPY.title}</h1>
+        <p className="text-body-sm text-ink-muted">{COACHING_COPY.sub}</p>
+      </div>
+      {groups.length === 0 ? (
+        <p className="text-body text-ink-muted">{COACHING_COPY.none}</p>
+      ) : (
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {groups.map((g) => (
+            <RouteCard key={g.route} group={g} />
+          ))}
+        </ul>
+      )}
+      <PromiseLine />
+    </>
+  );
+}
+
+function RouteDetail({ route, group }: { route: string; group: RouteGroup | undefined }) {
+  const signed = useSignedOff();
+  const tip = group ? habit(group) : null;
+  return (
+    <>
+      <nav aria-label="Breadcrumb" className="text-body-sm text-ink-muted">
+        <ol className="flex items-center gap-2">
+          <li>
+            <Link href="/coaching" className="rounded-sm underline-offset-2 outline-none hover:text-ink hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50">
+              Coaching
+            </Link>
+          </li>
+          <li aria-hidden>/</li>
+          <li aria-current="page" className="text-ink">
+            Route {route}
+          </li>
+        </ol>
+      </nav>
+      <div className="flex flex-wrap items-end gap-x-6 gap-y-4">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <h1 className="font-serif text-[40px] leading-none md:text-[52px]">Route {route}</h1>
+          <p className="text-body text-ink">{group ? patternLine(group) : COACHING_COPY.unknownRoute(route)}</p>
+          {group && <p className="text-data text-ink-muted">{scoreLineFor(group)}</p>}
+        </div>
+        <Button asChild variant="glass">
+          <Link href={{ pathname: "/dashboard", query: { route } }}>{COACHING_COPY.showRoute}</Link>
+        </Button>
+      </div>
+      {tip && (
+        <section aria-labelledby="habit-h" className="flex flex-col gap-2 rounded-lg border border-hairline bg-surface p-6">
+          <h2 id="habit-h" className="text-eye">
+            {COACHING_COPY.habit}
+          </h2>
+          <p className="font-serif text-[24px] leading-[1.2] text-balance">{tip}</p>
+        </section>
+      )}
+      {group && (
+        <section aria-labelledby="clips-h" className="flex flex-col gap-3">
+          <h2 id="clips-h" className="text-eye">
+            {COACHING_COPY.clips}
+          </h2>
+          <ul className="flex flex-col gap-3">
+            {group.items.map(({ pairing: p, incident: i }) =>
+              i ? (
+                <ReportRow key={p.incident_id} incident={i} pairing={p} signedOff={signed.has(i.id)} />
+              ) : (
+                <ReportRowSkeleton key={p.incident_id} />
+              ),
+            )}
+          </ul>
+        </section>
+      )}
+      <PromiseLine />
+    </>
   );
 }
 
 export function CoachingView() {
+  const route = useSearchParams().get("route");
   const pairings = useQuery(pairingsOptions());
   const incidents = useQuery(allIncidentsOptions());
   const byId = new Map((incidents.data ?? []).map((i) => [i.id, i]));
-  const cards = groupByRoute(pairings.data ?? [], byId);
+  const groups = groupByRoute(pairings.data ?? [], byId);
 
   return (
     <Atmosphere variant="soft">
-      <AppNav />
-      <main className="flex flex-col gap-6 px-4 pb-8 md:px-8">
-        <div className="flex flex-col gap-2 pt-4">
-          <h1 className="font-serif text-[40px] leading-none md:text-[56px]">Coaching by route</h1>
-          <p className="max-w-[640px] text-body text-ink-muted">
-            One card per route, built from the moments paired to its buses. Each fix is a coaching point for drivers on that route.
-          </p>
-          <p className="text-data text-ink-muted">Clips are stand-in footage paired to live buses for this demo.</p>
-        </div>
+      <AppHeader />
+      <main className="mx-auto flex w-full max-w-[960px] flex-col gap-8 px-4 pt-6 pb-12 md:px-8 md:pt-10">
         {pairings.isError ? (
           <LostPanel onRetry={() => void pairings.refetch()} />
         ) : pairings.isPending ? (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-            <Skeleton className="h-64 rounded-xl" />
-            <Skeleton className="h-64 rounded-xl" />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2" aria-busy>
+            <Skeleton className="h-40 rounded-lg" />
+            <Skeleton className="h-40 rounded-lg" />
           </div>
-        ) : cards.length === 0 ? (
-          <p className="text-body text-ink-muted">No routes have moments yet. Coaching cards appear after the next run.</p>
+        ) : route ? (
+          <RouteDetail route={route} group={groups.find((g) => g.route === route)} />
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {cards.map((c) => {
-              const checked = c.items.filter((x) => x.pairing.came_true !== "unknown");
-              const cameTrue = checked.filter((x) => x.pairing.came_true === "yes").length;
-              const top = Math.max(...c.items.map((x) => x.pairing.risk));
-              return (
-                <article key={c.route} className="flex flex-col gap-4 rounded-xl bg-surface p-6 shadow-float">
-                  <div className="flex items-center gap-3">
-                    <h2 className="font-serif text-[32px] leading-none">Route {c.route}</h2>
-                    <div className="flex-1" />
-                    <StatusPill tone={riskTone(top)}>{riskLabel(top)}</StatusPill>
-                  </div>
-                  <p className="text-data text-ink-muted">
-                    {plural(c.items.length, "moment")} ·{" "}
-                    {checked.length > 0 ? `${cameTrue} of ${checked.length} predictions came true` : "not checked yet"}
-                  </p>
-                  <ul className="flex flex-col gap-3">
-                    {c.items.map(({ pairing: p, incident: i }) => (
-                      <li key={p.incident_id} className="flex flex-col gap-1 border-t border-hairline pt-3">
-                        <span className="text-body-sm">{i?.what_next ?? "Moment details are loading."}</span>
-                        {i?.fix && (
-                          <span className="text-body-sm text-ink-muted">
-                            <b className="font-medium text-ink">Coach</b> {i.fix}
-                          </span>
-                        )}
-                        <Link
-                          href={{ pathname: "/incident", query: { id: p.incident_id } }}
-                          className="text-data text-slate underline-offset-2 hover:underline"
-                        >
-                          {BUS_COPY.openReport} →
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button asChild size="sm" variant="glass" className="mt-auto self-start">
-                    <Link href={{ pathname: "/dashboard", query: { route: c.route } }}>{BUS_COPY.showOnMap}</Link>
-                  </Button>
-                </article>
-              );
-            })}
-          </div>
+          <RouteList groups={groups} />
         )}
+        <p className="text-data text-ink-muted">{REPORT_COPY.standIn}</p>
       </main>
       <SiteFooter />
     </Atmosphere>

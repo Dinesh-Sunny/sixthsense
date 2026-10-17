@@ -31,7 +31,7 @@ function Choice<T extends string>({
   return (
     <div className="flex flex-col gap-2">
       <div className="text-eye">{label}</div>
-      <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-1 rounded-full bg-surface-sunk p-1">
+      <div role="radiogroup" aria-label={label} className="flex gap-0.5 rounded-full bg-surface-sunk p-1">
         {options.map((o) => (
           <button
             key={o.id}
@@ -40,7 +40,7 @@ function Choice<T extends string>({
             aria-checked={value === o.id}
             onClick={() => onChange(o.id)}
             className={cn(
-              "h-7 flex-1 rounded-full px-3 text-xs font-medium text-ink-muted transition-colors duration-150 hover:text-ink",
+              "h-7 flex-1 rounded-full px-2 text-xs font-medium text-ink-muted transition-colors duration-150 hover:text-ink",
               value === o.id && "bg-surface text-ink shadow-[0_0_0_1px_var(--hairline)]",
             )}
           >

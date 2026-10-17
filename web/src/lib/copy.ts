@@ -126,7 +126,7 @@ export const COPY = {
   runStart: "Start watching",
   runStarting: "Starting…",
   runLeave: "You can leave this page. We'll keep going.",
-  runSee: "See the moments",
+  runSee: "See the reports",
   runFailed: "Something went wrong while watching. Your earlier moments are safe.",
   runBusy: "We're already watching a camera. Here's how it's going.",
   runsOff: "Watching is paused right now. Your moments are safe.",
@@ -282,4 +282,105 @@ export function pairingPill(p: Pairing): { label: string; tone: Tone } {
     default:
       return { label: "Watching", tone: "mid" };
   }
+}
+
+// ---- v2 flows: Reports, report detail, Coaching (plan sixthsense-v2-flows.md) ----
+
+/** Inside-page nav: three places only. */
+export const APP_NAV = [
+  { path: "/dashboard", label: "Live" },
+  { path: "/reports", label: "Reports" },
+  { path: "/coaching", label: "Coaching" },
+] as const;
+
+export type ReportFilter = "all" | "true" | "no" | "checking";
+
+export const REPORT_FILTERS: { id: ReportFilter; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "true", label: "Came true" },
+  { id: "no", label: "Didn't happen" },
+  { id: "checking", label: "Checking" },
+];
+
+/** Partly counts under "Came true"; its own pill still says Partly. */
+export function matchesFilter(c: CameTrue, f: ReportFilter): boolean {
+  if (f === "all") return true;
+  if (f === "true") return c === "yes" || c === "partly";
+  if (f === "no") return c === "no";
+  return c === "unknown";
+}
+
+export const REPORT_COPY = {
+  title: "Near-miss reports",
+  checkFootage: "Check new footage",
+  allCameras: "All camera sources",
+  cameraSource: "Camera source",
+  toReview: "To review",
+  signedOff: "Signed off",
+  signedOffByYou: "Signed off by you",
+  signOff: "Sign off",
+  undo: "Undo",
+  sendGarage: "Send to garage",
+  sending: "Sending…",
+  showOnMap: "Show on map",
+  coachingRoute: "Coaching for this route",
+  before: "Before",
+  forecast: "Forecast",
+  whatHappened: "What happened",
+  outcome: "Outcome",
+  evidence: "Evidence · gap in car lengths",
+  timeline: "What the agent did",
+  actions: "Next steps",
+  noBus: "No live bus paired right now",
+  noneTitle: "No reports match",
+  noneBody: "Try another filter, or check new footage to find more.",
+  emptyTitle: "No reports yet",
+  emptyBody: "Check new footage and any close calls show up here as reports.",
+  standIn: "Clips are hackathon footage used as a stand-in. Bus pairing is a stand-in too.",
+  sendFailed: "We couldn't send it. Try again in a moment.",
+  notDelivered: "Saved, but the garage channel didn't answer.",
+  waitingClip: "Waiting for the next clip",
+};
+
+export const TIMELINE_STEP = {
+  spotted: "Spotted",
+  boxes: "Checked by boxes",
+  forecast: "Forecast",
+  nudged: "Driver nudged",
+  checked: "Checked next clip",
+  filed: "Report filed",
+} as const;
+
+export const COACHING_COPY = {
+  title: "Coaching by route",
+  sub: "One card per route, built from the clips paired to its buses.",
+  promise: "Coaching, not a league table. Drivers see their own clips first.",
+  habit: "One habit to try",
+  clips: "Clips on this route",
+  showRoute: "Show route on map",
+  none: "No routes have clips yet. Coaching appears after footage is checked.",
+  unknownRoute: (r: string) => `No clips for route ${r} yet.`,
+};
+
+/** Short, stable report number: NM-<last 6 id chars>. */
+export function reportId(id: string): string {
+  const clean = id.replace(/[^a-z0-9]/gi, "");
+  return `NM-${(clean.slice(-6) || id).toUpperCase()}`;
+}
+
+export function routeLine(p: Pick<Pairing, "route" | "vehicle_id"> | undefined): string {
+  return p ? `Route ${p.route} · Bus ${p.vehicle_id}` : REPORT_COPY.noBus;
+}
+
+export function scoreSummary(ms: ModeMetrics[] | undefined): string | null {
+  if (!ms || ms.length === 0) return null;
+  const yes = ms.reduce((a, m) => a + m.came_true_yes, 0);
+  const checked = ms.reduce((a, m) => a + m.checked, 0);
+  return checked > 0 ? `${yes} of ${checked} forecasts came true` : null;
+}
+
+/** "Close following" from "close_following"; the pattern line on a coaching card. */
+export function typeLabel(t: string): string {
+  const s = t.replace(/[_-]+/g, " ").trim();
+  return s ? s[0].toUpperCase() + s.slice(1).toLowerCase() : "";
 }

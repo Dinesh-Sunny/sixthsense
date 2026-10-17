@@ -1,131 +1,115 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { Route } from "next";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useTransition } from "react";
-import { AccuracyMeter } from "@/components/AccuracyMeter";
-import { AlertsPanel } from "@/components/AlertsPanel";
-import { AskBox } from "@/components/AskBox";
+import { useState } from "react";
+import { AppHeader } from "@/components/AppHeader";
 import { Atmosphere } from "@/components/Atmosphere";
-import { IncidentCard, IncidentCardSkeleton } from "@/components/IncidentCard";
-import { ModeTabs } from "@/components/ModeTabs";
-import { Panel, PanelHeading } from "@/components/Panel";
+import { ReportRow, ReportRowSkeleton } from "@/components/ReportRow";
 import { SiteFooter } from "@/components/SiteFooter";
-import { CalmPanel, LostPanel } from "@/components/StatePanels";
-import { WeatherPill } from "@/components/WeatherPill";
-import { AppNav } from "@/components/AppNav";
+import { LostPanel } from "@/components/StatePanels";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { incidentsOptions, metricsOptions, pairingsOptions } from "@/lib/api/queries";
-import { MODES, type Mode, type ModeMetrics } from "@/lib/api/types";
-import { COPY, MODE_INFO, calmBody, heroSubline, momentsHeadline } from "@/lib/copy";
-
-const FALLBACK_MODE: Mode = "road";
-
-function parseMode(v: string | null): Mode | null {
-  return MODES.includes(v as Mode) ? (v as Mode) : null;
-}
-
-/** No ?mode: open the camera with the most moments from its latest run. */
-function busiestMode(metrics: ModeMetrics[] | undefined): Mode {
-  const best = metrics?.filter((m) => m.verified > 0).sort((a, b) => b.verified - a.verified)[0];
-  return best?.mode ?? FALLBACK_MODE;
-}
+import { allIncidentsOptions, metricsOptions, pairingsOptions } from "@/lib/api/queries";
+import { MODES, type Mode } from "@/lib/api/types";
+import { MODE_INFO, REPORT_COPY, REPORT_FILTERS, type ReportFilter, matchesFilter, plural, scoreSummary } from "@/lib/copy";
+import { useSignedOff } from "@/lib/signoff";
+import { cn } from "@/lib/utils";
 
 export function ReportsView() {
-  const params = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-  const [, startTransition] = useTransition();
-  const metrics = useQuery(metricsOptions());
+  const incidents = useQuery(allIncidentsOptions());
   const pairings = useQuery(pairingsOptions());
-  const busFor = new Map((pairings.data ?? []).map((p) => [p.incident_id, p.vehicle_id]));
-  const asked = parseMode(params.get("mode"));
-  // Wait for metrics before picking a default so the page doesn't jump between tabs.
-  const modeKnown = asked !== null || !metrics.isPending;
-  const mode = asked ?? busiestMode(metrics.data);
+  const metrics = useQuery(metricsOptions());
+  const signed = useSignedOff();
+  const [filter, setFilter] = useState<ReportFilter>("all");
+  const [source, setSource] = useState<Mode | "all">("all");
 
-  const incidents = useQuery({ ...incidentsOptions(mode), enabled: modeKnown });
-  const m = metrics.data?.find((x) => x.mode === mode);
-  const list = incidents.data ?? [];
-
-  const setMode = (next: Mode) =>
-    startTransition(() => {
-      router.replace(`${pathname}?mode=${next}` as Route, { scroll: false });
-    });
+  const pairFor = new Map((pairings.data ?? []).map((p) => [p.incident_id, p]));
+  const all = incidents.data ?? [];
+  // To review first, then riskiest first.
+  const list = all
+    .filter((i) => matchesFilter(i.came_true, filter) && (source === "all" || i.mode === source))
+    .sort((a, b) => Number(signed.has(a.id)) - Number(signed.has(b.id)) || b.risk - a.risk);
+  const toReview = all.filter((i) => !i.fixture && !signed.has(i.id)).length;
+  const score = scoreSummary(metrics.data);
 
   return (
-    <Atmosphere variant="band">
-      <AppNav
-        onSky
-        right={
-          <>
-            <WeatherPill />
-            <Button asChild variant="glass" size="sm">
-              <Link href="/run">{COPY.watchCamera}</Link>
-            </Button>
-          </>
-        }
-      />
-      <div className="flex flex-wrap items-center gap-3 px-4 pt-2 md:px-8">
-        <span className="text-[13px] font-medium text-on-sky-muted">Camera source</span>
-        <ModeTabs mode={mode} metrics={metrics.data} onChange={setMode} />
-      </div>
-
-      <section className="flex flex-wrap items-end gap-6 px-4 pt-7 pb-9 md:px-8">
-        <div className="flex min-w-0 flex-col gap-2">
-          {incidents.isPending ? (
-            <Skeleton className="h-14 w-[min(520px,80vw)] bg-glass" />
-          ) : (
-            <h1 className="font-serif text-[40px] leading-none text-on-sky md:text-[56px]">
-              {momentsHeadline(incidents.isError ? 0 : list.length)}
-            </h1>
-          )}
-          <p className="text-base text-on-sky-muted">{heroSubline(mode, m, list.length > 0 && list.every((i) => i.fixture))}</p>
-        </div>
-        <div className="hidden flex-1 md:block" />
-        {m && (
-          <div className="glass rounded-panel px-[18px] py-3.5 shadow-float">
-            <AccuracyMeter metrics={m} />
+    <Atmosphere variant="soft">
+      <AppHeader />
+      <main className="mx-auto flex w-full max-w-[960px] flex-col gap-8 px-4 pt-6 pb-12 md:px-8 md:pt-10">
+        <div className="flex flex-wrap items-end gap-x-6 gap-y-4">
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <h1 className="font-serif text-[40px] leading-none md:text-[52px]">{REPORT_COPY.title}</h1>
+            <p className="min-h-5 text-body-sm text-ink-muted">
+              {incidents.isSuccess ? `${plural(toReview, "report")} to review` : null}
+              {score && <span> · {score}</span>}
+            </p>
           </div>
-        )}
-      </section>
+          <Button asChild>
+            <Link href="/run">{REPORT_COPY.checkFootage}</Link>
+          </Button>
+        </div>
 
-      <div className="flex flex-col gap-6 px-4 pb-8 md:px-8 lg:flex-row">
-        <main className="flex min-w-0 flex-1 flex-col gap-4">
-          <div className="text-eye">{COPY.riskiestFirst}</div>
-          {incidents.isError ? (
-            <LostPanel onRetry={() => void incidents.refetch()} />
-          ) : incidents.isPending ? (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <IncidentCardSkeleton />
-              <IncidentCardSkeleton />
-            </div>
-          ) : list.length === 0 ? (
-            <CalmPanel title={MODE_INFO[mode].calm} body={calmBody(m)} />
-          ) : (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {list.map((i) => (
-                <IncidentCard key={i.id} incident={i} busId={busFor.get(i.id)} />
+        <div className="flex flex-wrap items-center gap-3">
+          <div role="group" aria-label="Filter by outcome" className="flex flex-wrap gap-1">
+            {REPORT_FILTERS.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                aria-pressed={filter === f.id}
+                onClick={() => setFilter(f.id)}
+                className={cn(
+                  "inline-flex h-8 items-center rounded-full border px-3.5 text-[13px] font-medium outline-none transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                  filter === f.id
+                    ? "border-pill bg-pill text-on-ink"
+                    : "border-hairline bg-surface text-ink-muted hover:border-ink-muted hover:text-ink",
+                )}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex-1" />
+          <label className="flex items-center gap-2 text-[13px] text-ink-muted">
+            <span className="sr-only">{REPORT_COPY.cameraSource}</span>
+            <select
+              value={source}
+              onChange={(e) => setSource(e.target.value as Mode | "all")}
+              className="h-8 cursor-pointer rounded-full border border-hairline bg-surface px-3 text-[13px] font-medium text-ink outline-none transition-colors duration-150 hover:border-ink-muted focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            >
+              <option value="all">{REPORT_COPY.allCameras}</option>
+              {MODES.map((m) => (
+                <option key={m} value={m}>
+                  {MODE_INFO[m].name} · {MODE_INFO[m].place}
+                </option>
               ))}
-            </div>
-          )}
-        </main>
+            </select>
+          </label>
+        </div>
 
-        <aside className="flex w-full flex-col gap-4 lg:w-80">
-          <Panel aria-labelledby="ask-h">
-            <PanelHeading id="ask-h">{COPY.ask}</PanelHeading>
-            <AskBox showChips={false} />
-          </Panel>
-          <AlertsPanel />
-          <Panel aria-labelledby="how-h">
-            <PanelHeading id="how-h">{COPY.howItWorks}</PanelHeading>
-            <p className="text-body-sm text-ink-muted">{COPY.howItWorksBody}</p>
-          </Panel>
-        </aside>
-      </div>
+        {incidents.isError ? (
+          <LostPanel onRetry={() => void incidents.refetch()} />
+        ) : incidents.isPending ? (
+          <ul className="flex flex-col gap-3">
+            <ReportRowSkeleton />
+            <ReportRowSkeleton />
+            <ReportRowSkeleton />
+          </ul>
+        ) : list.length === 0 ? (
+          <div className="flex flex-col gap-2 rounded-lg border border-hairline bg-surface p-7">
+            <h2 className="font-serif text-[28px] leading-[1.15]">
+              {all.length === 0 ? REPORT_COPY.emptyTitle : REPORT_COPY.noneTitle}
+            </h2>
+            <p className="text-body-sm text-ink-muted">{all.length === 0 ? REPORT_COPY.emptyBody : REPORT_COPY.noneBody}</p>
+          </div>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {list.map((i) => (
+              <ReportRow key={i.id} incident={i} pairing={pairFor.get(i.id)} signedOff={signed.has(i.id)} />
+            ))}
+          </ul>
+        )}
+        <p className="text-data text-ink-muted">{REPORT_COPY.standIn}</p>
+      </main>
       <SiteFooter />
     </Atmosphere>
   );

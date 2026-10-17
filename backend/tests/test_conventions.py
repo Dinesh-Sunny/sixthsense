@@ -36,7 +36,7 @@ def test_vss_auth_does_not_buffer_bodies():
 
 
 def test_every_api_route_declares_a_response_model(settings, tmp_path):
-    exempt = {"/api/clip", "/readyz"}
+    exempt = {"/api/clip", "/api/poster", "/readyz"}
     (tmp_path / "web").mkdir()
     app = create_app(settings.model_copy(update={"web_dir": tmp_path / "web"}))
     paths = app.openapi()["paths"]

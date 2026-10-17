@@ -41,7 +41,8 @@ from .contracts import (
     RunStatus,
     Weather,
 )
-from .modes import DISCORD_MAX_CHARS, Mode
+from .media import PosterCache
+from .modes import DISCORD_MAX_CHARS, POSTER_CACHE_SECONDS, POSTER_MAX_T, Mode
 from .pipeline import Deps
 from .runner import RunManager, RunsDisabled
 from .settings import Settings, get_settings
@@ -256,6 +257,34 @@ async def clip(
     )
 
 
+@api.get("/poster", response_model=None)
+async def poster(
+    request: Request,
+    res: ResDep,
+    source: Annotated[str, Query(min_length=6)],
+    t: Annotated[float, Query(ge=0, le=POSTER_MAX_T)] = 1.0,
+) -> Response:
+    if not _valid_source(source, res.settings.clip_bucket):
+        raise HTTPException(400, "Bad source")
+    cache: PosterCache = request.state.posters
+    key = (source, round(t, 1))
+    jpeg = cache.get(key)
+    if jpeg is None:
+        try:
+            video = await res.vss.clip_bytes(source)
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404:
+                raise HTTPException(404, "Clip not found") from e
+            raise
+        jpeg = await cache.render(video, key[1])
+        if jpeg is None:
+            raise HTTPException(404, "Clip could not be read")
+        cache.put(key, jpeg)
+    return Response(
+        jpeg, media_type="image/jpeg", headers={"Cache-Control": f"public, max-age={POSTER_CACHE_SECONDS}"}
+    )
+
+
 @api.get("/weather")
 async def weather(res: ResDep, response: Response) -> Weather:
     response.headers["Cache-Control"] = "public, max-age=600"
@@ -368,6 +397,7 @@ def create_app(
                     "ask_sem": asyncio.Semaphore(settings.ask_concurrency),
                     "alert_lock": asyncio.Lock(),
                     "ready_cache": {},
+                    "posters": PosterCache(),
                 }
             finally:
                 if poller is not None:

@@ -2,10 +2,9 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { useState } from "react";
 import { StatusPill } from "@/components/StatusPill";
 import { Skeleton } from "@/components/ui/skeleton";
-import { clipUrl } from "@/lib/api/client";
+import { ClipStill } from "@/components/ClipStill";
 import { incidentOptions } from "@/lib/api/queries";
 import type { Incident, Pairing } from "@/lib/api/types";
 import { VIEW_LABEL, incidentTitle, shortLine, viewOf } from "@/lib/incident";
@@ -13,20 +12,9 @@ import { REPORT_COPY, SAMPLE, VERDICT, reportId, routeLine } from "@/lib/copy";
 
 /** First frame of the clip, muted and inert: the row's overlay link takes every click. */
 function Thumb({ source, view }: { source: string | null; view: string | null }) {
-  const [failed, setFailed] = useState(false);
   return (
     <div aria-hidden className="relative aspect-video w-24 shrink-0 overflow-hidden rounded-md bg-surface-sunk sm:w-36">
-      {source && !failed && (
-        <video
-          className="absolute inset-0 size-full object-cover"
-          src={clipUrl(source)}
-          preload="metadata"
-          muted
-          playsInline
-          tabIndex={-1}
-          onError={() => setFailed(true)}
-        />
-      )}
+      {source && <ClipStill source={source} alt="" />}
       {view && (
         <span className="absolute bottom-1 left-1 rounded-full bg-scrim px-1.5 py-0.5 text-[10px] leading-none font-medium text-on-sky">
           {view}

@@ -256,3 +256,11 @@ CLI_LIMIT_MAX = 60  # operator runs from the pod / VM
 ASK_MAX_CHARS = 500
 DISCORD_MAX_CHARS = 1500
 ALERTS_MAX = 50
+
+# --- poster stills (/api/poster) ---
+POSTER_WIDTH = 960
+POSTER_QUALITY = 82
+POSTER_CACHE_ITEMS = 512
+POSTER_CONCURRENCY = 2  # decodes at once; each holds a whole clip in memory
+POSTER_MAX_T = 600.0
+POSTER_CACHE_SECONDS = 86400

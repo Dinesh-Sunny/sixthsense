@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { apiUrl } from "@/lib/api/client";
+import { ClipStill } from "@/components/ClipStill";
 import type { Incident } from "@/lib/api/types";
 import { VIEW_LABEL, viewOf } from "@/lib/incident";
 import { assetUrl, cn } from "@/lib/utils";
@@ -12,8 +11,8 @@ export interface StaticFrame {
 }
 
 /**
- * A still from a real incident's clip: a muted, inert <video> seeked to 1 s (first frame via the clip proxy).
- * Falls back to the static JPG only when there is no incident or the clip can't load.
+ * A still from a real incident's clip (poster JPEG, else a lazy video frame at 1 s).
+ * Falls back to the static JPG only when there is no incident or neither still loads.
  */
 export function ClipFrame({
   incident,
@@ -26,27 +25,21 @@ export function ClipFrame({
   className?: string;
   showView?: boolean;
 }) {
-  const [failed, setFailed] = useState(false);
   const source = incident?.source;
   const view = viewOf(incident);
-  const live = Boolean(source) && !failed;
+  const staticImg = <img src={assetUrl(fallback.src)} alt={fallback.alt} className="block size-full object-cover" />;
   return (
     <div className={cn("relative size-full overflow-hidden", className)}>
-      {live ? (
-        <video
-          className="block size-full object-cover"
-          src={`${apiUrl("/clip", { source: source! })}#t=1`}
-          preload="metadata"
-          muted
-          playsInline
-          tabIndex={-1}
-          aria-label={view ? `${VIEW_LABEL[view]} still from a real clip` : "Still from a real clip"}
-          onError={() => setFailed(true)}
+      {source ? (
+        <ClipStill
+          source={source}
+          alt={view ? `${VIEW_LABEL[view]} still from a real clip` : "Still from a real clip"}
+          fallback={staticImg}
         />
       ) : (
-        <img src={assetUrl(fallback.src)} alt={fallback.alt} className="block size-full object-cover" />
+        staticImg
       )}
-      {live && view && showView && (
+      {source && view && showView && (
         <span className="absolute top-2 left-2 rounded-full bg-scrim px-2 py-0.5 text-[11px] font-medium text-on-sky">
           {VIEW_LABEL[view]}
         </span>

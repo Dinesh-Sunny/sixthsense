@@ -29,6 +29,11 @@ export function apiUrl(path: string, params?: Record<string, string | number | u
   return API_BASE + path + (query ? `?${query}` : "");
 }
 
+/** JPEG still of a clip at `t` seconds (backend poster endpoint); callers fall back to the video when it 404s. */
+export function posterUrl(source: string, t = 1): string {
+  return apiUrl("/poster", { source, t });
+}
+
 export function clipUrl(source: string): string {
   // #t=0.1 makes browsers paint the first frame as a poster (needs the 206 proxy).
   return apiUrl("/clip", { source }) + "#t=0.1";

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Phone alert</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ss.css">
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0}</style></helmet>
+<div class="page" style="width:390px;height:844px;padding:20px 16px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px">
+  <div class="panel" style="display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;box-shadow:0 8px 24px rgba(20,20,20,.08)">
+    <span class="dot" style="background:var(--risk-high)"></span>
+    <div><b style="font-weight:500">SixthSense · Risk 4</b><br><span class="kv">New York: a cyclist is cutting in close to a pedestrian.</span></div>
+  </div>
+  <div class="row"><div class="wm" style="font-size:24px">Sixth<i>Sense</i></div><div class="grow"></div><span class="meta">10:58</span></div>
+  <article class="card">
+    <div class="media"><img src="/_blob/c7c76352184cfbf95bc90c31a54495a6" alt="New York intersection, a cyclist close to a pedestrian"><span class="pill hi">Risk 4</span><span class="play"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3l8 5-8 5z" fill="#fff"></path></svg></span></div>
+    <div class="body">
+      <div class="meta">New York · camera 1 · 00:20</div>
+      <div class="eye">Next</div>
+      <div class="fc">The pedestrian steps aside as the cyclist keeps going.</div>
+      <div class="kv"><b>Why</b> The cyclist cuts in with little room.</div>
+      <div class="kv"><b>Fix</b> Cyclists keep a safe distance and yield at the crossing.</div>
+    </div>
+    <div class="foot"><span class="pill ok">Came true</span></div>
+  </article>
+  <div class="stack" style="margin-top:auto">
+    <a class="btn btn-p" href="Detail.dc.html" style="justify-content:center;height:48px">View full clip</a>
+    <button class="btn btn-g" type="button" style="justify-content:center;height:48px">Mark as handled</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

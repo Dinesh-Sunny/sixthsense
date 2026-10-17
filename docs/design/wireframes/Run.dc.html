@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Watch a camera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ss.css">
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0}</style></helmet>
+<div class="page" style="width:1280px;height:900px;padding:32px;box-sizing:border-box;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-content:start">
+  <section class="stack"><span class="state">1 · Pick what to watch</span>
+    <div class="panel stack" style="gap:16px;padding:24px">
+      <div style="font:400 28px/1.15 var(--font-serif)">What should we watch?</div>
+      <div class="stack" style="gap:8px">
+        <label class="row" style="justify-content:space-between;padding:12px 14px;border:1px solid var(--hairline);border-radius:var(--radius-md)"><span><b style="font-weight:500">Road</b><br><span class="kv">I-24 highway, Nashville</span></span><input type="radio" name="m"></label>
+        <label class="row" style="justify-content:space-between;padding:12px 14px;border:1px solid var(--ink);border-radius:var(--radius-md)"><span><b style="font-weight:500">City</b><br><span class="kv">6 intersections, New York and San Francisco</span></span><input type="radio" name="m" checked></label>
+        <label class="row" style="justify-content:space-between;padding:12px 14px;border:1px solid var(--hairline);border-radius:var(--radius-md)"><span><b style="font-weight:500">Street</b><br><span class="kv">One street, two full days</span></span><input type="radio" name="m"></label>
+      </div>
+      <div class="kv">Takes about 2 minutes for 20 clips.</div>
+      <button class="btn btn-p" type="button" style="align-self:flex-start">Start watching</button>
+    </div>
+  </section>
+  <section class="stack"><span class="state">2 · Watching</span>
+    <div class="panel stack" style="gap:16px;padding:24px">
+      <div style="font:400 28px/1.15 var(--font-serif)">Watching 6 intersections</div>
+      <div class="stack" style="gap:12px">
+        <div class="row" style="justify-content:space-between"><span>Finding risky moments</span><span class="pill ok">Done · 20</span></div>
+        <div class="row" style="justify-content:space-between"><span>Ruling out false alarms</span><span class="pill ok">Done · 11 out</span></div>
+        <div class="row" style="justify-content:space-between"><span>Predicting what's next</span><span class="pill unk">6 of 9</span></div>
+        <div class="row" style="justify-content:space-between;color:var(--ink-muted)"><span>Checking against the next clip</span><span class="meta">Waiting</span></div>
+      </div>
+      <div style="height:6px;background:var(--surface-sunk);border-radius:9999px"><div style="width:62%;height:6px;background:var(--ink);border-radius:9999px"></div></div>
+      <div class="kv">You can leave this page. We'll keep going.</div>
+    </div>
+  </section>
+  <section class="stack"><span class="state">3 · Done</span>
+    <div class="panel stack" style="gap:16px;padding:24px">
+      <div style="font:400 28px/1.15 var(--font-serif)">9 moments worth a look</div>
+      <div class="meter"><span class="num">4 / 6</span><span class="bar" aria-hidden="true"><i class="y"></i><i class="y"></i><i class="y"></i><i class="y"></i><i class="x"></i><i class="x"></i></span></div>
+      <div class="kv">4 of 6 predictions came true when we checked the next clip. 3 had no next clip yet.</div>
+      <a class="btn btn-p" href="Main.dc.html" style="align-self:flex-start">See the moments</a>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

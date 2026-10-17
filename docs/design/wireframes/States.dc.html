@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Card and page states</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ss.css">
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0}</style></helmet>
+<div class="page" style="width:1280px;height:900px;padding:32px;box-sizing:border-box;display:flex;flex-direction:column;gap:28px">
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+    <div class="stack"><span class="state">Loading</span>
+      <article class="card"><div class="media skel" style="border-radius:0"></div><div class="body"><div class="skel" style="height:12px;width:40%"></div><div class="skel" style="height:22px;width:90%"></div><div class="skel" style="height:22px;width:70%"></div><div class="skel" style="height:12px;width:60%"></div></div></article>
+    </div>
+    <div class="stack"><span class="state">Sample data</span>
+      <article class="card"><div class="media"><img src="/_blob/dba15402781dbbf26ed76f6178783249" alt="I-24 highway from above"><span class="pill sample">Sample</span></div><div class="body"><div class="meta">I-24, Nashville · 00:05</div><div class="eye">Next</div><div class="fc">The white truck moves into the middle lane.</div><div class="kv">This is example data. Watch a camera to see real moments.</div></div><div class="foot"><span class="pill unk">Example</span></div></article>
+    </div>
+    <div class="stack"><span class="state">Clip won't play</span>
+      <article class="card"><div class="media"><span class="pill hi">Risk 4</span><span class="kv" style="text-align:center;padding:0 24px">This clip can't play right now.<br><a href="#" style="color:var(--ink)">Try again</a></span></div><div class="body"><div class="meta">New York · camera 2 · 00:15</div><div class="eye">Next</div><div class="fc">A white van enters from the right and drives through.</div></div><div class="foot"><span class="pill ok">Came true</span></div></article>
+    </div>
+    <div class="stack"><span class="state">Alert sent</span>
+      <article class="card"><div class="media"><img src="/_blob/adf5fb2bab4751f0fbf16dde1a03cd20" alt="San Francisco intersection"><span class="pill hi">Risk 4</span></div><div class="body"><div class="meta">San Francisco · camera 4 · 00:05</div><div class="eye">Next</div><div class="fc">The woman with the stroller finishes crossing as the white sedan rolls on.</div></div><div class="foot"><span class="pill ok">Came true</span><button class="btn btn-p btn-sm" type="button" disabled>Sent at 11:02</button></div></article>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+    <div class="stack"><span class="state">Empty camera</span>
+      <div class="panel stack" style="align-items:flex-start;padding:28px">
+        <div style="font:400 28px/1.15 var(--font-serif)">All calm on I-24</div>
+        <div class="kv">We watched 20 clips and ruled out every alarm. We'll show moments here as soon as something needs a look.</div>
+        <a class="btn btn-g btn-sm" href="Run.dc.html">Watch another camera</a>
+      </div>
+    </div>
+    <div class="stack"><span class="state">Score with nothing checked yet</span>
+      <div class="panel stack" style="padding:28px">
+        <div class="meter"><span class="num" style="color:var(--ink-muted)">0 / 0</span><span class="kv">predictions checked so far</span></div>
+        <div class="kv">Each prediction gets checked against the clip that comes next. Scores appear as clips arrive.</div>
+      </div>
+    </div>
+    <div class="stack"><span class="state">Can't reach the cameras</span>
+      <div class="panel stack" style="padding:28px;border-color:var(--risk-high)">
+        <div style="font:400 28px/1.15 var(--font-serif)">We lost the connection</div>
+        <div class="kv">Your moments are safe. We'll reconnect on our own, or you can try now.</div>
+        <div class="row"><button class="btn btn-p btn-sm" type="button">Try again</button><span class="meta">Last update 10:41</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="stack"><span class="state">Pills and tabs</span>
+    <div class="row"><span class="pill hi">Risk 5</span><span class="pill hi">Risk 4</span><span class="pill mid">Risk 3</span><span class="pill lo">Risk 2</span><span class="pill ok">Came true</span><span class="pill mid">Partly</span><span class="pill hi">Didn't happen</span><span class="pill unk">Checking soon</span><span class="pill sample">Sample</span>
+      <nav class="tabs" aria-label="Camera mode" style="margin-left:24px"><button class="tab" type="button">Road <span class="n">0</span></button><button class="tab on" type="button">City <span class="n">9</span></button><button class="tab" type="button">Street</button></nav></div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

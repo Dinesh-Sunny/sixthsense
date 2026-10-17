@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SixthSense home</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ss.css">
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0}</style></helmet>
+<div class="page" style="width:1280px;height:1040px;background:radial-gradient(50% 220px at 80% 0,rgba(255,255,255,.5),rgba(255,255,255,0) 70%),radial-gradient(70% 160px at 50% 330px,var(--sun),rgba(247,217,168,0) 70%),linear-gradient(180deg,var(--sky-deep) 0,var(--sky-mid) 180px,var(--haze) 320px,var(--ground) 440px)">
+  <header class="top" style="padding:20px 32px">
+    <div class="wm" style="font-size:24px;color:#fff">Sixth<i style="color:#dbe7f5">Sense</i></div>
+    <span class="wx"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.2" fill="none" stroke="#b8860b" stroke-width="1.5"></circle><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"></path></svg>London · 12° · Sunny</span>
+    <div class="grow"></div>
+    <nav class="tabs" aria-label="Camera mode">
+      <button class="tab" type="button">Road <span class="n">0</span></button>
+      <button class="tab on" type="button">City <span class="n">9</span></button>
+      <button class="tab" type="button">Street</button>
+    </nav>
+    <div class="grow"></div>
+    <a class="btn btn-g btn-sm" href="Run.dc.html">Watch a camera</a>
+    <span class="btn btn-g btn-sm" style="pointer-events:none;padding-left:6px"><span style="width:22px;height:22px;border-radius:50%;background:var(--sky-deep);color:#fff;display:grid;place-items:center;font-size:11px">D</span>Hi, Dinesh</span>
+  </header>
+
+  <section style="padding:28px 32px 36px;display:flex;align-items:flex-end;gap:24px">
+    <div class="stack" style="gap:8px">
+      <div class="serif" style="font-size:56px;line-height:1;color:#fff">9 moments worth a look</div>
+      <div style="font-size:16px;color:rgba(255,255,255,.9)">6 crossings in New York and San Francisco. 20 clips watched, 11 false alarms ruled out.</div>
+    </div>
+    <div class="grow"></div>
+    <div class="glass float meter" style="border-radius:22px;padding:14px 18px" title="Predictions checked against the next clip">
+      <span class="num">4 / 6</span>
+      <span class="bar" aria-hidden="true"><i class="y"></i><i class="y"></i><i class="y"></i><i class="y"></i><i class="x"></i><i class="x"></i></span>
+      <span class="kv" style="color:var(--ink)">came true today</span>
+    </div>
+  </section>
+
+  <div style="display:flex;gap:24px;padding:0 32px 32px">
+    <main style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px">
+      <div class="row"><span class="eye">Riskiest first</span></div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px">
+        <article class="card">
+          <div class="media"><img src="/_blob/adf5fb2bab4751f0fbf16dde1a03cd20" alt="San Francisco intersection, a white sedan near a pedestrian with a stroller"><span class="pill hi">Risk 4</span><span class="play"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3l8 5-8 5z" fill="#fff"></path></svg></span></div>
+          <div class="body">
+            <div class="meta">San Francisco · camera 4 · 00:05</div>
+            <div class="eye">Next</div>
+            <div class="fc">The woman with the stroller finishes crossing as the white sedan rolls on.</div>
+            <div class="kv"><b>Why</b> The sedan doesn't yield at the crossing.</div>
+            <div class="meta">Gap closed from 2.1 to 0.5 car lengths in 1.7s</div>
+          </div>
+          <div class="foot"><span class="pill ok">Came true</span><a class="btn btn-p btn-sm" href="Detail.dc.html">View</a></div>
+        </article>
+        <article class="card">
+          <div class="media"><img src="/_blob/c7c76352184cfbf95bc90c31a54495a6" alt="New York intersection, a cyclist close to a pedestrian"><span class="pill hi">Risk 4</span><span class="play"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3l8 5-8 5z" fill="#fff"></path></svg></span></div>
+          <div class="body">
+            <div class="meta">New York · camera 1 · 00:20</div>
+            <div class="eye">Next</div>
+            <div class="fc">The pedestrian steps aside as the cyclist keeps going.</div>
+            <div class="kv"><b>Why</b> The cyclist cuts in with little room.</div>
+            <div class="meta">Gap closed from 4.2 to 0.6 car lengths in 3.8s</div>
+          </div>
+          <div class="foot"><span class="pill ok">Came true</span><a class="btn btn-p btn-sm" href="Detail.dc.html">View</a></div>
+        </article>
+        <article class="card">
+          <div class="media"><img src="/_blob/f74484d1ed87e09a18be3bee9db355da" alt="New York crosswalk, a blue car close to a pedestrian"><span class="pill hi">Risk 4</span><span class="play"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3l8 5-8 5z" fill="#fff"></path></svg></span></div>
+          <div class="body">
+            <div class="meta">New York · camera 1 · 00:25</div>
+            <div class="eye">Next</div>
+            <div class="fc">The pedestrian steps back as the blue car rolls forward.</div>
+            <div class="kv"><b>Why</b> The driver doesn't yield at the crosswalk.</div>
+            <div class="meta">Gap closed from 1.5 to 0.2 car lengths in 2.3s</div>
+          </div>
+          <div class="foot"><span class="pill unk">No next clip to check</span><a class="btn btn-p btn-sm" href="Detail.dc.html">View</a></div>
+        </article>
+        <article class="card">
+          <div class="media"><img src="/_blob/ae0a6f619e8a799625710acd4cc870e2" alt="New York intersection, a yellow taxi and a black SUV"><span class="pill mid">Risk 3</span><span class="play"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3l8 5-8 5z" fill="#fff"></path></svg></span></div>
+          <div class="body">
+            <div class="meta">New York · camera 2 · 00:20</div>
+            <div class="eye">Next</div>
+            <div class="fc">The yellow taxi stops and the black SUV keeps creeping forward.</div>
+            <div class="kv"><b>Why</b> The SUV cuts in without enough space.</div>
+            <div class="meta">Gap closed from 1.7 to 0.4 car lengths in 1.9s</div>
+          </div>
+          <div class="foot"><span class="pill hi">Didn't happen</span><a class="btn btn-p btn-sm" href="Detail.dc.html">View</a></div>
+        </article>
+      </div>
+    </main>
+
+    <aside style="width:320px;display:flex;flex-direction:column;gap:16px">
+      <section class="panel">
+        <h2 class="h">Ask</h2>
+        <div class="row" style="flex-wrap:nowrap"><label for="ask" style="position:absolute;left:-9999px">Ask about today's footage</label><input id="ask" class="input" placeholder="Any close calls at a crossing?"><a class="btn btn-p btn-sm" href="Ask.dc.html">Ask</a></div>
+      </section>
+      <section class="panel">
+        <h2 class="h">Alerts sent</h2>
+        <div class="alert"><span class="dot" style="background:var(--risk-high)"></span><div><b>Risk 4 · San Francisco</b><br><span style="color:var(--ink-muted)">The white sedan doesn't yield to a woman with a stroller.</span></div><span class="meta">11:02</span></div>
+        <div class="alert" style="border:0"><span class="dot" style="background:var(--risk-high)"></span><div><b>Risk 4 · New York</b><br><span style="color:var(--ink-muted)">A cyclist cuts in close to a pedestrian.</span></div><span class="meta">10:58</span></div>
+      </section>
+      <section class="panel">
+        <h2 class="h">How it works</h2>
+        <div class="kv">It watches every clip, rules out false alarms, predicts the next few seconds, then checks the next clip to see if it was right.</div>
+      </section>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

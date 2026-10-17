@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SixthSense landing</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ss.css">
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0}</style></helmet>
+<div style="width:1440px;background:var(--ground)">
+
+  <section class="sky" style="position:relative;padding:28px 40px 120px;display:flex;flex-direction:column;align-items:center">
+    <nav style="width:100%;display:flex;align-items:center;gap:16px">
+      <div class="wm" style="font-size:24px;color:var(--ink)">Sixth<i style="color:#4a5a78">Sense</i></div>
+      <div class="grow"></div>
+      <span class="btn btn-g btn-sm" style="pointer-events:none">Built at the VAST Builders Challenge</span>
+      <div class="grow"></div>
+      <a class="btn btn-p btn-sm" href="Main.dc.html">Open dashboard</a>
+    </nav>
+    <div class="stack" style="align-items:center;gap:22px;margin-top:96px;text-align:center">
+      <span class="wx"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.2" fill="none" stroke="#b8860b" stroke-width="1.5"></circle><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1" stroke="#b8860b" stroke-width="1.5" stroke-linecap="round"></path></svg>London · 12° · Sunny</span>
+      <div class="serif" style="font-size:84px;line-height:.95;color:var(--ink)">Sixth<i style="color:#4a5a78">Sense</i></div>
+      <p style="margin:0;font-size:22px;line-height:1.35;max-width:620px;color:var(--ink)">Your cameras record everything. SixthSense tells you what happens next, then checks if it was right.</p>
+      <div class="stack" style="width:420px;gap:10px;margin-top:10px">
+        <a class="btn btn-p" href="Main.dc.html" style="justify-content:center;height:48px">See it on real footage</a>
+        <a class="btn btn-g" href="#how" style="justify-content:center;height:48px">How it works</a>
+      </div>
+    </div>
+    <div style="position:relative;margin-top:88px;width:1120px">
+      <div class="card" style="aspect-ratio:16/8;border-radius:var(--radius-xl)">
+        <img src="/_blob/adf5fb2bab4751f0fbf16dde1a03cd20" alt="A San Francisco crossing seen from a street camera" style="width:100%;height:100%;object-fit:cover">
+      </div>
+      <div class="glass float" style="position:absolute;right:40px;bottom:-48px;width:380px;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:10px;background:rgba(255,255,255,.86)">
+        <div class="row"><span class="pill hi">Risk 4</span><span class="meta">San Francisco · 00:05</span></div>
+        <div class="eye">Next</div>
+        <div class="fc" style="font-size:24px">The woman with the stroller finishes crossing as the white sedan rolls on.</div>
+        <div class="row"><span class="pill ok">Came true</span><span class="kv">checked on the next clip</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:96px 40px 24px;display:flex;justify-content:center;gap:40px;flex-wrap:wrap" class="kv">
+    <span>Built on VAST AI OS</span><span>NVIDIA Cosmos</span><span>CoreWeave GPUs</span><span>Weights &amp; Biases</span>
+  </section>
+
+  <section id="how" style="padding:72px 120px;display:flex;flex-direction:column;gap:96px">
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:72px;align-items:center">
+      <div class="stack" style="gap:16px">
+        <h2 class="serif" style="margin:0;font-size:44px;line-height:1.08">It watches<br>every clip</h2>
+        <p class="kv" style="margin:0;font-size:15px;line-height:23px;max-width:400px">Highways, crossings, quiet streets. SixthSense reads every five seconds of footage across your cameras, so nothing waits for a person to press play.</p>
+      </div>
+      <div class="skycard" style="border-radius:var(--radius-xl);height:400px;display:grid;place-items:center">
+        <div class="float" style="background:#fff;border-radius:18px;padding:18px 20px;width:320px;display:flex;flex-direction:column;gap:12px">
+          <div class="eye">Watching now</div>
+          <div class="row" style="justify-content:space-between"><span>New York · 2 cameras</span><span class="meta">540 clips</span></div>
+          <div class="row" style="justify-content:space-between"><span>San Francisco · 4</span><span class="meta">545 clips</span></div>
+          <div class="row" style="justify-content:space-between"><span>I-24, Nashville</span><span class="meta">180 clips</span></div>
+          <div class="row" style="justify-content:space-between;color:var(--ink-muted)"><span>13 cameras in all</span><span class="meta">3,537 clips</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:72px;align-items:center">
+      <div class="lav" style="border-radius:var(--radius-xl);height:400px;display:grid;place-items:center">
+        <div class="float" style="background:#fff;border-radius:18px;padding:18px 20px;width:340px;display:flex;flex-direction:column;gap:10px">
+          <div class="eye">Gap in car lengths</div>
+          <svg viewBox="0 0 300 90" width="300" height="90" role="img" aria-label="Gap falls from 2.1 to 0.5 car lengths in 1.7 seconds">
+            <line x1="0" y1="60" x2="300" y2="60" stroke="#c8372d" stroke-dasharray="4 4"></line>
+            <polyline fill="none" stroke="#141414" stroke-width="2" points="0,12 60,18 120,30 180,48 240,70 300,74"></polyline>
+            <circle cx="300" cy="74" r="4" fill="#c8372d"></circle>
+          </svg>
+          <div class="meta">2.1 → 0.5 car lengths in 1.7s · real, not a false alarm</div>
+        </div>
+      </div>
+      <div class="stack" style="gap:16px">
+        <h2 class="serif" style="margin:0;font-size:44px;line-height:1.08">It rules out<br>false alarms</h2>
+        <p class="kv" style="margin:0;font-size:15px;line-height:23px;max-width:400px">Before anyone is bothered, it tracks every car and person frame by frame. If two of them aren't really closing in, the moment is dropped. This morning, 11 of 20 alarms never reached a screen.</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:72px;align-items:center">
+      <div class="stack" style="gap:16px">
+        <h2 class="serif" style="margin:0;font-size:44px;line-height:1.08">It sees what<br>happens next</h2>
+        <p class="kv" style="margin:0;font-size:15px;line-height:23px;max-width:400px">For every real moment, it predicts the next few seconds, says why, and suggests one practical fix. In plain words, with the vehicle and the time.</p>
+      </div>
+      <div class="dusk" style="border-radius:var(--radius-xl);height:400px;display:grid;place-items:center">
+        <div class="float" style="background:#fff;border-radius:18px;overflow:hidden;width:340px">
+          <img src="/_blob/c7c76352184cfbf95bc90c31a54495a6" alt="A New York crossing with a cyclist near a pedestrian" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block">
+          <div style="padding:14px 18px;display:flex;flex-direction:column;gap:6px">
+            <div class="eye">Next</div>
+            <div class="fc" style="font-size:20px">The pedestrian steps aside as the cyclist keeps going.</div>
+            <div class="kv"><b>Fix</b> Cyclists yield at the crossing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:72px;align-items:center">
+      <div class="skycard" style="border-radius:var(--radius-xl);height:400px;display:grid;place-items:center">
+        <div class="float" style="background:#fff;border-radius:18px;padding:20px;width:340px;display:flex;flex-direction:column;gap:12px">
+          <div class="eye">Today's score</div>
+          <div class="meter"><span class="num">4 / 6</span><span class="bar" aria-hidden="true"><i class="y"></i><i class="y"></i><i class="y"></i><i class="y"></i><i class="x"></i><i class="x"></i></span></div>
+          <div class="row"><span class="pill ok">Came true</span><span class="pill hi">Didn't happen</span></div>
+        </div>
+      </div>
+      <div class="stack" style="gap:16px">
+        <h2 class="serif" style="margin:0;font-size:44px;line-height:1.08">Then it checks<br>itself</h2>
+        <p class="kv" style="margin:0;font-size:15px;line-height:23px;max-width:400px">It watches the next clip and marks each prediction: came true, partly, or didn't happen. You get a score measured on your own footage, not a promise.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:140px 160px;text-align:center;background:#fff">
+    <p class="serif" style="margin:0 auto;font-size:60px;line-height:1.08;max-width:1040px;color:var(--ink)">Cameras record millions of hours a day. Almost nobody watches. The few seconds that matter deserve a second look.</p>
+  </section>
+
+  <section style="padding:96px 120px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+    <div class="card" style="padding:28px;gap:10px"><div class="serif" style="font-size:28px">Road operators</div><div class="kv">See risky lane changes and braking before they turn into a pile-up.</div></div>
+    <div class="card" style="padding:28px;gap:10px"><div class="serif" style="font-size:28px">City safety teams</div><div class="kv">Find the crossings where drivers don't yield, with the clips to prove it.</div></div>
+    <div class="card" style="padding:28px;gap:10px"><div class="serif" style="font-size:28px">Fleet insurers</div><div class="kv">Know which moments were close calls, and which predictions held up.</div></div>
+  </section>
+
+  <section style="padding:0 40px 40px">
+    <div class="dusk" style="border-radius:var(--radius-xl);padding:120px 40px;display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center">
+      <div class="serif" style="font-size:56px;line-height:1.02;color:var(--ink)">Never leave your cameras<br><i>home alone.</i></div>
+      <a class="btn btn-p" href="Main.dc.html" style="height:48px;padding:0 28px">Open the dashboard</a>
+    </div>
+  </section>
+
+  <footer style="padding:24px 40px 40px;display:flex;align-items:center;gap:16px" class="kv">
+    <div class="wm" style="font-size:20px;color:var(--ink)">Sixth<i>Sense</i></div>
+    <div class="grow"></div>
+    <span>Made in London, 17 October 2026</span>
+    <a href="https://github.com/Dinesh-Sunny/sixthsense" style="color:var(--ink)">GitHub</a>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":4600}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

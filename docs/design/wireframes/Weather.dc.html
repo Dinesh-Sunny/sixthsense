@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Weather atmospheres</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ss.css">
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0}</style></helmet>
+<div style="width:1280px;height:460px;box-sizing:border-box;padding:32px;background:var(--ground);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px">
+  <div class="sky wx-clear" style="border-radius:var(--radius-xl);padding:20px;display:flex;flex-direction:column;gap:12px">
+    <span class="wx">London · 12° · Sunny · now</span>
+    <div class="serif" style="font-size:30px;line-height:1.05;color:#fff;margin-top:auto">Clear</div>
+    <div class="kv" style="color:rgba(255,255,255,.92)">Bright sky, warm low-sun haze at the horizon.</div>
+  </div>
+  <div class="sky wx-cloudy" style="border-radius:var(--radius-xl);padding:20px;display:flex;flex-direction:column;gap:12px">
+    <span class="wx">Overcast</span>
+    <div class="serif" style="font-size:30px;line-height:1.05;color:#fff;margin-top:auto">Cloudy</div>
+    <div class="kv" style="color:rgba(255,255,255,.92)">Soft grey sky, no sun glow, flatter light.</div>
+  </div>
+  <div class="sky wx-rain" style="border-radius:var(--radius-xl);padding:20px;display:flex;flex-direction:column;gap:12px;background-image:repeating-linear-gradient(105deg,rgba(255,255,255,.10) 0 1px,rgba(255,255,255,0) 1px 14px),radial-gradient(70% 45% at 78% 4%,rgba(255,255,255,.35) 0%,rgba(255,255,255,0) 60%),linear-gradient(180deg,var(--sky-deep) 0%,var(--sky-mid) 45%,var(--haze) 100%)">
+    <span class="wx">Rain · 70%</span>
+    <div class="serif" style="font-size:30px;line-height:1.05;color:#fff;margin-top:auto">Rain</div>
+    <div class="kv" style="color:rgba(255,255,255,.92)">Cool slate with fine streaks. Also a cue: wet roads, longer stops.</div>
+  </div>
+  <div class="sky wx-night" style="border-radius:var(--radius-xl);padding:20px;display:flex;flex-direction:column;gap:12px">
+    <span class="wx">After sunset</span>
+    <div class="serif" style="font-size:30px;line-height:1.05;color:#fff;margin-top:auto">Night</div>
+    <div class="kv" style="color:rgba(255,255,255,.88)">Deep blue. Cards stay white so moments still read first.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":460}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ask the footage</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ss.css">
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0}</style></helmet>
+<div class="page" style="width:720px;height:980px;padding:32px;display:flex;flex-direction:column;gap:28px">
+  <section class="stack">
+    <span class="state">Idle</span>
+    <div class="panel stack">
+      <div class="row" style="flex-wrap:nowrap"><label for="q1" style="position:absolute;left:-9999px">Ask about today's footage</label><input id="q1" class="input" placeholder="Any close calls at a crossing?"><button class="btn btn-p btn-sm" type="button">Ask</button></div>
+      <div class="row"><span class="kv">Try</span><button class="btn btn-g btn-sm" type="button">Cars not yielding</button><button class="btn btn-g btn-sm" type="button">Cyclists near people</button></div>
+    </div>
+  </section>
+  <section class="stack">
+    <span class="state">Thinking</span>
+    <div class="panel stack">
+      <div class="row" style="flex-wrap:nowrap"><input class="input" value="Any close calls at a crossing?" aria-label="Question"><button class="btn btn-p btn-sm" type="button" disabled>Asking…</button></div>
+      <div class="kv">Looking through 3,537 clips…</div>
+      <div class="skel" style="height:14px;width:92%"></div><div class="skel" style="height:14px;width:64%"></div>
+    </div>
+  </section>
+  <section class="stack">
+    <span class="state">Answer</span>
+    <div class="panel stack">
+      <div class="row" style="flex-wrap:nowrap"><input class="input" value="Any close calls at a crossing?" aria-label="Question"><button class="btn btn-p btn-sm" type="button">Ask</button></div>
+      <div class="ans">Yes, two. In San Francisco a white sedan didn't yield to a woman with a stroller. In New York a cyclist cut in close to a pedestrian.<span class="cite">San Francisco camera 4 · 00:05 &nbsp;·&nbsp; New York camera 1 · 00:20</span></div>
+      <div class="row"><a class="btn btn-g btn-sm" href="Detail.dc.html">View San Francisco</a><a class="btn btn-g btn-sm" href="Detail.dc.html">View New York</a></div>
+    </div>
+  </section>
+  <section class="stack">
+    <span class="state">Nothing found</span>
+    <div class="panel stack">
+      <div class="ans">No clips show that yet. Try different words, or watch another camera.</div>
+    </div>
+  </section>
+  <section class="stack">
+    <span class="state">Can't reach the footage</span>
+    <div class="panel stack" style="border-color:var(--risk-high)">
+      <div class="kv" style="color:var(--ink)">We can't reach the footage right now. Your question is saved.</div>
+      <div class="row"><button class="btn btn-p btn-sm" type="button">Try again</button></div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":980}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

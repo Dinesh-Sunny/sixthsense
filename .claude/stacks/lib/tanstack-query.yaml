@@ -136,7 +136,7 @@ groups:
     entries:
     - id: tsq-prefetch-hover
       name: Prefetch on hover or focus
-      summary: call `void queryClient.query(options).catch(noop)` in onMouseEnter and onFocus; older `prefetchQuery` still exists and is documented as deprecated
+      summary: call `void queryClient.query(options).catch(noop)` in onMouseEnter and onFocus; `prefetchQuery` is documented as deprecated
       lenses: [perf, ux-a11y]
       signature: 'queryClient.query(incidentOptions(id))'
       notes: ['prefetch skips the fetch only when cached data is fresher than staleTime, so set one', 'both query and prefetchQuery exist in 5.104.3 typings; prefetchQuery is slated for removal in the next major', 'a prefetch staleTime does not carry over to useQuery']
@@ -158,7 +158,7 @@ groups:
     entries:
     - id: tsq-no-server-hydration
       name: No dehydrate or HydrationBoundary at runtime
-      summary: with `output: 'export'` there is no request-time server, so skip server prefetch and hydration; fetch on the client
+      summary: "with `output: 'export'` there is no request-time server, so skip server prefetch and hydration and fetch on the client"
       lenses: [best-practice, reliability]
       notes: ['build-time prefetch would freeze data into HTML; avoid it for live incident data', 'queryFn uses relative URLs and must throw on non-2xx; all fetching happens in client components, so first paint shows the Suspense or loading state', 'set a staleTime so cached data is not refetched right after mount']
       ref: /docs/framework/react/guides/ssr.md

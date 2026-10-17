@@ -41,14 +41,14 @@ groups:
     - id: vdb-transaction
       name: session.transaction()
       summary: context manager that commits on exit; every catalog and table call runs inside it
-      lenses: [best-practice, gotcha]
+      lenses: [best-practice, reliability]
       signature: with session.transaction() as tx
       notes: ['keep the transaction open while reading the returned reader; select raises MissingTransaction once it has ended', 'batch many reads or writes into one transaction instead of one per row']
       ref: /README.md
     - id: vdb-endpoints
       name: Data VIP versus Query Engine VIP
       summary: DDL and DML go to the data VIP; the QE VIP is only for reads that specifically need it
-      lenses: [gotcha]
+      lenses: [reliability]
       notes: ['hackathon: data VIP is S3_ENDPOINT in /config/<team>.config and must include http:// or https://; QE VIP is vdb_endpoint in the backend secret', 'other teams buckets return 403 by identity policy']
       ref: /README.md
   - id: vdb-ddl
@@ -67,7 +67,7 @@ groups:
     - id: vdb-create-table
       name: create_table with a pyarrow schema
       summary: define columns with pa.schema([...]) and create the table once
-      lenses: [best-practice, gotcha]
+      lenses: [best-practice, reliability]
       signature: 'schema.create_table(name, columns, fail_if_exists=True, use_external_row_ids_allocation=False, sorting_key=[], vector_index=None)'
       notes: ['use fail_if_exists=False for idempotent setup', 'sorting_key is for Elysium (sorted) tables; sorted_table, sorted_columns() report it', 'the VSS skill forbids dropping or recreating vss-collection or vss-prompts-events; make sibling tables only']
       ref: /vastdb/schema.py
@@ -94,13 +94,13 @@ groups:
     - id: vdb-upsert-pattern
       name: Upsert by id
       summary: select the existing row id for the key, then update; insert only when none matched
-      lenses: [best-practice, gotcha]
+      lenses: [best-practice, reliability]
       notes: ['no native upsert found in the fetched docs; do the select, update or insert inside one transaction', 'enforce uniqueness of id yourself']
       ref: /vastdb/table.py
     - id: vdb-row-id
       name: Internal row id ($row_id)
       summary: update and delete address rows by a uint64 $row_id column
-      lenses: [gotcha]
+      lenses: [reliability]
       signature: 'table.select(columns=[...], predicate=..., internal_row_id=True)'
       notes: ['internal_row_id=True adds the $row_id column to the result; carry it into update or delete', 'missing it raises errors.MissingRowIdColumn']
       ref: /vastdb/table.py
@@ -158,7 +158,7 @@ groups:
     - id: vdb-vectors
       name: Vector columns
       summary: never select vector columns from vss-collection
-      lenses: [gotcha]
+      lenses: [reliability]
       notes: ['hackathon skill: vectors and vectors_visual (256-dim) can crash the SDK; build the column list from table.columns() minus those names', 'incidents table should hold no vector columns']
       ref: /README.md
 - title: Performance
@@ -180,7 +180,7 @@ groups:
     - id: vdb-backoff
       name: BackoffConfig retries
       summary: retry settings for failed requests, default 10 tries or 60 s
-      lenses: [perf, gotcha]
+      lenses: [perf, reliability]
       notes: ['pass backoff_config to the Session to shorten retries on a live demo', 'select can raise errors.TooLargeRequest for huge predicates']
       ref: /vastdb/config.py
     - id: vdb-many-reads

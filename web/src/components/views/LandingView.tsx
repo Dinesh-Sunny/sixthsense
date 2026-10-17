@@ -8,13 +8,15 @@ import { CoachFan } from "@/components/landing/CoachFan";
 import { GapCreative } from "@/components/landing/GapCreative";
 import { HeroStage } from "@/components/landing/HeroStage";
 import { LiveLines } from "@/components/landing/LiveLines";
+import { LiveResults } from "@/components/landing/LiveResults";
+import { Team } from "@/components/landing/Team";
 import { Reveal, rise, stagger } from "@/components/landing/reveal";
 import { ScoreBar } from "@/components/landing/ScoreBar";
 import { StatusPill } from "@/components/StatusPill";
 import { WeatherPill } from "@/components/WeatherPill";
 import { Button } from "@/components/ui/button";
 import { incidentsOptions, metricsOptions, readyOptions, weatherOptions } from "@/lib/api/queries";
-import { MODES, type Incident, type ModeMetrics } from "@/lib/api/types";
+import type { Incident, ModeMetrics } from "@/lib/api/types";
 import { BUS_COPY, COPY, MODE_INFO, STORE_LABEL, gapLine, gapSummary, riskLabel, riskTone, scoreLine } from "@/lib/copy";
 import { hazardOf } from "@/lib/incident";
 import { assetUrl, cn } from "@/lib/utils";
@@ -29,13 +31,6 @@ const FRAMES = {
   predict: { src: "/landing/f1.jpg", alt: "A New York crossing with pedestrians and a cyclist" },
 };
 
-const STACK = [
-  { name: "VAST VastDB", role: "Keeps every moment, prediction and score, so the dashboard and the record are the same thing." },
-  { name: "NVIDIA Cosmos3-Reason", role: "Watches each clip, says what happens next and why, then watches the next clip to check." },
-  { name: "YOLO11 on CoreWeave", role: "Finds the cars and people in every frame, so close calls are measured, not guessed." },
-  { name: "W&B Weave", role: "Records every model call and every score, so each prediction can be traced back." },
-  { name: "TfL Open Data + Mapbox", role: "Live bus arrivals place every London bus on the map, refreshed every 30 seconds." },
-];
 
 const STEPS = [
   {
@@ -137,7 +132,7 @@ function FeatureRow({
   );
 }
 
-const floatCard = "flex w-full max-w-[340px] flex-col gap-3 rounded-[18px] bg-surface p-5 shadow-float";
+const floatCard = "lift flex w-full max-w-[340px] flex-col gap-3 rounded-[18px] bg-surface p-5 shadow-float";
 
 export function LandingView() {
   const weather = useQuery(weatherOptions());
@@ -159,6 +154,9 @@ export function LandingView() {
   const gap = withGap.find((i) => i.id !== top?.id && i.id !== foresee?.id) ?? topIncident([withGap]);
   const score = bestScore(m);
   const ran = m?.filter((x) => x.candidates > 0) ?? [];
+  // Live results come from the bus safety run, or the city run until the bus run exists.
+  const resultRun = ran.find((x) => x.mode === "bus") ?? ran.find((x) => x.mode === "city");
+  const resultIncidents = ((resultRun?.mode === "bus" ? bus.data : city.data) ?? []).filter((i) => !i.fixture);
   const totalWatched = ran.reduce((a, x) => a + x.candidates, 0);
   const totalRuledOut = ran.reduce((a, x) => a + x.ruled_out, 0);
   const stored = ready.data?.store ? STORE_LABEL[ready.data.store] : null;
@@ -259,7 +257,7 @@ export function LandingView() {
           index={2}
           wash="dusk-card"
           visual={
-            <Reveal className="w-full max-w-[340px] overflow-hidden rounded-[18px] bg-surface shadow-float">
+            <Reveal className="lift zoom-img w-full max-w-[340px] overflow-hidden rounded-[18px] bg-surface shadow-float">
               <Frame frame={FRAMES.predict} className="aspect-video" />
               {foresee && (
                 <div className="flex flex-col gap-1.5 px-[18px] py-3.5">
@@ -300,46 +298,8 @@ export function LandingView() {
         />
       </section>
 
-      {/* Live results: real numbers only; hidden when metrics fail. */}
-      {ran.length > 0 && (
-        <section className="mx-auto max-w-[1200px] px-4 pb-16 md:px-10 md:pb-24 lg:px-[80px]" aria-labelledby="results-h">
-          <h2 id="results-h" className="mb-8 font-serif text-[36px] leading-[1.08] md:text-[44px]">
-            Live results
-          </h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {MODES.map((mode) => {
-              const x = ran.find((r) => r.mode === mode);
-              if (!x) return null;
-              return (
-                <div key={mode} className="flex flex-col gap-3 rounded-xl bg-surface p-7 shadow-float">
-                  <div className="font-serif text-[28px] leading-none">{MODE_INFO[mode].name}</div>
-                  <div className="text-body-sm text-ink-muted">{MODE_INFO[mode].place}</div>
-                  <div className="font-mono text-[20px] leading-7 font-medium tabular-nums">{x.checked > 0 ? scoreLine(x) : "Nothing checked yet"}</div>
-                  {x.checked > 0 && <ScoreBar metrics={x} />}
-                  <div className="text-data text-ink-muted">
-                    {x.candidates} clips watched · {x.ruled_out} ruled out · {x.verified} worth a look
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* Built on */}
-      <section className="mx-auto max-w-[1200px] px-4 pb-16 md:px-10 md:pb-24 lg:px-[80px]" aria-labelledby="stack-h">
-        <h2 id="stack-h" className="mb-8 font-serif text-[36px] leading-[1.08] md:text-[44px]">
-          Built on
-        </h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {STACK.map((s) => (
-            <div key={s.name} className="flex flex-col gap-1.5 rounded-md border border-hairline bg-surface p-5">
-              <div className="text-title">{s.name}</div>
-              <p className="text-body-sm text-ink-muted">{s.role}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Live results: real numbers only; hidden when metrics fail or no run exists. */}
+      {resultRun && <LiveResults metrics={resultRun} incidents={resultIncidents} />}
 
       <section className="bg-surface px-4 py-16 text-center md:px-10 md:py-24">
         <Reveal>
@@ -352,7 +312,7 @@ export function LandingView() {
       <section className="mx-auto grid max-w-[1200px] grid-cols-1 gap-6 px-4 py-16 md:grid-cols-3 md:px-10 md:py-24 lg:px-[80px]">
         {AUDIENCES.map((a, n) => (
           <Reveal key={a.title} className="h-full">
-            <div className={cn("flex h-full flex-col gap-2.5 rounded-xl bg-surface p-7 shadow-float", rise)} style={stagger(n)}>
+            <div className={cn("lift flex h-full flex-col gap-2.5 rounded-xl bg-surface p-7 shadow-float", rise)} style={stagger(n)}>
               <div className="font-serif text-[28px] leading-tight">{a.title}</div>
               <p className="text-body-sm text-ink-muted">{a.body}</p>
               {n === AUDIENCES.length - 1 && <CoachFan />}
@@ -360,6 +320,8 @@ export function LandingView() {
           </Reveal>
         ))}
       </section>
+
+      <Team />
 
       <section className="px-4 pb-10 md:px-10">
         <div className="dusk-card flex flex-col items-center gap-6 rounded-xl px-6 py-16 text-center md:px-10 md:py-24">
@@ -379,14 +341,14 @@ export function LandingView() {
         <WordmarkLarge className="text-xl" />
         <div className="flex-1" />
         {stored && <span className="text-data">{stored}</span>}
-        <a href="https://open-meteo.com/" target="_blank" rel="noreferrer" className="text-data underline-offset-2 hover:underline">
+        <a href="https://open-meteo.com/" target="_blank" rel="noreferrer" className="link-grow text-data">
           {COPY.weatherCredit}
         </a>
-        <a href="https://tfl.gov.uk/info-for/open-data-users/" target="_blank" rel="noreferrer" className="text-data underline-offset-2 hover:underline">
+        <a href="https://tfl.gov.uk/info-for/open-data-users/" target="_blank" rel="noreferrer" className="link-grow text-data">
           {BUS_COPY.poweredBy}
         </a>
         <span>Made in London, 17 October 2026</span>
-        <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="text-ink underline-offset-2 hover:underline">
+        <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="link-grow text-ink">
           GitHub
         </a>
       </footer>

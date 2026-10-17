@@ -61,7 +61,7 @@ export function HeroStage({ top, frame }: { top: Incident | undefined; frame: { 
       >
         <Bus cone={inView} />
       </div>
-      <div className="aspect-[16/9] overflow-hidden rounded-xl bg-surface-sunk shadow-float md:aspect-[16/8]">
+      <div className="zoom-img aspect-[16/9] overflow-hidden rounded-xl bg-surface-sunk shadow-float md:aspect-[16/8]">
         <img src={assetUrl(frame.src)} alt={frame.alt} className="block size-full object-cover" />
       </div>
       {top && (

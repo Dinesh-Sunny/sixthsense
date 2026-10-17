@@ -162,11 +162,12 @@ The Builders Challenge maps to VAST's **CAMP** stack. SixthSense uses every laye
 
 | Mode | Camera | Candidates | Verified | Checked | Came true | Accuracy |
 |---|---|---|---|---|---|---|
+| 🚌 Bus safety | 8 hazard searches over the city + street cams | 10 | 7 | 7 | **4** | **4 of 7 (57%)** |
 | 🚦 City | NYC + SF intersection cams (6) | 10 | 9 | 8 | **5** | **5 of 8 (63%)** |
 | 🛣️ Road | `i24_cam-1` (Nashville I-24 highway) | 10 | 0 | 0 | - | - |
 | 🏘️ Street | `neighborhood_cam-1` (2 days) | 10 | 0 | 0 | - | - |
 
-Latest live run, 17 Oct 2026, 10 clips per mode. An earlier 10-clip city run scored 4 of 6, so across both runs 9 of 14 checked forecasts came true. Results are stored in VastDB (schema `sixthsense`, tables `incidents` + `runs`).
+Latest live run, 17 Oct 2026, 10 clips per mode. An earlier 10-clip city run scored 4 of 6, so across both city runs 9 of 14 checked forecasts came true. The bus safety run searches for 8 bus hazards (cyclist on the nearside, pedestrian stepping out, vehicle cutting in, car pulling out, blocked lane and more) and labels each one; 3 of its 10 candidates were ruled out by the box check. Results are stored in VastDB (schema `sixthsense`, tables `incidents` + `runs`).
 Road and Street raised no warnings: no clip showed a vehicle pair closing in fast enough to pass the box check. That is the filter doing its job - SixthSense stays quiet rather than guessing.
 
 Every forecast and grade is traced in Weave: [wandb.ai/vastdata/team-43/weave](https://wandb.ai/vastdata/team-43/weave)

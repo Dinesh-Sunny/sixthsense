@@ -17,6 +17,7 @@
 5. **Coach** - weekly, per route, from the drivers' own clips.
 
 ## Measured today (real run, no hand labels)
+- Bus safety run (8 hazard searches), 10 clips: 3 ruled out by boxes, 7 warnings, all 7 graded, **4 of 7 came true**.
 - City cameras, 10 clips: 9 warnings, 8 graded, **5 of 8 came true**. An earlier run: 4 of 6. Together **9 of 14**.
 - Road and Street: no warnings (no pair closing in fast enough to pass the box check).
 

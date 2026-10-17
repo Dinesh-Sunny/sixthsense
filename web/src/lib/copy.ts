@@ -1,6 +1,6 @@
 // All screen words and status colours live here (DESIGN.md + VOICE.md).
 // Simple, precise, helpful, human. No pipeline words: those belong to HowItDecided.
-import type { CameTrue, GapPoint, Incident, Mode, ModeMetrics, StepName, StoreState, Weather, Wx } from "@/lib/api/types";
+import type { CameTrue, GapPoint, Incident, Mode, ModeMetrics, Pairing, StepName, StoreState, Weather, Wx } from "@/lib/api/types";
 
 export type Tone = "hi" | "mid" | "lo" | "ok" | "unk" | "sample";
 
@@ -210,3 +210,62 @@ export function gapLine(g: GapSummary): string {
 }
 
 export const CLOSE_CL = 1.5;
+
+// ---- v2: London buses ----
+
+export type BusState = "road" | "look" | "watching" | "filed";
+
+/** One place for bus state: a paired bus is checked (filed), urgent (look) or being watched. */
+export function busState(p: Pairing | undefined): BusState {
+  if (!p) return "road";
+  if (p.came_true !== "unknown") return "filed";
+  return p.risk >= 4 ? "look" : "watching";
+}
+
+export const BUS_STATE: Record<BusState, { label: string; tone: Tone; cssVar: string }> = {
+  road: { label: "On the road", tone: "unk", cssVar: "--bus" },
+  look: { label: "Needs a look", tone: "hi", cssVar: "--risk-high" },
+  watching: { label: "Watching", tone: "mid", cssVar: "--risk-mid" },
+  filed: { label: "Report filed", tone: "ok", cssVar: "--truth" },
+};
+
+export const NAV = [
+  { path: "/dashboard", label: "Live map" },
+  { path: "/reports", label: "Reports" },
+  { path: "/coaching", label: "Coaching" },
+  { path: "/", hash: "how", label: "How it works" },
+] as const;
+
+export const BUS_COPY = {
+  heroTitle: "Every London bus,",
+  heroItalic: "a second pair of eyes.",
+  heroSub:
+    "SixthSense watches bus camera footage, spots close calls, predicts the next few seconds, then checks the next clip to see if it was right.",
+  visionZero: "TfL's goal: no one killed on or by a London bus by 2030.",
+  visionZeroUrl:
+    "https://tfl.gov.uk/info-for/media/press-releases/2018/october/london-s-bus-network-to-meet-new-world-leading-bus-safety-standard",
+  honest:
+    "Bus positions are live from TfL open data, placed at each bus's next stop. Clips are stand-in footage from San Francisco and New York, paired to live buses for this demo.",
+  poweredBy: "Powered by TfL Open Data",
+  standIn: "Stand-in clip",
+  noToken: "Map needs a Mapbox token",
+  noTokenBody: "Add MAPBOX_TOKEN to the app's secret to see the map. Buses and reports below still update live.",
+  needsLook: "Needs a look",
+  needsLookNone: "No buses need a look right now.",
+  routes: "Routes",
+  routeSearch: "Find a route",
+  follow: "Follow bus",
+  following: "Following",
+  showRoute: "Show route",
+  openReport: "Open report",
+  showOnMap: "Show on map",
+  busGone: "That bus isn't on the road right now.",
+  towards: "Towards",
+  nextStop: "Next stop",
+  timeline: ["Spotted", "Driver nudged", "Pinned on the map", "Checked the next clip", "Report filed"] as const,
+};
+
+export function etaText(s: number): string {
+  if (s < 60) return "due";
+  return `${Math.round(s / 60)} min`;
+}

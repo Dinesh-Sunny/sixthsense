@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getJson, getReady, postJson } from "./client";
-import type { Alert, AskIn, AskOut, Health, Incident, Mode, ModeMetrics, RunIn, RunStatus, Weather } from "./types";
+import type { Alert, AskIn, AskOut, FleetSnapshot, Health, Incident, MapConfig, Mode, ModeMetrics, Pairing, RouteDetail, RouteSummary, RunIn, RunStatus, Weather } from "./types";
 
 const RUN_POLL_MS = 2_000;
 const WEATHER_MS = 10 * 60_000;
@@ -16,6 +16,12 @@ export const queryKeys = {
   alerts: ["alerts"] as const,
   weather: ["weather"] as const,
   ready: ["ready"] as const,
+  incidentsEvery: ["incidents", "all"] as const,
+  vehicles: ["vehicles"] as const,
+  routes: ["routes"] as const,
+  route: (id: string) => ["route", id] as const,
+  pairings: ["pairings"] as const,
+  mapConfig: ["map-config"] as const,
 };
 
 export const incidentsOptions = (mode: Mode) =>
@@ -70,6 +76,48 @@ export const readyOptions = () =>
     queryFn: ({ signal }) => getReady<Health>(signal),
     staleTime: 60_000,
     retry: false,
+  });
+
+/** Every incident across modes (latest run per mode). */
+export const allIncidentsOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.incidentsEvery,
+    queryFn: ({ signal }) => getJson<Incident[]>("/incidents", undefined, signal),
+    refetchInterval: LIVE_MS,
+  });
+
+export const vehiclesOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.vehicles,
+    queryFn: ({ signal }) => getJson<FleetSnapshot>("/vehicles", undefined, signal),
+  });
+
+export const routesOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.routes,
+    queryFn: ({ signal }) => getJson<RouteSummary[]>("/routes", undefined, signal),
+    staleTime: Infinity,
+  });
+
+export const routeOptions = (id: string) =>
+  queryOptions({
+    queryKey: queryKeys.route(id),
+    queryFn: ({ signal }) => getJson<RouteDetail>(`/routes/${encodeURIComponent(id)}`, undefined, signal),
+    staleTime: Infinity,
+  });
+
+export const pairingsOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.pairings,
+    queryFn: ({ signal }) => getJson<Pairing[]>("/fleet/pairings", undefined, signal),
+    refetchInterval: LIVE_MS,
+  });
+
+export const mapConfigOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.mapConfig,
+    queryFn: ({ signal }) => getJson<MapConfig>("/map-config", undefined, signal),
+    staleTime: Infinity,
   });
 
 export const startRun = (body: RunIn) => postJson<RunStatus>("/runs", body);

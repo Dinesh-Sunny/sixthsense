@@ -2,6 +2,10 @@
 // basePath only prefixes <Link> and Next assets, so API and <video> URLs are built here.
 
 const ROOT = process.env.NEXT_PUBLIC_API_ORIGIN ?? process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+/** Socket.IO endpoint: origin (dev only) + path under the basePath (/app/socket.io behind the Ingress). */
+export const SOCKET_ORIGIN = process.env.NEXT_PUBLIC_API_ORIGIN;
+export const SOCKET_PATH = `${process.env.NEXT_PUBLIC_API_ORIGIN ? "" : (process.env.NEXT_PUBLIC_BASE_PATH ?? "")}/socket.io`;
 const API_BASE = ROOT + "/api";
 
 export class ApiError extends Error {

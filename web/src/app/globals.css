@@ -35,6 +35,7 @@
   --on-sky: #ffffff;
   --on-sky-muted: rgba(255, 255, 255, 0.9);
   --scrim: rgba(20, 20, 20, 0.72);
+  --bus: #2f6db5;
   --glass-strong: rgba(255, 255, 255, 0.86);
   --wordmark-accent: #4a5a78;
 
@@ -165,6 +166,7 @@
   --color-on-sky: var(--on-sky);
   --color-on-sky-muted: var(--on-sky-muted);
   --color-scrim: var(--scrim);
+  --color-bus: var(--bus);
   --color-glass-strong: var(--glass-strong);
   --color-wordmark-accent: var(--wordmark-accent);
 

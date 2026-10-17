@@ -149,3 +149,68 @@ export interface Health {
   store: StoreState | null;
   vss: boolean | null;
 }
+
+// ---- v2: London buses (plan sixthsense-v2-buses.md) ----
+
+export type Direction = "inbound" | "outbound";
+
+export interface Vehicle {
+  /** TfL vehicleId (a registration) */
+  id: string;
+  route: string;
+  dir: Direction;
+  towards: string;
+  /** naptanId */
+  next_stop: string;
+  next_stop_name: string;
+  eta_s: number;
+  lon: number;
+  lat: number;
+  bearing: number | null;
+  ts: string;
+}
+
+export interface FleetSnapshot {
+  ts: string;
+  vehicles: Vehicle[];
+  routes: number;
+  latency_ms: number;
+  source: "tfl";
+}
+
+export interface RouteSummary {
+  id: string;
+  name: string;
+}
+
+export interface RouteStop {
+  id: string;
+  name: string;
+  lon: number;
+  lat: number;
+}
+
+export interface RouteDirection {
+  dir: Direction;
+  coords: [number, number][];
+  stops: RouteStop[];
+}
+
+export interface RouteDetail {
+  id: string;
+  directions: RouteDirection[];
+}
+
+/** Stand-in pairing of a real incident (latest run per mode) to a live bus. */
+export interface Pairing {
+  incident_id: string;
+  vehicle_id: string;
+  route: string;
+  risk: number;
+  came_true: CameTrue;
+  mode: Mode;
+}
+
+export interface MapConfig {
+  mapbox_token: string | null;
+}

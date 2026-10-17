@@ -1,0 +1,12 @@
+# Decisions (sixthsense)
+- 2026-10-17 v1: FastAPI serves Next static export via StaticFiles(html=True) mounted last; app.frontend() deferred (untested with Next export).
+- 2026-10-17 v1: basePath '/app' + trailingSlash true; Ingress keeps rewrite that strips /app.
+- 2026-10-17 v1: Detail route is /incident/?id= (static export has no runtime dynamic routes).
+- 2026-10-17 v1: tracking = trackers.ByteTrackTracker (sv.ByteTrack removed in supervision 0.31); fresh tracker per clip.
+- 2026-10-17 v1: exclude opencv-python (via trackers) with uv exclude-dependencies; use opencv-python-headless (slim image has no libGL).
+- 2026-10-17 v1: weather = Open-Meteo via pod with 10-min cache (free tier 10k calls/day rules out browser-direct at scale); city London.
+- 2026-10-17 v1: fonts via geist + @fontsource/instrument-serif with next/font/local (Google Fonts blocked from workspace build).
+- 2026-10-17 v1: in-pod runs = asyncio TaskGroup + Semaphore + single-flight lock; arq/Redis deferred (later, 100k DAU).
+- 2026-10-17 v1: VSS token refresh via httpx.Auth auth_flow (re-login on 401).
+- Rejected 2026-10-17: openapi-typescript (lib_check FAIL idle, last release 2026-02-11) -> hand-written TS mirror + OpenAPI snapshot test. Watchlist row pending in registry.
+- Deferred 2026-10-17: arq + Redis (scope; Redis not in namespace); mypy gate (time).

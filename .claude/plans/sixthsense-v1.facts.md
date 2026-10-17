@@ -1,0 +1,12 @@
+# sixthsense-v1 facts (append-only)
+- trackers 2.6.1 depends on opencv-python (5.0.0.93); supervision 0.31.0 pulls av, matplotlib, scipy, not opencv — `uv pip compile` 2026-10-17
+- openai 3.33.0 depends on httpx2 2.13.1; fastapi[standard] 0.143.3 resolves starlette 1.8.0, uvicorn 0.54.0 — `uv pip compile` 2026-10-17
+- uv `[tool.uv] exclude-dependencies` exists (resolution controls) — uv outline uv-resolution-controls, 0.12.15
+- Open-Meteo forecast: `https://api.open-meteo.com/v1/forecast`, `current=temperature_2m,weather_code,is_day`, `timezone=auto`, no key for non-commercial — https://open-meteo.com/en/docs
+- Open-Meteo free tier: <10,000 calls/day, 5,000/h, 600/min; CC BY 4.0 attribution — https://open-meteo.com/en/terms
+- WMO codes: 0-1 clear, 2-3 cloudy, 45/48 fog, 51-57 drizzle, 61-67 & 80-82 rain, 71-77 & 85-86 snow, 95-99 thunderstorm — https://open-meteo.com/en/docs
+- Workspace proxy blocks api.open-meteo.com and fonts.googleapis.com (403); registry.npmjs.org reachable — curl 2026-10-17
+- geist 1.8.1 (OFL) exports ./font/sans, ./font/mono; peer next>=13.2.0 — registry.npmjs.org/geist/1.8.1
+- openapi-typescript 7.13.0 last release 2026-02-11: lib_check FAIL idle — lib_check.sh 2026-10-17
+- httpx custom auth: subclass httpx.Auth, `auth_flow` generator, `requires_response_body = True`, yield refresh request on 401 then retry — https://www.python-httpx.org/advanced/authentication/
+- VastDB creds in team config: S3_ENDPOINT (data VIP), ACCESS_KEY, SECRET_KEY, VASTDB_BUCKET, VDB_SCHEMA; skill uses ssl_verify=False — .claude/skills/vss-vast-database-vastdb-write/SKILL.md:25-74

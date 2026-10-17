@@ -1,16 +1,5 @@
 # architect memory
-
-<!--
-  Persistent memory for the "architect" subagent (frontmatter: memory: project).
-  Committed so the team shares what the agent learns. Claude Code loads the start of this file
-  into the subagent's context, so keep it short. Use one line per entry and link detail files.
--->
-
-## Recurring patterns
-- <!-- e.g. "Date handling: always use utils/date.ts, not raw Date parsing" -->
-
+- [architecture.md](architecture.md) - module map, mapped commit 357c01d
+- [decisions.md](decisions.md) - design decisions, rejected/deferred candidates
 ## Known pitfalls
--
-
-## Detail files
-- <!-- e.g. [auth-flows.md](auth-flows.md) -->
+- Workspace proxy blocks fonts.googleapis.com and api.open-meteo.com; npm registry and PyPI reachable (2026-10-17).

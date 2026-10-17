@@ -83,7 +83,7 @@ function HazardChips({ incidents }: { incidents: Incident[] }) {
 }
 
 /** Three live cards from the latest bus run (city until the bus run exists): score, ruled out, hazards. */
-export function LiveResults({ metrics, incidents }: { metrics: ModeMetrics; incidents: Incident[] }) {
+export function LiveResults({ metrics, incidents, actions }: { metrics: ModeMetrics; incidents: Incident[]; actions?: React.ReactNode }) {
   const runName = metrics.mode === "bus" ? MODE_INFO.bus.name : `${MODE_INFO[metrics.mode].name} run`;
   return (
     <section className="mx-auto max-w-[1200px] px-4 py-12 md:px-10 md:py-16 lg:px-[80px]" aria-labelledby="results-h">
@@ -121,6 +121,7 @@ export function LiveResults({ metrics, incidents }: { metrics: ModeMetrics; inci
           <HazardChips incidents={incidents} />
         </div>
       </div>
+      {actions && <div className="mt-8 flex flex-wrap items-center gap-3">{actions}</div>}
     </section>
   );
 }

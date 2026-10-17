@@ -57,10 +57,10 @@ const STEPS = [
 ];
 
 const AUDIENCES = [
-  { title: "Bus safety teams", body: "See which buses had a close call today, with the clip and what happened next." },
-  { title: "Control rooms", body: "Every live bus on one map, sorted so the ones that need a look come first." },
-  { title: "Driver coaches", body: "One card per route with the moments and fixes to talk through with drivers." },
-];
+  { title: "Bus safety teams", body: "See which buses had a close call today, with the clip and what happened next.", href: "/reports", cta: "Open the reports" },
+  { title: "Control rooms", body: "Every live bus on one map, sorted so the ones that need a look come first.", href: "/dashboard", cta: "Open the live map" },
+  { title: "Driver coaches", body: "One card per route with the moments and fixes to talk through with drivers.", href: "/coaching", cta: "Open coaching" },
+] as const;
 
 function Frame({ frame, className }: { frame: { src: string; alt: string }; className?: string }) {
   return <img src={assetUrl(frame.src)} alt={frame.alt} className={cn("block size-full object-cover", className)} />;
@@ -84,6 +84,11 @@ function rankDistinct(lists: (Incident[] | undefined)[]): Incident[] {
     .filter((i) => (seen.has(i.what_next) ? false : (seen.add(i.what_next), true)));
 }
 
+/** Link to one real incident's report, or the reports list when there is none. */
+function reportCta(label: string, i: Incident | undefined): { href: Href; label: string } {
+  return { href: i ? { pathname: "/incident", query: { id: i.id } } : "/reports", label };
+}
+
 function topIncident(lists: (Incident[] | undefined)[]): Incident | undefined {
   return lists
     .flatMap((l) => l ?? [])
@@ -95,14 +100,29 @@ function bestScore(metrics: ModeMetrics[] | undefined): ModeMetrics | undefined 
   return metrics?.filter((m) => m.checked > 0).sort((a, b) => b.checked - a.checked)[0];
 }
 
+type Href = React.ComponentProps<typeof Link>["href"];
+
+/** Quiet secondary call to action used under each section. */
+function Cta({ href, children }: { href: Href; children: React.ReactNode }) {
+  return (
+    <Button asChild variant="outline" size="sm" className="self-start">
+      <Link href={href}>
+        {children} <span aria-hidden>→</span>
+      </Link>
+    </Button>
+  );
+}
+
 function FeatureRow({
   index,
   visual,
   wash,
+  cta,
 }: {
   index: number;
   visual: React.ReactNode;
   wash: "sky-card" | "lav-card" | "dusk-card";
+  cta?: { href: Href; label: string };
 }) {
   const step = STEPS[index];
   const flip = index % 2 === 1;
@@ -114,6 +134,7 @@ function FeatureRow({
         </span>
         <h2 className="font-serif text-[36px] leading-[1.08] whitespace-pre-line md:text-[44px]">{step.title}</h2>
         <p className="max-w-[400px] text-[15px] leading-[23px] text-ink-muted">{step.body}</p>
+        {cta && <Cta href={cta.href}>{cta.label}</Cta>}
       </div>
       <div
         className={cn(
@@ -212,6 +233,7 @@ export function LandingView() {
       <section id="how" className="mx-auto flex max-w-[1200px] scroll-mt-6 flex-col gap-20 px-4 py-12 md:gap-24 md:px-10 md:py-16 lg:px-[80px]">
         <FeatureRow
           index={0}
+          cta={{ href: "/dashboard", label: "See the live map" }}
           wash="sky-card"
           visual={
             <div className={floatCard}>
@@ -232,6 +254,7 @@ export function LandingView() {
         />
         <FeatureRow
           index={1}
+          cta={reportCta("See a near-miss report", gap ?? top)}
           wash="lav-card"
           visual={
             <div className={floatCard}>
@@ -248,6 +271,7 @@ export function LandingView() {
         />
         <FeatureRow
           index={2}
+          cta={reportCta("Watch the clip", foresee)}
           wash="dusk-card"
           visual={
             <Reveal className="lift zoom-img w-full max-w-[340px] overflow-hidden rounded-[18px] bg-surface shadow-float">
@@ -273,6 +297,7 @@ export function LandingView() {
         />
         <FeatureRow
           index={3}
+          cta={{ href: "/reports", label: "See today's reports" }}
           wash="sky-card"
           visual={
             <div className={floatCard}>
@@ -292,24 +317,65 @@ export function LandingView() {
       </section>
 
       {/* Live results: real numbers only; hidden when metrics fail or no run exists. */}
-      {resultRun && <LiveResults metrics={resultRun} incidents={resultIncidents} />}
+      {resultRun && (
+        <LiveResults
+          metrics={resultRun}
+          incidents={resultIncidents}
+          actions={
+            <>
+              <Button asChild size="sm">
+                <Link href="/reports">Open the reports</Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <a href={GITHUB_URL} target="_blank" rel="noreferrer">
+                  View the code
+                </a>
+              </Button>
+            </>
+          }
+        />
+      )}
 
 
       <section className="mx-auto grid max-w-[1200px] grid-cols-1 gap-6 px-4 py-12 md:grid-cols-3 md:px-10 md:py-16 lg:px-[80px]">
         {AUDIENCES.map((a, n) => (
           <Reveal key={a.title} className="h-full">
-            <div className={cn("lift flex h-full flex-col gap-2.5 rounded-xl bg-surface p-7 shadow-float", rise)} style={stagger(n)}>
-              <div className="font-serif text-[28px] leading-tight">{a.title}</div>
+            <div className={cn("group/aud lift relative flex h-full flex-col gap-2.5 rounded-xl bg-surface p-7 shadow-float", rise)} style={stagger(n)}>
+              <div className="font-serif text-[28px] leading-tight">
+                {/* Whole card is the link (overlay); the visible text stays the title. */}
+                <Link
+                  href={a.href}
+                  className="outline-none after:absolute after:inset-0 after:rounded-xl after:content-[''] focus-visible:after:ring-[3px] focus-visible:after:ring-ring/50"
+                >
+                  {a.title}
+                </Link>
+              </div>
               <p className="text-body-sm text-ink-muted">{a.body}</p>
               {n === 0 && <ReportStack />}
               {n === 1 && <MapTile />}
               {n === 2 && <CoachFan />}
+              <span className="mt-auto pt-2 text-body-sm font-medium text-ink">
+                <span className="link-grow pb-0.5 group-hover/aud:[background-size:100%_1px]">{a.cta}</span> <span aria-hidden>→</span>
+              </span>
             </div>
           </Reveal>
         ))}
       </section>
 
-      <Team />
+      <Team
+        actions={
+          <>
+            <Button asChild className="h-11 px-6">
+              <Link href="/dashboard">Open the live map</Link>
+            </Button>
+            <Button asChild variant="outline" className="h-11 px-6">
+              <a href={GITHUB_URL} target="_blank" rel="noreferrer">
+                GitHub
+              </a>
+            </Button>
+          </>
+        }
+      />
 
       <section className="px-4 pb-10 md:px-10">
         <div className="dusk-card flex flex-col items-center gap-6 rounded-xl px-6 py-16 text-center md:px-10 md:py-24">

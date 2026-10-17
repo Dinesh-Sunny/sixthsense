@@ -20,7 +20,7 @@ export function AppHeader({ className }: { className?: string }) {
   const here = usePathname()?.replace(/\/$/, "") || "/";
   const active = activeFor(here);
   return (
-    <header className={cn("flex items-center gap-x-4 gap-y-3 px-4 py-4 md:gap-x-6 md:px-8", className)}>
+    <header className={cn("flex items-center gap-x-3 gap-y-3 px-4 py-4 sm:gap-x-4 md:gap-x-6 md:px-8", className)}>
       <Link
         href="/"
         aria-label="SixthSense home"
@@ -37,7 +37,7 @@ export function AppHeader({ className }: { className?: string }) {
               href={n.path}
               aria-current={on ? "page" : undefined}
               className={cn(
-                "inline-flex h-8 shrink-0 items-center rounded-full px-3.5 text-[13px] font-medium whitespace-nowrap text-ink-muted outline-none transition-colors duration-150 hover:bg-surface-sunk hover:text-ink focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                "inline-flex h-8 shrink-0 items-center rounded-full px-2.5 text-[13px] font-medium whitespace-nowrap sm:px-3.5 text-ink-muted outline-none transition-colors duration-150 hover:bg-surface-sunk hover:text-ink focus-visible:ring-[3px] focus-visible:ring-ring/50",
                 on && "bg-surface text-ink shadow-[0_0_0_1px_var(--hairline)] hover:bg-surface",
               )}
             >

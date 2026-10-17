@@ -37,8 +37,8 @@ export function ReportsView() {
       <AppHeader />
       <main className="mx-auto flex w-full max-w-[960px] flex-col gap-8 px-4 pt-6 pb-12 md:px-8 md:pt-10">
         <div className="flex flex-wrap items-end gap-x-6 gap-y-4">
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <h1 className="font-serif text-[40px] leading-none md:text-[52px]">{REPORT_COPY.title}</h1>
+          <div className="flex w-full min-w-0 flex-col gap-2 sm:w-auto sm:flex-1">
+            <h1 className="font-serif text-[36px] leading-none md:text-[52px]">{REPORT_COPY.title}</h1>
             <p className="min-h-5 text-body-sm text-ink-muted">
               {incidents.isSuccess ? `${plural(toReview, "report")} to review` : null}
               {score && <span> · {score}</span>}
@@ -69,12 +69,12 @@ export function ReportsView() {
             ))}
           </div>
           <div className="flex-1" />
-          <label className="flex items-center gap-2 text-[13px] text-ink-muted">
+          <label className="flex w-full min-w-0 items-center gap-2 text-[13px] text-ink-muted sm:w-auto">
             <span className="sr-only">{REPORT_COPY.cameraSource}</span>
             <select
               value={source}
               onChange={(e) => setSource(e.target.value as Mode | "all")}
-              className="h-8 cursor-pointer rounded-full border border-hairline bg-surface px-3 text-[13px] font-medium text-ink outline-none transition-colors duration-150 hover:border-ink-muted focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              className="h-8 w-full min-w-0 cursor-pointer rounded-full border border-hairline bg-surface px-3 text-[13px] font-medium text-ink outline-none transition-colors duration-150 hover:border-ink-muted focus-visible:ring-[3px] focus-visible:ring-ring/50"
             >
               <option value="all">{REPORT_COPY.allCameras}</option>
               {MODES.map((m) => (

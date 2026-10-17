@@ -125,7 +125,7 @@ function RouteDetail({ route, group }: { route: string; group: RouteGroup | unde
         </ol>
       </nav>
       <div className="flex flex-wrap items-end gap-x-6 gap-y-4">
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <div className="flex w-full min-w-0 flex-col gap-2 sm:w-auto sm:flex-1">
           <h1 className="font-serif text-[40px] leading-none md:text-[52px]">Route {route}</h1>
           <p className="text-body text-ink">{group ? patternLine(group) : COACHING_COPY.unknownRoute(route)}</p>
           {group && <p className="text-data text-ink-muted">{scoreLineFor(group)}</p>}

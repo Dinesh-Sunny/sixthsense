@@ -2,9 +2,9 @@
 
 # 👁️ SixthSense
 
-### The sixth sense your cameras were missing.
+### Every London bus, a second pair of eyes.
 
-**A video agent that watches CCTV, predicts what happens next, and then checks itself against what really happened.**
+**A video agent for London's bus network: it warns before a close call, checks what really happened, files the report and turns the pattern into driver coaching.**
 
 [![VAST Builders Challenge](https://img.shields.io/badge/VAST-Builders%20Challenge%20London%202026-1f4fff)](https://github.com/vast-data/vast-builders-challenge)
 [![NVIDIA Cosmos](https://img.shields.io/badge/NVIDIA-Cosmos3--Reason%20%7C%20Embed1-76b900)](https://www.nvidia.com/en-us/ai/cosmos/)
@@ -21,19 +21,21 @@
 
 ## ⚡ TL;DR
 
-> In *Final Destination 2* the pile-up had warning signs. In *Home Alone* the burglars cased the street for days.
-> Both were on camera. Nobody watched.
+London has **25,000 bus drivers**, and TfL's Vision Zero goal is that **no one is killed on or by a London bus by 2030** ([TfL, 2018](https://tfl.gov.uk/info-for/media/press-releases/2018/october/london-s-bus-network-to-meet-new-world-leading-bus-safety-standard)). Buses already carry cameras, but the footage is usually pulled only *after* something goes wrong.
 
-Cities and companies record millions of hours of camera footage that **no human ever watches**. SixthSense turns that footage into a short list of moments that need a human, and for each one it says:
+SixthSense gives a bus safety team one live map of every London bus and an agent loop on top of the camera footage:
 
-| | |
-|---|---|
-| 🎯 **What happens now** | grounded in the clip, from NVIDIA Cosmos3-Reason |
-| 🔮 **What happens next** | a forecast for the next seconds (road) or the next visit (street) |
-| 🧠 **Why** and 🛠️ **the fix** | the visible cause and one practical change |
-| ✅ **Did it come true?** | the agent reads the *next* clip and grades its own forecast |
+| | Agent | What it does |
+|---|---|---|
+| 👀 **Watch** | Watcher | searches every new clip for risky moments (cyclists on the nearside, people stepping out, tight pull-outs) |
+| ⚠️ **Pre-incident** | Checker + Forecaster | YOLO boxes confirm two road users are really closing in; Cosmos3-Reason predicts the next seconds, says why and suggests a fix |
+| 📣 **Act** | Dispatcher | a calm nudge to the driver and a pin on the control room map |
+| ✅ **Post-incident** | Grader + Reporter | reads the *next* clip, grades its own forecast, and files the near-miss report when it came true |
+| 🎓 **Coach** | Coach | weekly coaching from the driver's own clips: supportive, never a league table |
 
-That last row is the point. Most video AI demos *claim* they are accurate. **SixthSense measures it, on the day, with no hand labels.**
+Most video AI demos *claim* they are accurate. **SixthSense measures it, on the day, with no hand labels.**
+
+> **Honest about today.** Bus positions are **live TfL open data** (estimated at each bus's next stop). The camera clips are the hackathon's San Francisco and New York footage, used as a **labelled stand-in** for bus cameras, and pairing an incident to a live bus is a stand-in too. Every forecast, check and score is from our real run on VAST.
 
 ---
 
@@ -43,12 +45,12 @@ That last row is the point. Most video AI demos *claim* they are accurate. **Six
 
 <!-- screenshot: docs/screenshot.png added after the live run -->
 
-**The 30-second story**
-1. Open the **City** tab - each card is a real San Francisco or New York clip with a risk score.
-2. Read the forecast: *"the pedestrian will complete crossing the street"* after a white sedan cut in close.
-3. Look at the pill: ✅ **came true** - the next clip shows the pedestrian with the stroller finishing the crossing.
-4. The header badge shows how many forecasts came true today.
-5. Hit **Send alert** - the warning lands in the alert feed (and Discord).
+**The 60-second story**
+1. **Live map**: every London bus moving on a Mapbox map, fed by TfL open data over Socket.IO. Pick route 18, follow a bus.
+2. **Needs a look**: a bus pulses red. Open it: the camera clip, the forecast (*"the pedestrian will complete crossing the street"* after a car cut in close), why, and the fix.
+3. **What the agents did**: spotted → driver nudged → pinned on the map → checked the next clip: ✅ **came true** → near-miss report filed.
+4. **Reports** and **Coaching**: the report writes itself; the weekly coaching card is built from the driver's own clips.
+5. The header shows how many forecasts came true today, every step traced in W&B Weave.
 
 ---
 
@@ -56,7 +58,7 @@ That last row is the point. Most video AI demos *claim* they are accurate. **Six
 
 | Pain | Today | With SixthSense |
 |---|---|---|
-| Hours of unwatched footage | Reviewed only after an accident | Reviewed continuously by an agent |
+| Bus camera footage | Pulled only after an incident | Watched continuously by an agent |
 | "Search" tools | Find what *already* happened | Predict what happens **next** |
 | AI hallucination | Model says an event happened; nobody checks | **YOLO boxes verify** every flagged moment |
 | Trust | Vendors quote accuracy from a lab | The agent **grades itself** on your own footage |
@@ -304,4 +306,4 @@ sixthsense/
 ## 🙏 Thanks
 VAST Data, NVIDIA, CoreWeave, Weights & Biases, Cursor and tokens& for the stack, the footage and the day.
 
-<div align="center"><sub>Never leave your cameras Home Alone.</sub></div>
+<div align="center"><sub>Every London bus, a second pair of eyes.</sub></div>

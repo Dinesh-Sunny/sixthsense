@@ -1,0 +1,41 @@
+[project]
+name = "sixthsense"
+version = "1.0.0"
+description = "Video agent that predicts what happens next on CCTV, verifies it with tracked boxes, and grades itself."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "anyio>=4",
+    "fastapi==0.143.3",
+    "httpx==0.28.1",
+    "ibis-framework>=10.8.0",
+    "numpy>=2.0.2",
+    "openai==3.33.0",
+    "opencv-python-headless>=4.8,<6",
+    "pyarrow>=23.0.1",
+    "pydantic==2.14.1",
+    "pydantic-settings==2.16.0",
+    "supervision==0.31.0",
+    "tenacity==9.2.1",
+    "trackers==2.6.1",
+    "uvicorn==0.54.0",
+    "vastdb==2.1.0",
+    "weave==0.53.12",
+]
+
+[project.scripts]
+sixthsense = "sixthsense.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.11.30,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv]
+# trackers hard-requires opencv-python (needs libGL, absent on python:3.12-slim); the
+# headless wheel ships the same cv2 module. matplotlib/av are unused supervision deps (~180 MB).
+exclude-dependencies = ["opencv-python", "matplotlib", "av"]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "ruff==0.16.10",
+]

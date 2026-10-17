@@ -28,18 +28,37 @@ export function shortLine(i: Incident | undefined, prefer: "fix" | "happened" = 
   return prefer === "fix" ? i?.fix || happened : happened || i?.fix || "";
 }
 
-/**
- * Inside pages show the bus safety run; until it has run, they fall back to the city run.
- * Returns undefined while metrics load.
- */
-export function useDataMode(): Mode | undefined {
-  const metrics = useQuery(metricsOptions());
-  if (metrics.isPending) return undefined;
-  return metrics.data?.some((m) => m.mode === "bus" && m.candidates > 0) ? "bus" : "city";
+export type CameraView = "front" | "nearside";
+export const VIEW_MODES: readonly Mode[] = ["bus_front", "bus_nearside"];
+
+export const VIEW_LABEL: Record<CameraView, string> = { front: "Front camera", nearside: "Nearside camera" };
+export const STAND_IN_NOTE = "Stand-in footage: a car dashcam and a bike camera, not a London bus.";
+
+/** The bus camera view of an incident: the backend's camera_view, else derived from its mode. */
+export function viewOf(i: { mode: Mode } | undefined): CameraView | null {
+  if (!i) return null;
+  const v = (i as { camera_view?: unknown }).camera_view;
+  if (v === "front" || v === "nearside") return v;
+  if (i.mode === "bus_front") return "front";
+  if (i.mode === "bus_nearside") return "nearside";
+  return null;
 }
 
-export function inMode<T extends { mode: Mode }>(rows: T[] | undefined, mode: Mode | undefined): T[] {
+/**
+ * Modes every inside page shows: the bus front + nearside runs; until they exist, the bus run, then the city run.
+ * Undefined while metrics load.
+ */
+export function useDataModes(): Mode[] | undefined {
+  const metrics = useQuery(metricsOptions());
+  if (metrics.isPending) return undefined;
+  const ran = new Set((metrics.data ?? []).filter((m) => m.candidates > 0).map((m) => m.mode));
+  const views = VIEW_MODES.filter((m) => ran.has(m));
+  if (views.length > 0) return views;
+  return ran.has("bus") ? ["bus"] : ["city"];
+}
+
+export function inModes<T extends { mode: Mode }>(rows: T[] | undefined, modes: Mode[] | undefined): T[] {
   if (!rows) return [];
-  if (!mode) return rows;
-  return rows.filter((r) => r.mode === mode);
+  if (!modes) return rows;
+  return rows.filter((r) => modes.includes(r.mode));
 }

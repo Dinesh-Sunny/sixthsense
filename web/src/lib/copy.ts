@@ -22,6 +22,18 @@ export const VERDICT: Record<CameTrue, { label: string; tone: Tone }> = {
 export const SAMPLE = { label: "Sample", tone: "sample" as Tone, example: "Example" };
 
 export const MODE_INFO: Record<Mode, { name: string; place: string; where: string; calm: string }> = {
+  bus_front: {
+    name: "Front camera",
+    place: "Bus front camera (stand-in: a car dashcam)",
+    where: "From the bus's front camera",
+    calm: "All calm ahead of the bus",
+  },
+  bus_nearside: {
+    name: "Nearside camera",
+    place: "Bus nearside camera (stand-in: a bike camera)",
+    where: "From the bus's nearside camera",
+    calm: "All calm on the nearside",
+  },
   bus: {
     name: "Bus safety run",
     place: "Live London buses, stand-in footage",

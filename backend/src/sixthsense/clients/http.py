@@ -28,6 +28,10 @@ LIMITS = httpx.Limits(max_connections=20, max_keepalive_connections=10)
 VSS_TIMEOUT = httpx.Timeout(10.0, read=120.0)
 GPU_TIMEOUT = httpx.Timeout(10.0, read=120.0)
 PUBLIC_TIMEOUT = httpx.Timeout(3.0)
+TFL_TIMEOUT = httpx.Timeout(10.0, read=30.0)
+TFL_BASE_URL = "https://api.tfl.gov.uk"
+# TfL returns 403 to requests without a User-Agent (seen from the pod).
+TFL_USER_AGENT = "SixthSense/1.0 (+github.com/Dinesh-Sunny/sixthsense)"
 STREAM_PATH_SUFFIX = "/videos/stream"
 
 
@@ -163,4 +167,18 @@ def public_client(transport: httpx.AsyncBaseTransport | None = None) -> httpx.As
     """Open-Meteo and Discord: real CAs, short timeouts."""
     return httpx.AsyncClient(
         timeout=PUBLIC_TIMEOUT, limits=LIMITS, event_hooks=EVENT_HOOKS, transport=transport
+    )
+
+
+def tfl_client(settings: Settings, transport: httpx.AsyncBaseTransport | None = None) -> httpx.AsyncClient:
+    """TfL Unified API: real CAs, a User-Agent, and app_key only when configured."""
+    key = settings.tfl_app_key.get_secret_value()
+    return httpx.AsyncClient(
+        base_url=TFL_BASE_URL,
+        headers={"User-Agent": TFL_USER_AGENT, "Accept": "application/json"},
+        params={"app_key": key} if key else None,
+        timeout=TFL_TIMEOUT,
+        limits=LIMITS,
+        event_hooks=EVENT_HOOKS,
+        transport=transport,
     )

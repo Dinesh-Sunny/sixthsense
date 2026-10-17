@@ -4,10 +4,11 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AppNav } from "@/components/AppNav";
+import { AppHeader } from "@/components/AppHeader";
 import { AskFootage } from "@/components/map/AskFootage";
 import { BusDrawer } from "@/components/map/BusDrawer";
-import { BusMap, type Layers, type Scene, type Theme } from "@/components/map/BusMap";
+import { BusMap, type AttentionBus, type Layers, type Scene, type Theme } from "@/components/map/BusMap";
+import { rankPairings } from "@/components/map/rank";
 import { MapControls } from "@/components/map/MapControls";
 import { MAP_COPY } from "@/components/map/mapCopy";
 import { StatusPill } from "@/components/StatusPill";
@@ -24,7 +25,7 @@ import {
   routesOptions,
   weatherOptions,
 } from "@/lib/api/queries";
-import { BUS_COPY, busState, pairingPill, riskLabel, riskTone, type BusState } from "@/lib/copy";
+import { BUS_COPY, BUS_STATE, busState, pairingPill, riskLabel, riskTone } from "@/lib/copy";
 import { cn } from "@/lib/utils";
 
 const panel = "glass-map rounded-panel shadow-float";
@@ -66,7 +67,7 @@ export function LiveMapView() {
   const [query, setQuery] = useState("");
   const [scene, setScene] = useState<Scene>("2d");
   const [userTheme, setUserTheme] = useState<Theme | null>(null);
-  const [layers, setLayers] = useState<Layers>({ traffic: false, cameras: true });
+  const [layers, setLayers] = useState<Layers>({ traffic: false, all: false });
   const [mapFailed, setMapFailed] = useState(false);
   const [leftOpen, setLeftOpen] = useState(true);
   const theme: Theme = userTheme ?? (weather.data?.wx === "night" ? "night" : "light");
@@ -91,23 +92,31 @@ export function LiveMapView() {
   }, [vehicles.length, refetchPairings]);
 
   const pairByBus = useMemo(() => new Map((pairings.data ?? []).map((p) => [p.vehicle_id, p])), [pairings.data]);
-  const states = useMemo(() => {
-    const m = new Map<string, BusState>();
-    pairByBus.forEach((p, id) => m.set(id, busState(p)));
-    return m;
-  }, [pairByBus]);
-  const incidentById = useMemo(() => new Map((incidents.data ?? []).map((i) => [i.id, i])), [incidents.data]);
-  const shown = useMemo(
+  const vehicleById = useMemo(() => new Map(vehicles.map((v) => [v.id, v])), [vehicles]);
+  const needsLook = useMemo(() => rankPairings(pairings.data ?? []), [pairings.data]);
+  // Numbered 1..N in attention order; only live buses can be placed on the map.
+  const attention = useMemo<AttentionBus[]>(
     () =>
-      chosenRoutes.length === 0
-        ? vehicles
-        : vehicles.filter((v) => chosenRoutes.includes(v.route) || v.id === selectedId || pairByBus.has(v.id)),
-    [vehicles, chosenRoutes, selectedId, pairByBus],
+      needsLook.flatMap((p, i) => {
+        const v = vehicleById.get(p.vehicle_id);
+        return v ? [{ id: v.id, n: i + 1, lon: v.lon, lat: v.lat, state: busState(p) }] : [];
+      }),
+    [needsLook, vehicleById],
+  );
+  const incidentById = useMemo(() => new Map((incidents.data ?? []).map((i) => [i.id, i])), [incidents.data]);
+  // Faint context dots: every bus only on request, otherwise just the chosen routes' buses (attention buses are markers).
+  const faint = useMemo(
+    () =>
+      vehicles.filter(
+        (v) =>
+          !pairByBus.has(v.id) &&
+          (layers.all || chosenRoutes.includes(v.route) || v.id === selectedId),
+      ),
+    [vehicles, pairByBus, layers.all, chosenRoutes, selectedId],
   );
   const routeDetails = useQueries({ queries: chosenRoutes.map((id) => routeOptions(id)) })
     .map((q) => q.data)
     .filter((d) => d !== undefined);
-  const needsLook = useMemo(() => [...(pairings.data ?? [])].sort((a, b) => b.risk - a.risk), [pairings.data]);
 
   const addRoute = (raw: string) => {
     const typed = raw.trim();
@@ -126,7 +135,7 @@ export function LiveMapView() {
   const pairing = selectedId ? pairByBus.get(selectedId) : undefined;
   const token = mapConfig.data?.mapbox_token ?? null;
   const statusLine = snapshot.data
-    ? `${MAP_COPY.liveLink[link]} · ${NUMBER.format(snapshot.data.vehicles.length)} buses · ${NUMBER.format(snapshot.data.routes)} routes · ${snapshot.data.latency_ms} ms`
+    ? `${MAP_COPY.liveLink[link]} · ${NUMBER.format(snapshot.data.vehicles.length)} buses live · ${needsLook.length} need a look`
     : MAP_COPY.liveLink.connecting;
 
   return (
@@ -136,8 +145,8 @@ export function LiveMapView() {
         {token && !mapFailed ? (
           <BusMap
             token={token}
-            vehicles={shown}
-            states={states}
+            vehicles={faint}
+            attention={attention}
             selectedId={selectedId}
             followId={followId}
             routes={routeDetails}
@@ -163,7 +172,7 @@ export function LiveMapView() {
         )}
       </div>
 
-      <AppNav
+      <AppHeader
         className="pointer-events-none absolute inset-x-0 top-0 z-10 [&>*]:pointer-events-auto"
         right={
           <div className="hidden items-center gap-2 md:flex">
@@ -305,6 +314,13 @@ export function LiveMapView() {
                         className="flex w-full flex-col gap-1.5 rounded-md px-2 py-3 text-left transition-colors duration-150 hover:bg-surface-sunk focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                       >
                         <span className="flex flex-wrap items-center gap-2">
+                          <span
+                            aria-label={`Number ${n + 1}`}
+                            className="grid size-6 place-items-center rounded-full font-mono text-[11px] font-semibold text-on-sky"
+                            style={{ background: `var(${BUS_STATE[busState(p)].cssVar})` }}
+                          >
+                            {n + 1}
+                          </span>
                           <StatusPill tone={riskTone(p.risk)}>{riskLabel(p.risk)}</StatusPill>
                           <StatusPill tone={pill.tone}>{pill.label}</StatusPill>
                         </span>

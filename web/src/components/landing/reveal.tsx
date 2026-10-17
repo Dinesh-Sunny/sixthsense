@@ -1,27 +1,37 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 
-export function prefersReducedMotion(): boolean {
-  return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const REDUCE = "(prefers-reduced-motion: reduce)";
+
+function subscribeReduce(cb: () => void) {
+  const mq = window.matchMedia(REDUCE);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+}
+
+/** Live prefers-reduced-motion (false during the static prerender). */
+export function useReducedMotion(): boolean {
+  return useSyncExternalStore(
+    subscribeReduce,
+    () => window.matchMedia(REDUCE).matches,
+    () => false,
+  );
 }
 
 /** True once the element has scrolled into view (once). Reduced motion: true straight away, final state, no motion. */
 export function useInView<T extends Element>(threshold = 0.3) {
   const ref = useRef<T>(null);
-  const [inView, setInView] = useState(false);
+  const [seen, setSeen] = useState(false);
+  const reduced = useReducedMotion();
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    if (prefersReducedMotion() || typeof IntersectionObserver === "undefined") {
-      setInView(true);
-      return;
-    }
+    if (!el || reduced) return;
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
-          setInView(true);
+          setSeen(true);
           io.disconnect();
         }
       },
@@ -29,8 +39,9 @@ export function useInView<T extends Element>(threshold = 0.3) {
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [threshold]);
-  return [ref, inView] as const;
+  }, [threshold, reduced]);
+  // Reduced motion: final state at once (the global CSS rule also removes transition time).
+  return [ref, seen || reduced] as const;
 }
 
 /** Group wrapper: children using `rise` animate in when this scrolls into view. */

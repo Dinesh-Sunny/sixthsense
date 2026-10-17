@@ -3,7 +3,6 @@
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
-import { incidentHref } from "@/components/IncidentCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -89,7 +88,7 @@ export function AskBox({ showChips = true }: { showChips?: boolean }) {
             <div className="flex flex-wrap gap-2">
               {links.map((e) => (
                 <Button key={e.incident_id} asChild variant="glass" size="sm">
-                  <Link href={incidentHref(e.incident_id as string)}>
+                  <Link href={{ pathname: "/incident", query: { id: e.incident_id as string } }}>
                     {COPY.view} {typeof e.camera_id === "string" ? e.camera_id : ""}
                   </Link>
                 </Button>

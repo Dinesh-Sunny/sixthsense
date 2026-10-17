@@ -100,7 +100,7 @@ export function MapControls({
           <div className="flex flex-col gap-2">
             <div className="text-eye">{MAP_COPY.layers}</div>
             <Check checked={layers.traffic} label={MAP_COPY.traffic} onChange={() => onLayers({ ...layers, traffic: !layers.traffic })} />
-            <Check checked={layers.cameras} label={MAP_COPY.cameras} onChange={() => onLayers({ ...layers, cameras: !layers.cameras })} />
+            <Check checked={layers.all} label={MAP_COPY.allBuses} onChange={() => onLayers({ ...layers, all: !layers.all })} />
           </div>
           <Choice label={MAP_COPY.theme} value={theme} options={THEMES} onChange={onTheme} />
         </Popover.Content>

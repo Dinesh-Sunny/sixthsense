@@ -36,6 +36,11 @@
   --on-sky-muted: rgba(255, 255, 255, 0.9);
   --scrim: rgba(20, 20, 20, 0.72);
   --bus: #2f6db5;
+  /* Landing illustration only (generic red double-decker), never a state colour. */
+  --illus-bus: #d2402f;
+  --illus-bus-dark: #a8301f;
+  --illus-glass: #dfe9f3;
+  --illus-tyre: #2a2c33;
   --glass-strong: rgba(255, 255, 255, 0.86);
   --glass-map: rgba(255, 255, 255, 0.9);
   --wordmark-accent: #4a5a78;

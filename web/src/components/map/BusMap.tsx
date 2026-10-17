@@ -1,7 +1,7 @@
 "use client";
 
 import "mapbox-gl/dist/mapbox-gl.css";
-import type { GeoJSONSource, Map as MapboxMap, MapMouseEvent } from "mapbox-gl";
+import type { GeoJSONSource, Map as MapboxMap, MapMouseEvent, Marker } from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 import type { RouteDetail, Vehicle } from "@/lib/api/types";
 import { BUS_STATE, type BusState } from "@/lib/copy";
@@ -10,7 +10,17 @@ export type Scene = "2d" | "3d" | "drone";
 export type Theme = "light" | "dark" | "satellite" | "night";
 export interface Layers {
   traffic: boolean;
-  cameras: boolean;
+  /** Off by default: only the buses that need attention are drawn. */
+  all: boolean;
+}
+
+/** A bus that needs attention, drawn as a numbered marker (1 = look first). */
+export interface AttentionBus {
+  id: string;
+  n: number;
+  lon: number;
+  lat: number;
+  state: BusState;
 }
 
 const LONDON: [number, number] = [-0.1276, 51.5072];
@@ -93,49 +103,20 @@ function addLayers(map: MapboxMap) {
     paint: { "line-color": cssVar("--ink"), "line-width": 3, "line-opacity": 0.7 },
   });
   map.addSource("buses", { type: "geojson", data: empty });
-  const white = cssVar("--surface");
+  // Context buses ("Show all buses" or the chosen route): small and faint.
   map.addLayer({
     id: "buses",
     type: "circle",
     source: "buses",
-    filter: ["==", ["get", "paired"], false],
     paint: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mapbox expression arrays
-      "circle-radius": radius(0, 4) as any,
-      "circle-color": ["get", "color"],
-      "circle-opacity": 0.85,
+      "circle-radius": radius(0, 3) as any,
+      "circle-color": cssVar("--bus"),
+      "circle-opacity": ["case", ["get", "sel"], 0.95, 0.4],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       "circle-stroke-width": STROKE_W as any,
-      "circle-stroke-color": white,
-    },
-  });
-  // Soft halo under paired buses ("Cameras" layer toggle).
-  map.addLayer({
-    id: "cameras",
-    type: "circle",
-    source: "buses",
-    filter: ["==", ["get", "paired"], true],
-    paint: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      "circle-radius": radius(8, 12) as any,
-      "circle-color": ["get", "color"],
-      "circle-opacity": 0.18,
-      "circle-blur": 0.6,
-    },
-  });
-  // Paired buses always on top.
-  map.addLayer({
-    id: "buses-paired",
-    type: "circle",
-    source: "buses",
-    filter: ["==", ["get", "paired"], true],
-    paint: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      "circle-radius": radius(2, 5) as any,
-      "circle-color": ["get", "color"],
-      "circle-opacity": 0.95,
-      "circle-stroke-width": ["case", ["get", "sel"], 2.5, 1],
-      "circle-stroke-color": white,
+      "circle-stroke-color": cssVar("--surface"),
+      "circle-stroke-opacity": 0.6,
     },
   });
 }
@@ -143,7 +124,7 @@ function addLayers(map: MapboxMap) {
 export function BusMap({
   token,
   vehicles,
-  states,
+  attention,
   selectedId,
   followId,
   routes,
@@ -155,7 +136,7 @@ export function BusMap({
 }: {
   token: string;
   vehicles: Vehicle[];
-  states: Map<string, BusState>;
+  attention: AttentionBus[];
   selectedId: string | null;
   followId: string | null;
   routes: RouteDetail[];
@@ -174,12 +155,16 @@ export function BusMap({
   const followIdRef = useRef(followId);
   // Bumped on every style load so data effects re-apply to the fresh style.
   const [styleVersion, setStyleVersion] = useState(0);
+  const markers = useRef(new Map<string, { m: Marker; el: HTMLButtonElement }>());
+  const [mapboxReady, setMapboxReady] = useState<typeof import("mapbox-gl").default | null>(null);
+  const routesRef = useRef(routes);
 
   useEffect(() => {
     onSelectRef.current = onSelect;
     onErrorRef.current = onError;
     themeRef.current = theme;
     followIdRef.current = followId;
+    routesRef.current = routes;
   });
 
   // Create the map once, client-side only (keeps window out of the static prerender).
@@ -189,6 +174,7 @@ export function BusMap({
     void import("mapbox-gl").then(({ default: mapboxgl }) => {
       if (cancelled || !box.current) return;
       mapboxgl.accessToken = token;
+      setMapboxReady(() => mapboxgl);
       map = new mapboxgl.Map({
         container: box.current,
         style: styleRef.current,
@@ -204,7 +190,7 @@ export function BusMap({
         applyBasemap(map, themeRef.current);
         setStyleVersion((v) => v + 1);
       });
-      for (const layer of ["buses", "buses-paired"]) {
+      for (const layer of ["buses"]) {
         map.on("click", layer, (e: MapMouseEvent) => {
           const id = e.features?.[0]?.properties?.id;
           if (typeof id === "string") onSelectRef.current(id);
@@ -218,8 +204,11 @@ export function BusMap({
         if (status === 401 || status === 403) onErrorRef.current();
       });
     });
+    const placed = markers.current;
     return () => {
       cancelled = true;
+      placed.forEach((e) => e.m.remove());
+      placed.clear();
       map?.remove();
       mapRef.current = null;
     };
@@ -248,34 +237,84 @@ export function BusMap({
     const map = mapRef.current;
     if (!map || !styleVersion || !map.getLayer("traffic")) return;
     map.setLayoutProperty("traffic", "visibility", layers.traffic ? "visible" : "none");
-    map.setLayoutProperty("cameras", "visibility", layers.cameras ? "visible" : "none");
   }, [layers, styleVersion]);
 
   useEffect(() => {
     const src = mapRef.current?.getSource("buses") as GeoJSONSource | undefined;
     if (!src) return;
-    const colour = Object.fromEntries(
-      (Object.keys(BUS_STATE) as BusState[]).map((k) => [k, cssVar(BUS_STATE[k].cssVar)]),
-    ) as Record<BusState, string>;
     src.setData({
       type: "FeatureCollection",
       features: vehicles.map((v) => {
-        const state = states.get(v.id) ?? "road";
         return {
           type: "Feature",
           geometry: { type: "Point", coordinates: [v.lon, v.lat] },
-          properties: { id: v.id, color: colour[state], paired: state !== "road", sel: v.id === selectedId },
+          properties: { id: v.id, sel: v.id === selectedId },
         };
       }),
     });
-  }, [vehicles, states, selectedId, styleVersion]);
+  }, [vehicles, selectedId, styleVersion]);
+
+  // Numbered HTML markers for the buses that need attention (few, crisp, no glyph dependency).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapboxReady) return;
+    const seen = new Set<string>();
+    for (const a of attention) {
+      seen.add(a.id);
+      let entry = markers.current.get(a.id);
+      if (!entry) {
+        const el = document.createElement("button");
+        el.type = "button";
+        el.className =
+          "grid size-6 place-items-center rounded-full border-2 border-white font-mono text-[11px] font-semibold text-white shadow-float transition-transform duration-150 hover:scale-110 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50";
+        el.addEventListener("click", (e) => {
+          e.stopPropagation();
+          onSelectRef.current(a.id);
+        });
+        entry = { m: new mapboxReady.Marker({ element: el }).setLngLat([a.lon, a.lat]).addTo(map), el };
+        markers.current.set(a.id, entry);
+      }
+      entry.m.setLngLat([a.lon, a.lat]);
+      entry.el.textContent = String(a.n);
+      entry.el.setAttribute("aria-label", `Bus ${a.n} of ${attention.length}: ${a.id}, ${BUS_STATE[a.state].label}`);
+      entry.el.style.background = cssVar(BUS_STATE[a.state].cssVar);
+      entry.el.style.zIndex = String(1000 - a.n);
+      entry.el.style.transform = "";
+      entry.el.dataset.sel = String(a.id === selectedId);
+      entry.el.style.boxShadow = a.id === selectedId ? `0 0 0 3px ${cssVar("--ink")}` : "";
+    }
+    for (const [id, entry] of markers.current) {
+      if (!seen.has(id)) {
+        entry.m.remove();
+        markers.current.delete(id);
+      }
+    }
+  }, [attention, selectedId, mapboxReady]);
+
+  // On load, frame the attention buses once (unless a bus or route deep link already framed the map).
+  const framed = useRef(false);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || framed.current || attention.length === 0) return;
+    framed.current = true;
+    if (followIdRef.current || selectedId || routesRef.current.length > 0) return;
+    const lons = attention.map((a) => a.lon);
+    const lats = attention.map((a) => a.lat);
+    map.fitBounds(
+      [
+        [Math.min(...lons), Math.min(...lats)],
+        [Math.max(...lons), Math.max(...lats)],
+      ],
+      {
+        padding: window.innerWidth >= 768 ? { top: 100, bottom: 90, left: 330, right: 380 } : 32,
+        maxZoom: 13,
+        duration: 900,
+      },
+    );
+  }, [attention, selectedId, mapboxReady]);
 
   // Both directions of every chosen route, under the buses.
   const routeKey = routes.map((r) => `${r.id}:${r.directions.map((d) => d.coords.length).join("/")}`).join(",");
-  const routesRef = useRef(routes);
-  useEffect(() => {
-    routesRef.current = routes;
-  });
   const fittedKey = useRef("");
   useEffect(() => {
     const map = mapRef.current;
@@ -311,7 +350,8 @@ export function BusMap({
   }, [routeKey, styleVersion]);
 
   // Follow (or jump to) the bus each time the fleet updates.
-  const target = vehicles.find((v) => v.id === (followId ?? selectedId));
+  const targetId = followId ?? selectedId;
+  const target = vehicles.find((v) => v.id === targetId) ?? attention.find((a) => a.id === targetId);
   const tLon = target?.lon;
   const tLat = target?.lat;
   useEffect(() => {

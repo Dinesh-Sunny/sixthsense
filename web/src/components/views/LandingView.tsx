@@ -2,14 +2,20 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { AccuracyMeter } from "@/components/AccuracyMeter";
-import { GapChart } from "@/components/GapChart";
+import { BuiltWith } from "@/components/landing/BuiltWith";
+import { CheckTimeline } from "@/components/landing/CheckTimeline";
+import { CoachFan } from "@/components/landing/CoachFan";
+import { GapCreative } from "@/components/landing/GapCreative";
+import { HeroStage } from "@/components/landing/HeroStage";
+import { LiveLines } from "@/components/landing/LiveLines";
+import { Reveal, rise, stagger } from "@/components/landing/reveal";
+import { ScoreBar } from "@/components/landing/ScoreBar";
 import { StatusPill } from "@/components/StatusPill";
 import { WeatherPill } from "@/components/WeatherPill";
 import { Button } from "@/components/ui/button";
 import { incidentsOptions, metricsOptions, readyOptions, weatherOptions } from "@/lib/api/queries";
 import { MODES, type Incident, type ModeMetrics } from "@/lib/api/types";
-import { BUS_COPY, COPY, MODE_INFO, STORE_LABEL, VERDICT, cameraLine, gapLine, gapSummary, riskLabel, riskTone, scoreLine } from "@/lib/copy";
+import { BUS_COPY, COPY, MODE_INFO, STORE_LABEL, gapLine, gapSummary, riskLabel, riskTone, scoreLine } from "@/lib/copy";
 import { assetUrl, cn } from "@/lib/utils";
 
 const GITHUB_URL = "https://github.com/Dinesh-Sunny/sixthsense";
@@ -190,26 +196,10 @@ export function LandingView() {
           </a>
         </div>
 
-        <div className="relative mt-10 w-full max-w-[1120px] md:mt-12">
-          <div className="aspect-[16/9] overflow-hidden rounded-xl bg-surface-sunk shadow-float md:aspect-[16/8]">
-            <Frame frame={FRAMES.hero} />
-          </div>
-          {top && (
-            <div className="glass relative mx-auto -mt-10 flex w-[calc(100%-24px)] max-w-[380px] flex-col gap-2.5 rounded-panel bg-glass-strong p-5 shadow-float md:absolute md:right-10 md:-bottom-12 md:mt-0 md:w-[380px]">
-              <div className="flex flex-wrap items-center gap-3">
-                <StatusPill tone={riskTone(top.risk)}>{riskLabel(top.risk)}</StatusPill>
-                <span className="text-data text-ink-muted">{cameraLine(top)}</span>
-              </div>
-              <div className="text-eye">{COPY.next}</div>
-              <p className="font-serif text-[22px] leading-[1.2] text-balance md:text-2xl">{top.what_next}</p>
-              <div className="flex items-center gap-3">
-                <StatusPill tone={VERDICT[top.came_true].tone}>{VERDICT[top.came_true].label}</StatusPill>
-                {top.came_true !== "unknown" && <span className="text-body-sm text-ink-muted">checked on the next clip</span>}
-              </div>
-            </div>
-          )}
-        </div>
+        <HeroStage top={top} frame={FRAMES.hero} />
       </section>
+
+      <BuiltWith />
 
       {/* How it works */}
       <section id="how" className="mx-auto flex max-w-[1200px] scroll-mt-6 flex-col gap-20 px-4 py-16 md:gap-24 md:px-10 md:py-24 lg:px-[80px]">
@@ -218,9 +208,7 @@ export function LandingView() {
           wash="sky-card"
           visual={
             <div className={floatCard}>
-              <div className="overflow-hidden rounded-sm">
-                <Frame frame={FRAMES.watch} className="aspect-video" />
-              </div>
+              <LiveLines />
               {ran.length > 0 && (
                 <>
                   <div className="text-eye">Last runs</div>
@@ -240,17 +228,8 @@ export function LandingView() {
           wash="lav-card"
           visual={
             <div className={floatCard}>
-              {gap ? (
-                <>
-                  <div className="text-eye">Gap in car lengths</div>
-                  <GapChart series={gap.gap_series} />
-                  <div className="text-data text-ink-muted">{gapLine(gapSummary(gap.gap_series)!)}</div>
-                </>
-              ) : (
-                <div className="overflow-hidden rounded-sm">
-                  <Frame frame={FRAMES.ruleOut} className="aspect-video" />
-                </div>
-              )}
+              <GapCreative series={gap?.gap_series} frame={FRAMES.ruleOut} />
+              {gap && <div className="text-data text-ink-muted">{gapLine(gapSummary(gap.gap_series)!)}</div>}
               {/* Live: sum of ruled_out / candidates over each mode's latest run. */}
               {totalWatched > 0 && (
                 <div className="text-body-sm text-ink">
@@ -264,38 +243,43 @@ export function LandingView() {
           index={2}
           wash="dusk-card"
           visual={
-            <div className="w-full max-w-[340px] overflow-hidden rounded-[18px] bg-surface shadow-float">
+            <Reveal className="w-full max-w-[340px] overflow-hidden rounded-[18px] bg-surface shadow-float">
               <Frame frame={FRAMES.predict} className="aspect-video" />
               {top && (
                 <div className="flex flex-col gap-1.5 px-[18px] py-3.5">
-                  <div className="text-eye">{COPY.next}</div>
-                  <p className="font-serif text-xl leading-[1.2]">{top.what_next}</p>
+                  <div className={cn("text-eye", rise)} style={stagger(1)}>{COPY.next}</div>
+                  <p className={cn("font-serif text-xl leading-[1.2]", rise)} style={stagger(2)}>
+                    {top.what_next}
+                  </p>
                   {top.fix && (
-                    <p className="text-body-sm text-ink-muted">
+                    <p className={cn("text-body-sm text-ink-muted", rise)} style={stagger(3)}>
                       <b className="font-medium text-ink">{COPY.fix}</b> {top.fix}
                     </p>
                   )}
+                  <div className={rise} style={stagger(4)}>
+                    <StatusPill tone={riskTone(top.risk)}>{riskLabel(top.risk)}</StatusPill>
+                  </div>
                 </div>
               )}
-            </div>
+            </Reveal>
           }
         />
         <FeatureRow
           index={3}
           wash="sky-card"
           visual={
-            score ? (
-              <div className={floatCard}>
-                <div className="text-eye">Latest score · {MODE_INFO[score.mode].name}</div>
-                <AccuracyMeter metrics={score} showLabel={false} />
-                <div className="text-body-sm text-ink">{scoreLine(score)}</div>
-              </div>
-            ) : (
-              <div className={floatCard}>
-                <div className="text-eye">Score</div>
+            <div className={floatCard}>
+              <div className="text-eye">One moment, start to finish</div>
+              <CheckTimeline />
+              {score ? (
+                <div className="flex items-center gap-3 border-t border-hairline pt-3">
+                  <ScoreBar metrics={score} />
+                  <span className="text-body-sm text-ink">{scoreLine(score)} · {MODE_INFO[score.mode].name}</span>
+                </div>
+              ) : (
                 <p className="text-body-sm text-ink-muted">{COPY.scoreNothingBody}</p>
-              </div>
-            )
+              )}
+            </div>
           }
         />
       </section>
@@ -315,6 +299,7 @@ export function LandingView() {
                   <div className="font-serif text-[28px] leading-none">{MODE_INFO[mode].name}</div>
                   <div className="text-body-sm text-ink-muted">{MODE_INFO[mode].place}</div>
                   <div className="font-mono text-[20px] leading-7 font-medium tabular-nums">{x.checked > 0 ? scoreLine(x) : "Nothing checked yet"}</div>
+                  {x.checked > 0 && <ScoreBar metrics={x} />}
                   <div className="text-data text-ink-muted">
                     {x.candidates} clips watched · {x.ruled_out} ruled out · {x.verified} worth a look
                   </div>
@@ -341,17 +326,22 @@ export function LandingView() {
       </section>
 
       <section className="bg-surface px-4 py-16 text-center md:px-10 md:py-24">
-        <p className="mx-auto max-w-[1040px] font-serif text-[36px] leading-[1.08] text-ink md:text-[56px]">
-          Most camera footage is never watched. The few seconds that matter deserve a second look.
-        </p>
+        <Reveal>
+          <p className={cn("mx-auto max-w-[1040px] font-serif text-[36px] leading-[1.08] text-ink md:text-[56px]", rise)}>
+            Most camera footage is never watched. The few seconds that matter deserve a second look.
+          </p>
+        </Reveal>
       </section>
 
       <section className="mx-auto grid max-w-[1200px] grid-cols-1 gap-6 px-4 py-16 md:grid-cols-3 md:px-10 md:py-24 lg:px-[80px]">
-        {AUDIENCES.map((a) => (
-          <div key={a.title} className="flex flex-col gap-2.5 rounded-xl bg-surface p-7 shadow-float">
-            <div className="font-serif text-[28px] leading-tight">{a.title}</div>
-            <p className="text-body-sm text-ink-muted">{a.body}</p>
-          </div>
+        {AUDIENCES.map((a, n) => (
+          <Reveal key={a.title} className="h-full">
+            <div className={cn("flex h-full flex-col gap-2.5 rounded-xl bg-surface p-7 shadow-float", rise)} style={stagger(n)}>
+              <div className="font-serif text-[28px] leading-tight">{a.title}</div>
+              <p className="text-body-sm text-ink-muted">{a.body}</p>
+              {n === AUDIENCES.length - 1 && <CoachFan />}
+            </div>
+          </Reveal>
         ))}
       </section>
 

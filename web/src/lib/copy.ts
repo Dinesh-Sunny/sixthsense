@@ -229,13 +229,6 @@ export const BUS_STATE: Record<BusState, { label: string; tone: Tone; cssVar: st
   filed: { label: "Report filed", tone: "ok", cssVar: "--truth" },
 };
 
-export const NAV = [
-  { path: "/dashboard", label: "Live map" },
-  { path: "/reports", label: "Reports" },
-  { path: "/coaching", label: "Coaching" },
-  { path: "/", hash: "how", label: "How it works" },
-] as const;
-
 export const BUS_COPY = {
   heroTitle: "Every London bus,",
   heroItalic: "a second pair of eyes.",

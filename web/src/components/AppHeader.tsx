@@ -16,7 +16,7 @@ function activeFor(path: string): string | null {
 }
 
 /** One top bar for every inside page: wordmark, Live · Reports · Coaching, weather. */
-export function AppHeader({ className }: { className?: string }) {
+export function AppHeader({ className, right }: { className?: string; right?: React.ReactNode }) {
   const here = usePathname()?.replace(/\/$/, "") || "/";
   const active = activeFor(here);
   return (
@@ -47,9 +47,12 @@ export function AppHeader({ className }: { className?: string }) {
         })}
       </nav>
       <div className="flex-1" />
-      <div className="hidden sm:block">
-        <WeatherPill />
-      </div>
+      {/* Pages may swap the weather pill for their own tools (the live map shows weather in its bottom bar). */}
+      {right ?? (
+        <div className="hidden sm:block">
+          <WeatherPill />
+        </div>
+      )}
     </header>
   );
 }

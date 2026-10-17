@@ -5,7 +5,7 @@ export const MAP_COPY = {
   layers: "Layers",
   theme: "Theme",
   traffic: "Traffic",
-  cameras: "Buses with a clip",
+  allBuses: "Show all buses",
   ask: "Ask about the footage",
   askPlaceholder: "Ask about the footage",
   asking: "Looking through the footage…",

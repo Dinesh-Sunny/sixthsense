@@ -1,8 +1,7 @@
 "use client";
 
 import { useQueries } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
-import { useInView, prefersReducedMotion } from "@/components/landing/reveal";
+import { useInView } from "@/components/landing/reveal";
 import { useTween } from "@/components/landing/useTween";
 import { routeOptions } from "@/lib/api/queries";
 import { cn } from "@/lib/utils";
@@ -48,30 +47,15 @@ function pointAt(line: Pt[], f: number): Pt {
 export function LiveLines() {
   const [ref, inView] = useInView<HTMLDivElement>(0.4);
   const t = useTween(inView, 2400);
-  const [phase, setPhase] = useState<"glide" | "look" | "checked">("glide");
+  // After the glide, the first bus needs a look for 1.6 s, then turns green (checked).
+  const lookT = useTween(t >= 1, 1600);
+  const phase: "glide" | "look" | "checked" = t < 1 ? "glide" : lookT < 1 ? "look" : "checked";
   const routes = useQueries({ queries: ROUTES.map((id) => routeOptions(id)) });
   const real = routes.every((r) => r.data && r.data.directions.some((d) => d.coords.length > 1));
 
-  const lines = useMemo<Pt[][]>(() => {
-    if (!real) return FALLBACK;
-    const raw = routes.map((r) => {
-      const d = r.data!.directions.find((x) => x.coords.length > 1)!;
-      return d.coords as Pt[];
-    });
-    return project(raw);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- recompute when the data arrives
-  }, [real, routes.map((r) => r.dataUpdatedAt).join()]);
-
-  useEffect(() => {
-    if (t < 1) return;
-    if (prefersReducedMotion()) {
-      setPhase("checked");
-      return;
-    }
-    setPhase("look");
-    const timer = setTimeout(() => setPhase("checked"), 1600);
-    return () => clearTimeout(timer);
-  }, [t]);
+  const lines: Pt[][] = real
+    ? project(routes.map((r) => r.data!.directions.find((x) => x.coords.length > 1)!.coords as Pt[]))
+    : FALLBACK;
 
   const starts = [0.08, 0.15, 0.1];
   const spans = [0.55, 0.6, 0.5];

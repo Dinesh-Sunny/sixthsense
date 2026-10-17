@@ -199,12 +199,12 @@ function Actions({ incident: i, pairing, alert }: { incident: Incident; pairing:
       {send.isError && <p className="text-body-sm text-risk-high">{REPORT_COPY.sendFailed}</p>}
       {pairing && (
         <div className="flex flex-wrap gap-3">
-          <Button asChild variant="glass" size="sm">
+          <Button asChild variant="outline" size="sm">
             <Link href={{ pathname: "/dashboard", query: { bus: pairing.vehicle_id, route: pairing.route } }}>
               {REPORT_COPY.showOnMap}
             </Link>
           </Button>
-          <Button asChild variant="glass" size="sm">
+          <Button asChild variant="outline" size="sm">
             <Link href={{ pathname: "/coaching", query: { route: pairing.route } }}>{REPORT_COPY.coachingRoute}</Link>
           </Button>
         </div>

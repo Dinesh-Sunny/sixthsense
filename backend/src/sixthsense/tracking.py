@@ -21,6 +21,13 @@ from .modes import (
     COCO_IDS,
     DEFAULT_FRAME_WH,
     EGO_GROWTH_MIN,
+    EGO_MEDIAN_FRAMES,
+    EGO_MIN_FRAMES,
+    EGO_MIN_MEAN_CONF,
+    EGO_MIN_SPAN_S,
+    EGO_MIN_START_AREA,
+    EGO_NEAR_HEIGHT,
+    EGO_SELF_MASK,
     EGO_TTC_MAX_S,
     EGO_TTC_MIN_SCALE,
     EGO_TTC_SPAN_S,
@@ -45,6 +52,8 @@ class GapResult:
     note: str
     gap_series: list[GapPoint] = field(default_factory=list)
     passed: bool | None = None  # set by checks with their own pass rule (ego); else score >= VERIFY_MIN
+    # ego only: best passing (score, note) per road-user class, so the note can follow the hazard
+    passing: dict[str, tuple[float, str]] = field(default_factory=dict)
 
 
 @dataclass
@@ -52,6 +61,7 @@ class _Point:
     center: np.ndarray
     diag: float
     xyxy: np.ndarray
+    conf: float = 1.0
 
 
 @dataclass
@@ -120,7 +130,8 @@ def _track_group(det: DetectionsResp, group: frozenset[str], fps: float) -> list
             x1, y1, x2, y2 = tracked.xyxy[i]
             diag = float(math.hypot(x2 - x1, y2 - y1))
             tr = tracks.setdefault(int(tid), _Track(label=str(tracked.data["class_name"][i])))
-            tr.points[round(t, 3)] = _Point(centers[i], diag, tracked.xyxy[i].astype(float))
+            conf = float(tracked.confidence[i]) if tracked.confidence is not None else 1.0
+            tr.points[round(t, 3)] = _Point(centers[i], diag, tracked.xyxy[i].astype(float), conf)
     return [t for t in tracks.values() if len(t.points) >= MIN_TRACK_FRAMES]
 
 
@@ -201,7 +212,14 @@ class _EgoHit:
     growth: float
     window_s: float
     ttc_s: float | None
+    height_frac: float
     passed: bool
+
+    @property
+    def score(self) -> float:
+        # growth beyond the gate, plus credit for a short time to contact; capped at 1
+        ttc = 1 - self.ttc_s / EGO_TTC_MAX_S if self.ttc_s is not None and self.ttc_s < EGO_TTC_MAX_S else 0.0
+        return round(min(1.0, max((self.growth - 1) / (EGO_GROWTH_MIN - 1) / 2, ttc)), 2)
 
 
 def _frame_wh(det: DetectionsResp) -> tuple[float, float]:
@@ -213,39 +231,76 @@ def _frame_wh(det: DetectionsResp) -> tuple[float, float]:
     return max([DEFAULT_FRAME_WH[0], *xs]), max([DEFAULT_FRAME_WH[1], *ys])
 
 
+def _drop_camera_boxes(det: DetectionsResp, wh: tuple[float, float], view: CameraView) -> DetectionsResp:
+    """Remove boxes that belong to the camera's own vehicle (bike handlebars, hands, front wheel)."""
+    mask = EGO_SELF_MASK.get(view)
+    if mask is None:
+        return det
+    band, max_w = mask
+    floor, widest = (1 - band) * wh[1], max_w * wh[0]
+
+    def own(bbox: list[float]) -> bool:
+        return len(bbox) == 4 and (bbox[3] >= floor or bbox[2] - bbox[0] > widest)
+
+    frames = [
+        f.model_copy(update={"detections": [b for b in f.detections if not own(b.bbox)]}) for f in det.frames
+    ]
+    return det.model_copy(update={"frames": frames})
+
+
 def _in_zone(p: _Point, wh: tuple[float, float], view: CameraView) -> bool:
     x_min, x_max, y_min = EGO_ZONES[view]
     cx = (p.xyxy[0] + p.xyxy[2]) / 2
     return x_min * wh[0] <= cx <= x_max * wh[0] and p.xyxy[3] >= y_min * wh[1]
 
 
+def _trailing_median(values: list[float], n: int) -> list[float]:
+    return [float(np.median(values[max(0, i - n + 1) : i + 1])) for i in range(len(values))]
+
+
+def _usable(track: _Track, wh: tuple[float, float]) -> bool:
+    ts = sorted(track.points)
+    first = track.points[ts[0]].xyxy
+    start_area = (first[2] - first[0]) * (first[3] - first[1]) / (wh[0] * wh[1])
+    mean_conf = sum(p.conf for p in track.points.values()) / len(track.points)
+    return start_area >= EGO_MIN_START_AREA and mean_conf >= EGO_MIN_MEAN_CONF
+
+
 def _ego_track(track: _Track, wh: tuple[float, float], view: CameraView) -> _EgoHit | None:
     """Best growth of one track while it is in the lane zone.
 
     Scale expansion is the classic time-to-contact cue: if a box grows by s over dt, contact is
-    about dt / (s - 1) away at constant closing speed (no depth or speed needed).
+    about dt / (s - 1) away at constant closing speed (no depth or speed needed). Heights are a
+    trailing median, so one jittery box can never produce a 13x "growth".
     """
     ts = sorted(track.points)
-    heights = _smooth([float(track.points[t].xyxy[3] - track.points[t].xyxy[1]) for t in ts])
+    raw = [float(track.points[t].xyxy[3] - track.points[t].xyxy[1]) for t in ts]
+    heights = _trailing_median(raw, EGO_MEDIAN_FRAMES)
     best: _EgoHit | None = None
     i = k = 0
     for j, tj in enumerate(ts):
-        if not _in_zone(track.points[tj], wh, view) or heights[j] <= 0:
-            continue
         while tj - ts[i] > EGO_WINDOW_S:
             i += 1
         while k < j and tj - ts[k + 1] >= EGO_TTC_SPAN_S:
             k += 1
-        m0 = min(range(i, j + 1), key=lambda m: heights[m])  # smallest box in the window, at or before now
-        growth = heights[j] / heights[m0] if heights[m0] > 0 else 1.0
+        if not _in_zone(track.points[tj], wh, view) or heights[j] <= 0:
+            continue
+        # baseline = smallest box at least EGO_MIN_SPAN_S and EGO_MIN_FRAMES before now
+        early = [m for m in range(i, j + 1) if tj - ts[m] >= EGO_MIN_SPAN_S and j - m + 1 >= EGO_MIN_FRAMES]
+        if not early:
+            continue
+        m0 = min(early, key=lambda m: heights[m])
+        if heights[m0] <= 0:
+            continue
+        growth = heights[j] / heights[m0]
         ttc = None
-        if k < j and heights[k] > 0:
-            scale, dt = heights[j] / heights[k], tj - ts[k]
-            # A shorter span turns 1-2 px of box jitter into a fake "seconds to contact".
-            if scale >= EGO_TTC_MIN_SCALE and dt >= EGO_TTC_SPAN_S:
-                ttc = dt / (scale - 1)
-        passed = growth >= EGO_GROWTH_MIN or (ttc is not None and ttc <= EGO_TTC_MAX_S)
-        hit = _EgoHit(growth, tj - ts[m0], ttc, passed)
+        scale, dt = (heights[j] / heights[k], tj - ts[k]) if heights[k] > 0 else (0.0, 0.0)
+        # A shorter span turns 1-2 px of box jitter into a fake "seconds to contact".
+        if k < j and scale >= EGO_TTC_MIN_SCALE and dt >= EGO_TTC_SPAN_S:
+            ttc = dt / (scale - 1)
+        height_frac = heights[j] / wh[1]
+        close = (ttc is not None and ttc <= EGO_TTC_MAX_S) or height_frac >= EGO_NEAR_HEIGHT
+        hit = _EgoHit(growth, tj - ts[m0], ttc, height_frac, growth >= EGO_GROWTH_MIN and close)
         if best is None or (hit.passed, hit.growth) > (best.passed, best.growth):
             best = hit
     return best
@@ -256,11 +311,13 @@ def _users(n: int) -> str:
 
 
 def _ego_note(label: str, hit: _EgoHit, view: CameraView) -> str:
-    who = f"{_a(label)} {_WHERE[view]}"
-    note = f"{who} grew {hit.growth:.1f}x in {hit.window_s:.1f} s"
-    if hit.ttc_s is not None and hit.ttc_s <= 2 * EGO_TTC_MAX_S:
+    note = f"{_a(label)} {_WHERE[view]} grew {hit.growth:.1f}x in {hit.window_s:.1f} s"
+    # Cite whichever closeness test actually passed: time to contact first, else box size.
+    if hit.ttc_s is not None and hit.ttc_s <= EGO_TTC_MAX_S:
         when = "under 1 s" if hit.ttc_s < 1 else f"about {hit.ttc_s:.0f} s"
         note += f", {when} from {_TOWARD[view]}"
+    elif hit.height_frac >= EGO_NEAR_HEIGHT:
+        note += f", now filling {hit.height_frac:.0%} of the frame height"
     return note
 
 
@@ -268,7 +325,8 @@ def closing_on_us(
     det: DetectionsResp | None, classes: frozenset[str], view: CameraView
 ) -> GapResult | None:
     """Vehicle-mounted camera: keep the clip when a tracked road user in our lane zone grows
-    >= EGO_GROWTH_MIN within EGO_WINDOW_S, or its time-to-contact proxy is <= EGO_TTC_MAX_S.
+    >= EGO_GROWTH_MIN over >= EGO_MIN_SPAN_S, AND is close (TTC proxy <= EGO_TTC_MAX_S or box
+    height >= EGO_NEAR_HEIGHT of the frame).
 
     The camera vehicle has no box of its own, so the pair check cannot apply. Returns None when
     there are no frames. gap_series stays empty: there is no gap in car lengths to chart.
@@ -276,11 +334,16 @@ def closing_on_us(
     if det is None or not det.frames:
         return None
     wh = _frame_wh(det)
-    tracks = _tracks(det, classes)
+    tracks = [t for t in _tracks(_drop_camera_boxes(det, wh, view), classes) if _usable(t, wh)]
     best: tuple[_Track, _EgoHit] | None = None
+    passing: dict[str, tuple[float, str]] = {}
     for tr in tracks:
         hit = _ego_track(tr, wh, view)
-        if hit and (best is None or (hit.passed, hit.growth) > (best[1].passed, best[1].growth)):
+        if hit is None:
+            continue
+        if hit.passed and (tr.label not in passing or hit.score > passing[tr.label][0]):
+            passing[tr.label] = (hit.score, _ego_note(tr.label, hit, view))
+        if best is None or (hit.passed, hit.growth) > (best[1].passed, best[1].growth):
             best = (tr, hit)
     if best is None:
         return GapResult(0.0, f"{_users(len(tracks))} tracked, none in the lane {_WHERE[view]}", passed=False)
@@ -291,7 +354,10 @@ def closing_on_us(
             f"{_users(len(tracks))} tracked, none closing on us fast enough",
             passed=False,
         )
-    # score: growth beyond 1x, plus credit for a short time to contact; capped at 1
-    ttc_credit = 1 - hit.ttc_s / EGO_TTC_MAX_S if hit.ttc_s is not None and hit.ttc_s < EGO_TTC_MAX_S else 0.0
-    score = round(min(1.0, max(hit.growth - 1, ttc_credit)), 2)
-    return GapResult(score, _ego_note(tr.label, hit, view), passed=True)
+    return GapResult(hit.score, _ego_note(tr.label, hit, view), passed=True, passing=passing)
+
+
+def hazard_match(passing: dict[str, tuple[float, str]], wanted: frozenset[str]) -> tuple[float, str] | None:
+    """Best passing track among the classes a hazard names (e.g. person for 'Pedestrian stepping out')."""
+    hits = [v for label, v in passing.items() if label in wanted]
+    return max(hits) if hits else None

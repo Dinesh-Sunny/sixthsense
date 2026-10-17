@@ -1,58 +1,100 @@
 """Ego "closing on us" check for vehicle-mounted cameras, on synthetic growing boxes."""
 
 from sixthsense.clients.vss import DetectionsResp
-from sixthsense.modes import VEHICLES, VULNERABLE
+from sixthsense.modes import MODES, VEHICLES, VULNERABLE
+from sixthsense.pipeline import Verification, bus_prompt, restates_present, retarget_ego
 from sixthsense.tracking import closing_on_us
 
 ALL = VEHICLES | VULNERABLE
 W, H = 1920, 1080
 
 
-def growing(label="person", cx=960, h0=100.0, rate=1.0, n=60, fps=30, bottom=800.0, conf=0.8):
+def box(label, cx, h, bottom, conf, aspect=None):
+    w = h * (aspect or (0.4 if label == "person" else 1.6))
+    return {"label": label, "confidence": conf, "bbox": [cx - w / 2, bottom - h, cx + w / 2, bottom]}
+
+
+def growing(label="person", cx=960, h0=300.0, rate=1.0, n=60, fps=30, bottom=900.0, conf=0.8, extra=None,
+            spike_at=None):
     """One box whose height grows `rate`x per second (rate=1 = constant), anchored at `bottom`."""
     frames = []
     for i in range(n):
         t = i / fps
         h = h0 * rate**t
-        w = h * (0.4 if label == "person" else 1.6)
-        frames.append({"frame_index": i, "time_sec": t, "detections": [
-            {"label": label, "confidence": conf, "bbox": [cx - w / 2, bottom - h, cx + w / 2, bottom]}]})
+        if spike_at is not None and i == spike_at:
+            h *= 13.2  # one jittery detection
+        dets = [box(label, cx, min(h, bottom), bottom, conf)]
+        if extra:
+            dets.append(extra(i))
+        frames.append({"frame_index": i, "time_sec": t, "detections": dets})
     return DetectionsResp.model_validate({"fps": fps, "video_shape": [H, W], "frames": frames})
 
 
-def test_pedestrian_ahead_growing_fast_is_kept_with_plain_note():
-    r = closing_on_us(growing(rate=1.8, n=45), ALL, "front")  # 1.5 s at 1.8x/s
-    assert r is not None and r.passed is True and r.score >= 0.3
-    assert r.note.startswith("a pedestrian ahead grew ") and " s from the front of the bus" in r.note
-    assert r.gap_series == []
+# ---------- the gate ----------
+def test_pedestrian_ahead_closing_fast_is_kept_with_plain_note():
+    r = closing_on_us(growing(rate=1.8, n=45), ALL, "front")  # 1.5 s at 1.8x/s -> ~2.3x
+    assert r.passed is True and r.score >= 0.5
+    assert r.note.startswith("a pedestrian ahead grew 2.") and "s from the front of the bus" in r.note
+    assert r.gap_series == [] and "person" in r.passing
 
 
 def test_constant_size_box_is_not_kept():
     r = closing_on_us(growing(rate=1.0), ALL, "front")
-    assert r is not None and r.passed is False and r.note == "1 road user tracked, none closing on us fast enough"
+    assert r.passed is False and r.note == "1 road user tracked, none closing on us fast enough"
 
 
-def test_slow_growth_fails_but_short_ttc_passes():
-    slow = closing_on_us(growing(rate=1.05, n=60), ALL, "front")  # ~5% per second: TTC ~20 s
+def test_growth_below_1_6_is_not_kept_even_with_short_ttc():
+    # 1.4x/s over 1.2 s -> ~1.5x total; TTC over 0.5 s ~ 2.7 s: close, but growth gate fails
+    assert closing_on_us(growing(rate=1.4, n=36), ALL, "front").passed is False
+
+
+def test_growth_needs_0_8_s_and_8_frames():
+    # 3x/s but only 0.5 s of track (15 frames at 30 fps): too short to measure
+    assert closing_on_us(growing(rate=3.0, n=15), ALL, "front").passed is False
+    # at 8 fps the tracker confirms from frame 2, so 9 frames = 8 tracked over 0.875 s: just enough
+    assert closing_on_us(growing(rate=3.0, n=9, fps=8), ALL, "front").passed is True
+    assert closing_on_us(growing(rate=3.0, n=8, fps=8), ALL, "front").passed is False
+
+
+def test_growth_alone_needs_ttc_or_a_near_box():
+    # steady growth over 2 s: ~1.66x but TTC ~ 3.6 s and the box ends at 23% of frame height
+    slow = closing_on_us(growing(label="car", rate=1.3, n=60, h0=150), ALL, "front")
     assert slow.passed is False
-    # 0.63 s seen at 1.5x/s: growth 1.29 (< 1.35) but scale over 0.5 s gives TTC ~2.3 s
-    fast_ttc = closing_on_us(growing(rate=1.5, n=20), ALL, "front")
-    assert fast_ttc.passed is True and "about 2 s from the front of the bus" in fast_ttc.note
-    # under the TTC span (0.37 s) a short burst cannot pass on TTC alone
-    assert closing_on_us(growing(rate=1.5, n=12), ALL, "front").passed is False
+    # same growth, but the box ends at ~31% of the frame height -> close enough
+    near = closing_on_us(growing(label="car", rate=1.3, n=60, h0=200), ALL, "front")
+    assert near.passed is True and near.note.endswith("of the frame height")
 
 
-def test_outside_the_lane_zone_is_ignored_for_front_but_counts_nearside():
-    side = growing(label="bicycle", cx=150, rate=1.8, n=45)  # far left of frame
+def test_single_jitter_spike_does_not_count():
+    r = closing_on_us(growing(rate=1.0, spike_at=40), ALL, "front")
+    assert r.passed is False
+
+
+def test_tiny_start_and_low_confidence_tracks_are_ignored():
+    tiny = closing_on_us(growing(rate=1.8, n=45, h0=60), ALL, "front")  # starts at ~0.07% of frame
+    assert tiny.passed is False and tiny.note.startswith("0 road users")
+    unsure = closing_on_us(growing(rate=1.8, n=45, conf=0.35), ALL, "front")
+    assert unsure.passed is False
+
+
+def test_lane_zone_front_vs_nearside():
+    side = growing(label="bicycle", cx=200, rate=1.8, n=45, h0=200)
     assert closing_on_us(side, ALL, "front").passed is False
     near = closing_on_us(side, ALL, "nearside")
     assert near.passed is True and near.note.startswith("a cyclist alongside grew ")
     assert "the side of the bus" in near.note
+    high = growing(rate=1.8, n=45, bottom=420.0, h0=150)  # bottom edge above the zone line
+    assert closing_on_us(high, ALL, "front").passed is False
 
 
-def test_box_high_in_frame_is_not_in_lane_zone():
-    far = growing(rate=1.8, n=45, bottom=300.0)  # bottom edge above the zone line
-    assert closing_on_us(far, ALL, "front").passed is False
+def test_nearside_ignores_the_riders_own_handlebars_and_wheel():
+    # handlebars: a wide box glued to the bottom of the frame that "grows" as the rider moves
+    bars = growing(label="bicycle", cx=960, rate=1.8, n=45, h0=200, bottom=1080.0)
+    assert closing_on_us(bars, ALL, "nearside").passed is False
+    wide = growing(label="bicycle", cx=960, rate=1.8, n=45, h0=500, bottom=900.0)  # > 45% of frame width
+    assert closing_on_us(wide, ALL, "nearside").passed is False
+    # the front camera keeps boxes near the bottom (a close pedestrian may touch it)
+    assert closing_on_us(growing(rate=1.8, n=45, bottom=1080.0), ALL, "front").passed is True
 
 
 def test_no_frames_returns_none_and_unknown_shape_defaults():
@@ -64,6 +106,43 @@ def test_no_frames_returns_none_and_unknown_shape_defaults():
 
 
 def test_vehicle_class_filter_applies():
-    car = growing(label="car", rate=1.8, n=45)
+    car = growing(label="car", rate=1.8, n=45, h0=200)
     assert closing_on_us(car, frozenset({"person"}), "front").passed is False
     assert closing_on_us(car, ALL, "front").note.startswith("a car ahead grew")
+
+
+# ---------- hazard-matched note ----------
+def _ver_for(det):
+    r = closing_on_us(det, ALL, "front")
+    return Verification(verified=bool(r.passed), verify_score=r.score, verify_note=r.note,
+                        verify_by="yolo boxes (closing on us)", ego_passing=r.passing)
+
+
+def test_pedestrian_hazard_cites_the_pedestrian_not_the_car():
+    # a car grows faster (would be cited by default) but a pedestrian also passes
+    car = lambda i: box("car", 1300, 200 * 2.2 ** (i / 30), 900, 0.9)  # noqa: E731
+    ver = _ver_for(growing(rate=1.8, n=45, cx=700, extra=car))
+    assert ver.verified and ver.verify_note.startswith("a car ahead")
+    out = retarget_ego(ver, "Pedestrian stepping out")
+    assert out.verified and out.verify_note.startswith("a pedestrian ahead")
+    assert retarget_ego(ver, "Vehicle cutting in").verify_note.startswith("a car ahead")  # names no class
+
+
+def test_cyclist_hazard_with_only_a_car_closing_is_ruled_out():
+    ver = _ver_for(growing(label="car", rate=1.8, n=45, h0=200))
+    out = retarget_ego(ver, "Cyclist ahead")
+    assert out.verified is False and out.verify_note.startswith("no bicycle closing on us")
+
+
+# ---------- prompts and judge ----------
+def test_prompts_demand_a_change_and_nearside_ignores_handlebars():
+    near = bus_prompt(MODES["bus_nearside"])
+    assert "handlebars" in near and "belong to" in near and "ignore them" in near
+    for p in (near, bus_prompt(MODES["bus_front"])):
+        assert "CHANGE" in p and "continues walking" in p and "reaches the bus's lane in about 2 s" in p
+
+
+def test_restated_predictions_are_detected():
+    assert restates_present("The pedestrian continues walking along the kerb")
+    assert restates_present("The van stays in the bus lane")
+    assert not restates_present("The pedestrian reaches the bus's lane in about 2 s")

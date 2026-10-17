@@ -8,6 +8,7 @@ import asyncio
 import difflib
 import hashlib
 import logging
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -24,6 +25,7 @@ from .modes import (
     DESCRIPTION_MAX_CHARS,
     EVIDENCE_MAX_CHARS,
     FORESEE_MAX_TOKENS,
+    HAZARD_CLASSES,
     JUDGE_MAX_TOKENS,
     MODES,
     NEAR_DUP_DESC_RATIO,
@@ -39,7 +41,7 @@ from .modes import (
 )
 from .settings import Settings
 from .store import IncidentStore
-from .tracking import GapResult, closing_gap, closing_on_us
+from .tracking import GapResult, closing_gap, closing_on_us, hazard_match
 
 log = logging.getLogger("sixthsense.pipeline")
 op = tracing.op
@@ -66,6 +68,8 @@ class Verification(BaseModel):
     verify_note: str
     verify_by: str
     gap_series: list[GapPoint] = []
+    # ego only: best passing (score, note) per road-user class; lets the note follow the hazard type
+    ego_passing: dict[str, tuple[float, str]] = {}
 
 
 class Forecast(BaseModel):
@@ -128,12 +132,13 @@ Describe only what is really visible in this clip: never invent people, vehicles
 Answer in JSON only:
 {{"type": "<exactly one of: {types}>",
  "what_happens": "<one sentence naming the specific road users and where they are: colour, side, distance>",
- "what_next": "<the most likely thing in {horizon}, one sentence, checkable on camera>",
+ "what_next": "<a CHANGE you expect in {horizon}, one sentence, checkable on camera, e.g. the pedestrian reaches the bus's lane in about 2 s>",
  "why": "<one sentence: the visible cause>",
  "fix": "<one sentence of advice to the bus driver, e.g. {fix_example}>",
  "risk": <integer 1-5>}}
-Pick the type that best fits what you see. Use your own fresh wording for this clip; do not reuse stock phrases
-like "continues driving". If nothing risky is happening, set risk to 1 and what_next to "nothing notable"."""
+"what_next" must predict something that is not already happening: never "continues walking", "keeps driving"
+or "remains in the lane". Pick the type that best fits what you see. Use your own fresh wording for this clip.
+If nothing risky is happening, set risk to 1 and what_next to "nothing notable"."""
 
 # How the bus prompt frames the camera, per view (None = fixed street/city camera read as a bus view).
 BUS_CAMERA_LINES: dict[str | None, tuple[str, str]] = {
@@ -148,7 +153,8 @@ BUS_CAMERA_LINES: dict[str | None, tuple[str, str]] = {
     ),
     "nearside": (
         "This is the bus's nearside camera, low on the kerb side: road users beside the camera are alongside "
-        "the bus on its nearside.",
+        "the bus on its nearside. The handlebars, hands and front wheel at the bottom of the frame belong to "
+        "the camera; ignore them, they are not a road user.",
         "Check the nearside mirror and hold at the stop until the cyclist has passed",
     ),
 }
@@ -162,6 +168,18 @@ def bus_prompt(cfg: ModeConfig) -> str:
         types=", ".join(cfg.get("hazard_types", BUS_HAZARD_TYPES)),
         horizon=cfg["horizon"],
     )
+
+
+# Bus-view judges: a prediction that only restates the present is not a forecast that came true.
+JUDGE_RESTATE_RULE = (
+    ' If the prediction only restates what was already happening (e.g. "continues walking", "keeps driving"), '
+    'answer "partly", never "yes".'
+)
+RESTATE_RE = re.compile(r"\b(continu\w*|keeps?|keeping|remains?|remaining|stays?|staying|still)\b", re.I)
+
+
+def restates_present(what_next: str) -> bool:
+    return bool(RESTATE_RE.search(what_next))
 
 
 VERIFY_EGO_Q = "Answer only yes or no. Is a person, bike or vehicle close to this camera and getting closer?"
@@ -275,6 +293,7 @@ async def verify(deps: Deps, cand: Candidate, mode: Mode, clip: _Clip) -> Verifi
                 verify_note=gap.note,
                 verify_by=by,
                 gap_series=gap.gap_series,
+                ego_passing=gap.passing,
             )
     # Street mode, or no boxes at all: a strict yes/no asked of Cosmos on the clip.
     q = {"boxes": VERIFY_BOXES_Q, "ego": VERIFY_EGO_Q}.get(cfg["verify"], VERIFY_STREET_Q)
@@ -317,14 +336,43 @@ def bus_hazard_type(raw: str, types: tuple[str, ...] = BUS_HAZARD_TYPES) -> str:
     return by_key[close[0]] if close else raw
 
 
+def hazard_classes(hazard_type: str) -> frozenset[str] | None:
+    """Road-user classes a hazard label names, or None when it names no specific one."""
+    t = hazard_type.lower()
+    for word, classes in HAZARD_CLASSES.items():
+        if word in t:
+            return classes
+    return None
+
+
+def retarget_ego(ver: Verification, hazard_type: str) -> Verification:
+    """Cite the road user the hazard names. If the forecast is about a pedestrian or cyclist but
+    only a car closed on us, the boxes do not back the forecast, so the clip is ruled out."""
+    wanted = hazard_classes(hazard_type)
+    if wanted is None or not ver.verified:
+        return ver
+    match = hazard_match(ver.ego_passing, wanted)
+    if match is None:
+        return ver.model_copy(
+            update={"verified": False, "verify_note": f"no {'/'.join(sorted(wanted))} closing on us; {ver.verify_note}"}
+        )
+    score, note = match
+    return ver.model_copy(update={"verify_score": score, "verify_note": note})
+
+
 # ---------- 4 SELF-CHECK ----------
 def _came_true(value: str) -> CameTrue:
     v = value.strip().lower()
     return v if v in ("yes", "partly", "no") else "unknown"  # type: ignore[return-value]
 
 
+def _cap_restated(verdict: CameTrue, what_next: str, bus_view: bool) -> CameTrue:
+    """Backstop for the judge rule: a restated present can earn "partly" at most."""
+    return "partly" if bus_view and verdict == "yes" and restates_present(what_next) else verdict
+
+
 @op(kind="llm")
-async def selfcheck(deps: Deps, cand: Candidate, what_next: str) -> SelfCheck:
+async def selfcheck(deps: Deps, cand: Candidate, what_next: str, mode: Mode | None = None) -> SelfCheck:
     parent = cand.hit.original_video
     if not parent or NOTHING in what_next.lower():
         return SelfCheck()
@@ -342,7 +390,9 @@ async def selfcheck(deps: Deps, cand: Candidate, what_next: str) -> SelfCheck:
             next_desc = (await deps.vss.metadata(nxt.source)).description
         except httpx.HTTPError:
             next_desc = ""
-    text_prompt = JUDGE.format(what_next=what_next, next_desc=next_desc[:NEXT_DESC_MAX_CHARS])
+    bus_view = mode is not None and MODES[mode].get("prompt") == "bus"
+    rule = JUDGE_RESTATE_RULE if bus_view else ""
+    text_prompt = JUDGE.format(what_next=what_next, next_desc=next_desc[:NEXT_DESC_MAX_CHARS]) + rule
     judge: Judgement | None = None
     judged_by = "llm-text"
     if deps.settings.selfcheck_via == "video":
@@ -350,7 +400,7 @@ async def selfcheck(deps: Deps, cand: Candidate, what_next: str) -> SelfCheck:
         try:
             clip = await deps.vss.clip_bytes(nxt.source)
             judge = await deps.models.cosmos_json(
-                JUDGE_VIDEO.format(what_next=what_next), clip, Judgement, JUDGE_MAX_TOKENS
+                JUDGE_VIDEO.format(what_next=what_next) + rule, clip, Judgement, JUDGE_MAX_TOKENS
             )
             judged_by = "cosmos-video"
         except (UpstreamError, httpx.HTTPError) as e:
@@ -361,7 +411,7 @@ async def selfcheck(deps: Deps, cand: Candidate, what_next: str) -> SelfCheck:
     if judge is None:
         return SelfCheck(next_source=nxt.source, judged_by=judged_by)
     return SelfCheck(
-        came_true=_came_true(judge.came_true),
+        came_true=_cap_restated(_came_true(judge.came_true), what_next, bus_view),
         came_true_evidence=judge.evidence[:EVIDENCE_MAX_CHARS],
         next_source=nxt.source,
         judged_by=judged_by,
@@ -411,10 +461,16 @@ async def run_mode(
             if fc is None or fc.risk < RISK_SKIP_BELOW:
                 emit()
                 return None
+            if ver.ego_passing or MODES[mode]["verify"] == "ego":
+                ver = retarget_ego(ver, fc.type)
+                if not ver.verified:  # the hazard's road user never closed on us: rule it out
+                    counts["ruled_out"] += 1
+                    emit()
+                    return None
             steps.check.total += 1
             emit()
             async with asyncio.timeout(timeout):
-                sc = await selfcheck(deps, cand, fc.what_next)
+                sc = await selfcheck(deps, cand, fc.what_next, mode)
             steps.check.done += 1
             emit()
         h = cand.hit

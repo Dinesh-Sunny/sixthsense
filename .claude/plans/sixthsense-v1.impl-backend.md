@@ -24,3 +24,8 @@
 - [x] Hazard-matched note: pedestrian/cyclist/scooter/crowd hazards cite the matching class track; none passing -> ruled out.
 - [x] Prompts ask for a CHANGE (not "continues ..."); nearside prompt says the handlebars/front wheel are the camera; bus-view judges answer partly for restated predictions (+ regex backstop capping yes -> partly).
 - [x] GET /api/poster?source=&t=1 (media.py, cv2 headless, 960 px, q82, LRU 512, Semaphore(2), Cache-Control 1 day, 404 unreadable). 98 tests.
+
+## v3.2 gate data
+- [x] `sixthsense gate-debug --mode bus_front|bus_nearside --limit N`: search + detections only, one line per candidate (hazard, best track class, start->end height %, start area, growth/span/frames, conf, ttc, lane, rejecting rule) + summary counts.
+- [x] Removed the regex yes->partly cap (judge instruction kept). Hazard match falls back to the best passing track with "(closest road user: <class>)".
+- [x] Provisional gate: growth >=1.4x over >=0.6 s and >=6 frames, start area >=0.8%, mean conf >=0.35; nearside bottom-band mask kept. 99 tests.

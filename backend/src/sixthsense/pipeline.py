@@ -8,7 +8,6 @@ import asyncio
 import difflib
 import hashlib
 import logging
-import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -175,13 +174,6 @@ JUDGE_RESTATE_RULE = (
     ' If the prediction only restates what was already happening (e.g. "continues walking", "keeps driving"), '
     'answer "partly", never "yes".'
 )
-RESTATE_RE = re.compile(r"\b(continu\w*|keeps?|keeping|remains?|remaining|stays?|staying|still)\b", re.I)
-
-
-def restates_present(what_next: str) -> bool:
-    return bool(RESTATE_RE.search(what_next))
-
-
 VERIFY_EGO_Q = "Answer only yes or no. Is a person, bike or vehicle close to this camera and getting closer?"
 VERIFY_BOXES_Q = (
     "Answer only yes or no. Are two vehicles within about one car length of each other and getting closer?"
@@ -346,15 +338,19 @@ def hazard_classes(hazard_type: str) -> frozenset[str] | None:
 
 
 def retarget_ego(ver: Verification, hazard_type: str) -> Verification:
-    """Cite the road user the hazard names. If the forecast is about a pedestrian or cyclist but
-    only a car closed on us, the boxes do not back the forecast, so the clip is ruled out."""
+    """Cite the road user the hazard names. If none of that class passed, keep the best passing
+    track of any class and say so, so the note never pretends a car is the pedestrian."""
     wanted = hazard_classes(hazard_type)
     if wanted is None or not ver.verified:
         return ver
     match = hazard_match(ver.ego_passing, wanted)
     if match is None:
+        best = max(ver.ego_passing.items(), key=lambda kv: kv[1][0], default=None)
+        if best is None:
+            return ver
+        label, (score, note) = best
         return ver.model_copy(
-            update={"verified": False, "verify_note": f"no {'/'.join(sorted(wanted))} closing on us; {ver.verify_note}"}
+            update={"verify_score": score, "verify_note": f"{note} (closest road user: {label})"}
         )
     score, note = match
     return ver.model_copy(update={"verify_score": score, "verify_note": note})
@@ -364,11 +360,6 @@ def retarget_ego(ver: Verification, hazard_type: str) -> Verification:
 def _came_true(value: str) -> CameTrue:
     v = value.strip().lower()
     return v if v in ("yes", "partly", "no") else "unknown"  # type: ignore[return-value]
-
-
-def _cap_restated(verdict: CameTrue, what_next: str, bus_view: bool) -> CameTrue:
-    """Backstop for the judge rule: a restated present can earn "partly" at most."""
-    return "partly" if bus_view and verdict == "yes" and restates_present(what_next) else verdict
 
 
 @op(kind="llm")
@@ -411,7 +402,7 @@ async def selfcheck(deps: Deps, cand: Candidate, what_next: str, mode: Mode | No
     if judge is None:
         return SelfCheck(next_source=nxt.source, judged_by=judged_by)
     return SelfCheck(
-        came_true=_cap_restated(_came_true(judge.came_true), what_next, bus_view),
+        came_true=_came_true(judge.came_true),
         came_true_evidence=judge.evidence[:EVIDENCE_MAX_CHARS],
         next_source=nxt.source,
         judged_by=judged_by,
@@ -463,10 +454,6 @@ async def run_mode(
                 return None
             if ver.ego_passing or MODES[mode]["verify"] == "ego":
                 ver = retarget_ego(ver, fc.type)
-                if not ver.verified:  # the hazard's road user never closed on us: rule it out
-                    counts["ruled_out"] += 1
-                    emit()
-                    return None
             steps.check.total += 1
             emit()
             async with asyncio.timeout(timeout):

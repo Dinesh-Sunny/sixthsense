@@ -205,19 +205,19 @@ VERIFY_MIN = 0.30  # closing score needed to call a candidate verified
 GAP_SERIES_MAX_POINTS = 60
 
 # --- ego "closing on us" check (vehicle-mounted cameras) ---
-# Tuned after the first real runs (17 Oct): the looser 1.35x gate kept 37/40 clips, boxed the
-# bike rider's own handlebars, and read 13x "growth" off box jitter.
-EGO_GROWTH_MIN = 1.6  # box height must grow >= 60% ...
+# Provisional (17 Oct): 1.35x kept 37/40 clips; 1.6x/0.8 s/8 frames kept 9/68. Re-tune from
+# `sixthsense gate-debug` output on real clips.
+EGO_GROWTH_MIN = 1.4  # box height must grow >= 40% ...
 EGO_WINDOW_S = 2.0  # ... within at most this window
-EGO_MIN_SPAN_S = 0.8  # ... measured over at least this long
-EGO_MIN_FRAMES = 8  # ... and at least this many tracked frames
+EGO_MIN_SPAN_S = 0.6  # ... measured over at least this long
+EGO_MIN_FRAMES = 6  # ... and at least this many tracked frames
 EGO_TTC_MAX_S = 3.0  # and then: time-to-contact proxy dt / (s - 1) at most this ...
 EGO_NEAR_HEIGHT = 0.25  # ... or the box already fills >= 25% of the frame height
 EGO_TTC_SPAN_S = 0.5  # scale is measured over this span for the TTC proxy
 EGO_TTC_MIN_SCALE = 1.03  # below this the box is not really growing (noise), so no TTC
 EGO_MEDIAN_FRAMES = 5  # heights are a trailing median of this many frames (kills jitter spikes)
-EGO_MIN_START_AREA = 0.015  # tracks whose first box is under 1.5% of the frame are too far/noisy
-EGO_MIN_MEAN_CONF = 0.4  # tracks the detector is unsure about are ignored
+EGO_MIN_START_AREA = 0.008  # tracks whose first box is under 0.8% of the frame are too far/noisy
+EGO_MIN_MEAN_CONF = 0.35  # tracks the detector is unsure about are ignored
 # Camera-owned boxes: the nearside stand-in is a bike, so its handlebars, hands and front wheel
 # sit at the bottom of the frame. Drop boxes touching the bottom band or wider than this.
 EGO_SELF_MASK: dict[CameraView, tuple[float, float]] = {"nearside": (0.12, 0.45)}  # (bottom band, max width)

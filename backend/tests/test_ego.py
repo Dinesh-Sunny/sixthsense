@@ -2,8 +2,8 @@
 
 from sixthsense.clients.vss import DetectionsResp
 from sixthsense.modes import MODES, VEHICLES, VULNERABLE
-from sixthsense.pipeline import Verification, bus_prompt, restates_present, retarget_ego
-from sixthsense.tracking import closing_on_us
+from sixthsense.pipeline import Verification, bus_prompt, retarget_ego
+from sixthsense.tracking import closing_on_us, ego_diagnostics
 
 ALL = VEHICLES | VULNERABLE
 W, H = 1920, 1080
@@ -15,7 +15,7 @@ def box(label, cx, h, bottom, conf, aspect=None):
 
 
 def growing(label="person", cx=960, h0=300.0, rate=1.0, n=60, fps=30, bottom=900.0, conf=0.8, extra=None,
-            spike_at=None):
+            spike_at=None, conf_after=None):
     """One box whose height grows `rate`x per second (rate=1 = constant), anchored at `bottom`."""
     frames = []
     for i in range(n):
@@ -23,7 +23,8 @@ def growing(label="person", cx=960, h0=300.0, rate=1.0, n=60, fps=30, bottom=900
         h = h0 * rate**t
         if spike_at is not None and i == spike_at:
             h *= 13.2  # one jittery detection
-        dets = [box(label, cx, min(h, bottom), bottom, conf)]
+        c = conf_after if conf_after is not None and i >= 3 else conf
+        dets = [box(label, cx, min(h, bottom), bottom, c)]
         if extra:
             dets.append(extra(i))
         frames.append({"frame_index": i, "time_sec": t, "detections": dets})
@@ -43,17 +44,18 @@ def test_constant_size_box_is_not_kept():
     assert r.passed is False and r.note == "1 road user tracked, none closing on us fast enough"
 
 
-def test_growth_below_1_6_is_not_kept_even_with_short_ttc():
-    # 1.4x/s over 1.2 s -> ~1.5x total; TTC over 0.5 s ~ 2.7 s: close, but growth gate fails
-    assert closing_on_us(growing(rate=1.4, n=36), ALL, "front").passed is False
+def test_growth_below_1_4_is_not_kept():
+    # 1.25x/s over 1.2 s -> ~1.3x total
+    r = ego_diagnostics(growing(rate=1.25, n=36), ALL, "front")[0]
+    assert r.reason.startswith("growth ") and closing_on_us(growing(rate=1.25, n=36), ALL, "front").passed is False
 
 
-def test_growth_needs_0_8_s_and_8_frames():
+def test_growth_needs_0_6_s_and_6_frames():
     # 3x/s but only 0.5 s of track (15 frames at 30 fps): too short to measure
-    assert closing_on_us(growing(rate=3.0, n=15), ALL, "front").passed is False
-    # at 8 fps the tracker confirms from frame 2, so 9 frames = 8 tracked over 0.875 s: just enough
-    assert closing_on_us(growing(rate=3.0, n=9, fps=8), ALL, "front").passed is True
-    assert closing_on_us(growing(rate=3.0, n=8, fps=8), ALL, "front").passed is False
+    assert ego_diagnostics(growing(rate=3.0, n=15), ALL, "front")[0].reason.startswith("short span")
+    # at 8 fps the tracker confirms from frame 2, so 7 frames = 6 tracked over 0.625 s: just enough
+    assert closing_on_us(growing(rate=3.0, n=7, fps=8), ALL, "front").passed is True
+    assert closing_on_us(growing(rate=3.0, n=6, fps=8), ALL, "front").passed is False
 
 
 def test_growth_alone_needs_ttc_or_a_near_box():
@@ -73,8 +75,11 @@ def test_single_jitter_spike_does_not_count():
 def test_tiny_start_and_low_confidence_tracks_are_ignored():
     tiny = closing_on_us(growing(rate=1.8, n=45, h0=60), ALL, "front")  # starts at ~0.07% of frame
     assert tiny.passed is False and tiny.note.startswith("0 road users")
-    unsure = closing_on_us(growing(rate=1.8, n=45, conf=0.35), ALL, "front")
-    assert unsure.passed is False
+    # born at 0.9, then the detector drops to 0.28 (still matched in ByteTrack's second stage)
+    unsure = growing(rate=1.8, n=45, conf=0.9, conf_after=0.28)
+    d = ego_diagnostics(unsure, ALL, "front")[0]
+    assert d.reason.startswith("unsure conf") and d.mean_conf < 0.35
+    assert closing_on_us(unsure, ALL, "front").passed is False
 
 
 def test_lane_zone_front_vs_nearside():
@@ -128,10 +133,11 @@ def test_pedestrian_hazard_cites_the_pedestrian_not_the_car():
     assert retarget_ego(ver, "Vehicle cutting in").verify_note.startswith("a car ahead")  # names no class
 
 
-def test_cyclist_hazard_with_only_a_car_closing_is_ruled_out():
+def test_cyclist_hazard_with_only_a_car_closing_names_the_closest_road_user():
     ver = _ver_for(growing(label="car", rate=1.8, n=45, h0=200))
     out = retarget_ego(ver, "Cyclist ahead")
-    assert out.verified is False and out.verify_note.startswith("no bicycle closing on us")
+    assert out.verified is True
+    assert out.verify_note.startswith("a car ahead grew") and out.verify_note.endswith("(closest road user: car)")
 
 
 # ---------- prompts and judge ----------
@@ -142,7 +148,14 @@ def test_prompts_demand_a_change_and_nearside_ignores_handlebars():
         assert "CHANGE" in p and "continues walking" in p and "reaches the bus's lane in about 2 s" in p
 
 
-def test_restated_predictions_are_detected():
-    assert restates_present("The pedestrian continues walking along the kerb")
-    assert restates_present("The van stays in the bus lane")
-    assert not restates_present("The pedestrian reaches the bus's lane in about 2 s")
+def test_diagnostics_explain_each_rejection():
+    reasons = {
+        "pass": growing(rate=1.8, n=45),
+        "small": growing(rate=1.8, n=45, h0=60),
+        "out-of-lane": growing(label="car", rate=1.8, n=45, bottom=420.0, h0=150),
+        "far": growing(label="car", rate=1.3, n=60, h0=150),
+    }
+    for want, det in reasons.items():
+        d = ego_diagnostics(det, ALL, "front")[0]
+        assert d.reason.split(" ")[0] == want, (want, d)
+        assert d.frames > 0 and 0 < d.start_h < 1

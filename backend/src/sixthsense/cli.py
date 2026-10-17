@@ -124,7 +124,8 @@ def _diag_line(n: int, hazard: str, cand: Candidate, d: EgoDiag | None, note: st
     return (
         f"{head} | {d.label:<10} h {d.start_h:5.1%}->{d.end_h:5.1%} area0 {d.start_area:5.1%}"
         f" | growth {d.growth:4.2f}x {d.span_s:4.2f}s {d.span_frames:3d}fr/{d.frames:3d}"
-        f" | conf {d.mean_conf:.2f} | ttc {ttc:>6} | lane {'yes' if d.in_lane else 'no '} | {d.reason}"
+        f" | conf {d.mean_conf:.2f} | ttc {ttc:>6} | lane {'yes' if d.in_lane else 'no '}"
+        f" | {d.reason}{f' ({d.rule})' if d.rule else ''}"
     )
 
 

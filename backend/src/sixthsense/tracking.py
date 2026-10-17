@@ -9,6 +9,7 @@ Ported from pipeline/run.py closing_gap: same rule (pair ends within CLOSE_CL ca
 
 import math
 from dataclasses import dataclass, field
+from typing import Literal
 
 import numpy as np
 import supervision as sv
@@ -20,10 +21,16 @@ from .modes import (
     CLOSE_CL,
     COCO_IDS,
     DEFAULT_FRAME_WH,
+    EGO_ENTRY_CLASSES,
+    EGO_ENTRY_EDGE,
+    EGO_ENTRY_MAX_S,
+    EGO_ENTRY_MIN_MOVE,
     EGO_GROWTH_MIN,
+    EGO_GROWTH_MIN_BY_CLASS,
     EGO_MEDIAN_FRAMES,
     EGO_MIN_FRAMES,
     EGO_MIN_MEAN_CONF,
+    EGO_MIN_SPAN_BY_CLASS,
     EGO_MIN_SPAN_S,
     EGO_MIN_START_AREA,
     EGO_NEAR_HEIGHT,
@@ -205,6 +212,15 @@ def closing_gap(det: DetectionsResp | None, classes: frozenset[str] = VEHICLES) 
 # ---------- ego check: vehicle-mounted cameras ----------
 _WHERE = {"front": "ahead", "nearside": "alongside"}
 _TOWARD = {"front": "the front of the bus", "nearside": "the side of the bus"}
+EgoRule = Literal["growth", "ttc", "lane-entry"]
+
+
+def growth_min(label: str) -> float:
+    return EGO_GROWTH_MIN_BY_CLASS.get(label, EGO_GROWTH_MIN)
+
+
+def min_span(label: str) -> tuple[float, int]:
+    return EGO_MIN_SPAN_BY_CLASS.get(label, (EGO_MIN_SPAN_S, EGO_MIN_FRAMES))
 
 
 @dataclass
@@ -212,14 +228,21 @@ class _EgoHit:
     growth: float
     window_s: float
     ttc_s: float | None
-    height_frac: float
+    height_frac: float  # box height at the end of the window, fraction of frame height
     passed: bool
+    gate: float = EGO_GROWTH_MIN
+    rule: EgoRule | None = None  # which rule passed
+    win_start_h: float = 0.0  # box height at the start of the growth window, fraction of frame height
+    entry_side: str = ""  # lane-entry only: "left" | "right"
+    entry_frames: int = 0  # lane-entry only: tracked frames from outside the lane to inside it
 
     @property
     def score(self) -> float:
+        if self.rule == "lane-entry":
+            return 0.6
         # growth beyond the gate, plus credit for a short time to contact; capped at 1
         ttc = 1 - self.ttc_s / EGO_TTC_MAX_S if self.ttc_s is not None and self.ttc_s < EGO_TTC_MAX_S else 0.0
-        return round(min(1.0, max((self.growth - 1) / (EGO_GROWTH_MIN - 1) / 2, ttc)), 2)
+        return round(min(1.0, max((self.growth - 1) / (self.gate - 1) / 2, ttc)), 2)
 
 
 def _frame_wh(det: DetectionsResp) -> tuple[float, float]:
@@ -248,14 +271,49 @@ def _drop_camera_boxes(det: DetectionsResp, wh: tuple[float, float], view: Camer
     return det.model_copy(update={"frames": frames})
 
 
+def _cx(p: _Point) -> float:
+    return float((p.xyxy[0] + p.xyxy[2]) / 2)
+
+
 def _in_zone(p: _Point, wh: tuple[float, float], view: CameraView) -> bool:
     x_min, x_max, y_min = EGO_ZONES[view]
-    cx = (p.xyxy[0] + p.xyxy[2]) / 2
-    return x_min * wh[0] <= cx <= x_max * wh[0] and p.xyxy[3] >= y_min * wh[1]
+    return x_min * wh[0] <= _cx(p) <= x_max * wh[0] and p.xyxy[3] >= y_min * wh[1]
 
 
 def _trailing_median(values: list[float], n: int) -> list[float]:
     return [float(np.median(values[max(0, i - n + 1) : i + 1])) for i in range(len(values))]
+
+
+def _lane_entry(ts: list[float], pts: list[_Point], wh: tuple[float, float]) -> _EgoHit | None:
+    """Front camera: a person/bike whose centre moves from beside the lane into it (or to within
+    EGO_ENTRY_EDGE of its edge) within EGO_ENTRY_MAX_S. Box growth is not required."""
+    x_min, x_max, y_min = EGO_ZONES["front"]
+    lo, hi = x_min * wh[0], x_max * wh[0]
+    edge, move = EGO_ENTRY_EDGE * wh[0], EGO_ENTRY_MIN_MOVE * wh[0]
+    best: _EgoHit | None = None
+    i = 0
+    for j, tj in enumerate(ts):
+        while tj - ts[i] > EGO_ENTRY_MAX_S:
+            i += 1
+        end = pts[j]
+        x_end = _cx(end)
+        if end.xyxy[3] < y_min * wh[1] or not lo - edge <= x_end <= hi + edge:
+            continue
+        for m in range(i, j):
+            x0 = _cx(pts[m])
+            if x0 < lo and x_end - x0 >= move:
+                side = "left"
+            elif x0 > hi and x0 - x_end >= move:
+                side = "right"
+            else:
+                continue
+            dt = tj - ts[m]
+            hit = _EgoHit(1.0, dt, None, float(end.xyxy[3] - end.xyxy[1]) / wh[1], True,
+                          rule="lane-entry", entry_side=side, entry_frames=j - m + 1)
+            if best is None or dt < best.window_s:
+                best = hit
+            break  # earliest qualifying start for this end point
+    return best
 
 
 @dataclass
@@ -265,8 +323,8 @@ class EgoDiag:
     label: str
     frames: int
     mean_conf: float
-    start_h: float  # first box height, fraction of frame height
-    end_h: float  # last box height (trailing median), fraction of frame height
+    start_h: float  # growth-window start height, fraction of frame height (first box until computed)
+    end_h: float  # growth-window end height, fraction of frame height
     start_area: float  # first box area, fraction of frame area
     in_lane: bool  # any point inside the lane zone
     growth: float = 1.0
@@ -277,9 +335,14 @@ class EgoDiag:
     hit: _EgoHit | None = None
 
     @property
+    def rule(self) -> str:
+        return self.hit.rule or "" if self.hit and self.reason == "pass" else ""
+
+    @property
     def stage(self) -> int:
         """How far through the gate it got (for picking the most interesting track)."""
-        return _STAGES.index(self.reason.split(" ")[0]) if self.reason.split(" ")[0] in _STAGES else 0
+        word = self.reason.split(" ")[0]
+        return _STAGES.index(word) if word in _STAGES else 0
 
 
 # gate order: earlier entries reject first; "pass" is the last stage
@@ -291,7 +354,9 @@ def _diagnose(track: _Track, wh: tuple[float, float], view: CameraView) -> EgoDi
 
     Scale expansion is the classic time-to-contact cue: if a box grows by s over dt, contact is
     about dt / (s - 1) away at constant closing speed (no depth or speed needed). Heights are a
-    trailing median, so one jittery box can never produce a 13x "growth".
+    trailing median, so one jittery box can never produce a 13x "growth". Growth is measured on a
+    rising window: from the smallest box to a later box that is the largest since then, and the
+    window's own start/end heights are what gets reported.
     """
     ts = sorted(track.points)
     pts = [track.points[t] for t in ts]
@@ -304,7 +369,7 @@ def _diagnose(track: _Track, wh: tuple[float, float], view: CameraView) -> EgoDi
         frames=len(pts),
         mean_conf=sum(p.conf for p in pts) / len(pts),
         start_h=raw[0] / wh[1],
-        end_h=heights[-1] / wh[1],
+        end_h=raw[0] / wh[1],
         start_area=float((first[2] - first[0]) * (first[3] - first[1])) / (wh[0] * wh[1]),
         in_lane=any(zone),
     )
@@ -314,10 +379,9 @@ def _diagnose(track: _Track, wh: tuple[float, float], view: CameraView) -> EgoDi
     if d.mean_conf < EGO_MIN_MEAN_CONF:
         d.reason = f"unsure conf {d.mean_conf:.2f} < {EGO_MIN_MEAN_CONF}"
         return d
-    if not d.in_lane:
-        d.reason = "out-of-lane"
-        return d
-    best: tuple[int, float, int, float, float | None, _EgoHit | None] | None = None  # rank, growth, ...
+    gate = growth_min(track.label)
+    span_s_min, span_frames_min = min_span(track.label)
+    best: tuple[int, float, int, _EgoHit] | None = None  # rank, growth, span frames, hit
     i = k = 0
     for j, tj in enumerate(ts):
         while tj - ts[i] > EGO_WINDOW_S:
@@ -326,11 +390,11 @@ def _diagnose(track: _Track, wh: tuple[float, float], view: CameraView) -> EgoDi
             k += 1
         if not zone[j] or heights[j] <= 0:
             continue
-        # baseline = smallest box at least EGO_MIN_SPAN_S and EGO_MIN_FRAMES before now
-        early = [m for m in range(i, j + 1) if tj - ts[m] >= EGO_MIN_SPAN_S and j - m + 1 >= EGO_MIN_FRAMES]
+        early = [m for m in range(i, j + 1) if tj - ts[m] >= span_s_min and j - m + 1 >= span_frames_min]
         m0 = min(early or range(i, j + 1), key=lambda m: heights[m])
-        growth = heights[j] / heights[m0] if heights[m0] > 0 else 1.0
-        span_s, span_frames = tj - ts[m0], j - m0 + 1
+        if heights[m0] <= 0 or heights[j] < max(heights[m0 : j + 1]):
+            continue  # j must be the peak since the window start: a rising window only
+        growth = heights[j] / heights[m0]
         ttc = None
         if k < j and heights[k] > 0:
             scale, dt = heights[j] / heights[k], tj - ts[k]
@@ -338,29 +402,43 @@ def _diagnose(track: _Track, wh: tuple[float, float], view: CameraView) -> EgoDi
             if scale >= EGO_TTC_MIN_SCALE and dt >= EGO_TTC_SPAN_S:
                 ttc = dt / (scale - 1)
         height_frac = heights[j] / wh[1]
-        close = (ttc is not None and ttc <= EGO_TTC_MAX_S) or height_frac >= EGO_NEAR_HEIGHT
+        near_ttc = ttc is not None and ttc <= EGO_TTC_MAX_S
         if not early:
             rank = 3
-        elif growth < EGO_GROWTH_MIN:
+        elif growth < gate:
             rank = 4
-        elif not close:
+        elif not (near_ttc or height_frac >= EGO_NEAR_HEIGHT):
             rank = 5
         else:
             rank = 6
-        hit = _EgoHit(growth, span_s, ttc, height_frac, rank == 6)
+        hit = _EgoHit(
+            growth, tj - ts[m0], ttc, height_frac, rank == 6, gate,
+            rule=("ttc" if near_ttc else "growth") if rank == 6 else None, win_start_h=heights[m0] / wh[1],
+        )
         if best is None or (rank, growth) > (best[0], best[1]):
-            best = (rank, growth, span_frames, span_s, ttc, hit)
-    if best is None:  # in-lane points all had zero height
+            best = (rank, growth, j - m0 + 1, hit)
+    if best is not None:
+        rank, d.growth, d.span_frames, d.hit = best
+        d.span_s, d.ttc_s = d.hit.window_s, d.hit.ttc_s
+        d.start_h, d.end_h = d.hit.win_start_h, d.hit.height_frac
+    else:
+        rank = 2
+    if rank < 6 and view == "front" and track.label in EGO_ENTRY_CLASSES:
+        entry = _lane_entry(ts, pts, wh)
+        if entry is not None:
+            d.hit, d.reason = entry, "pass"
+            d.growth, d.span_s, d.span_frames, d.ttc_s = 1.0, entry.window_s, entry.entry_frames, None
+            d.start_h = d.end_h = entry.height_frac
+            return d
+    if rank == 2:
         d.reason = "out-of-lane"
-        return d
-    rank, d.growth, d.span_frames, d.span_s, d.ttc_s, d.hit = best
-    if rank == 3:
-        d.reason = f"short span {d.span_s:.2f} s / {d.span_frames} frames < {EGO_MIN_SPAN_S} s / {EGO_MIN_FRAMES}"
+    elif rank == 3:
+        d.reason = f"short span {d.span_s:.2f} s / {d.span_frames} frames < {span_s_min} s / {span_frames_min}"
     elif rank == 4:
-        d.reason = f"growth {d.growth:.2f}x < {EGO_GROWTH_MIN}x"
+        d.reason = f"growth {d.growth:.2f}x < {gate}x"
     elif rank == 5:
         ttc = "none" if d.ttc_s is None else f"{d.ttc_s:.1f} s"
-        d.reason = f"far ttc {ttc} > {EGO_TTC_MAX_S} s and height {d.hit.height_frac:.0%} < {EGO_NEAR_HEIGHT:.0%}"
+        d.reason = f"far ttc {ttc} > {EGO_TTC_MAX_S} s and height {d.end_h:.0%} < {EGO_NEAR_HEIGHT:.0%}"
     return d
 
 
@@ -376,22 +454,29 @@ def _users(n: int) -> str:
 
 
 def _ego_note(label: str, hit: _EgoHit, view: CameraView) -> str:
-    note = f"{_a(label)} {_WHERE[view]} grew {hit.growth:.1f}x in {hit.window_s:.1f} s"
+    if hit.rule == "lane-entry":
+        verb = "stepped" if label == "person" else "moved"
+        return f"{_a(label)} {verb} into the bus's path from the {hit.entry_side} in {hit.window_s:.1f} s"
+    note = (
+        f"{_a(label)} {_WHERE[view]} grew {hit.growth:.1f}x in {hit.window_s:.1f} s "
+        f"({hit.win_start_h:.0%} to {hit.height_frac:.0%} of the frame height)"
+    )
     # Cite whichever closeness test actually passed: time to contact first, else box size.
     if hit.ttc_s is not None and hit.ttc_s <= EGO_TTC_MAX_S:
         when = "under 1 s" if hit.ttc_s < 1 else f"about {hit.ttc_s:.0f} s"
         note += f", {when} from {_TOWARD[view]}"
     elif hit.height_frac >= EGO_NEAR_HEIGHT:
-        note += f", now filling {hit.height_frac:.0%} of the frame height"
+        note += ", now close"
     return note
 
 
 def closing_on_us(
     det: DetectionsResp | None, classes: frozenset[str], view: CameraView
 ) -> GapResult | None:
-    """Vehicle-mounted camera: keep the clip when a tracked road user in our lane zone grows
-    >= EGO_GROWTH_MIN over >= EGO_MIN_SPAN_S, AND is close (TTC proxy <= EGO_TTC_MAX_S or box
-    height >= EGO_NEAR_HEIGHT of the frame).
+    """Vehicle-mounted camera: keep the clip when a tracked road user in our lane zone grows past
+    its class gate (vehicles 1.4x, people/bikes 1.25x) over a long enough span AND is close (TTC
+    proxy <= EGO_TTC_MAX_S or box height >= EGO_NEAR_HEIGHT), or, on the front camera, when a
+    person or bike enters our lane.
 
     The camera vehicle has no box of its own, so the pair check cannot apply. Returns None when
     there are no frames. gap_series stays empty: there is no gap in car lengths to chart.

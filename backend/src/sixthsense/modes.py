@@ -207,10 +207,20 @@ GAP_SERIES_MAX_POINTS = 60
 # --- ego "closing on us" check (vehicle-mounted cameras) ---
 # Provisional (17 Oct): 1.35x kept 37/40 clips; 1.6x/0.8 s/8 frames kept 9/68. Re-tune from
 # `sixthsense gate-debug` output on real clips.
-EGO_GROWTH_MIN = 1.4  # box height must grow >= 40% ...
+EGO_GROWTH_MIN = 1.4  # vehicles: box height must grow >= 40% ...
+# People and bikes are small and approach slowly (gate-debug: crossing pedestrians 1.18-1.40x).
+EGO_GROWTH_MIN_BY_CLASS: dict[str, float] = {"person": 1.25, "bicycle": 1.25, "motorcycle": 1.25}
 EGO_WINDOW_S = 2.0  # ... within at most this window
 EGO_MIN_SPAN_S = 0.6  # ... measured over at least this long
 EGO_MIN_FRAMES = 6  # ... and at least this many tracked frames
+# People are often tracked only briefly; at 30 fps 0.5 s is ~15 frames, so 12 frames still bites.
+EGO_MIN_SPAN_BY_CLASS: dict[str, tuple[float, int]] = {"person": (0.5, 12)}
+# "Entering our lane" (front camera, person/bicycle): centre crosses from outside the lane zone to
+# inside it, or to within this fraction of the frame width of its edge, moving toward it ...
+EGO_ENTRY_CLASSES: frozenset[str] = frozenset({"person", "bicycle"})
+EGO_ENTRY_EDGE = 0.05
+EGO_ENTRY_MIN_MOVE = 0.05  # ... by at least this fraction of the frame width (jitter guard) ...
+EGO_ENTRY_MAX_S = 2.0  # ... within this long, regardless of growth
 EGO_TTC_MAX_S = 3.0  # and then: time-to-contact proxy dt / (s - 1) at most this ...
 EGO_NEAR_HEIGHT = 0.25  # ... or the box already fills >= 25% of the frame height
 EGO_TTC_SPAN_S = 0.5  # scale is measured over this span for the TTC proxy

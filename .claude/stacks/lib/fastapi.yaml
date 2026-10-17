@@ -10,7 +10,7 @@ toc:
 - index: 'https://pydantic.dev/docs/validation/latest/'
   match: '^https://pydantic\.dev/docs/validation/'
 groups:
-- title: Versions and docs access
+- title: AI tooling
   sections:
   - id: fa-versions
     title: Versions and doc locations

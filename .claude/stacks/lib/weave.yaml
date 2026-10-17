@@ -1,0 +1,202 @@
+stack: weave
+version: "0.53.12"
+docs_base: https://docs.coreweave.com/products/wandb/weave
+source: https://docs.coreweave.com/llms.txt
+fetched: 2026-10-17
+verified: 2026-10-17
+toc:
+- index: 'https://docs.coreweave.com/_llms/en/forge/weights-and-biases.txt'
+  match: '^https://docs\.coreweave\.com/products/wandb/weave/'
+  why: 'docs.wandb.ai redirects to docs.coreweave.com; pip shows weave 0.53.12 and openai 3.33.0 on 2026-10-17. Weave docs are this index; the openai SDK docs are the GitHub raw README, helpers.md and httpx2.md.'
+groups:
+- title: Tracing and autopatching
+  sections:
+  - id: wv-tracing
+    title: Init, ops and OpenAI autopatch
+    level: basic
+    requires: []
+    ref: /quickstart.md
+    entries:
+    - id: wv-init
+      name: weave.init
+      summary: starts tracing to `<team>/<project>`; a missing project is created, a missing team uses the default entity
+      lenses: [observability]
+      import: weave
+      signature: weave.init("team/project", global_attributes={...})
+      notes: ['Python 3.10+; install with `pip install weave openai`', 'call it once at startup before any traced call']
+      ref: /quickstart.md
+    - id: wv-op
+      name: '@weave.op'
+      summary: records inputs, outputs, code, latency and errors of a sync or async function as a Call; nested ops form a trace tree
+      lenses: [observability]
+      import: weave
+      signature: '@weave.op()'
+      notes: ['`kind` takes agent, llm, tool or search; `postprocess_inputs` and `postprocess_output` redact what is logged', '`tracing_sample_rate` (0.0-1.0) applies to outermost ops only; an unsampled call drops its children too']
+      ref: /guides/tracking/ops.md
+    - id: wv-openai-autopatch
+      name: OpenAI autopatch
+      summary: openai calls are traced automatically, whether openai is imported before or after `weave.init`
+      lenses: [observability, best-practice]
+      import: weave
+      signature: weave.integrations.patch_openai()
+      notes: ['sync, async, streaming and `parse` calls are traced and nest under the calling `@weave.op`', 'cost is computed from OpenAI public pricing, so it is wrong for custom base_url models; the docs do not describe disabling autopatch']
+      ref: /guides/integrations/openai.md
+    - id: wv-inference-trace
+      name: Tracing W&B Inference with the openai client
+      summary: client uses base_url `https://api.inference.wandb.ai/v1`, `project="<team>/<project>"` (sent as `OpenAI-Project`), and a Forge API key
+      lenses: [observability, reliability]
+      import: openai
+      signature: openai.AsyncOpenAI(base_url=..., api_key=..., project="team/project")
+      notes: ['use the same team/project in `project=` and `weave.init`; the docs example mixes two', '401 can mean wrong key or wrong team/project; 429 "Concurrency limit reached" means lower parallelism']
+      ref: /guides/integrations/inference.md
+  - id: wv-context
+    title: Attributes, threads, env vars
+    level: intermediate
+    requires: [wv-tracing]
+    ref: /guides/tools/attributes.md
+    entries:
+    - id: wv-attributes
+      name: weave.attributes and global_attributes
+      summary: metadata attached to every op inside a `with` block, or to the whole project via `weave.init(global_attributes=...)`
+      lenses: [observability]
+      import: weave
+      signature: with weave.attributes({"clip": id}): ...
+      notes: ['inner values override outer and global values for the same key', 'set them before the op starts; read with `weave.get_current_call().attributes`']
+      ref: /guides/tools/attributes.md
+    - id: wv-thread
+      name: weave.thread
+      summary: context manager grouping top-level ops into one thread; each top-level op is a turn
+      lenses: [observability]
+      import: weave
+      signature: with weave.thread("session-id") as ctx: ...
+      notes: ['omit the id for an auto UUID v7; `thread_id=None` disables grouping', 'a nested `weave.thread()` starts a new thread unless it reuses the id']
+      ref: /guides/tracking/threads.md
+    - id: wv-env
+      name: Environment variables
+      summary: runtime switches for tracing, evaluation parallelism and send retries
+      lenses: [reliability, perf]
+      notes: ['`WEAVE_DISABLED=true` turns ops into plain functions; `WEAVE_PRINT_CALL_LINK=false` quiets logs; `WEAVE_CAPTURE_CODE=false` skips code capture', '`WEAVE_PARALLELISM` defaults to 20 examples at once; `WEAVE_RETRY_MAX_ATTEMPTS` defaults to 3; `WEAVE_ENABLE_WAL` persists unsent calls']
+      ref: /guides/core-types/env-vars.md
+- title: Models, evaluations and scorers
+  sections:
+  - id: wv-eval
+    title: Model, Evaluation and scorers
+    level: intermediate
+    requires: [wv-tracing]
+    ref: /guides/core-types/evaluations.md
+    entries:
+    - id: wv-model
+      name: weave.Model
+      summary: subclass with typed fields and an `@weave.op()` `predict` method; fields are versioned with each call
+      lenses: [best-practice, reuse]
+      import: weave
+      signature: class M(weave.Model): def predict(self, ...) -> ...
+      notes: ['changing a field such as prompt or model id creates a new Model version to compare', 'a plain `@weave.op` function can also be evaluated']
+      ref: /guides/core-types/evaluations.md
+    - id: wv-evaluation
+      name: weave.Evaluation
+      summary: runs a dataset (Dataset or list of dicts) through a Model or op and applies scorers; started with `await evaluation.evaluate(model)`
+      lenses: [testing, observability]
+      import: weave
+      signature: weave.Evaluation(dataset=rows, scorers=[...], trials=1)
+      notes: ['`preprocess_model_input` reshapes the model input but scorers still get the original row', 'name a run with `__weave={"display_name": ...}`; run with `asyncio.run` from sync code']
+      ref: /guides/core-types/evaluations.md
+    - id: wv-scorer-fn
+      name: Function scorer
+      summary: '`@weave.op` function with an `output` parameter plus params named after dataset columns, returning a dict'
+      lenses: [testing]
+      import: weave
+      signature: '@weave.op def came_true(output, label) -> dict'
+      notes: ['must return a dict, for example `{"came_true": bool}`', 'the legacy `model_output` param name causes a missing-`output` error']
+      ref: /guides/evaluation/scorers.md
+    - id: wv-scorer-class
+      name: weave.Scorer class
+      summary: subclass with an `@weave.op` `score` method (dict return) and an optional `summarize(score_rows)` for aggregates
+      lenses: [testing, reuse]
+      import: weave
+      signature: class S(weave.Scorer): def score(self, output, ...) -> dict
+      notes: ['default summary gives count and fraction for bool values; override `summarize` for hit-rate or calibration', 'LLM-judge scorers call an LLM client inside `score`; the docs show no async `score`', '`column_map={scorer_arg: dataset_column}` renames columns']
+      ref: /guides/evaluation/scorers.md
+    - id: wv-eval-logger
+      name: EvaluationLogger
+      summary: imperative alternative to `Evaluation`; log each prediction and score as it happens
+      lenses: [best-practice, observability]
+      import: weave
+      notes: ['fits predictions graded later against the next clip, where no dataset exists up front']
+      ref: /guides/evaluation/evaluation_logger.md
+- title: openai Python SDK (OpenAI-compatible endpoints)
+  sections:
+  - id: oa-client
+    title: AsyncOpenAI client and reliability
+    level: basic
+    requires: []
+    ref: https://raw.githubusercontent.com/openai/openai-python/main/README.md
+    entries:
+    - id: oa-asyncclient
+      name: AsyncOpenAI
+      summary: async client taking `base_url`, `api_key`, `project`, `max_retries` and `timeout`; Python 3.10+
+      lenses: [reliability]
+      import: openai
+      signature: AsyncOpenAI(base_url=..., api_key=..., max_retries=2, timeout=60.0)
+      notes: ['openai 3.x uses HTTPX2: pass `httpx2.Timeout`, not `httpx.Timeout`; `httpx` is no longer installed with openai', 'default timeout is 10 minutes, so always set one for video requests']
+      ref: https://raw.githubusercontent.com/openai/openai-python/main/httpx2.md
+    - id: oa-retries
+      name: max_retries and errors
+      summary: connection errors, 408, 409, 429 and 5xx retry with short exponential backoff; default 2
+      lenses: [reliability]
+      signature: client.with_options(max_retries=5).chat.completions.create(...)
+      notes: ['`0` disables retries; errors are `RateLimitError`, `APITimeoutError`, `APIStatusError` (has `.request_id`)', 'the README does not document Retry-After handling']
+      ref: https://raw.githubusercontent.com/openai/openai-python/main/README.md
+    - id: oa-raw
+      name: with_raw_response
+      summary: '`.with_raw_response.create(...)` exposes headers (rate limits, request id); `.parse()` returns the normal object'
+      lenses: [observability, reliability]
+      signature: raw = await client.chat.completions.with_raw_response.create(...); r = raw.parse()
+      notes: ['returns the legacy response class, flagged for change in the next major', 'every object also carries `_request_id` from `x-request-id`']
+      ref: https://raw.githubusercontent.com/openai/openai-python/main/README.md
+    - id: oa-aiohttp
+      name: aiohttp transport
+      summary: '`pip install openai[aiohttp]` and `http_client=DefaultAioHttpClient()` for higher async concurrency'
+      lenses: [perf]
+      import: openai
+      notes: ['use `async with AsyncOpenAI(...)` so the client closes cleanly', 'the docs do not show setting pool `max_connections` on the default HTTPX2 client; verify before relying on it']
+      ref: https://raw.githubusercontent.com/openai/openai-python/main/README.md
+  - id: oa-structured
+    title: Structured JSON output
+    level: intermediate
+    requires: [oa-client]
+    ref: https://raw.githubusercontent.com/openai/openai-python/main/helpers.md
+    entries:
+    - id: oa-parse
+      name: chat.completions.parse
+      summary: pass a Pydantic class as `response_format`; read `choices[0].message.parsed`, fall back to `.refusal`
+      lenses: [typing-dx, reliability]
+      signature: await client.chat.completions.parse(model=..., messages=..., response_format=Model)
+      notes: ['raises `LengthFinishReasonError` and `ContentFilterFinishReasonError`; only strict function tools are allowed', 'it relies on server JSON-schema support; the W&B Inference page does not list `response_format`, and NIM support must be tested']
+      ref: https://raw.githubusercontent.com/openai/openai-python/main/helpers.md
+- title: Concurrency and gotchas
+  sections:
+  - id: wv-practices
+    title: Practices for parallel model calls
+    level: advanced
+    requires: [oa-client, wv-eval]
+    ref: /guides/integrations/inference.md
+    entries:
+    - id: wv-semaphore
+      name: Bound concurrency with asyncio.Semaphore
+      summary: one shared `AsyncOpenAI` per process, a semaphore around each call, and `asyncio.gather` over clips
+      lenses: [reliability, perf]
+      notes: ['keep the limit below the endpoint concurrency cap (W&B Inference returns 429 "Concurrency limit reached"); also lower `WEAVE_PARALLELISM` for Evaluations', 'client retries on 429 add load, so use a low `max_retries` with the semaphore and log `x-request-id` via `with_raw_response`']
+      ref: /guides/integrations/inference.md
+    - id: wv-gotcha-video
+      name: Large video data URLs
+      summary: base64 `video_url` payloads inflate trace size and request time
+      lenses: [gotcha, cost]
+      notes: ['use `postprocess_inputs` on the wrapping op to replace the data URL with a clip id; autopatched openai spans still log raw inputs, so test what is logged', 'this repo has not verified NIM `video_url` limits from these docs; check the NIM docs']
+      ref: /guides/tracking/ops.md
+    - id: wv-gotcha-misc
+      name: Other gotchas
+      summary: traces and eval defaults that surprise
+      lenses: [gotcha]
+      notes: ['docs.wandb.ai now redirects to docs.coreweave.com and the login is a Forge account; the quickstart says "Forge" where older text says W&B', 'autopatch cost is OpenAI pricing; custom models show wrong or no cost', 'Weave sends traces in the background: finish scripts only after calls complete, and set `WEAVE_ENABLE_WAL` if losing traces matters']
+      ref: /guides/core-types/env-vars.md

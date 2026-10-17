@@ -1,0 +1,30 @@
+## web brief (next 16.3.8 export, react 19.2.8, shadcn 4.21.1 radix/Tailwind v4, tanstack-query 5.104.3)
+Docs fetched 2026-10-17 (nextjs.org static-exports + font, tanstack ssr + suspense, ui.shadcn.com/theming). (unverified) = proven by first build.
+- [must] next.config.ts: `output:'export', basePath:'/app', trailingSlash:true, images:{unoptimized:true}, poweredByHeader:false, typedRoutes:true, env:{NEXT_PUBLIC_BASE_PATH:'/app'}` (cfg-base-path, cfg-trailing-slash, cfg-env). Unsupported in export: headers(), rewrites, redirects, Proxy, Server Actions, dynamic routes without generateStaticParams (guide-static-exports). Use none.
+- [must] Detail = `app/incident/page.tsx` reading `?id=` via `useSearchParams()` inside `<Suspense>` (build fails without). Mode tabs write `?mode=` with `router.replace` inside `startTransition`.
+- [must] `lib/api/client.ts` is the only fetch site: `apiUrl(path) = (NEXT_PUBLIC_API_ORIGIN ?? NEXT_PUBLIC_BASE_PATH) + '/api' + path`; throws ApiError on non-2xx. Same helper builds `<video src>` (basePath only prefixes Link and next assets). Ingress rewrite strips /app.
+- [must] Fonts `app/fonts.ts`: GeistSans/GeistMono from `geist/font/{sans,mono}` (1.8.1, OFL). Instrument Serif via `localFont` with two woff2 (400 normal + italic) copied from `@fontsource/instrument-serif` 5.3.0 into `src/app/fonts/`; variable `--font-instrument`, display swap; `.variable` classes on `<html>`. Never import ss.css (Google Fonts @import blocked).
+- [must] globals.css (shadcn init -b radix): keep init imports + `@custom-variant dark`; (a) `:root` tokens.json light values under own names (+ --glass/--glass-line, --sky-deep/--sky-mid/--haze/--sun), `.dark` dark column; (b) shadcn aliases: --background:var(--ground), --foreground:var(--ink), --card/--popover:var(--surface), --primary:var(--pill), --primary-foreground:var(--on-ink), --secondary/--muted/--accent:var(--surface-sunk), --muted-foreground:var(--ink-muted), --destructive:var(--risk-high), --border/--input:var(--hairline), --ring:var(--slate); (c) `@theme inline` --color-* for those tokens; fonts --font-sans/mono/serif; radii --radius-sm 8 / md 14 / lg 24 / xl 26px. MUST be `inline` so `.wx-*` re-themes descendants (sh-theme-inline).
+- [should] Spacing = Tailwind default 4px; pill = rounded-full, h-10. Edit cva in owned ui/button, ui/tabs, ui/badge (sh-cva). `@theme { --shadow-soft; --shadow-float }` + .dark overrides.
+- [should] Don't expose sky-100/sky-300 as utilities (collide with Tailwind sky-*).
+- [must] Atmosphere: `@utility sky-wash` (ss.css `.sky` gradient) + `.wx-clear|cloudy|rain|night` vars + rain streaks on wx-rain; :root default = clear. `Atmosphere` client component: `useQuery(weatherOptions)` -> `wx-${data?.wx ?? 'clear'}`, staleTime/refetchInterval 10 min; on error keep clear, hide label. `glass` @utility. Footer credit "Weather data by Open-Meteo.com" (CC BY 4.0).
+- [must] Status colour in one place: `lib/copy.ts` risk 4-5 hi / 3 mid / 1-2 lo; verdicts yes ok "Came true", partly mid "Partly", no hi "Didn't happen", unchecked slate "Checking soon"; fixture dashed "Sample". StatusPill = shadcn Badge outline + cva tone + dot (colour always with a word).
+- [should] shadcn: button (asChild for Link), tabs (TabsList/Trigger only), badge, card, skeleton, empty, input. `shimmer` on "Asking...". No sonner.
+- [must] Query layer: one QueryClient in useState in `app/providers.tsx` ("use client"), staleTime 30_000. `lib/api/queries.ts` queryOptions factories; keys ['incidents',mode], ['incident',id], ['metrics'], ['run'], ['alerts'], ['weather']. Run poll `refetchInterval: q => q.state.data?.state==='running' ? 2000 : false`; on running->done invalidate incidents+metrics; Run page reads GET /api/runs/current on mount. Send alert useMutation; button "Sent" from isPending||isSuccess (tsq-optimistic-ui); onSettled invalidate ['alerts']. Hover/focus prefetch `void queryClient.query(incidentOptions(id)).catch(()=>{})`.
+- [should] Clip: `<video preload="metadata" muted playsInline controls src={clipUrl+'#t=0.1'}>` (needs 206 proxy), never autoPlay. Gap chart ~25-line inline SVG polyline from gap_series (no recharts).
+- [should] ESLint flat: eslint-config-next/core-web-vitals + /typescript; `"lint":"eslint ."`; pnpm build runs tsc.
+## Plan corrections
+- [must] useSuspenseQuery -> useQuery (export prerenders client components; suspense query would fetch at build, unverified). isPending -> Skeleton, isError -> Empty + "Try again" (refetch). Drop tsq-use-suspense-query.
+- [must] Dev origin: rewrites unsupported under export -> NEXT_PUBLIC_API_ORIGIN=http://localhost:8080 in dev; FastAPI CORSMiddleware only when settings.cors_origins non-empty.
+- [should] Colour conflict: use ss.css values for the four wx-* (approved); tokens.json atmo-* for landing cards; note in globals.css.
+- [should] Remove sh-sonner and use-optimistic from leverage; one optimistic mechanism.
+- [should] Convention checks via ESLint (no JS test runner).
+## Opportunities
+- [adopt] sh-shimmer on "Asking..." + Run step labels; [adopt] tsq-prefetch-hover on IncidentCard; [adopt] one StatusPill + lib/copy.ts everywhere.
+- [consider] white hero text over wx-rain/cloudy ~3:1 near haze: keep hero above --sky-mid stop or soft text-shadow.
+- [later] react-compiler, dark mode toggle, tsq-devtools, msw.
+## Proposed rules (.claude/rules/web.md, paths: web/**)
+- fetch only in src/lib/api/** (no-restricted-globals); no raw hex colours (no-restricted-syntax); no pipeline words on screen except components/HowItDecided.tsx; no next/font/google, next/image, next/server or route handlers; API paths only via apiUrl().
+## Outline updates
+- next: export notes (rewrites unsupported; fetch/video/a need basePath manually); tanstack: suspense query runs during prerender under export; shadcn sh-theme-inline required for ancestor re-theming + radius scale override; next fonts local src relative to calling file. Statuses: next export entries planned; sh-sonner rejected; tsq-use-suspense-query rejected (this repo).
+Not run-verified: prerender behaviour (from TanStack docs); `--font-geist-sans` variable name.

@@ -14,57 +14,57 @@ toc:
   exclude: '/docs/((angular|bs-react|cypress|marko|nightwatch|pptr|preact|qwik|react-native|solid|svelte|testcafe|vue|webdriverio)-testing-library/|ecosystem-(bs-jest-dom|cli-testing-library|jasmine-dom|riot-testing-library))'
   why: 'adapters for other frameworks (Angular, Vue, Svelte, Preact, Solid, Qwik, Marko, React Native, ReasonML), other runners (Cypress, WebdriverIO, TestCafe, Nightwatch, Puppeteer) and their ecosystem helpers; this repo tests React with Vitest'
 groups:
-- title: 'AI tooling'
+- title: AI tooling
   sections:
   - id: vt-ai-tooling
-    title: 'Agent entry points for Vitest and Testing Library'
+    title: Agent entry points for Vitest and Testing Library
     level: basic
     requires: []
     ref: /guide/learn/writing-tests-with-ai.md
     entries:
     - id: vt-llms-txt
-      name: 'llms.txt and llms-full.txt'
-      summary: 'ToC index plus ~1.4 MB full text, one `.md` per page'
+      name: llms.txt and llms-full.txt
+      summary: ToC index plus ~1.4 MB full text, one `.md` per page
       lenses: [reuse]
       notes: ['grep llms-full.txt, never load it whole', 'every vitest.dev page also serves raw markdown at `<path>.md`']
       ref: /llms.txt
     - id: vt-agent-reporter
-      name: 'Agent-aware output'
+      name: Agent-aware output
       summary: 'Vitest auto-detects AI agents: `minimal` reporter (alias `agent`), coverage `text` gets `skipFull` + `text-summary`'
       lenses: [cost, reliability]
       signature: '--reporter=minimal'
       notes: ['minimal prints only failed tests and errors, hides logs of passing tests', 'configuring your own `reporters` replaces the defaults; spread `configDefaults.reporters` to keep them', still run `vitest run` or `--no-watch` explicitly]
       ref: /guide/reporters.md
     - id: vt-writing-tests-with-ai
-      name: 'Writing Tests with AI guide'
-      summary: 'give config, sibling tests, AGENTS.md; review weak asserts'
+      name: Writing Tests with AI guide
+      summary: give config, sibling tests, AGENTS.md; review weak asserts
       lenses: [best-practice, testing]
       notes: [LLMs emit `jest.*`; leaked spies fixed by `restoreMocks`]
       ref: /guide/learn/writing-tests-with-ai.md
     - id: vt-mcp
-      name: 'Vitest MCP server'
+      name: Vitest MCP server
       summary: '`@vitest/mcp` (vitest-community/mcp)'
       lenses: [reuse]
       signature: '@vitest/mcp'
       notes: ['npm `@vitest/mcp` returned 404 on 2026-10-05; the repo README calls it work in progress']
       ref: https://github.com/vitest-community/mcp
     - id: vt-skill
-      name: 'antfu/skills vitest skill'
-      summary: 'generated from the Vitest docs (version 2026.9.25)'
+      name: antfu/skills vitest skill
+      summary: generated from the Vitest docs (version 2026.9.25)
       lenses: [reuse]
       notes:
       - third-party, not locked in skills-lock.json; the docs and llms.txt are the verified source
       ref: https://github.com/antfu/skills
-- title: 'Runner config and environments'
+- title: Runner config and environments
   sections:
   - id: vt-config-env
-    title: 'Config, aliases, environments'
+    title: Config, aliases, environments
     level: basic
     requires: []
     ref: /config.md
     entries:
     - id: vt-config
-      name: 'Config'
+      name: Config
       summary: 'one `vitest.config` using `defineConfig` with the React plugin, native tsconfig-paths and aliases'
       lenses: [best-practice, reuse]
       import: vitest/config
@@ -77,7 +77,7 @@ groups:
       notes: ['`resolve.tsconfigPaths` (default false) replaces vite-tsconfig-paths']
       ref: https://vite.dev/config/shared-options.md
     - id: vt-environment
-      name: 'Environment'
+      name: Environment
       summary: 'choose `jsdom` for DOM tests and keep `node` for server code; a docblock overrides it per file'
       lenses: [perf, best-practice]
       signature: 'test.environment: ''jsdom'' | // @vitest-environment node'
@@ -87,15 +87,15 @@ groups:
       notes: ['a control comment `// @vitest-environment <name>` overrides one file', happy-dom is faster but lacks some APIs, 'browser is not an environment; use a Browser Mode project']
       ref: /guide/environment.md
     - id: vt-server-only-alias
-      name: 'Alias for server-only'
+      name: Alias for server-only
       summary: '`resolve.alias` to a stub module'
       lenses: [composability]
       signature: 'resolve.alias: { "server-only": stubPath }'
       notes: [the real `server-only` package throws outside a React Server environment, 'aliases only affect modules imported with `import`, not `require`']
       ref: /config/alias.md
     - id: vt-setup-files
-      name: 'setupFiles'
-      summary: 'shared setup run before every test file (jest-dom, MSW server, global resets)'
+      name: setupFiles
+      summary: shared setup run before every test file (jest-dom, MSW server, global resets)
       lenses: [reuse, testing]
       signature: 'test.setupFiles: string | string[]'
       params:
@@ -103,7 +103,7 @@ groups:
       notes: ['modules imported in a setup file are cached, so `vi.mock` will not affect them', 'with `isolate: false` the setup file still re-runs per file; keep it idempotent', editing it reruns all tests in watch mode]
       ref: /config/setupfiles.md
     - id: vt-globals
-      name: 'globals'
+      name: globals
       summary: '`test.globals` (default false) exposes describe/it/expect/vi globally; needs `vitest/globals` types'
       lenses: [typing-dx]
       signature: 'test.globals: true'
@@ -112,7 +112,7 @@ groups:
       notes: ['add `"types": ["vitest/globals"]` to tsconfig', 'if typeRoots is customized, include `./node_modules` so vitest/globals resolves']
       ref: /config/globals.md
     - id: vt-projects
-      name: 'Test projects'
+      name: Test projects
       summary: '`test.projects` runs several configs in one process (jsdom vs node, isolated vs not); replaces deprecated workspace'
       lenses: [composability, perf]
       signature: 'test.projects: [glob | configPath | inlineConfig]'
@@ -123,26 +123,26 @@ groups:
       notes: ['use `defineProject` in per-project config files for typed options', 'a config that declares `projects` runs no tests itself', 'sequence.groupOrder orders projects']
       ref: /guide/projects.md
     - id: vt-next-async-rsc
-      name: 'Async Server Components'
-      summary: 'not unit-testable in Vitest, use E2E'
+      name: Async Server Components
+      summary: not unit-testable in Vitest, use E2E
       lenses: [reliability]
       ref: https://nextjs.org/docs/app/guides/testing/vitest.md
     - id: vt-engines
-      name: 'Node engine ranges'
-      summary: 'vitest 5 `^22.12 || ^24 || >=26`, jsdom 30 `^22.22.2 || ^24.15 || >=26`'
+      name: Node engine ranges
+      summary: vitest 5 `^22.12 || ^24 || >=26`, jsdom 30 `^22.22.2 || ^24.15 || >=26`
       lenses: [reliability]
       signature: ^22.12 || ^24 || >=26
       ref: /guide/migration.md
-- title: 'Mocking'
+- title: Mocking
   sections:
   - id: vt-mocking
-    title: 'Mocks, stubs, timers, network'
+    title: Mocks, stubs, timers, network
     level: intermediate
     requires: [vt-config-env]
     ref: /guide/mocking.md
     entries:
     - id: vt-vi-mock
-      name: 'Module mocks'
+      name: Module mocks
       summary: '`vi.mock(path, factory | { spy })` swaps a module; hoisted above imports, so v5 throws unless it is top level'
       lenses: [best-practice, testing]
       import: vitest
@@ -154,23 +154,23 @@ groups:
       notes: ['`vi` must be imported from vitest (or globals on) so hoisting can see it', '`doMock`/`doUnmock` are not hoisted and may run anywhere', 'same-module calls cannot be mocked', 'does not work with `require`']
       ref: /api/vi.md#vi-mock
     - id: vt-hoisted
-      name: 'vi.hoisted'
-      summary: 'define shared mock fns that hoisted `vi.mock` factories can reference'
+      name: vi.hoisted
+      summary: define shared mock fns that hoisted `vi.mock` factories can reference
       lenses: [testing]
       signature: vi.hoisted(() => value)
       returns: the factory result, evaluated before imports so `vi.mock` factories may close over it
       notes: [v5 also throws when called outside the top level]
       ref: /api/vi.md#vi-hoisted
     - id: vt-import-original
-      name: 'Partial mocks'
-      summary: 'spread the real module in the factory via `importOriginal`, override a few exports; `vi.mocked` types the mocks'
+      name: Partial mocks
+      summary: spread the real module in the factory via `importOriginal`, override a few exports; `vi.mocked` types the mocks
       lenses: [typing-dx, testing]
       signature: 'vi.mock(path, async (importOriginal) => ({ ...(await importOriginal<T>()), fn: vi.fn() }))'
       returns: '`vi.mocked(fn, { partial?, deep? })` returns the same object typed as a mock; no runtime effect'
       notes: ['`vi.importActual(path)` is the equivalent outside a factory', 'pass `{ partial: true }` to vi.mocked to allow partial return values']
       ref: /api/vi.md#vi-mocked
     - id: vt-fn-spy
-      name: 'Mock functions'
+      name: Mock functions
       summary: '`vi.fn` creates a mock, `vi.spyOn` wraps an existing method; both share the `.mock*` API'
       lenses: [testing]
       signature: vi.fn(impl?) | vi.spyOn(obj, key, accessor?)
@@ -180,7 +180,7 @@ groups:
       notes: ['mockClear drops history; mockReset also resets the impl (to `impl` for vi.fn(impl)); mockRestore also restores spyOn originals', 'class targets need `function`/`class` impls']
       ref: /guide/mocking/functions.md
     - id: vt-when
-      name: 'Argument-matched stubs (5.0.0)'
+      name: Argument-matched stubs (5.0.0)
       summary: '`vi.when(spy).calledWith(…).thenReturn(…)` defines per-argument behaviour without if/else in the mock'
       lenses: [testing, typing-dx]
       signature: vi.when(spy, { onUnmatched }).calledWith(...args).thenReturn(value)
@@ -192,7 +192,7 @@ groups:
       since: "5.0.0"
       ref: /api/vi.md#vi-when
     - id: vt-stub-env
-      name: 'Env stubs'
+      name: Env stubs
       summary: '`vi.stubEnv` sets a value on `process.env` and `import.meta.env`; `vi.unstubAllEnvs()` restores them'
       lenses: [best-practice, security]
       signature: vi.stubEnv(name, value)
@@ -202,15 +202,15 @@ groups:
       notes: ['plain assignment cannot be undone by unstubAllEnvs', 'config `unstubEnvs: true` restores before each test (default false)']
       ref: /api/vi.md#vi-stubenv
     - id: vt-stub-global
-      name: 'Global stubs'
+      name: Global stubs
       summary: '`vi.stubGlobal` puts a value on `globalThis` (fetch, IntersectionObserver, matchMedia); undo with `unstubAllGlobals`'
       lenses: [testing]
       signature: vi.stubGlobal(name, value)
       notes: ['config `unstubGlobals: true` restores before each test (default false)', 'class stubs use `vi.fn(class { … })`']
       ref: /guide/mocking/globals.md
     - id: vt-mock-cleanup
-      name: 'Automatic mock cleanup'
-      summary: 'config flags that reset mocks/stubs before every test; `clearMocks` is on by default in v5'
+      name: Automatic mock cleanup
+      summary: config flags that reset mocks/stubs before every test; `clearMocks` is on by default in v5
       lenses: [reliability, testing]
       signature: 'test: { clearMocks, restoreMocks, unstubEnvs, unstubGlobals }'
       options:
@@ -221,7 +221,7 @@ groups:
       notes: ['all four are unsafe with concurrent tests: one finishing resets mocks of tests still running', 'restoreAllMocks does not touch automocked or vi.fn mocks']
       ref: /config/restoremocks.md
     - id: vt-fake-timers
-      name: 'Fake timers'
+      name: Fake timers
       summary: '`vi.useFakeTimers` mocks timers and Date; advance with the `*Async` variants when promises are involved'
       lenses: [reliability, testing]
       signature: vi.useFakeTimers({ toFake?, toNotFake? })
@@ -232,8 +232,8 @@ groups:
       notes: [v5 fake timers also mock Temporal, '`vi.setTimerTickMode(manual|nextTimerAsync|interval)` (4.1.0) auto-advances', 'faking nextTick hangs under --pool=forks child_process', '`vi.waitFor` auto-advances fake timers']
       ref: /guide/mocking/timers.md
     - id: vt-msw
-      name: 'Network mocking with MSW'
-      summary: 'Vitest''s recommended way to mock HTTP, WebSocket and GraphQL; a `setupServer` in a setup file, no app changes'
+      name: Network mocking with MSW
+      summary: Vitest's recommended way to mock HTTP, WebSocket and GraphQL; a `setupServer` in a setup file, no app changes
       lenses: [testing, security]
       import: msw/node
       signature: setupServer(...handlers)
@@ -242,30 +242,30 @@ groups:
       notes: ['pattern: beforeAll listen, afterEach resetHandlers, afterAll close', 'handlers via `http.get(url, () => HttpResponse.json(...))`']
       ref: /guide/mocking/requests.md
     - id: vt-mock-classes
-      name: 'Class mocks'
+      name: Class mocks
       summary: '`vi.fn(class { … })` mocks a constructor; instances keep the implementation prototype (v5)'
       lenses: [testing]
       signature: vi.fn(class { method = vi.fn() })
       notes: ['define members as class fields so each instance gets its own mock; prototype methods are shared', v5 `instanceof` against the impl class passes]
       ref: /guide/mocking/classes.md
-- title: 'Assertions and authoring'
+- title: Assertions and authoring
   sections:
   - id: vt-authoring
-    title: 'Writing deterministic tests'
+    title: Writing deterministic tests
     level: intermediate
     requires: []
     ref: /api/test.md
     entries:
     - id: vt-each-for
-      name: 'Table tests'
+      name: Table tests
       summary: '`test.each` / `test.for` run one body over a table of cases; `for` passes the row as one arg and supports context'
       lenses: [reuse, testing]
       signature: test.each(table)(name, fn) | test.for(table)(name, (row, ctx) => …)
       notes: ['test.for does not spread array rows into arguments, unlike each', 'printf placeholders (`%s`, `%i`, `%#`) format titles']
       ref: /api/test.md
     - id: vt-poll
-      name: 'Async waiting'
-      summary: 'poll an assertion, retry-until-no-throw, or poll-until-truthy; pick by what the wait is'
+      name: Async waiting
+      summary: poll an assertion, retry-until-no-throw, or poll-until-truthy; pick by what the wait is
       lenses: [reliability, testing]
       signature: await expect.poll(fn, { timeout, interval }).matcher() | vi.waitFor(fn, opts) | vi.waitUntil(fn, opts)
       params:
@@ -277,13 +277,13 @@ groups:
       - 'waitUntil fails fast on a throw; poll/waitFor retry on throw'
       ref: /guide/recipes/wait-for.md
     - id: vt-await-assertions
-      name: 'Awaited async assertions'
+      name: Awaited async assertions
       summary: '`.resolves`/`.rejects` and poll assertions must be awaited; v5 fails the test otherwise'
       lenses: [reliability]
       signature: await expect(p).resolves | rejects
       ref: /guide/migration.md
     - id: vt-test-extend
-      name: 'Fixtures'
+      name: Fixtures
       summary: '`test.extend` builds reusable per-test fixtures with automatic teardown; the builder form infers types'
       lenses: [reuse, composability]
       signature: test.extend('name', value | async (ctx, { onCleanup }) => value)
@@ -295,28 +295,28 @@ groups:
       since: "4.1.0"
       ref: /guide/test-context.md
     - id: vt-test-context
-      name: 'Test context hooks'
-      summary: 'per-test `onTestFinished`/`onTestFailed`, `signal` and a local `expect`; required for concurrent tests'
+      name: Test context hooks
+      summary: per-test `onTestFinished`/`onTestFailed`, `signal` and a local `expect`; required for concurrent tests
       lenses: [reliability]
       signature: test(name, ({ expect, signal, onTestFinished, onTestFailed }) => …)
       notes: ['use context `expect` under `sequence.concurrent` so assertions and snapshots bind to the right test', '`signal` aborts on timeout or cancel (3.2.0)']
       ref: /guide/test-context.md
     - id: vt-explicit-resources
-      name: 'Auto-cleanup with `using`'
+      name: Auto-cleanup with `using`
       summary: '`using spy = vi.spyOn(...)` restores when the block exits, even mid-test; also vi.doMock and vi.when'
       lenses: [reliability, reuse]
       signature: using spy = vi.spyOn(obj, key)
       notes: ['needs TypeScript >= 5.2 and Node >= 24 (or a transpiling bundler)', 'fallback: `onTestFinished(() => spy.mockRestore())`', 'avoids global `restoreMocks` when few spies need it']
       ref: /guide/recipes/explicit-resources.md
     - id: vt-custom-matchers
-      name: 'Custom matchers'
+      name: Custom matchers
       summary: '`expect.extend` adds matchers; augment the `Matchers<R, T>` interface for types'
       lenses: [reuse, typing-dx]
       signature: expect.extend({ toBeFoo(received) { return { pass, message } } })
       notes: ['do not flip `pass` for `.not`; Vitest does it via `this.isNot`', 'return R from sync matchers so they type correctly with `.resolves` and poll', 'include the ambient `declare module ''vitest''` file in tsconfig']
       ref: /guide/extending-matchers.md
     - id: vt-define-helper
-      name: 'Assertion helpers'
+      name: Assertion helpers
       summary: '`vi.defineHelper` makes failures in a shared assertion helper point at the caller line'
       lenses: [reuse, typing-dx]
       signature: vi.defineHelper(fn)
@@ -325,21 +325,21 @@ groups:
       since: "4.1.0"
       ref: /api/vi.md#vi-definehelper
     - id: vt-soft-assertions
-      name: 'Soft assertions'
+      name: Soft assertions
       summary: '`expect.soft` records a failure and continues, so one test reports every mismatch'
       lenses: [testing, observability]
       signature: expect.soft(value).matcher()
       notes: [only usable inside a `test` body]
       ref: /api/expect.md#soft
     - id: vt-testing-types
-      name: 'Type tests'
+      name: Type tests
       summary: '`expectTypeOf`/`assertType` check types; run by `typecheck.enabled` with `*.test-d.ts` files'
       lenses: [typing-dx]
       signature: expectTypeOf(value).toEqualTypeOf<T>()
       notes: [prefer a type argument over a concrete value for readable errors, 'a failing toBeString resolves to a non-callable type']
       ref: /guide/testing-types.md
     - id: vt-tags
-      name: 'Test tags (4.1.0)'
+      name: Test tags (4.1.0)
       summary: 'label tests, share timeout/retry per category, filter runs with `--tags-filter` expressions'
       lenses: [composability]
       signature: 'test.tags: [{ name, description?, timeout?, retry?, priority? }]'
@@ -348,16 +348,16 @@ groups:
       notes: ['filter: `--tags-filter=''db && !flaky''`', 'augment `TestTags` for typed tag names', 'use projects instead when isolation/pool/environment differ']
       since: "4.1.0"
       ref: /guide/test-tags.md
-- title: 'React Testing Library'
+- title: React Testing Library
   sections:
   - id: rtl
-    title: 'React Testing Library and DOM queries'
+    title: React Testing Library and DOM queries
     level: basic
     requires: [vt-config-env]
     ref: testing-library:/docs/react-testing-library/intro
     entries:
     - id: rtl-render
-      name: 'Render helpers'
+      name: Render helpers
       summary: '`render` mounts into document.body (act-wrapped), `screen` queries it, `renderHook` tests hooks'
       lenses: [testing, reuse]
       import: '@testing-library/react'
@@ -370,15 +370,15 @@ groups:
       notes: ['`renderHook` gives a stable `result` ref', 'act() is applied automatically; manual act is rarely needed']
       ref: testing-library:/docs/react-testing-library/api
     - id: rtl-cleanup
-      name: 'Cleanup'
-      summary: 'auto-unmounts after each test when a global `afterEach` exists; otherwise call `cleanup` yourself'
+      name: Cleanup
+      summary: auto-unmounts after each test when a global `afterEach` exists; otherwise call `cleanup` yourself
       lenses: [reliability, testing]
       signature: afterEach(cleanup)
       notes: ['Vitest globals are off by default, so auto-cleanup does not register', '`@testing-library/react/pure` opts out of auto-cleanup entirely']
       ref: /config/globals.md
     - id: rtl-queries
-      name: 'Query priority'
-      summary: 'prefer `getByRole` with an accessible name, then label/text, test id last; also covers `queryBy*` for absence'
+      name: Query priority
+      summary: prefer `getByRole` with an accessible name, then label/text, test id last; also covers `queryBy*` for absence
       lenses: [ux-a11y, testing]
       signature: screen.getByRole(role, { name, hidden, level, checked, expanded })
       params:
@@ -388,7 +388,7 @@ groups:
       notes: ['ByRole is costly on big trees; `hidden: true` speeds it', 'password inputs have no implicit role; use ByLabelText']
       ref: testing-library:/docs/queries/byrole
     - id: rtl-async-queries
-      name: 'Async queries'
+      name: Async queries
       summary: '`findBy*` is getBy plus waitFor; `waitFor` retries a throwing callback until timeout'
       lenses: [reliability, testing]
       signature: await screen.findByRole(role, queryOpts, { timeout, interval })
@@ -398,14 +398,14 @@ groups:
       notes: ['waitFor callback must throw to retry; return values do not retry', 'prefer findBy over `waitFor(() => getBy…)`', 'do not put side effects inside waitFor']
       ref: testing-library:/docs/dom-testing-library/api-async
     - id: rtl-fire-event
-      name: 'fireEvent'
-      summary: 'dispatches a single DOM event'
+      name: fireEvent
+      summary: dispatches a single DOM event
       lenses: [testing]
       notes: [user-event is preferred; fireEvent is the fallback for interactions it lacks]
       ref: testing-library:/docs/dom-testing-library/api-events
     - id: rtl-user-event
-      name: 'user-event'
-      summary: 'simulates whole interactions (focus, pointer, keyboard, visibility checks) rather than one event'
+      name: user-event
+      summary: simulates whole interactions (focus, pointer, keyboard, visibility checks) rather than one event
       lenses: [ux-a11y, testing]
       import: '@testing-library/user-event'
       signature: const user = userEvent.setup({ advanceTimers }); await user.click(el)
@@ -416,15 +416,15 @@ groups:
       notes: [not installed, 'create the instance with setup() per test; direct `userEvent.click` exists only to ease migration', '`type` clicks the element first unless skipClick']
       ref: testing-library:/docs/user-event/intro
     - id: rtl-jest-dom
-      name: 'jest-dom matchers'
-      summary: 'DOM assertions (`toBeInTheDocument`, `toBeVisible`, `toHaveAccessibleName`) registered via the vitest entry point'
+      name: jest-dom matchers
+      summary: DOM assertions (`toBeInTheDocument`, `toBeVisible`, `toHaveAccessibleName`) registered via the vitest entry point
       lenses: [typing-dx, ux-a11y]
       import: '@testing-library/jest-dom/vitest'
       signature: import '@testing-library/jest-dom/vitest'
       notes: [not installed, 'import it in a setupFiles module', 'for types add `@testing-library/jest-dom` (and `vitest/globals` if globals) to tsconfig types or include the setup file']
       ref: https://github.com/testing-library/jest-dom
     - id: rtl-strict-mode
-      name: 'Strict Mode renders'
+      name: Strict Mode renders
       summary: '`configure({ reactStrictMode: true })` double-invokes effects like dev'
       lenses: [reliability]
       import: '@testing-library/react'
@@ -432,29 +432,29 @@ groups:
       notes: [call it in a setup file; `render`/`renderHook` option overrides per call]
       ref: testing-library:/docs/react-testing-library/api
     - id: vt-browser-mode
-      name: 'Browser Mode component tests'
-      summary: 'runs component tests in real Chromium/Firefox/WebKit; docs call it the most accurate option'
+      name: Browser Mode component tests
+      summary: runs component tests in real Chromium/Firefox/WebKit; docs call it the most accurate option
       lenses: [ux-a11y, reliability]
       signature: 'test.browser: { enabled, provider, instances }'
       notes: ['pair with `vitest-browser-react` and the Playwright provider', catches CSS layout and focus issues jsdom cannot, 'declare it as its own project, it is not an environment']
       ref: /guide/browser/component-testing.md
-- title: 'Speed, CI and reporting'
+- title: Speed, CI and reporting
   sections:
   - id: vt-run
-    title: 'Running, speed and quality gates'
+    title: Running, speed and quality gates
     level: intermediate
     requires: []
     ref: /guide/improving-performance.md
     entries:
     - id: vt-run-mode
-      name: 'Non-watch run'
+      name: Non-watch run
       summary: '`vitest run` exits after one pass; plain `vitest` watches in a TTY'
       lenses: [reliability, cost]
       signature: vitest run
       notes: ['plain `vitest` watches locally but falls back to run mode in CI or without a TTY', '`--shard` cannot be combined with watch']
       ref: /guide/cli.md
     - id: vt-coverage
-      name: 'Coverage'
+      name: Coverage
       summary: 'V8 coverage (default provider, needs `@vitest/coverage-v8`) with include/exclude and thresholds that fail the run'
       lenses: [testing, observability]
       signature: 'test.coverage: { provider, include, exclude, thresholds, reporter }'
@@ -466,7 +466,7 @@ groups:
       notes: [not installed, 'enable per run with `vitest run --coverage`', 'v5: glob thresholds no longer inherit perFile']
       ref: /guide/coverage.md
     - id: vt-isolation
-      name: 'Isolation and pool'
+      name: Isolation and pool
       summary: '`isolate: false` skips per-file isolation for side-effect-free node tests; scope it with projects'
       lenses: [perf]
       signature: 'test: { isolate, pool }'
@@ -476,8 +476,8 @@ groups:
       notes: ['profile first: the summary breaks time into environment, import, transform, tests', '`vitest doctor` runs the suite under alternative configs and reports speedups', 'jsdom suites rarely tolerate isolate false']
       ref: /guide/improving-performance.md
     - id: vt-sequence
-      name: 'Order and flake control'
-      summary: 'shuffle tests to expose order dependence; retry reruns failures; detectAsyncLeaks finds leaked timers'
+      name: Order and flake control
+      summary: shuffle tests to expose order dependence; retry reruns failures; detectAsyncLeaks finds leaked timers
       lenses: [reliability, testing]
       signature: 'test: { sequence: { shuffle, seed }, retry, detectAsyncLeaks }'
       options:
@@ -488,14 +488,14 @@ groups:
       notes: ['detectAsyncLeaks is much slower, debug only; retry hides flakes']
       ref: /config/sequence.md
     - id: vt-reporters
-      name: 'Reporters'
+      name: Reporters
       summary: '`--reporter` picks output (default, minimal, github-actions, junit, json, blob, html)'
       lenses: [observability]
       signature: --reporter=<name>
       notes: ['`configDefaults.reporters` keeps agent and CI defaults when adding one', 'github-actions is added automatically on GitHub Actions', 'blob is the format for merging sharded runs']
       ref: /guide/reporters.md
     - id: vt-sharding
-      name: 'Sharding'
+      name: Sharding
       summary: '`--shard=i/n` splits test files across CI machines; merge with the blob reporter'
       lenses: [perf]
       signature: vitest run --reporter=blob --shard=1/3
@@ -504,21 +504,21 @@ groups:
 - title: 'Config: discovery, runtime and environment'
   sections:
   - id: vt-cfg-discovery
-    title: 'Test discovery, run selection and watch'
+    title: Test discovery, run selection and watch
     level: basic
     requires:
     - vt-config-env
     ref: /config/include.md
     entries:
     - id: vt-cfg-include
-      name: 'include'
-      summary: 'globs that match test files; overriding replaces the defaults, so spread `configDefaults.include` to extend'
+      name: include
+      summary: globs that match test files; overriding replaces the defaults, so spread `configDefaults.include` to extend
       lenses:
       - best-practice
       - composability
       signature: 'test.include: string[]'
       params:
-      - name: 'include'
+      - name: include
         type: string[]
         default: '[''**/*.{test,spec}.?(c|m)[jt]s?(x)'']'
         desc: resolved against `root` with tinyglobby; CLI `vitest [...include]`
@@ -527,13 +527,13 @@ groups:
       - useful in per-project configs
       ref: /config/include.md
     - id: vt-cfg-exclude
-      name: 'exclude'
-      summary: 'globs removed from test discovery; the CLI `--exclude` is additive while the config value replaces defaults'
+      name: exclude
+      summary: globs removed from test discovery; the CLI `--exclude` is additive while the config value replaces defaults
       lenses:
       - best-practice
       signature: 'test.exclude: string[]'
       params:
-      - name: 'exclude'
+      - name: exclude
         type: string[]
         default: '[''**/node_modules/**'', ''**/.git/**'']'
         desc: does not affect coverage; use `coverage.exclude` for that
@@ -541,13 +541,13 @@ groups:
       - extend defaults with `configDefaults.exclude` from `vitest/config`
       ref: /config/exclude.md
     - id: vt-cfg-include-source
-      name: 'includeSource'
-      summary: 'runs files that contain `import.meta.vitest` as in-source tests'
+      name: includeSource
+      summary: runs files that contain `import.meta.vitest` as in-source tests
       lenses:
       - testing
       signature: 'test.includeSource: string[]'
       params:
-      - name: 'includeSource'
+      - name: includeSource
         type: string[]
         default: '[]'
         desc: globs matched by a plain text check, so `import.meta.vitest` in a comment also matches
@@ -556,74 +556,74 @@ groups:
       - types via `vitest/importMeta` in tsconfig
       ref: /config/include-source.md
     - id: vt-cfg-dir
-      name: 'dir'
-      summary: 'base directory scanned for test files; narrows discovery when the root covers a whole monorepo'
+      name: dir
+      summary: base directory scanned for test files; narrows discovery when the root covers a whole monorepo
       lenses:
       - perf
       signature: 'test.dir: string'
       params:
-      - name: 'dir'
+      - name: dir
         type: string
         default: same as root
         desc: CLI `--dir=<path>`
       ref: /config/dir.md
     - id: vt-cfg-root
-      name: 'root'
-      summary: 'project root that globs and relative paths resolve against'
+      name: root
+      summary: project root that globs and relative paths resolve against
       lenses:
       - reuse
       signature: 'test.root: string'
       params:
-      - name: 'root'
+      - name: root
         type: string
         default: null
         desc: CLI `-r <path>`, `--root=<path>`
       ref: /config/root.md
     - id: vt-cfg-mode
-      name: 'mode'
-      summary: 'overrides the Vite mode used to load config and env files'
+      name: mode
+      summary: overrides the Vite mode used to load config and env files
       lenses:
       - reuse
       signature: 'test.mode: string'
       params:
-      - name: 'mode'
+      - name: mode
         type: string
         default: '''test'''
         desc: CLI `--mode=staging`
       ref: /config/mode.md
     - id: vt-cfg-pass-with-no-tests
-      name: 'passWithNoTests'
-      summary: 'exit 0 when no test files match instead of failing'
+      name: passWithNoTests
+      summary: exit 0 when no test files match instead of failing
       lenses:
       - reliability
       signature: 'test.passWithNoTests: boolean'
       params:
-      - name: 'passWithNoTests'
+      - name: passWithNoTests
         type: boolean
         default: 'false'
         desc: CLI `--passWithNoTests`
       ref: /config/passwithnotests.md
     - id: vt-cfg-allow-only
-      name: 'allowOnly'
+      name: allowOnly
       summary: '`.only` fails the run in CI by default (std-env detection) but is allowed locally'
       lenses:
       - reliability
       - best-practice
       signature: 'test.allowOnly: boolean'
       params:
-      - name: 'allowOnly'
+      - name: allowOnly
         type: boolean
         default: '!process.env.CI'
         desc: CLI `--allowOnly`, `--allowOnly=false`
       ref: /config/allowonly.md
     - id: vt-cfg-test-name-pattern
-      name: 'testNamePattern'
-      summary: 'runs tests whose full name matches; v5 joins suite and test names with ` > `, not a space'
+      name: testNamePattern
+      summary: runs tests whose full name matches; v5 joins suite and test names with ` > `, not a space
       lenses:
       - testing
       signature: vitest -t <pattern>
       params:
-      - name: 'testNamePattern'
+      - name: testNamePattern
         type: string | RegExp
         default: null
         desc: CLI `-t`, `--testNamePattern`, `--test-name-pattern`; matched against `suite > test`
@@ -632,14 +632,14 @@ groups:
       - pair with `experimental.preParse` so other files are skipped without running
       ref: /config/testnamepattern.md
     - id: vt-cfg-changed
-      name: 'changed'
-      summary: 'runs only tests related to uncommitted changes, or to a commit or branch diff'
+      name: changed
+      summary: runs only tests related to uncommitted changes, or to a commit or branch diff
       lenses:
       - perf
       - cost
       signature: vitest --changed [ref]
       params:
-      - name: 'changed'
+      - name: changed
         type: boolean | string
         default: 'false'
         desc: bare flag = uncommitted changes; `--changed HEAD~1`, a hash or `origin/develop` compares against it
@@ -648,13 +648,13 @@ groups:
       - '`forceRerunTriggers` (config and package.json by default) rerun the whole suite'
       ref: /config/changed.md
     - id: vt-cfg-force-rerun-triggers
-      name: 'forceRerunTriggers'
-      summary: 'globs whose change reruns the whole suite; defaults cover package.json and the vitest/vite config'
+      name: forceRerunTriggers
+      summary: globs whose change reruns the whole suite; defaults cover package.json and the vitest/vite config
       lenses:
       - reliability
       signature: 'test.forceRerunTriggers: string[]'
       params:
-      - name: 'forceRerunTriggers'
+      - name: forceRerunTriggers
         type: string[]
         default: '[''**/package.json'', ''**/vitest.config.*'', ''**/vite.config.*'']'
         desc: useful when tests call CLIs, where Vite has no module graph
@@ -662,13 +662,13 @@ groups:
       - files must not be ignored by `server.watch.ignored`
       ref: /config/forcereruntriggers.md
     - id: vt-cfg-watch-trigger-patterns
-      name: 'watchTriggerPatterns'
-      summary: 'regex-to-test-files rules for tests that read files Vitest cannot see in the module graph'
+      name: watchTriggerPatterns
+      summary: regex-to-test-files rules for tests that read files Vitest cannot see in the module graph
       lenses:
       - reliability
       signature: 'test.watchTriggerPatterns: WatcherTriggerPattern[]'
       params:
-      - name: 'watchTriggerPatterns'
+      - name: watchTriggerPatterns
         type: WatcherTriggerPattern[]
         default: null
         desc: each item maps a changed-file regex to the list of test files to rerun
@@ -678,27 +678,27 @@ groups:
       - returned files are absolute or relative to root
       ref: /config/watchtriggerpatterns.md
     - id: vt-cfg-watch
-      name: 'watch'
-      summary: 'watch mode is on only for interactive TTY runs; it is off in CI and when an AI agent is detected'
+      name: watch
+      summary: watch mode is on only for interactive TTY runs; it is off in CI and when an AI agent is detected
       lenses:
       - reliability
       - cost
       signature: 'test.watch: boolean'
       params:
-      - name: 'watch'
+      - name: watch
         type: boolean
         default: '!process.env.CI && process.stdin.isTTY, false for AI agents'
         desc: CLI `-w`, `--watch`, `--watch=false`
       ref: /config/watch.md
     - id: vt-cfg-update
-      name: 'update'
+      name: update
       summary: 'snapshot write policy: all, new, none; default is `new` locally and `none` in CI'
       lenses:
       - testing
       - reliability
       signature: 'test.update: boolean | ''new'' | ''all'' | ''none'''
       params:
-      - name: 'update'
+      - name: update
         type: boolean | 'new' | 'all' | 'none'
         default: 'false'
         desc: CLI `-u`, `--update=new`, `--update=none`; true or all rewrites changed snapshots and deletes obsolete ones
@@ -707,25 +707,25 @@ groups:
       - false resolves to `new` outside CI and `none` when `process.env.CI` is truthy
       ref: /config/update.md
     - id: vt-cfg-cache
-      name: 'cache'
+      name: cache
       summary: '`cache: false` disables the result cache that orders failed and long tests first'
       lenses:
       - perf
       signature: 'test.cache: false'
       params:
-      - name: 'cache'
+      - name: cache
         type: 'false'
         default: null
         desc: CLI `--no-cache`, `--cache=false`; directory follows Vite `cacheDir`
       ref: /config/cache.md
     - id: vt-cfg-fs-module-cache
-      name: 'fsModuleCache'
-      summary: 'persists transformed modules on disk so separate runs reuse them (not in browser mode)'
+      name: fsModuleCache
+      summary: persists transformed modules on disk so separate runs reuse them (not in browser mode)
       lenses:
       - perf
       signature: 'test.fsModuleCache: boolean'
       params:
-      - name: 'fsModuleCache'
+      - name: fsModuleCache
         type: boolean
         default: 'false'
         desc: CLI `--fsModuleCache`; cache lives in node_modules at the workspace root
@@ -736,34 +736,34 @@ groups:
       - debug with `DEBUG=vitest:cache:fs`
       ref: /config/fsmodulecache.md
     - id: vt-cfg-fs-module-cache-path
-      name: 'fsModuleCachePath'
-      summary: 'directory for the persistent module cache, settable per project'
+      name: fsModuleCachePath
+      summary: directory for the persistent module cache, settable per project
       lenses:
       - perf
       signature: 'test.fsModuleCachePath: string'
       params:
-      - name: 'fsModuleCachePath'
+      - name: fsModuleCachePath
         type: string
         default: '''node_modules/.vitest-cache'''
         desc: resolved from the workspace root; the invalidation lockfile metadata stays shared
       since: 5.0.0
       ref: /config/fsmodulecachepath.md
   - id: vt-cfg-runtime
-    title: 'Environment, modules and global setup'
+    title: Environment, modules and global setup
     level: intermediate
     requires:
     - vt-config-env
     ref: /config/environment.md
     entries:
     - id: vt-cfg-environment
-      name: 'environment (config page)'
+      name: environment (config page)
       summary: '`test.environment` default `node`; a `@vitest-environment` docblock overrides one file'
       lenses:
       - best-practice
       - perf
       signature: 'test.environment: ''node'' | ''jsdom'' | ''happy-dom'' | ''edge-runtime'' | string'
       params:
-      - name: 'environment'
+      - name: environment
         type: '''node'' | ''jsdom'' | ''happy-dom'' | ''edge-runtime'' | string'
         default: '''node'''
         desc: CLI `--environment=<env>`; custom environments are published as `vitest-environment-<name>` packages
@@ -771,38 +771,38 @@ groups:
       - Browser Mode runs integration tests without mocking a DOM
       ref: /config/environment.md
     - id: vt-cfg-environment-options
-      name: 'environmentOptions'
-      summary: 'options passed to the jsdom and happy-dom setup, nested under their own key'
+      name: environmentOptions
+      summary: options passed to the jsdom and happy-dom setup, nested under their own key
       lenses:
       - best-practice
       signature: 'test.environmentOptions: { jsdom?: {...}, happyDOM?: {...} }'
       params:
-      - name: 'environmentOptions'
+      - name: environmentOptions
         type: Record<'jsdom' | 'happyDOM' | string, unknown>
         default: '{}'
         desc: scoped per environment so several can coexist in one project
       ref: /config/environmentoptions.md
     - id: vt-cfg-env
-      name: 'env'
-      summary: 'environment variables set on `process.env` and `import.meta.env` in test workers only (not globalSetup)'
+      name: env
+      summary: environment variables set on `process.env` and `import.meta.env` in test workers only (not globalSetup)
       lenses:
       - best-practice
       signature: 'test.env: Partial<NodeJS.ProcessEnv>'
       params:
-      - name: 'env'
+      - name: env
         type: Partial<NodeJS.ProcessEnv>
         default: null
         desc: TZ set here does not change the zone in `threads` and `vmThreads` pools
       ref: /config/env.md
     - id: vt-cfg-provide
-      name: 'provide and inject'
-      summary: 'serializable values handed to tests via `inject(key)`; typed by augmenting `ProvidedContext`'
+      name: provide and inject
+      summary: serializable values handed to tests via `inject(key)`; typed by augmenting `ProvidedContext`
       lenses:
       - composability
       - typing-dx
       signature: 'test.provide: Partial<ProvidedContext>'
       params:
-      - name: 'provide'
+      - name: provide
         type: Partial<ProvidedContext>
         default: null
         desc: keys are strings, values must be structured-clone serializable because they cross processes
@@ -811,14 +811,14 @@ groups:
       - augment `declare module 'vitest' { interface ProvidedContext {...} }`
       ref: /config/provide.md
     - id: vt-cfg-global-setup
-      name: 'globalSetup'
-      summary: 'once-per-run setup and teardown files that run in the main process before any worker starts'
+      name: globalSetup
+      summary: once-per-run setup and teardown files that run in the main process before any worker starts
       lenses:
       - reuse
       - reliability
       signature: 'test.globalSetup: string | string[]'
       params:
-      - name: 'globalSetup'
+      - name: globalSetup
         type: string | string[]
         default: null
         desc: paths relative to root; export `setup`/`teardown` or a default function returning a teardown
@@ -828,62 +828,62 @@ groups:
       - in watch mode teardown runs at process exit; use `onTestsRerun` to reconfigure per rerun
       ref: /config/globalsetup.md
     - id: vt-cfg-inject-cjs-globals
-      name: 'injectCjsGlobals'
-      summary: 'inject `module`, `exports`, `require`, `__dirname` into every module; disable for stricter ESM'
+      name: injectCjsGlobals
+      summary: inject `module`, `exports`, `require`, `__dirname` into every module; disable for stricter ESM
       lenses:
       - reliability
       signature: 'test.injectCjsGlobals: boolean'
       params:
-      - name: 'injectCjsGlobals'
+      - name: injectCjsGlobals
         type: boolean
         default: 'true'
         desc: CLI `--no-inject-cjs-globals`; when off only detected CJS modules get them
       ref: /config/injectcjsglobals.md
     - id: vt-cfg-deps
-      name: 'deps'
+      name: deps
       summary: 'dependency handling: optimizer bundling, client asset/css transforms, CJS default interop, module directories'
       lenses:
       - perf
       - reliability
       signature: 'test.deps: { optimizer, client, interopDefault, moduleDirectories }'
       options:
-      - name: 'optimizer.{ssr|client}.enabled'
+      - name: optimizer.{ssr|client}.enabled
         type: boolean
         default: 'false'
         desc: bundle listed external packages with esbuild so many imports load once; `client` is used for jsdom/happy-dom
-      - name: 'client.transformAssets / transformCss'
+      - name: client.transformAssets / transformCss
         type: boolean
         default: 'true'
         desc: process assets and CSS in external files; only works with `vmThreads` and `vmForks`
-      - name: 'client.transformGlobPattern'
+      - name: client.transformGlobPattern
         type: RegExp | RegExp[]
         default: '[]'
         desc: external files that should be transformed; vm pools only
-      - name: 'interopDefault'
+      - name: interopDefault
         type: boolean
         default: 'true'
         desc: treat a CJS default export as named exports
-      - name: 'moduleDirectories'
+      - name: moduleDirectories
         type: string[]
         default: '[''node_modules'']'
         desc: also decides where `__mocks__` is searched for factory-less vi.mock; setting it replaces the default
       ref: /config/deps.md
     - id: vt-cfg-server
-      name: 'server.deps'
-      summary: 'last-resort control of which modules are externalized (native import) or inlined (Vite module runner)'
+      name: server.deps
+      summary: last-resort control of which modules are externalized (native import) or inlined (Vite module runner)
       lenses:
       - reliability
       signature: 'test.server.deps: { external, inline, fallbackCJS }'
       options:
-      - name: 'external'
+      - name: external
         type: (string | RegExp)[]
         default: files inside moduleDirectories
         desc: skip Vite transforms; not in the module graph, so no rerun on change
-      - name: 'inline'
+      - name: inline
         type: (string | RegExp)[] | true
         default: everything not externalized
         desc: transform with Vite's module runner; strings are prefixed with `/node_modules/`
-      - name: 'fallbackCJS'
+      - name: fallbackCJS
         type: boolean
         default: 'false'
         desc: guess a CJS build for an ESM entry by file-name patterns
@@ -892,13 +892,13 @@ groups:
       - Vitest should pick correctly by itself; use only to fix a broken dependency
       ref: /config/server.md
     - id: vt-cfg-runner
-      name: 'runner'
-      summary: 'path to a custom test runner class for library authors'
+      name: runner
+      summary: path to a custom test runner class for library authors
       lenses:
       - composability
       signature: 'test.runner: VitestRunnerConstructor'
       params:
-      - name: 'runner'
+      - name: runner
         type: VitestRunnerConstructor
         default: null
         desc: see the Runner API page
@@ -906,21 +906,21 @@ groups:
       - advanced; most suites never need it
       ref: /config/runner.md
     - id: vt-cfg-css
-      name: 'css'
-      summary: 'controls whether CSS is processed; excluded files become empty strings and CSS Modules a proxy'
+      name: css
+      summary: controls whether CSS is processed; excluded files become empty strings and CSS Modules a proxy
       lenses:
       - perf
       signature: 'test.css: boolean | { include?, exclude?, modules? }'
       options:
-      - name: 'include'
+      - name: include
         type: RegExp | RegExp[]
         default: '[]'
         desc: files that return real CSS processed by Vite; `/.+/` for all
-      - name: 'exclude'
+      - name: exclude
         type: RegExp | RegExp[]
         default: '[]'
         desc: files that return empty CSS
-      - name: 'modules.classNameStrategy'
+      - name: modules.classNameStrategy
         type: '''stable'' | ''scoped'' | ''non-scoped'''
         default: '''stable'''
         desc: how class names in processed CSS Modules are generated
@@ -928,25 +928,25 @@ groups:
       - not applied to browser tests
       ref: /config/css.md
     - id: vt-cfg-execargv
-      name: 'execArgv'
-      summary: 'extra Node arguments for the runner worker; some (`--prof`, `--title`) crash workers'
+      name: execArgv
+      summary: extra Node arguments for the runner worker; some (`--prof`, `--title`) crash workers
       lenses:
       - reliability
       signature: 'test.execArgv: string[]'
       params:
-      - name: 'execArgv'
+      - name: execArgv
         type: string[]
         default: '[]'
         desc: passed to node in each worker
       ref: /config/execargv.md
     - id: vt-cfg-shared-vite-server
-      name: 'sharedViteServer'
-      summary: 'inline projects without Vite-level overrides share one Vite server and transform cache'
+      name: sharedViteServer
+      summary: inline projects without Vite-level overrides share one Vite server and transform cache
       lenses:
       - perf
       signature: 'test.sharedViteServer: boolean'
       params:
-      - name: 'sharedViteServer'
+      - name: sharedViteServer
         type: boolean
         default: 'true'
         desc: CLI `--sharedViteServer=false`
@@ -955,26 +955,26 @@ groups:
       - env, setupFiles, server.deps and environment do not prevent sharing
       ref: /config/sharedviteserver.md
     - id: vt-cfg-projects
-      name: 'projects (config page)'
-      summary: 'config-file reference for `test.projects`; the declaring config runs no tests itself'
+      name: projects (config page)
+      summary: config-file reference for `test.projects`; the declaring config runs no tests itself
       lenses:
       - composability
       signature: 'test.projects: TestProjectConfiguration[]'
       params:
-      - name: 'projects'
+      - name: projects
         type: TestProjectConfiguration[]
         default: '[]'
         desc: not supported inside an inline project; a referenced config with `projects` becomes a container for nested projects
       ref: /config/projects.md
     - id: vt-cfg-name
-      name: 'name'
-      summary: 'unique project or process name, optionally with a CLI/UI color'
+      name: name
+      summary: unique project or process name, optionally with a CLI/UI color
       lenses:
       - observability
       - composability
       signature: 'test.name: string | { label: string, color?: string }'
       params:
-      - name: 'name'
+      - name: name
         type: string | { label, color }
         default: null
         desc: 'colors: black, red, green, yellow, blue, magenta, cyan, white'
@@ -984,21 +984,21 @@ groups:
       - browser instances show as `<project> (<browser>)`
       ref: /config/name.md
   - id: vt-cfg-workers
-    title: 'Workers, pools and concurrency'
+    title: Workers, pools and concurrency
     level: intermediate
     requires:
     - vt-config-env
     ref: /config/pool.md
     entries:
     - id: vt-cfg-pool
-      name: 'pool'
+      name: pool
       summary: 'worker kind: forks (default), threads, vmThreads, vmForks'
       lenses:
       - perf
       - reliability
       signature: 'test.pool: ''threads'' | ''forks'' | ''vmThreads'' | ''vmForks'''
       params:
-      - name: 'pool'
+      - name: pool
         type: '''threads'' | ''forks'' | ''vmThreads'' | ''vmForks'''
         default: '''forks'''
         desc: CLI `--pool=threads`
@@ -1008,25 +1008,25 @@ groups:
       - vm pools run in a VM context and leak memory
       ref: /config/pool.md
     - id: vt-cfg-isolate
-      name: 'isolate'
-      summary: 'each test file in a fresh environment; no effect on vm pools; disable only for side-effect-free suites'
+      name: isolate
+      summary: each test file in a fresh environment; no effect on vm pools; disable only for side-effect-free suites
       lenses:
       - perf
       signature: 'test.isolate: boolean'
       params:
-      - name: 'isolate'
+      - name: isolate
         type: boolean
         default: 'true'
         desc: CLI `--no-isolate`, `--isolate=false`; scope per project
       ref: /config/isolate.md
     - id: vt-cfg-max-workers
-      name: 'maxWorkers'
-      summary: 'worker cap as a number or percent of available parallelism; halves in watch mode'
+      name: maxWorkers
+      summary: worker cap as a number or percent of available parallelism; halves in watch mode
       lenses:
       - perf
       signature: 'test.maxWorkers: number | string'
       params:
-      - name: 'maxWorkers'
+      - name: maxWorkers
         type: number | string
         default: all parallelism (half in watch mode)
         desc: CLI `--maxWorkers=4` or `--maxWorkers=50%`
@@ -1034,37 +1034,37 @@ groups:
       - uses `os.availableParallelism`
       ref: /config/maxworkers.md
     - id: vt-cfg-file-parallelism
-      name: 'fileParallelism'
-      summary: 'set false to run test files one at a time (forces maxWorkers 1); tests inside a file are unaffected'
+      name: fileParallelism
+      summary: set false to run test files one at a time (forces maxWorkers 1); tests inside a file are unaffected
       lenses:
       - reliability
       signature: 'test.fileParallelism: boolean'
       params:
-      - name: 'fileParallelism'
+      - name: fileParallelism
         type: boolean
         default: 'true'
         desc: CLI `--no-file-parallelism`
       ref: /config/fileparallelism.md
     - id: vt-cfg-max-concurrency
-      name: 'maxConcurrency'
-      summary: 'cap on simultaneous `test.concurrent` tests and hooks'
+      name: maxConcurrency
+      summary: cap on simultaneous `test.concurrent` tests and hooks
       lenses:
       - perf
       signature: 'test.maxConcurrency: number'
       params:
-      - name: 'maxConcurrency'
+      - name: maxConcurrency
         type: number
         default: '5'
         desc: 'CLI `--max-concurrency=10`; also bounds `sequence.hooks: ''parallel''`'
       ref: /config/maxconcurrency.md
     - id: vt-cfg-vm-memory-limit
-      name: 'vmMemoryLimit'
-      summary: 'memory limit before a vm-pool worker is recycled; system memory is split by default'
+      name: vmMemoryLimit
+      summary: memory limit before a vm-pool worker is recycled; system memory is split by default
       lenses:
       - perf
       signature: 'test.vmMemoryLimit: string | number'
       params:
-      - name: 'vmMemoryLimit'
+      - name: vmMemoryLimit
         type: string | number
         default: 1 / maxWorkers
         desc: only affects `vmForks` and `vmThreads`; set it explicitly for your host
@@ -1072,77 +1072,77 @@ groups:
 - title: 'Config: test behaviour, output and coverage'
   sections:
   - id: vt-cfg-behaviour
-    title: 'Timeouts, retries, mocks and assertions'
+    title: Timeouts, retries, mocks and assertions
     level: intermediate
     requires:
     - vt-config-env
     ref: /config/testtimeout.md
     entries:
     - id: vt-cfg-test-timeout
-      name: 'testTimeout'
-      summary: 'per-test timeout, 5s in Node and 15s with browser mode; 0 disables'
+      name: testTimeout
+      summary: per-test timeout, 5s in Node and 15s with browser mode; 0 disables
       lenses:
       - reliability
       signature: 'test.testTimeout: number'
       params:
-      - name: 'testTimeout'
+      - name: testTimeout
         type: number
         default: 5_000 (15_000 in browser mode)
         desc: CLI `--test-timeout=5000`
       ref: /config/testtimeout.md
     - id: vt-cfg-hook-timeout
-      name: 'hookTimeout'
-      summary: 'per-hook timeout, 10s in Node and 30s with browser mode; 0 disables'
+      name: hookTimeout
+      summary: per-hook timeout, 10s in Node and 30s with browser mode; 0 disables
       lenses:
       - reliability
       signature: 'test.hookTimeout: number'
       params:
-      - name: 'hookTimeout'
+      - name: hookTimeout
         type: number
         default: 10_000 (30_000 in browser mode)
         desc: CLI `--hook-timeout=10000`
       ref: /config/hooktimeout.md
     - id: vt-cfg-teardown-timeout
-      name: 'teardownTimeout'
-      summary: 'ms Vitest waits for close on shutdown'
+      name: teardownTimeout
+      summary: ms Vitest waits for close on shutdown
       lenses:
       - reliability
       signature: 'test.teardownTimeout: number'
       params:
-      - name: 'teardownTimeout'
+      - name: teardownTimeout
         type: number
         default: '10000'
         desc: CLI `--teardown-timeout=5000`
       ref: /config/teardowntimeout.md
     - id: vt-cfg-bail
-      name: 'bail'
-      summary: 'stop the run after N failed tests; speeds up failing CI builds'
+      name: bail
+      summary: stop the run after N failed tests; speeds up failing CI builds
       lenses:
       - cost
       - perf
       signature: 'test.bail: number'
       params:
-      - name: 'bail'
+      - name: bail
         type: number
         default: '0'
         desc: CLI `--bail=<value>`
       ref: /config/bail.md
     - id: vt-cfg-retry
-      name: 'retry'
-      summary: 'reruns failed tests; the object form adds delay and an error-matching condition'
+      name: retry
+      summary: reruns failed tests; the object form adds delay and an error-matching condition
       lenses:
       - reliability
       signature: 'test.retry: number | { count?, delay?, condition? }'
       options:
-      - name: 'count'
+      - name: count
         type: number
         default: '0'
         desc: attempts after the first failure; CLI `--retry.count`
-      - name: 'delay'
+      - name: delay
         type: number
         default: '0'
         desc: ms between attempts, for rate-limited APIs; CLI `--retry.delay`
-      - name: 'condition'
+      - name: condition
         type: RegExp | (error) => boolean
         default: null
         desc: retry only errors that match; CLI `--retry.condition 'ECONNREFUSED|timeout'`
@@ -1151,124 +1151,124 @@ groups:
       - the object form is 4.1.0; a bare number works earlier
       ref: /config/retry.md
     - id: vt-cfg-repeats
-      name: 'repeats'
-      summary: 'repeat every test N times regardless of result; any failing repetition fails the test'
+      name: repeats
+      summary: repeat every test N times regardless of result; any failing repetition fails the test
       lenses:
       - reliability
       - testing
       signature: 'test.repeats: number'
       params:
-      - name: 'repeats'
+      - name: repeats
         type: number
         default: '0'
         desc: CLI `--repeats=<n>`; a per-test `repeats` option wins
       ref: /config/repeats.md
     - id: vt-cfg-fake-timers
-      name: 'fakeTimers'
-      summary: 'defaults passed to `@sinonjs/fake-timers` for `vi.useFakeTimers()`'
+      name: fakeTimers
+      summary: defaults passed to `@sinonjs/fake-timers` for `vi.useFakeTimers()`
       lenses:
       - testing
       - reliability
       signature: 'test.fakeTimers: FakeTimerConfig'
       options:
-      - name: 'now'
+      - name: now
         type: number | Date
         default: Date.now()
         desc: starting epoch
-      - name: 'toFake'
+      - name: toFake
         type: string[]
         default: all globals except nextTick and queueMicrotask
         desc: APIs to fake; Temporal only when present globally
-      - name: 'toNotFake'
+      - name: toNotFake
         type: string[]
         default: '[]'
         desc: APIs to leave real; nextTick and queueMicrotask always excluded; not combinable with toFake
-      - name: 'loopLimit'
+      - name: loopLimit
         type: number
         default: '10_000'
         desc: max timers run by `vi.runAllTimers()`
-      - name: 'shouldAdvanceTime'
+      - name: shouldAdvanceTime
         type: boolean
         default: 'false'
         desc: advance fake time with the real clock
-      - name: 'advanceTimeDelta'
+      - name: advanceTimeDelta
         type: number
         default: '20'
         desc: step in ms when shouldAdvanceTime is on
-      - name: 'shouldClearNativeTimers'
+      - name: shouldClearNativeTimers
         type: boolean
         default: 'true'
         desc: clear native timers created before faking
       ref: /config/faketimers.md
     - id: vt-cfg-clear-mocks
-      name: 'clearMocks'
-      summary: 'calls `vi.clearAllMocks()` before each test (history only); on by default'
+      name: clearMocks
+      summary: calls `vi.clearAllMocks()` before each test (history only); on by default
       lenses:
       - testing
       - reliability
       signature: 'test.clearMocks: boolean'
       params:
-      - name: 'clearMocks'
+      - name: clearMocks
         type: boolean
         default: 'true'
         desc: 'unsafe with concurrent tests: one finishing clears mocks in use elsewhere'
       ref: /config/clearmocks.md
     - id: vt-cfg-mock-reset
-      name: 'mockReset'
+      name: mockReset
       summary: 'calls `vi.resetAllMocks()` before each test: clears history and resets implementations'
       lenses:
       - testing
       - reliability
       signature: 'test.mockReset: boolean'
       params:
-      - name: 'mockReset'
+      - name: mockReset
         type: boolean
         default: 'false'
         desc: unsafe with concurrent tests
       ref: /config/mockreset.md
     - id: vt-cfg-unstub-envs
-      name: 'unstubEnvs'
-      summary: 'calls `vi.unstubAllEnvs()` before each test'
+      name: unstubEnvs
+      summary: calls `vi.unstubAllEnvs()` before each test
       lenses:
       - testing
       - reliability
       signature: 'test.unstubEnvs: boolean'
       params:
-      - name: 'unstubEnvs'
+      - name: unstubEnvs
         type: boolean
         default: 'false'
         desc: restores values changed by `vi.stubEnv`; unsafe with concurrent tests
       ref: /config/unstubenvs.md
     - id: vt-cfg-unstub-globals
-      name: 'unstubGlobals'
-      summary: 'calls `vi.unstubAllGlobals()` before each test'
+      name: unstubGlobals
+      summary: calls `vi.unstubAllGlobals()` before each test
       lenses:
       - testing
       - reliability
       signature: 'test.unstubGlobals: boolean'
       params:
-      - name: 'unstubGlobals'
+      - name: unstubGlobals
         type: boolean
         default: 'false'
         desc: restores globals changed by `vi.stubGlobal`; unsafe with concurrent tests
       ref: /config/unstubglobals.md
     - id: vt-cfg-expect
-      name: 'expect options'
+      name: expect options
       summary: '`expect.requireAssertions` fails assertion-free tests; `expect.poll` sets global poll timing'
       lenses:
       - testing
       - reliability
       signature: 'test.expect: { requireAssertions?, poll? }'
       options:
-      - name: 'requireAssertions'
+      - name: requireAssertions
         type: boolean
         default: 'false'
         desc: like `expect.hasAssertions()` at the start of every test; only counts Vitest `expect`, not `assert` or `.should`
-      - name: 'poll.interval'
+      - name: poll.interval
         type: number
         default: '50'
         desc: ms between `expect.poll` attempts
-      - name: 'poll.timeout'
+      - name: poll.timeout
         type: number
         default: '1000'
         desc: ms before `expect.poll` rejects
@@ -1277,33 +1277,33 @@ groups:
       - '`vi.setConfig({ expect: {...} })` changes it until `vi.resetConfig`'
       ref: /config/expect.md
     - id: vt-cfg-chai-config
-      name: 'chaiConfig'
+      name: chaiConfig
       summary: 'tunes the Chai AssertionError shape: stack in message, diff flag, value truncation'
       lenses:
       - observability
       signature: 'test.chaiConfig: { includeStack?, showDiff?, truncateThreshold? }'
       options:
-      - name: 'includeStack'
+      - name: includeStack
         type: boolean
         default: 'false'
         desc: include a stack trace in the assertion message
-      - name: 'showDiff'
+      - name: showDiff
         type: boolean
         default: 'true'
         desc: set the `showDiff` flag on AssertionErrors
-      - name: 'truncateThreshold'
+      - name: truncateThreshold
         type: number
         default: '40'
         desc: length above which actual and expected values are shortened
       ref: /config/chaiconfig.md
     - id: vt-cfg-tags
-      name: 'tags (config)'
-      summary: 'declares the available test tags with optional description, timeout, retry and priority'
+      name: tags (config)
+      summary: declares the available test tags with optional description, timeout, retry and priority
       lenses:
       - composability
       signature: 'test.tags: TestTagDefinition[]'
       params:
-      - name: 'tags'
+      - name: tags
         type: TestTagDefinition[]
         default: '[]'
         desc: '`name` required; projects inherit the global definitions'
@@ -1313,86 +1313,86 @@ groups:
       - augment `TestTags` with a union of names for type safety
       ref: /config/tags.md
     - id: vt-cfg-strict-tags
-      name: 'strictTags'
-      summary: 'throw when a test uses a tag not defined in config, catching typos that would silently skip or mis-configure tests'
+      name: strictTags
+      summary: throw when a test uses a tag not defined in config, catching typos that would silently skip or mis-configure tests
       lenses:
       - reliability
       signature: 'test.strictTags: boolean'
       params:
-      - name: 'strictTags'
+      - name: strictTags
         type: boolean
         default: 'true'
         desc: CLI `--strict-tags`, `--no-strict-tags`; an undefined tag in `--tags-filter` always throws
       since: 4.1.0
       ref: /config/stricttags.md
     - id: vt-cfg-typecheck
-      name: 'typecheck'
-      summary: 'runs `tsc` over `*.test-d.ts` files alongside tests and reports type errors as failures'
+      name: typecheck
+      summary: runs `tsc` over `*.test-d.ts` files alongside tests and reports type errors as failures
       lenses:
       - typing-dx
       - testing
       signature: 'test.typecheck: { enabled, only, checker, include, exclude, ... }'
       options:
-      - name: 'enabled'
+      - name: enabled
         type: boolean
         default: 'false'
         desc: CLI `--typecheck`
-      - name: 'only'
+      - name: only
         type: boolean
         default: 'false'
         desc: run only typecheck tests; the CLI flag also enables typecheck
-      - name: 'checker'
+      - name: checker
         type: '''tsc'' | ''vue-tsc'' | string'
         default: '''tsc'''
         desc: tool that prints `tsc --noEmit --pretty false` output
-      - name: 'include'
+      - name: include
         type: string[]
         default: '[''**/*.{test,spec}-d.?(c|m)[jt]s?(x)'']'
         desc: files treated as type tests
-      - name: 'allowJs'
+      - name: allowJs
         type: boolean
         default: 'false'
         desc: check JS files with `@ts-check`
-      - name: 'ignoreSourceErrors'
+      - name: ignoreSourceErrors
         type: boolean
         default: 'false'
         desc: do not fail on type errors outside test files (and hides them)
-      - name: 'tsconfig'
+      - name: tsconfig
         type: string
         default: closest tsconfig.json
         desc: custom tsconfig relative to root
-      - name: 'spawnTimeout'
+      - name: spawnTimeout
         type: number
         default: '10_000'
         desc: ms to wait for the checker process
       ref: /config/typecheck.md
     - id: vt-cfg-detect-async-leaks
-      name: 'detectAsyncLeaks'
-      summary: 'uses `async_hooks` to report timers and other async resources left alive after a test file'
+      name: detectAsyncLeaks
+      summary: uses `async_hooks` to report timers and other async resources left alive after a test file
       lenses:
       - reliability
       signature: 'test.detectAsyncLeaks: boolean'
       params:
-      - name: 'detectAsyncLeaks'
+      - name: detectAsyncLeaks
         type: boolean
         default: 'false'
         desc: CLI `--detectAsyncLeaks`; much slower, enable only to debug
       ref: /config/detectasyncleaks.md
   - id: vt-cfg-output
-    title: 'Reporting, console and snapshots'
+    title: Reporting, console and snapshots
     level: intermediate
     requires:
     - vt-config-env
     ref: /config/reporters.md
     entries:
     - id: vt-cfg-reporters
-      name: 'reporters (config)'
-      summary: 'one or more reporters, built-in names, a module path or `[name, options]` tuples'
+      name: reporters (config)
+      summary: one or more reporters, built-in names, a module path or `[name, options]` tuples
       lenses:
       - observability
       signature: 'test.reporters: string | Reporter | [string, object][]'
       params:
-      - name: 'reporters'
+      - name: reporters
         type: string | Reporter | Array
         default: '[''default'']'
         desc: CLI `--reporter=verbose --reporter=github-actions`
@@ -1402,81 +1402,81 @@ groups:
       - spread `configDefaults.reporters` to keep environment-specific defaults
       ref: /config/reporters.md
     - id: vt-cfg-output-file
-      name: 'outputFile'
-      summary: 'file for `json` or `junit` reporter output; an object assigns one file per reporter'
+      name: outputFile
+      summary: file for `json` or `junit` reporter output; an object assigns one file per reporter
       lenses:
       - observability
       signature: 'test.outputFile: string | Record<string, string>'
       params:
-      - name: 'outputFile'
+      - name: outputFile
         type: string | Record<string, string>
         default: null
         desc: CLI `--outputFile=<path>`, `--outputFile.json=./path`
       ref: /config/outputfile.md
     - id: vt-cfg-silent
-      name: 'silent'
-      summary: 'mute test console output; `''passed-only''` keeps logs of failing tests'
+      name: silent
+      summary: mute test console output; `'passed-only'` keeps logs of failing tests
       lenses:
       - observability
       - cost
       signature: 'test.silent: boolean | ''passed-only'''
       params:
-      - name: 'silent'
+      - name: silent
         type: boolean | 'passed-only'
         default: 'false'
         desc: CLI `--silent`; failing-test logs print after the test finishes
       ref: /config/silent.md
     - id: vt-cfg-disable-console-intercept
-      name: 'disableConsoleIntercept'
-      summary: 'stop Vitest wrapping `console` with file and test context; needed for plain synchronous logging'
+      name: disableConsoleIntercept
+      summary: stop Vitest wrapping `console` with file and test context; needed for plain synchronous logging
       lenses:
       - observability
       signature: 'test.disableConsoleIntercept: boolean'
       params:
-      - name: 'disableConsoleIntercept'
+      - name: disableConsoleIntercept
         type: boolean
         default: 'false'
         desc: required for browser log forwarding and UI console previews
       ref: /config/disableconsoleintercept.md
     - id: vt-cfg-on-console-log
-      name: 'onConsoleLog'
-      summary: 'handler for test `console` calls; return false to drop a log, e.g. noisy third-party output'
+      name: onConsoleLog
+      summary: handler for test `console` calls; return false to drop a log, e.g. noisy third-party output
       lenses:
       - observability
       signature: 'test.onConsoleLog: (log, type) => boolean | void'
       params:
-      - name: 'onConsoleLog'
+      - name: onConsoleLog
         type: '(log: string, type: ''stdout'' | ''stderr'') => boolean | void'
         default: null
         desc: other falsy returns do not suppress
       ref: /config/onconsolelog.md
     - id: vt-cfg-print-console-trace
-      name: 'printConsoleTrace'
-      summary: 'always print a call-site trace for every console method'
+      name: printConsoleTrace
+      summary: always print a call-site trace for every console method
       lenses:
       - observability
       signature: 'test.printConsoleTrace: boolean'
       params:
-      - name: 'printConsoleTrace'
+      - name: printConsoleTrace
         type: boolean
         default: 'false'
         desc: debugging aid
       ref: /config/printconsoletrace.md
     - id: vt-cfg-on-stack-trace
-      name: 'onStackTrace'
-      summary: 'filter each parsed stack frame of reported errors, e.g. hide third-party frames'
+      name: onStackTrace
+      summary: filter each parsed stack frame of reported errors, e.g. hide third-party frames
       lenses:
       - observability
       signature: 'test.onStackTrace: (error, frame) => boolean | void'
       params:
-      - name: 'onStackTrace'
+      - name: onStackTrace
         type: (error, frame) => boolean | void
         default: null
         desc: raise `Error.stackTraceLimit` in setup to avoid truncated stacks
       ref: /config/onstacktrace.md
     - id: vt-cfg-on-unhandled-error
-      name: 'onUnhandledError'
-      summary: 'callback that filters unhandled errors out of the run result; runs on the main thread'
+      name: onUnhandledError
+      summary: callback that filters unhandled errors out of the run result; runs on the main thread
       lenses:
       - reliability
       signature: 'test.onUnhandledError: (error) => boolean | void'
@@ -1486,33 +1486,33 @@ groups:
       - use `dangerouslyIgnoreUnhandledErrors` to report without failing
       ref: /config/onunhandlederror.md
     - id: vt-cfg-ignore-unhandled-errors
-      name: 'dangerouslyIgnoreUnhandledErrors'
-      summary: 'do not fail the run for unhandled errors; reporters still print them'
+      name: dangerouslyIgnoreUnhandledErrors
+      summary: do not fail the run for unhandled errors; reporters still print them
       lenses:
       - reliability
       signature: 'test.dangerouslyIgnoreUnhandledErrors: boolean'
       params:
-      - name: 'dangerouslyIgnoreUnhandledErrors'
+      - name: dangerouslyIgnoreUnhandledErrors
         type: boolean
         default: 'false'
         desc: prefer `onUnhandledError` for selective filtering
       ref: /config/dangerouslyignoreunhandlederrors.md
     - id: vt-cfg-diff
-      name: 'diff'
-      summary: 'customizes failure diffs through a `DiffOptions` object or module path'
+      name: diff
+      summary: customizes failure diffs through a `DiffOptions` object or module path
       lenses:
       - observability
       signature: 'test.diff: DiffOptions | string'
       options:
-      - name: 'expand'
+      - name: expand
         type: boolean
         default: 'false'
         desc: expand all common lines; CLI `--diff.expand`
-      - name: 'truncateThreshold'
+      - name: truncateThreshold
         type: number
         default: '0'
         desc: max diff length before truncation; 0 disables
-      - name: 'truncateAnnotation'
+      - name: truncateAnnotation
         type: string
         default: '''... Diff result is truncated'''
         desc: text appended when truncated
@@ -1520,93 +1520,93 @@ groups:
       - rendering uses `@vitest/pretty-format`
       ref: /config/diff.md
     - id: vt-cfg-expand-snapshot-diff
-      name: 'expandSnapshotDiff'
-      summary: 'show the full snapshot diff instead of a patch hunk'
+      name: expandSnapshotDiff
+      summary: show the full snapshot diff instead of a patch hunk
       lenses:
       - observability
       signature: 'test.expandSnapshotDiff: boolean'
       params:
-      - name: 'expandSnapshotDiff'
+      - name: expandSnapshotDiff
         type: boolean
         default: 'false'
         desc: CLI `--expandSnapshotDiff`
       ref: /config/expandsnapshotdiff.md
     - id: vt-cfg-hide-skipped-tests
-      name: 'hideSkippedTests'
-      summary: 'hide log lines for skipped tests'
+      name: hideSkippedTests
+      summary: hide log lines for skipped tests
       lenses:
       - observability
       signature: 'test.hideSkippedTests: boolean'
       params:
-      - name: 'hideSkippedTests'
+      - name: hideSkippedTests
         type: boolean
         default: 'false'
         desc: CLI `--hideSkippedTests`
       ref: /config/hideskippedtests.md
     - id: vt-cfg-log-heap-usage
-      name: 'logHeapUsage'
-      summary: 'print heap usage after each test to find memory leaks'
+      name: logHeapUsage
+      summary: print heap usage after each test to find memory leaks
       lenses:
       - observability
       signature: 'test.logHeapUsage: boolean'
       params:
-      - name: 'logHeapUsage'
+      - name: logHeapUsage
         type: boolean
         default: 'false'
         desc: CLI `--logHeapUsage`
       ref: /config/logheapusage.md
     - id: vt-cfg-slow-test-threshold
-      name: 'slowTestThreshold'
-      summary: 'ms after which a test or suite is reported as slow'
+      name: slowTestThreshold
+      summary: ms after which a test or suite is reported as slow
       lenses:
       - perf
       - observability
       signature: 'test.slowTestThreshold: number'
       params:
-      - name: 'slowTestThreshold'
+      - name: slowTestThreshold
         type: number
         default: '300'
         desc: CLI `--slow-test-threshold=<n>`
       ref: /config/slowtestthreshold.md
     - id: vt-cfg-title-truncate
-      name: 'taskTitleValueFormatTruncate'
-      summary: 'length cap for values interpolated into `test.each`/`test.for` titles'
+      name: taskTitleValueFormatTruncate
+      summary: length cap for values interpolated into `test.each`/`test.for` titles
       lenses:
       - observability
       signature: 'test.taskTitleValueFormatTruncate: number'
       params:
-      - name: 'taskTitleValueFormatTruncate'
+      - name: taskTitleValueFormatTruncate
         type: number
         default: '40'
         desc: 0 disables truncation
       ref: /config/tasktitlevalueformattruncate.md
     - id: vt-cfg-include-task-location
-      name: 'includeTaskLocation'
-      summary: 'adds line and column `location` to tasks sent to reporters; auto-on for UI, HTML reporter, headed browser'
+      name: includeTaskLocation
+      summary: adds line and column `location` to tasks sent to reporters; auto-on for UI, HTML reporter, headed browser
       lenses:
       - observability
       signature: 'test.includeTaskLocation: boolean'
       params:
-      - name: 'includeTaskLocation'
+      - name: includeTaskLocation
         type: boolean
         default: 'false'
         desc: small performance cost with many tests
       ref: /config/includetasklocation.md
     - id: vt-cfg-attachments-dir
-      name: 'attachmentsDir'
-      summary: 'where `context.annotate` attachments are stored; shared by all projects'
+      name: attachmentsDir
+      summary: where `context.annotate` attachments are stored; shared by all projects
       lenses:
       - observability
       signature: 'test.attachmentsDir: string'
       params:
-      - name: 'attachmentsDir'
+      - name: attachmentsDir
         type: string
         default: '''.vitest/attachments'''
         desc: relative to the root config
       ref: /config/attachmentsdir.md
     - id: vt-cfg-snapshot-format
-      name: 'snapshotFormat'
-      summary: 'pretty-format options for snapshots on top of Vitest defaults (no prototype, unescaped strings)'
+      name: snapshotFormat
+      summary: pretty-format options for snapshots on top of Vitest defaults (no prototype, unescaped strings)
       lenses:
       - testing
       signature: 'test.snapshotFormat: PrettyFormatOptions'
@@ -1616,57 +1616,57 @@ groups:
       - '`plugins` and `compareKeys` are not accepted'
       ref: /config/snapshotformat.md
     - id: vt-cfg-snapshot-serializers
-      name: 'snapshotSerializers'
-      summary: 'module paths of custom snapshot serializers'
+      name: snapshotSerializers
+      summary: module paths of custom snapshot serializers
       lenses:
       - testing
       - reuse
       signature: 'test.snapshotSerializers: string[]'
       params:
-      - name: 'snapshotSerializers'
+      - name: snapshotSerializers
         type: string[]
         default: '[]'
         desc: see the custom serializer docs
       ref: /config/snapshotserializers.md
     - id: vt-cfg-resolve-snapshot-path
-      name: 'resolveSnapshotPath'
-      summary: 'where snapshot files live; the context exposes the project config for per-project paths'
+      name: resolveSnapshotPath
+      summary: where snapshot files live; the context exposes the project config for per-project paths
       lenses:
       - testing
       signature: 'test.resolveSnapshotPath: (testPath, snapExtension, { config }) => string'
       params:
-      - name: 'resolveSnapshotPath'
+      - name: resolveSnapshotPath
         type: (testPath, snapExtension, context) => string
         default: __snapshots__ directory
         desc: e.g. store next to the test file
       ref: /config/resolvesnapshotpath.md
     - id: vt-cfg-snapshot-environment
-      name: 'snapshotEnvironment'
-      summary: 'custom snapshot file IO for runtimes without Node APIs; extends `VitestSnapshotEnvironment`'
+      name: snapshotEnvironment
+      summary: custom snapshot file IO for runtimes without Node APIs; extends `VitestSnapshotEnvironment`
       lenses:
       - testing
       signature: 'test.snapshotEnvironment: string'
       params:
-      - name: 'snapshotEnvironment'
+      - name: snapshotEnvironment
         type: string
         default: null
         desc: low-level; ignored by the browser runner
       ref: /config/snapshotenvironment.md
   - id: vt-cfg-ui-api
-    title: 'UI, API server and experimental options'
+    title: UI, API server and experimental options
     level: advanced
     requires:
     - vt-config-env
     ref: /config/ui.md
     entries:
     - id: vt-cfg-ui
-      name: 'ui'
-      summary: 'serves the Vitest UI (needs `@vitest/ui`, installed on first use)'
+      name: ui
+      summary: serves the Vitest UI (needs `@vitest/ui`, installed on first use)
       lenses:
       - observability
       signature: 'test.ui: boolean'
       params:
-      - name: 'ui'
+      - name: ui
         type: boolean
         default: 'false'
         desc: CLI `--ui`
@@ -1674,34 +1674,34 @@ groups:
       - 'do not expose the UI server to the network: a non-localhost `api.host` makes the UI read-only since 4.1'
       ref: /config/ui.md
     - id: vt-cfg-open
-      name: 'open'
-      summary: 'opens the Vitest UI automatically when `ui` is enabled; off in CI'
+      name: open
+      summary: opens the Vitest UI automatically when `ui` is enabled; off in CI
       lenses:
       - observability
       signature: 'test.open: boolean'
       params:
-      - name: 'open'
+      - name: open
         type: boolean
         default: '!process.env.CI'
         desc: CLI `--open`, `--open=false`
       ref: /config/open.md
     - id: vt-cfg-api
-      name: 'api'
-      summary: 'port and host of the server that backs the UI and browser server; write access is gated'
+      name: api
+      summary: port and host of the server that backs the UI and browser server; write access is gated
       lenses:
       - security
       - observability
       signature: 'test.api: boolean | number | { port, host, strictPort, allowWrite }'
       options:
-      - name: 'port'
+      - name: port
         type: number
         default: 51204 (63315 in browser mode)
         desc: CLI `--api.port`
-      - name: 'host'
+      - name: host
         type: string
         default: '''localhost'''
         desc: CLI `--api.host`
-      - name: 'allowWrite'
+      - name: allowWrite
         type: boolean
         default: true unless exposed to the network
         desc: lets API clients save test or snapshot files, which means arbitrary code execution
@@ -1711,14 +1711,14 @@ groups:
       - browser mode saves attachments, artifacts and snapshots through the same socket
       ref: /config/api.md
     - id: vt-cfg-experimental-diagnostics
-      name: 'experimental.diagnostics'
-      summary: 'post-run hints when isolation, environment setup, imports or transforms dominate time'
+      name: experimental.diagnostics
+      summary: post-run hints when isolation, environment setup, imports or transforms dominate time
       lenses:
       - perf
       - observability
       signature: 'test.experimental.diagnostics: boolean | { isolate, environment, import, transform }'
       params:
-      - name: 'diagnostics'
+      - name: diagnostics
         type: boolean | DiagnosticsOptions
         default: 'true'
         desc: each key defaults to true; hints are also printed in CI
@@ -1728,40 +1728,40 @@ groups:
       - measure suggestions with `vitest doctor`
       ref: /config/experimental.md#experimental-diagnostics
     - id: vt-cfg-experimental-import-durations
-      name: 'experimental.importDurations'
-      summary: 'prints or fails on slow module imports with warn and danger thresholds'
+      name: experimental.importDurations
+      summary: prints or fails on slow module imports with warn and danger thresholds
       lenses:
       - perf
       - observability
       signature: 'test.experimental.importDurations: { print, failOnDanger, limit, thresholds }'
       options:
-      - name: 'print'
+      - name: print
         type: boolean | 'on-warn'
         default: 'false'
         desc: when to print the import breakdown
-      - name: 'failOnDanger'
+      - name: failOnDanger
         type: boolean
         default: 'false'
         desc: fail when an import exceeds `thresholds.danger`
-      - name: 'limit'
+      - name: limit
         type: number
         default: '0'
         desc: max imports shown; 10 when print or UI is on
-      - name: 'thresholds'
+      - name: thresholds
         type: '{ warn, danger }'
         default: '{ warn: 100, danger: 500 }'
         desc: ms for yellow and red
       since: 4.1.0
       ref: /config/experimental.md#experimental-importdurations
     - id: vt-cfg-experimental-module-runner
-      name: 'experimental.viteModuleRunner'
-      summary: 'set false to run tests with Node''s native import instead of Vite''s module runner (forks/threads only)'
+      name: experimental.viteModuleRunner
+      summary: set false to run tests with Node's native import instead of Vite's module runner (forks/threads only)
       lenses:
       - perf
       - reliability
       signature: 'test.experimental.viteModuleRunner: boolean'
       params:
-      - name: 'viteModuleRunner'
+      - name: viteModuleRunner
         type: boolean
         default: 'true'
         desc: disabling skips all Vite transforms of tests, source, setup and custom runner files
@@ -1771,22 +1771,22 @@ groups:
       - '`experimental.nodeLoader` (default true) keeps `vi.mock`, `vi.hoisted` and `import.meta.vitest` working without the runner'
       ref: /config/experimental.md#experimental-vitemodulerunner
     - id: vt-cfg-experimental-misc
-      name: 'experimental.openTelemetry, vcsProvider, preParse'
-      summary: 'OpenTelemetry tracing, a custom changed-files provider, and static pre-parse of `.only`/`-t` filters'
+      name: experimental.openTelemetry, vcsProvider, preParse
+      summary: OpenTelemetry tracing, a custom changed-files provider, and static pre-parse of `.only`/`-t` filters
       lenses:
       - observability
       - perf
       signature: 'test.experimental: { openTelemetry, vcsProvider, preParse }'
       options:
-      - name: 'openTelemetry'
+      - name: openTelemetry
         type: '{ enabled, sdkPath }'
         default: '{ enabled: false }'
-        desc: imports your started SDK in the main thread and before each test file; costs perf, debug only (4.0.11)
-      - name: 'vcsProvider'
+        desc: imports your started SDK in the main thread and before each test file; costs performance, debug only (4.0.11)
+      - name: vcsProvider
         type: VCSProvider | string
         default: '''git'''
         desc: custom `findChangedFiles` for `--changed` (4.1.1)
-      - name: 'preParse'
+      - name: preParse
         type: boolean
         default: 'false'
         desc: AST-parse specs so `.only`, `-t`, tags and line filters apply across files without running them (4.1.3)
@@ -1794,24 +1794,24 @@ groups:
       - preParse needs statically analyzable test names and tags
       ref: /config/experimental.md#experimental-opentelemetry
   - id: vt-cfg-coverage
-    title: 'Coverage options'
+    title: Coverage options
     level: intermediate
     requires:
     - vt-config-env
     ref: /config/coverage.md
     entries:
     - id: vt-cfg-coverage-provider
-      name: 'coverage.provider and enabled'
-      summary: 'pick `v8` (default), `istanbul` or `custom`; `coverage.enabled` turns collection on'
+      name: coverage.provider and enabled
+      summary: pick `v8` (default), `istanbul` or `custom`; `coverage.enabled` turns collection on
       lenses:
       - testing
       signature: 'test.coverage: { provider, enabled }'
       options:
-      - name: 'provider'
+      - name: provider
         type: '''v8'' | ''istanbul'' | ''custom'''
         default: '''v8'''
         desc: CLI `--coverage.provider`
-      - name: 'enabled'
+      - name: enabled
         type: boolean
         default: 'false'
         desc: CLI `--coverage.enabled`; the bare `--coverage` flag also turns it on
@@ -1819,65 +1819,65 @@ groups:
       - with dot-notation CLI options pass `--coverage.enabled`, not a single `--coverage`
       ref: /config/coverage.md#coverage-provider
     - id: vt-cfg-coverage-files
-      name: 'coverage.include and exclude'
+      name: coverage.include and exclude
       summary: 'which files count: by default only files imported during the run; globs are relative to root'
       lenses:
       - testing
       signature: 'test.coverage: { include, exclude, allowExternal, excludeAfterRemap, changed }'
       options:
-      - name: 'include'
+      - name: include
         type: string[]
         default: files imported during the run
         desc: a pattern without wildcards is a directory; give extensions
-      - name: 'exclude'
+      - name: exclude
         type: string[]
         default: '[]'
         desc: same matching rules; also gains the test include patterns
-      - name: 'allowExternal'
+      - name: allowExternal
         type: boolean
         default: 'false'
         desc: collect files outside the project root
-      - name: 'excludeAfterRemap'
+      - name: excludeAfterRemap
         type: boolean
         default: 'false'
         desc: re-apply exclusions after sourcemap remapping, for transpiled sources
-      - name: 'changed'
+      - name: changed
         type: boolean | string
         default: false (inherits test.changed)
         desc: only files changed since a commit or branch
       ref: /config/coverage.md#coverage-include
     - id: vt-cfg-coverage-reporters
-      name: 'coverage.reporter and output'
-      summary: 'reporters (text, html, clover, json by default), output directory, cleaning and skip-full'
+      name: coverage.reporter and output
+      summary: reporters (text, html, clover, json by default), output directory, cleaning and skip-full
       lenses:
       - observability
       signature: 'test.coverage: { reporter, reportsDirectory, clean, cleanOnRerun, reportOnFailure, skipFull, htmlDir }'
       options:
-      - name: 'reporter'
+      - name: reporter
         type: string | string[] | [string, {}][]
         default: '[''text'', ''html'', ''clover'', ''json'']'
         desc: istanbul reporter names, tuples with options, or custom reporters
-      - name: 'reportsDirectory'
+      - name: reportsDirectory
         type: string
         default: '''./coverage'''
         desc: deleted before the run when `clean` is true
-      - name: 'clean'
+      - name: clean
         type: boolean
         default: 'true'
         desc: clear results before running
-      - name: 'cleanOnRerun'
+      - name: cleanOnRerun
         type: boolean
         default: 'true'
         desc: clear on watch reruns
-      - name: 'reportOnFailure'
+      - name: reportOnFailure
         type: boolean
         default: 'false'
         desc: write the report even when tests fail
-      - name: 'skipFull'
+      - name: skipFull
         type: boolean
         default: 'false'
         desc: hide files with 100% statements, branches and functions
-      - name: 'htmlDir'
+      - name: htmlDir
         type: string
         default: inferred from html, html-spa or lcov
         desc: directory the UI and HTML reporter serve; does not move the output
@@ -1885,22 +1885,22 @@ groups:
       - 'AI-agent runs automatically add `text-summary` and `skipFull: true` on `text`'
       ref: /config/coverage.md#coverage-reporter
     - id: vt-cfg-coverage-thresholds
-      name: 'coverage.thresholds'
-      summary: 'minimum percentages (or negative max-uncovered counts) that fail the run; per-glob and per-file variants'
+      name: coverage.thresholds
+      summary: minimum percentages (or negative max-uncovered counts) that fail the run; per-glob and per-file variants
       lenses:
       - testing
       - reliability
       signature: 'test.coverage.thresholds: { lines, functions, branches, statements, perFile, autoUpdate, 100, [glob] }'
       options:
-      - name: 'lines | functions | branches | statements'
+      - name: lines | functions | branches | statements
         type: number
         default: null
         desc: positive = minimum percent, negative = max uncovered items
-      - name: 'perFile'
+      - name: perFile
         type: boolean | { 100?, lines?, ... }
         default: 'false'
         desc: check every file against the thresholds; globs do not inherit it
-      - name: 'autoUpdate'
+      - name: autoUpdate
         type: boolean | function
         default: 'false'
         desc: rewrite config thresholds upward when coverage improves; a function formats new values
@@ -1914,56 +1914,56 @@ groups:
         desc: thresholds for matching files; those files still count toward the global total
       ref: /config/coverage.md#coverage-thresholds
     - id: vt-cfg-coverage-advanced
-      name: 'coverage tuning options'
-      summary: 'ignored class methods, watermarks, concurrency, custom instrumenter/provider, subprocess coverage'
+      name: coverage tuning options
+      summary: ignored class methods, watermarks, concurrency, custom instrumenter/provider, subprocess coverage
       lenses:
       - testing
       - perf
       signature: 'test.coverage: { ignoreClassMethods, watermarks, processingConcurrency, instrumenter, customProviderModule, autoAttachSubprocess }'
       options:
-      - name: 'ignoreClassMethods'
+      - name: ignoreClassMethods
         type: string[]
         default: '[]'
         desc: class methods to skip
-      - name: 'watermarks'
+      - name: watermarks
         type: object
         default: null
         desc: low/high percent bands per metric, e.g. statements `[50, 80]`
-      - name: 'processingConcurrency'
+      - name: processingConcurrency
         type: number
         default: min(20, availableParallelism)
         desc: limit while processing results
-      - name: 'instrumenter'
+      - name: instrumenter
         type: (options) => CoverageInstrumenter
         default: null
         desc: istanbul only; replaces `@vitest/istanbul-lib-instrument` (4.1.5)
-      - name: 'customProviderModule'
+      - name: customProviderModule
         type: string
         default: null
         desc: 'module for `provider: ''custom''`'
-      - name: 'autoAttachSubprocess'
+      - name: autoAttachSubprocess
         type: boolean
         default: 'false'
         desc: 'v8 only: track `child_process` and `worker_threads` via NODE_V8_COVERAGE; overhead (5.0.0)'
       ref: /config/coverage.md#coverage-ignoreclassmethods
-- title: 'Browser Mode (config, guides and API)'
+- title: Browser Mode (config, guides and API)
   sections:
   - id: vt-bm-config
-    title: 'Browser Mode configuration'
+    title: Browser Mode configuration
     level: intermediate
     requires:
     - vt-browser-mode
     ref: /config/browser/enabled.md
     entries:
     - id: vt-bm-enabled
-      name: 'browser.enabled'
-      summary: 'run every test file in a real browser; also needs a provider and at least one instance'
+      name: browser.enabled
+      summary: run every test file in a real browser; also needs a provider and at least one instance
       lenses:
       - testing
       - ux-a11y
       signature: 'test.browser: { enabled, provider, instances }'
       params:
-      - name: 'enabled'
+      - name: enabled
         type: boolean
         default: 'false'
         desc: CLI `--browser`, `--browser.enabled=false`; use `--browser.enabled` when passing other dotted browser options
@@ -1972,14 +1972,14 @@ groups:
       - with TypeScript, `instances[].browser` autocompletes from the provider
       ref: /config/browser/enabled.md
     - id: vt-bm-instances
-      name: 'browser.instances'
-      summary: 'one entry per browser setup; each becomes a project sharing a single Vite server'
+      name: browser.instances
+      summary: one entry per browser setup; each becomes a project sharing a single Vite server
       lenses:
       - composability
       - perf
       signature: 'test.browser.instances: BrowserConfig[]'
       params:
-      - name: 'instances'
+      - name: instances
         type: BrowserConfig[]
         default: '[]'
         desc: each needs `browser`; may set most project options plus headless, locators, viewport, testerHtmlPath, screenshotDirectory, screenshotFailures, provider
@@ -1989,13 +1989,13 @@ groups:
       - name shows as `<project> (<browser>)`
       ref: /config/browser/instances.md
     - id: vt-bm-provider
-      name: 'browser.provider'
-      summary: 'factory from `@vitest/browser-<name>`; options passed to the factory configure how the browser starts'
+      name: browser.provider
+      summary: factory from `@vitest/browser-<name>`; options passed to the factory configure how the browser starts
       lenses:
       - composability
       signature: 'test.browser.provider: playwright() | webdriverio() | preview()'
       params:
-      - name: 'provider'
+      - name: provider
         type: BrowserProviderOption
         default: null
         desc: return value of the provider factory
@@ -2003,7 +2003,7 @@ groups:
       - the custom provider API is highly experimental and may change in patches
       ref: /config/browser/provider.md
     - id: vt-bm-playwright
-      name: 'Playwright provider options'
+      name: Playwright provider options
       summary: '`@vitest/browser-playwright`: launch, connect and context options, action timeout, persistent context'
       lenses:
       - testing
@@ -2011,23 +2011,23 @@ groups:
       import: '@vitest/browser-playwright'
       signature: playwright({ launchOptions, connectOptions, contextOptions, actionTimeout, persistentContext })
       options:
-      - name: 'launchOptions'
+      - name: launchOptions
         type: object
         default: null
         desc: passed to `browserType.launch`
-      - name: 'connectOptions'
+      - name: connectOptions
         type: object
         default: null
         desc: connect to a remote Playwright server, e.g. a Docker image
-      - name: 'contextOptions'
+      - name: contextOptions
         type: object
         default: null
         desc: passed to `browser.newContext`
-      - name: 'actionTimeout'
+      - name: actionTimeout
         type: number
         default: null
         desc: timeout for each interaction; can be overridden per call via `timeout`
-      - name: 'persistentContext'
+      - name: persistentContext
         type: boolean | string
         default: 'false'
         desc: keep cookies and storage between runs; ignored when running in parallel (4.1.0)
@@ -2036,8 +2036,8 @@ groups:
       - instance-level `provider` overrides do not merge with the parent options
       ref: /config/browser/playwright.md
     - id: vt-bm-webdriverio
-      name: 'WebdriverIO provider'
-      summary: 'community-maintained `@vitest/browser-webdriverio`; accepts the `remote()` options'
+      name: WebdriverIO provider
+      summary: community-maintained `@vitest/browser-webdriverio`; accepts the `remote()` options
       lenses:
       - testing
       import: '@vitest/browser-webdriverio'
@@ -2047,7 +2047,7 @@ groups:
       - test runner options are ignored; only browser capabilities are used
       ref: /config/browser/webdriverio.md
     - id: vt-bm-preview
-      name: 'Preview provider'
+      name: Preview provider
       summary: '`@vitest/browser-preview` opens your default browser to watch tests; no headless, no CDP, no parallel instances'
       lenses:
       - testing
@@ -2058,102 +2058,102 @@ groups:
       - not suitable for CI
       ref: /config/browser/preview.md
     - id: vt-bm-headless
-      name: 'browser.headless'
-      summary: 'run without a visible browser; defaults to on in CI and needs playwright or webdriverio'
+      name: browser.headless
+      summary: run without a visible browser; defaults to on in CI and needs playwright or webdriverio
       lenses:
       - reliability
       signature: 'test.browser.headless: boolean'
       params:
-      - name: 'browser.headless'
+      - name: browser.headless
         type: boolean
         default: process.env.CI
         desc: CLI `--browser.headless`
       ref: /config/browser/headless.md
     - id: vt-bm-ui
-      name: 'browser.ui'
-      summary: 'inject the Vitest UI iframe around the tests; default on outside CI'
+      name: browser.ui
+      summary: inject the Vitest UI iframe around the tests; default on outside CI
       lenses:
       - observability
       signature: 'test.browser.ui: boolean'
       params:
-      - name: 'browser.ui'
+      - name: browser.ui
         type: boolean
         default: '!isCI'
         desc: CLI `--browser.ui=false`
       ref: /config/browser/ui.md
     - id: vt-bm-details-panel
-      name: 'browser.detailsPanelPosition'
-      summary: 'put the UI details panel on the right or at the bottom'
+      name: browser.detailsPanelPosition
+      summary: put the UI details panel on the right or at the bottom
       lenses:
       - observability
       signature: 'test.browser.detailsPanelPosition: ''right'' | ''bottom'''
       params:
-      - name: 'browser.detailsPanelPosition'
+      - name: browser.detailsPanelPosition
         type: '''right'' | ''bottom'''
         default: '''right'''
         desc: CLI `--browser.detailsPanelPosition=bottom`
       ref: /config/browser/detailspanelposition.md
     - id: vt-bm-viewport
-      name: 'browser.viewport'
-      summary: 'default iframe viewport size'
+      name: browser.viewport
+      summary: default iframe viewport size
       lenses:
       - reliability
       signature: 'test.browser.viewport: { width, height }'
       params:
-      - name: 'browser.viewport'
+      - name: browser.viewport
         type: '{ width, height }'
         default: 414x896
         desc: can be changed per test with `page.viewport`
       ref: /config/browser/viewport.md
     - id: vt-bm-locators-config
-      name: 'browser.locators'
-      summary: 'default test-id attribute, exact text matching and failure output format for locators'
+      name: browser.locators
+      summary: default test-id attribute, exact text matching and failure output format for locators
       lenses:
       - testing
       - ux-a11y
       signature: 'test.browser.locators: { testIdAttribute, exact, errorFormat }'
       options:
-      - name: 'testIdAttribute'
+      - name: testIdAttribute
         type: string
         default: '''data-testid'''
         desc: attribute used by `getByTestId`
-      - name: 'exact'
+      - name: exact
         type: boolean
         default: 'true'
         desc: text locators match full, case-sensitive strings; per-call `exact` overrides
-      - name: 'errorFormat'
+      - name: errorFormat
         type: '''html'' | ''aria'' | ''all'''
         default: '''all'''
         desc: what is printed when no element is found (5.0.0)
       ref: /config/browser/locators.md
     - id: vt-bm-screenshot-dir
-      name: 'browser.screenshotDirectory'
-      summary: 'where screenshots are saved, relative to root'
+      name: browser.screenshotDirectory
+      summary: where screenshots are saved, relative to root
       lenses:
       - testing
       signature: 'test.browser.screenshotDirectory: string'
       params:
-      - name: 'browser.screenshotDirectory'
+      - name: browser.screenshotDirectory
         type: string
         default: __screenshots__ in the test file directory
         desc: affects `locator.screenshot()` and failure screenshots
       ref: /config/browser/screenshotdirectory.md
     - id: vt-bm-screenshot-failures
-      name: 'browser.screenshotFailures'
-      summary: 'take a screenshot when a test fails; on by default when the UI is off'
+      name: browser.screenshotFailures
+      summary: take a screenshot when a test fails; on by default when the UI is off
       lenses:
       - testing
       - observability
       signature: 'test.browser.screenshotFailures: boolean'
       params:
-      - name: 'browser.screenshotFailures'
+      - name: browser.screenshotFailures
         type: boolean
         default: '!browser.ui'
         desc: enabled in headless CI runs
       ref: /config/browser/screenshotfailures.md
     - id: vt-bm-expect-config
-      name: 'browser.expect.toMatchScreenshot'
-      summary: 'global defaults for screenshot assertions plus path resolver hooks'
+      name: browser.expect.toMatchScreenshot
+      summary: global defaults for screenshot assertions plus path resolver hooks
       lenses:
       - testing
       signature: 'test.browser.expect.toMatchScreenshot: { comparatorName, comparatorOptions, screenshotOptions, timeout, resolveScreenshotPath, resolveDiffPath }'
@@ -2162,115 +2162,115 @@ groups:
       - any per-assertion option can be set globally and overridden per call
       ref: /config/browser/expect.md
     - id: vt-bm-trace
-      name: 'browser.trace'
+      name: browser.trace
       summary: 'Playwright traces: on, off, on-first-retry, on-all-retries, retain-on-failure, or an object'
       lenses:
       - observability
       - reliability
       signature: 'test.browser.trace: ''on'' | ''off'' | ''on-first-retry'' | ''on-all-retries'' | ''retain-on-failure'' | object'
       params:
-      - name: 'browser.trace'
+      - name: browser.trace
         type: '''on'' | ''off'' | ''on-first-retry'' | ''on-all-retries'' | ''retain-on-failure'' | object'
         default: '''off'''
         desc: CLI `--browser.trace=retain-on-failure`; Playwright provider only
       ref: /config/browser/trace.md
     - id: vt-bm-trace-view-config
-      name: 'browser.traceView'
-      summary: 'built-in DOM-snapshot trace viewer, provider independent'
+      name: browser.traceView
+      summary: built-in DOM-snapshot trace viewer, provider independent
       lenses:
       - observability
       - reliability
       signature: 'test.browser.traceView: boolean | { enabled?, recordCanvas?, inlineImages? }'
       params:
-      - name: 'browser.traceView'
+      - name: browser.traceView
         type: boolean | { enabled?, recordCanvas?, inlineImages? }
         default: 'false'
         desc: CLI `--browser.traceView`; object form adds canvas pixels and inlined images
       since: 5.0.0
       ref: /config/browser/traceview.md
     - id: vt-bm-commands-config
-      name: 'browser.commands'
-      summary: 'custom server-side commands callable from browser tests via `vitest/browser`'
+      name: browser.commands
+      summary: custom server-side commands callable from browser tests via `vitest/browser`
       lenses:
       - composability
       - security
       signature: 'test.browser.commands: Record<string, BrowserCommand>'
       params:
-      - name: 'browser.commands'
+      - name: browser.commands
         type: Record<string, BrowserCommand>
         default: '{ readFile, writeFile, ... }'
         desc: commands run in Node, so validate any browser-supplied input they use for fs, network or shell access
       ref: /config/browser/commands.md
     - id: vt-bm-connect-timeout
-      name: 'browser.connectTimeout'
-      summary: 'max time for the browser to open its WebSocket to the Vitest server'
+      name: browser.connectTimeout
+      summary: max time for the browser to open its WebSocket to the Vitest server
       lenses:
       - reliability
       signature: 'test.browser.connectTimeout: number'
       params:
-      - name: 'browser.connectTimeout'
+      - name: browser.connectTimeout
         type: number
         default: '60_000'
         desc: normally never reached
       ref: /config/browser/connecttimeout.md
     - id: vt-bm-dependency-sourcemaps
-      name: 'browser.dependencySourcemaps'
-      summary: 'serve node_modules sourcemaps to headless browsers; turn off for faster runs if you do not debug into dependencies'
+      name: browser.dependencySourcemaps
+      summary: serve node_modules sourcemaps to headless browsers; turn off for faster runs if you do not debug into dependencies
       lenses:
       - perf
       signature: 'test.browser.dependencySourcemaps: boolean'
       params:
-      - name: 'browser.dependencySourcemaps'
+      - name: browser.dependencySourcemaps
         type: boolean
         default: 'true'
         desc: reported test errors still map stacks from on-disk sourcemaps
       ref: /config/browser/dependencysourcemaps.md
     - id: vt-bm-orchestrator-scripts
-      name: 'browser.orchestratorScripts'
-      summary: 'scripts injected into the orchestrator HTML before test iframes start'
+      name: browser.orchestratorScripts
+      summary: scripts injected into the orchestrator HTML before test iframes start
       lenses:
       - composability
       signature: 'test.browser.orchestratorScripts: BrowserScript[]'
       params:
-      - name: 'browser.orchestratorScripts'
+      - name: browser.orchestratorScripts
         type: BrowserScript[]
         default: '[]'
         desc: '`src` and `content` go through Vite plugins'
       ref: /config/browser/orchestratorscripts.md
     - id: vt-bm-tester-html
-      name: 'browser.testerHtmlPath'
-      summary: 'HTML entry for tests, processed by `transformIndexHtml`'
+      name: browser.testerHtmlPath
+      summary: HTML entry for tests, processed by `transformIndexHtml`
       lenses:
       - composability
       signature: 'test.browser.testerHtmlPath: string'
       params:
-      - name: 'browser.testerHtmlPath'
+      - name: browser.testerHtmlPath
         type: string
         default: null
         desc: relative to project root
       ref: /config/browser/testerhtmlpath.md
     - id: vt-bm-track-unhandled-errors
-      name: 'browser.trackUnhandledErrors'
-      summary: 'report uncaught browser errors; disable to debug with Pause on exceptions'
+      name: browser.trackUnhandledErrors
+      summary: report uncaught browser errors; disable to debug with Pause on exceptions
       lenses:
       - reliability
       signature: 'test.browser.trackUnhandledErrors: boolean'
       params:
-      - name: 'browser.trackUnhandledErrors'
+      - name: browser.trackUnhandledErrors
         type: boolean
         default: 'true'
         desc: to hide specific errors use `onUnhandledError`
       ref: /config/browser/trackunhandlederrors.md
   - id: vt-bm-guides
-    title: 'Browser Mode guides'
+    title: Browser Mode guides
     level: intermediate
     requires:
     - vt-browser-mode
     ref: /guide/browser.md
     entries:
     - id: vt-bm-guide
-      name: 'Browser Mode guide'
-      summary: 'install a provider, enable `browser`, split Node and browser suites with projects, headless runs, limitations'
+      name: Browser Mode guide
+      summary: install a provider, enable `browser`, split Node and browser suites with projects, headless runs, limitations
       lenses:
       - testing
       - reliability
@@ -2283,8 +2283,8 @@ groups:
       - 'module namespaces are sealed so `vi.spyOn(importedModule, ...)` fails; use `vi.mock(path, { spy: true })`'
       ref: /guide/browser.md
     - id: vt-bm-why
-      name: 'Why Browser Mode'
-      summary: 'real browsers avoid jsdom discrepancies but are not a replacement for E2E runners and start slower'
+      name: Why Browser Mode
+      summary: real browsers avoid jsdom discrepancies but are not a replacement for E2E runners and start slower
       lenses:
       - testing
       - ux-a11y
@@ -2293,7 +2293,7 @@ groups:
       - 'drawbacks: longer initialization, not a drop-in replacement for standalone E2E tools'
       ref: /guide/browser/why.md
     - id: vt-bm-multiple-setups
-      name: 'Multiple browser setups'
+      name: Multiple browser setups
       summary: '`browser.instances` runs the same tests in several browsers or configurations with one shared Vite cache'
       lenses:
       - composability
@@ -2305,7 +2305,7 @@ groups:
       - set `name` when reusing a browser
       ref: /guide/browser/multiple-setups.md
     - id: vt-bm-visual-regression
-      name: 'Visual regression testing'
+      name: Visual regression testing
       summary: '`toMatchScreenshot` compares against reference images in `__screenshots__`; run in a controlled environment'
       lenses:
       - testing
@@ -2319,8 +2319,8 @@ groups:
       - disable animations and mask dynamic content; use Docker or CI-only runs for stability
       ref: /guide/browser/visual-regression-testing.md
     - id: vt-bm-trace-view
-      name: 'Trace View (5.0.0)'
-      summary: 'replayable DOM-snapshot timeline of browser interactions, usable in browser UI, Vitest UI or the HTML reporter'
+      name: Trace View (5.0.0)
+      summary: replayable DOM-snapshot timeline of browser interactions, usable in browser UI, Vitest UI or the HTML reporter
       lenses:
       - observability
       - reliability
@@ -2331,7 +2331,7 @@ groups:
       - a VS Code extension adds an Open Trace View action when the HTML reporter is on
       ref: /guide/browser/trace-view.md
     - id: vt-bm-playwright-traces
-      name: 'Playwright traces'
+      name: Playwright traces
       summary: '`browser.trace` writes Playwright trace files to `__traces__`, viewable in the Playwright Trace Viewer'
       lenses:
       - observability
@@ -2342,7 +2342,7 @@ groups:
       - '`tracesDir` option groups traces in one directory'
       ref: /guide/browser/playwright-traces.md
     - id: vt-bm-aria-snapshots
-      name: 'ARIA snapshots (4.1.4)'
+      name: ARIA snapshots (4.1.4)
       summary: '`toMatchAriaSnapshot` asserts the accessibility tree rather than HTML; hand-edited regex patterns survive `--update`'
       lenses:
       - ux-a11y
@@ -2355,14 +2355,14 @@ groups:
       - 'YAML-like format: role, quoted name or `/regex/`, attributes like checked, level, expanded'
       ref: /guide/browser/aria-snapshots.md
   - id: vt-bm-api
-    title: 'Browser Mode API'
+    title: Browser Mode API
     level: intermediate
     requires:
     - vt-browser-mode
     ref: /api/browser/context.md
     entries:
     - id: vt-bm-context
-      name: 'vitest/browser context'
+      name: vitest/browser context
       summary: '`page`, `userEvent`, `commands`, `cdp`, `server` and `utils` exports for browser tests'
       lenses:
       - testing
@@ -2375,7 +2375,7 @@ groups:
       - '`cdp()` works only with Playwright on Chromium and needs `api.allowWrite` and `api.allowExec`'
       ref: /api/browser/context.md
     - id: vt-bm-interactivity
-      name: 'userEvent (browser)'
+      name: userEvent (browser)
       summary: 'CDP or WebDriver based subset of user-event: click, fill, type, keyboard, tab, hover, drag, upload, clipboard'
       lenses:
       - testing
@@ -2389,7 +2389,7 @@ groups:
       - '`wheel` since 4.1.0'
       ref: /api/browser/interactivity.md
     - id: vt-bm-locators
-      name: 'Locators'
+      name: Locators
       summary: '`page.getBy*` returns composable, retrying locators (Ivya), unlike testing-library queries that return elements'
       lenses:
       - testing
@@ -2404,8 +2404,8 @@ groups:
       - do not use `locator.selector` in test code; it is for commands
       ref: /api/browser/locators.md
     - id: vt-bm-assertions
-      name: 'DOM assertions and expect.element'
-      summary: 'jest-dom style matchers forked into Vitest with locator support and retry; `expect.element` retries until timeout'
+      name: DOM assertions and expect.element
+      summary: jest-dom style matchers forked into Vitest with locator support and retry; `expect.element` retries until timeout
       lenses:
       - testing
       - ux-a11y
@@ -2417,7 +2417,7 @@ groups:
       - '`toMatchScreenshot` retries until two captures match; options include comparatorName, comparatorOptions, timeout 5000'
       ref: /api/browser/assertions.md
     - id: vt-bm-commands
-      name: 'Browser commands'
+      name: Browser commands
       summary: 'server-side functions callable from browser tests: file IO, CDP session and custom plugin commands'
       lenses:
       - composability
@@ -2428,8 +2428,8 @@ groups:
       - libraries can contribute commands via a plugin `config` hook
       ref: /api/browser/commands.md
     - id: vt-bm-react
-      name: 'vitest-browser-react'
-      summary: 'community React renderer for Browser Mode; async `render` returns locators instead of DOM queries'
+      name: vitest-browser-react
+      summary: community React renderer for Browser Mode; async `render` returns locators instead of DOM queries
       lenses:
       - testing
       - reuse
@@ -2443,7 +2443,7 @@ groups:
       - inspired by @testing-library/react but retries via locators
       ref: /api/browser/react.md
     - id: vt-bm-recipe-locators
-      name: 'Domain locators recipe'
+      name: Domain locators recipe
       summary: '`locators.extend` builds app-specific locators that keep retry, strictness and chaining'
       lenses:
       - reuse
@@ -2456,14 +2456,14 @@ groups:
 - title: 'Guides: workflow, authoring and recipes'
   sections:
   - id: vt-guides-learn
-    title: 'Learn series'
+    title: Learn series
     level: basic
     requires: []
     ref: /guide/learn/testing-in-practice.md
     entries:
     - id: vt-learn-async
-      name: 'Testing asynchronous code'
-      summary: 'await in the test body; `.resolves`/`.rejects` must be awaited; count assertions when they sit in callbacks'
+      name: Testing asynchronous code
+      summary: await in the test body; `.resolves`/`.rejects` must be awaited; count assertions when they sit in callbacks
       lenses:
       - reliability
       - testing
@@ -2474,8 +2474,8 @@ groups:
       - unawaited assertions fail the test at its end
       ref: /guide/learn/async.md
     - id: vt-learn-setup-teardown
-      name: 'Setup and teardown'
-      summary: 'beforeEach/afterEach per test, beforeAll/afterAll per file or suite; outer hooks wrap inner ones'
+      name: Setup and teardown
+      summary: beforeEach/afterEach per test, beforeAll/afterAll per file or suite; outer hooks wrap inner ones
       lenses:
       - testing
       - reliability
@@ -2486,8 +2486,8 @@ groups:
       - reset shared state in hooks, shared mutable state is a classic flaky-test source
       ref: /guide/learn/setup-teardown.md
     - id: vt-learn-testing-in-practice
-      name: 'Testing in practice'
-      summary: 'test the contract (inputs and outputs), one behaviour per test, descriptive names, mock only slow or non-deterministic dependencies'
+      name: Testing in practice
+      summary: test the contract (inputs and outputs), one behaviour per test, descriptive names, mock only slow or non-deterministic dependencies
       lenses:
       - best-practice
       - testing
@@ -2496,8 +2496,8 @@ groups:
       - 'sections: edge cases, property-based testing, when to mock and what not to mock, reproduce bugs with a failing test first'
       ref: /guide/learn/testing-in-practice.md
     - id: vt-learn-debugging-tests
-      name: 'Debugging failing tests'
-      summary: 'read the diff, isolate the test, then check shared state, missing awaits, stale snapshots, wrong environment and leaked mocks'
+      name: Debugging failing tests
+      summary: read the diff, isolate the test, then check shared state, missing awaits, stale snapshots, wrong environment and leaked mocks
       lenses:
       - reliability
       - testing
@@ -2509,15 +2509,15 @@ groups:
       - the UI shows the module graph
       ref: /guide/learn/debugging-tests.md
   - id: vt-guides-workflow
-    title: 'Running, filtering and debugging'
+    title: Running, filtering and debugging
     level: intermediate
     requires:
     - vt-run
     ref: /guide/filtering.md
     entries:
     - id: vt-guide-filtering
-      name: 'Test filtering'
-      summary: 'filter by file substring, `-t` name pattern, `file:line`, tags, `.only`/`.skip`/`.todo`'
+      name: Test filtering
+      summary: filter by file substring, `-t` name pattern, `file:line`, tags, `.only`/`.skip`/`.todo`
       lenses:
       - perf
       - testing
@@ -2528,8 +2528,8 @@ groups:
       - line filters need the full filename
       ref: /guide/filtering.md
     - id: vt-guide-parallelism
-      name: 'Parallelism'
-      summary: 'files run in parallel workers by default; tests inside a file are sequential unless marked `concurrent`'
+      name: Parallelism
+      summary: files run in parallel workers by default; tests inside a file are sequential unless marked `concurrent`
       lenses:
       - perf
       - reliability
@@ -2540,7 +2540,7 @@ groups:
       - '`fileParallelism: false` stops file parallelism only'
       ref: /guide/parallelism.md
     - id: vt-guide-lifecycle
-      name: 'Test run lifecycle'
+      name: Test run lifecycle
       summary: 'order: init, globalSetup, workers, collection, execution (aroundAll, beforeAll, aroundEach, beforeEach), reporting, teardown'
       lenses:
       - reliability
@@ -2552,7 +2552,7 @@ groups:
       - hook cleanup functions returned from beforeEach/beforeAll run after the matching after hooks
       ref: /guide/lifecycle.md
     - id: vt-guide-ui
-      name: 'Vitest UI and HTML reporter'
+      name: Vitest UI and HTML reporter
       summary: '`--ui` live dashboard (needs `@vitest/ui`); the html reporter writes a static, read-only report'
       lenses:
       - observability
@@ -2564,8 +2564,8 @@ groups:
       - also shows coverage, trace view and the module graph with import breakdown
       ref: /guide/ui.md
     - id: vt-guide-debugging
-      name: 'Debugging'
-      summary: 'VS Code debug terminal or launch config, `--inspect-brk` with `--no-file-parallelism` and `--test-timeout=0`'
+      name: Debugging
+      summary: VS Code debug terminal or launch config, `--inspect-brk` with `--no-file-parallelism` and `--test-timeout=0`
       lenses:
       - reliability
       signature: vitest --inspect-brk --no-file-parallelism --test-timeout=0
@@ -2575,8 +2575,8 @@ groups:
       - Node inspector debugging needs non-parallel runs
       ref: /guide/debugging.md
     - id: vt-guide-common-errors
-      name: 'Common errors'
-      summary: 'module not found, thread worker termination, per-project cwd, custom package conditions, timezone, unhandled rejections'
+      name: Common errors
+      summary: module not found, thread worker termination, per-project cwd, custom package conditions, timezone, unhandled rejections
       lenses:
       - reliability
       notes:
@@ -2587,8 +2587,8 @@ groups:
       - '`process.chdir()` works in forks only, via a setup file'
       ref: /guide/common-errors.md
     - id: vt-guide-profiling
-      name: 'Profiling test performance'
-      summary: 'run summary splits transform, setup, import, tests and environment time; Node flags profile the runner and main thread'
+      name: Profiling test performance
+      summary: run summary splits transform, setup, import, tests and environment time; Node flags profile the runner and main thread
       lenses:
       - perf
       signature: 'test.execArgv: [''--cpu-prof'', ''--cpu-prof-dir=test-runner-profile'']'
@@ -2598,8 +2598,8 @@ groups:
       - the dependency optimizer can bundle heavy packages
       ref: /guide/profiling-test-performance.md
     - id: vt-guide-open-telemetry
-      name: 'OpenTelemetry support'
-      summary: 'spans per worker and test; point `experimental.openTelemetry.sdkPath` at a started SDK default export'
+      name: OpenTelemetry support
+      summary: spans per worker and test; point `experimental.openTelemetry.sdkPath` at a started SDK default export
       lenses:
       - observability
       signature: 'experimental: { openTelemetry: { enabled: true, sdkPath } }'
@@ -2611,8 +2611,8 @@ groups:
       - browser mode propagates trace context between Node and the browser
       ref: /guide/open-telemetry.md
     - id: vt-guide-in-source
-      name: 'In-source testing'
-      summary: 'tests live next to the code inside `if (import.meta.vitest)`; strip with `define` in production builds'
+      name: In-source testing
+      summary: tests live next to the code inside `if (import.meta.vitest)`; strip with `define` in production builds
       lenses:
       - testing
       signature: if (import.meta.vitest) { const { it, expect } = import.meta.vitest }
@@ -2622,22 +2622,22 @@ groups:
       - use separate files for components and E2E
       ref: /guide/in-source.md
     - id: vt-guide-plugins
-      name: 'Using plugins'
-      summary: 'Vitest accepts Vite plugins; the `configureVitest` hook gives access to Vitest internals'
+      name: Using plugins
+      summary: Vitest accepts Vite plugins; the `configureVitest` hook gives access to Vitest internals
       lenses:
       - composability
       notes:
       - same API and concepts as Vite plugins
       ref: /guide/using-plugins.md
   - id: vt-guides-authoring
-    title: 'Snapshots, annotations, mocking and benchmarks'
+    title: Snapshots, annotations, mocking and benchmarks
     level: intermediate
     requires:
     - vt-config-env
     ref: /guide/snapshot.md
     entries:
     - id: vt-snapshot-guide
-      name: 'Snapshots'
+      name: Snapshots
       summary: '`toMatchSnapshot`, `toMatchInlineSnapshot`, `toMatchFileSnapshot`, custom serializers and snapshot matchers'
       lenses:
       - testing
@@ -2651,7 +2651,7 @@ groups:
       - DOM snapshots cover React elements; ARIA and screenshot snapshots exist in Browser Mode
       ref: /guide/snapshot.md
     - id: vt-test-annotations
-      name: 'Test annotations'
+      name: Test annotations
       summary: '`context.annotate(message, type?, attachment?)` attaches notes or files to a test and sends them to reporters'
       lenses:
       - observability
@@ -2664,8 +2664,8 @@ groups:
       - attachments are stored in `attachmentsDir`
       ref: /guide/test-annotations.md
     - id: vt-mocking-modules
-      name: 'Mocking modules guide'
-      summary: 'definitions of mocked and spied modules; factory with `importOriginal`; `__mocks__` folders; spying exports'
+      name: Mocking modules guide
+      summary: definitions of mocked and spied modules; factory with `importOriginal`; `__mocks__` folders; spying exports
       lenses:
       - testing
       signature: 'vi.mock(import(''./x''), async (importOriginal) => ({ ...(await importOriginal()), fn: vi.fn() }))'
@@ -2676,7 +2676,7 @@ groups:
       - '`importOriginal` is async'
       ref: /guide/mocking/modules.md
     - id: vt-mocking-dates
-      name: 'Mocking dates'
+      name: Mocking dates
       summary: '`vi.useFakeTimers()` and `vi.setSystemTime()` control Date through `@sinonjs/fake-timers`'
       lenses:
       - testing
@@ -2684,8 +2684,8 @@ groups:
       signature: vi.setSystemTime(new Date(2026, 0, 1)); vi.useRealTimers()
       ref: /guide/mocking/dates.md
     - id: vt-mocking-file-system
-      name: 'Mocking the file system'
-      summary: 'no built-in API; use `memfs` through `__mocks__/fs.cjs` and `__mocks__/fs/promises.cjs`'
+      name: Mocking the file system
+      summary: no built-in API; use `memfs` through `__mocks__/fs.cjs` and `__mocks__/fs/promises.cjs`
       lenses:
       - testing
       - reuse
@@ -2695,8 +2695,8 @@ groups:
       - an in-memory fs makes error cases like permissions and full disks testable
       ref: /guide/mocking/file-system.md
     - id: vt-benchmarking
-      name: 'Benchmarking (5.0.0)'
-      summary: 'the `bench` fixture in `*.bench.ts` files runs Tinybench inside normal tests; compare, assert and replay results'
+      name: Benchmarking (5.0.0)
+      summary: the `bench` fixture in `*.bench.ts` files runs Tinybench inside normal tests; compare, assert and replay results
       lenses:
       - perf
       - testing
@@ -2710,15 +2710,15 @@ groups:
       - mind dead-code elimination and module-runner overhead
       ref: /guide/benchmarking.md
   - id: vt-guides-recipes
-    title: 'Recipes'
+    title: Recipes
     level: intermediate
     requires:
     - vt-config-env
     ref: /guide/recipes/wait-for.md
     entries:
     - id: vt-recipe-cancellable
-      name: 'Cancellable test resources'
-      summary: 'pass the context `signal` to fetch, listeners, streams or timers so a timeout, bail or Ctrl+C releases them'
+      name: Cancellable test resources
+      summary: pass the context `signal` to fetch, listeners, streams or timers so a timeout, bail or Ctrl+C releases them
       lenses:
       - reliability
       signature: test(name, async ({ signal }) => { await fetch(url, { signal }) })
@@ -2728,8 +2728,8 @@ groups:
       - forward the signal into your own helpers
       ref: /guide/recipes/cancellable.md
     - id: vt-recipe-conditional-mocking
-      name: 'Conditional mocking with vi.when'
-      summary: 'replaces switch statements in `mockImplementation` with `calledWith(...).then*`'
+      name: Conditional mocking with vi.when
+      summary: replaces switch statements in `mockImplementation` with `calledWith(...).then*`
       lenses:
       - testing
       signature: vi.when(spy).calledWith(a).thenReturn(x)
@@ -2740,7 +2740,7 @@ groups:
       - register indefinite actions first
       ref: /guide/recipes/conditional-mocking.md
     - id: vt-recipe-custom-assertions
-      name: 'Custom assertion helpers'
+      name: Custom assertion helpers
       summary: '`vi.defineHelper` points failures at the helper''s call site'
       lenses:
       - reuse
@@ -2751,7 +2751,7 @@ groups:
       - use whenever a helper calls `expect` more than once
       ref: /guide/recipes/custom-assertions.md
     - id: vt-recipe-db-transaction
-      name: 'Database transaction per test'
+      name: Database transaction per test
       summary: '`aroundEach` with a file- or worker-scoped fixture rolls back every test'
       lenses:
       - reliability
@@ -2764,7 +2764,7 @@ groups:
       - isolation off lets module state leak between files
       ref: /guide/recipes/db-transaction.md
     - id: vt-recipe-disable-isolation
-      name: 'Per-file isolation settings'
+      name: Per-file isolation settings
       summary: 'use projects to run unit tests with `isolate: false` and keep integration tests isolated'
       lenses:
       - perf
@@ -2774,7 +2774,7 @@ groups:
       - vm pools always isolate
       ref: /guide/recipes/disable-isolation.md
     - id: vt-recipe-parallel-sequential
-      name: 'Parallel and sequential test files'
+      name: Parallel and sequential test files
       summary: 'split into two projects; the sequential one sets `fileParallelism: false`; `sequence.groupOrder` runs it after'
       lenses:
       - reliability
@@ -2785,7 +2785,7 @@ groups:
       - file parallelism and `concurrent` are separate knobs
       ref: /guide/recipes/parallel-sequential.md
     - id: vt-recipe-schema-matching
-      name: 'Schema-driven assertions'
+      name: Schema-driven assertions
       summary: '`expect.schemaMatching(schema)` asserts a value against any Standard Schema (Zod, Valibot, ArkType)'
       lenses:
       - testing
@@ -2797,7 +2797,7 @@ groups:
       - good for generated ids and timestamps
       ref: /guide/recipes/schema-matching.md
     - id: vt-recipe-type-narrowing
-      name: 'Type narrowing in tests'
+      name: Type narrowing in tests
       summary: '`expect.assert(cond)` throws and narrows the TypeScript type, unlike `toBeTruthy` or `toBeDefined`'
       lenses:
       - typing-dx
@@ -2808,7 +2808,7 @@ groups:
       - replaces `as` casts and `!` assertions
       ref: /guide/recipes/type-narrowing.md
     - id: vt-recipe-watch-templates
-      name: 'Watching non-imported files'
+      name: Watching non-imported files
       summary: '`watchTriggerPatterns` maps changed files (templates, fixtures) to the tests to rerun'
       lenses:
       - perf
@@ -2819,28 +2819,28 @@ groups:
       - returns file paths, not globs
       - '`forceRerunTriggers` reruns everything instead'
       ref: /guide/recipes/watch-templates.md
-- title: 'Test API reference and Node API'
+- title: Test API reference and Node API
   sections:
   - id: vt-api-ref
-    title: 'Suites, hooks, mocks and type assertions'
+    title: Suites, hooks, mocks and type assertions
     level: intermediate
     requires:
     - vt-authoring
     ref: /api/describe.md
     entries:
     - id: vt-api-describe
-      name: 'describe'
-      summary: 'groups tests into suites; options (timeout, retry, concurrent, shuffle) apply to every nested test'
+      name: describe
+      summary: groups tests into suites; options (timeout, retry, concurrent, shuffle) apply to every nested test
       lenses:
       - testing
       - composability
       signature: describe(name, options?, fn) | describe.skip | .skipIf | .runIf | .only | .concurrent | .shuffle | .todo | .each | .for
       params:
-      - name: 'shuffle'
+      - name: shuffle
         type: boolean
         default: 'false'
         desc: random order inside the suite; inherited by nested suites; follows `sequence.shuffle`
-      - name: 'concurrent'
+      - name: concurrent
         type: boolean
         default: null
         desc: set false to opt out of concurrency inherited from a parent or `sequence.concurrent`
@@ -2851,14 +2851,14 @@ groups:
       - '`.skipIf`/`.runIf` replace wrapping a suite in `if`'
       ref: /api/describe.md
     - id: vt-api-hooks
-      name: 'Lifecycle hooks'
-      summary: 'beforeEach, afterEach, beforeAll, afterAll plus aroundEach/aroundAll wrappers; hooks apply to the file or enclosing suite'
+      name: Lifecycle hooks
+      summary: beforeEach, afterEach, beforeAll, afterAll plus aroundEach/aroundAll wrappers; hooks apply to the file or enclosing suite
       lenses:
       - testing
       - reliability
       signature: beforeEach(fn, timeout?) | aroundEach(async (runTest, ctx) => { await runTest() }) | aroundAll(async (runSuite) => { await runSuite() })
       params:
-      - name: 'timeout'
+      - name: timeout
         type: number
         default: 10 seconds (`hookTimeout`)
         desc: per hook; for around hooks the setup and teardown phases are timed separately
@@ -2871,8 +2871,8 @@ groups:
       - order of stacked hooks is set by `sequence.hooks`
       ref: /api/hooks.md
     - id: vt-api-test-hooks
-      name: 'onTestFinished and onTestFailed'
-      summary: 'per-test cleanup callbacks registered inside the test body; always run after afterEach hooks'
+      name: onTestFinished and onTestFailed
+      summary: per-test cleanup callbacks registered inside the test body; always run after afterEach hooks
       lenses:
       - reliability
       - testing
@@ -2884,7 +2884,7 @@ groups:
       - restoring a spy in `onTestFinished` is safe even when an assertion fails
       ref: /api/hooks.md#ontestfinished
     - id: vt-api-mock-methods
-      name: 'Mock implementation methods'
+      name: Mock implementation methods
       summary: '`mockImplementation(Once)`, `mockReturnValue(Once)`, `mockResolvedValue`, `mockRejectedValue`, `mockThrow(Once)`, `withImplementation`'
       lenses:
       - testing
@@ -2897,7 +2897,7 @@ groups:
       - spies inherit the implementation's `length` at creation only
       ref: /api/mock.md
     - id: vt-api-mock-state
-      name: 'Mock state and reset'
+      name: Mock state and reset
       summary: '`mock.calls`, `results`, `settledResults`, `instances`, `contexts`, `invocationCallOrder`, `mockClear`, `mockReset`, `mockRestore`'
       lenses:
       - testing
@@ -2912,8 +2912,8 @@ groups:
       - '`mockName`/`getMockName` label mocks in failures'
       ref: /api/mock.md#mock-calls
     - id: vt-api-expect-typeof
-      name: 'expectTypeOf'
-      summary: 'compile-time type assertions that do nothing at runtime; enable typecheck to run them'
+      name: expectTypeOf
+      summary: compile-time type assertions that do nothing at runtime; enable typecheck to run them
       lenses:
       - typing-dx
       - testing
@@ -2925,8 +2925,8 @@ groups:
       - also toBeCallableWith, toHaveProperty, guards, asserts, branded
       ref: /api/expect-typeof.md
     - id: vt-api-assert-type
-      name: 'assertType'
-      summary: 'asserts that the argument type equals the generic; runtime no-op'
+      name: assertType
+      summary: asserts that the argument type equals the generic; runtime no-op
       lenses:
       - typing-dx
       signature: 'assertType<T>(value: T): void'
@@ -2934,8 +2934,8 @@ groups:
       - pass `--typecheck` to enable checking
       ref: /api/assert-type.md
     - id: vt-api-assert
-      name: 'assert (chai)'
-      summary: 're-export of chai `assert`; `assert(expr)` is a TS assertion function'
+      name: assert (chai)
+      summary: re-export of chai `assert`; `assert(expr)` is a TS assertion function
       lenses:
       - testing
       signature: assert(expression, message?) | assert.fail(message?)
@@ -2944,14 +2944,14 @@ groups:
       - does not count toward `expect.requireAssertions`
       ref: /api/assert.md
   - id: vt-api-node
-    title: 'Node API and extension points'
+    title: Node API and extension points
     level: advanced
     requires:
     - vt-cfg-runtime
     ref: /guide/advanced.md
     entries:
     - id: vt-adv-start
-      name: 'startVitest and createVitest'
+      name: startVitest and createVitest
       summary: 'programmatic runs from `vitest/node`: `startVitest` runs, `createVitest` only builds the instance'
       lenses:
       - composability
@@ -2964,7 +2964,7 @@ groups:
       - '`createVitest` skips package validation and does not auto-close; call `init()` and prefer `watch` for long-lived instances'
       ref: /guide/advanced.md
     - id: vt-adv-tests
-      name: 'Running tests via the Node API'
+      name: Running tests via the Node API
       summary: '`runTestSpecifications` and `rerunTestSpecifications` after `init()`'
       lenses:
       - composability
@@ -2974,8 +2974,8 @@ groups:
       - '`createVitest` does not respect `standalone` or `mergeReports`'
       ref: /guide/advanced/tests.md
     - id: vt-adv-reporters-guide
-      name: 'Custom reporters'
-      summary: 'implement the `Reporter` interface or extend built-ins; write artifacts under `.vitest`'
+      name: Custom reporters
+      summary: implement the `Reporter` interface or extend built-ins; write artifacts under `.vitest`
       lenses:
       - observability
       import: vitest/node
@@ -2986,7 +2986,7 @@ groups:
       - pass an instance or module path in `reporters`
       ref: /guide/advanced/reporters.md
     - id: vt-adv-pool
-      name: 'Custom pool'
+      name: Custom pool
       summary: 'experimental low-level API: `pool` accepts a `PoolRunnerInitializer`'
       lenses:
       - composability
@@ -2996,8 +2996,8 @@ groups:
       - mix pools with `projects`
       ref: /guide/advanced/pool.md
     - id: vt-adv-benchmark-provider
-      name: 'Custom benchmark provider (5.0.0)'
-      summary: 'replace Tinybench by pointing `benchmark.provider` at a module with a default `BenchmarkProvider`'
+      name: Custom benchmark provider (5.0.0)
+      summary: replace Tinybench by pointing `benchmark.provider` at a module with a default `BenchmarkProvider`
       lenses:
       - composability
       - perf
@@ -3008,13 +3008,13 @@ groups:
       - add Tinybench as a direct dependency if the provider uses it
       ref: /guide/advanced/benchmark-provider.md
     - id: vt-cfg-benchmark
-      name: 'benchmark'
+      name: benchmark
       summary: 'options for `vitest bench`: enabled, include, exclude, includeSource, retainSamples, provider, suppressExportGetterWarnings'
       lenses:
       - perf
       signature: 'test.benchmark: { enabled?, include?, exclude?, ... }'
       params:
-      - name: 'benchmark'
+      - name: benchmark
         type: '{ enabled?, include?, exclude?, ... }'
         default: null
         desc: default include `**/*.{bench,benchmark}.?(c|m)[jt]s?(x)`; `enabled` default false
@@ -3022,7 +3022,7 @@ groups:
       - '`retainSamples` (default false) keeps per-iteration timings for custom reporters'
       ref: /config/benchmark.md
     - id: vt-adv-vitest-class
-      name: 'Vitest instance API'
+      name: Vitest instance API
       summary: 'main-process controller: config, state, projects, specifications, run and rerun, snapshots, coverage and lifecycle hooks'
       lenses:
       - composability
@@ -3035,7 +3035,7 @@ groups:
       - '`createReport` 5.0.0, `parseSpecifications` 5.0.0, `clearCache` 5.0.0'
       ref: /api/advanced/vitest.md
     - id: vt-adv-test-project
-      name: 'TestProject'
+      name: TestProject
       summary: 'one project: name, serialized config, Vite server, browser, provide, specification creation and file globbing'
       lenses:
       - composability
@@ -3048,8 +3048,8 @@ groups:
       - '`globTestFiles`, `matchesTestGlob`, `import`, `provide`'
       ref: /api/advanced/test-project.md
     - id: vt-adv-test-specification
-      name: 'TestSpecification'
-      summary: 'a module to run plus its project, pool and optional test lines or ids'
+      name: TestSpecification
+      summary: a module to run plus its project, pool and optional test lines or ids
       lenses:
       - composability
       import: vitest/node
@@ -3058,7 +3058,7 @@ groups:
       - with `typecheck.enabled` several specifications can share a module id with different pools
       ref: /api/advanced/test-specification.md
     - id: vt-adv-test-case
-      name: 'TestCase (reported task)'
+      name: TestCase (reported task)
       summary: 'main-thread view of one test: name, fullName, id, location, result, diagnostic, annotations, artifacts'
       lenses:
       - observability
@@ -3069,7 +3069,7 @@ groups:
       - use the Runner API for in-worker tasks
       ref: /api/advanced/test-case.md
     - id: vt-adv-test-suite
-      name: 'TestSuite (reported task)'
+      name: TestSuite (reported task)
       summary: 'main-thread view of a suite: name, fullName, id, location, state, children'
       lenses:
       - observability
@@ -3078,7 +3078,7 @@ groups:
       - '`type` is `suite`; distinguish from tests and modules by `type`'
       ref: /api/advanced/test-suite.md
     - id: vt-adv-test-module
-      name: 'TestModule (reported task)'
+      name: TestModule (reported task)
       summary: 'a test file in one project: module id, relative id, state, Vite environment, meta, diagnostic'
       lenses:
       - observability
@@ -3089,8 +3089,8 @@ groups:
       - '`viteEnvironment` 4.1.0, `meta` 3.1.0'
       ref: /api/advanced/test-module.md
     - id: vt-adv-test-collection
-      name: 'TestCollection'
-      summary: 'iterable of top-level suites and tests with `at`, `array`, `allSuites`, `allTests`, `tests`, `suites`'
+      name: TestCollection
+      summary: iterable of top-level suites and tests with `at`, `array`, `allSuites`, `allTests`, `tests`, `suites`
       lenses:
       - observability
       import: vitest/node
@@ -3100,7 +3100,7 @@ groups:
       ref: /api/advanced/test-collection.md
     - id: vt-adv-plugin
       name: 'Plugin API: configureVitest'
-      summary: 'Vite plugin hook with `project`, `vitest`, `injectTestProjects` and `defineCacheKeyGenerator`'
+      summary: Vite plugin hook with `project`, `vitest`, `injectTestProjects` and `defineCacheKeyGenerator`
       lenses:
       - composability
       signature: configureVitest({ project, vitest, injectTestProjects, defineCacheKeyGenerator })
@@ -3111,8 +3111,8 @@ groups:
       - '`defineCacheKeyGenerator` (5.0.0) feeds `fsModuleCache` keys; return false to skip caching'
       ref: /api/advanced/plugin.md
     - id: vt-adv-runner
-      name: 'Runner API'
-      summary: 'custom runner class with lifecycle hooks (onBeforeRunTask, onAfterRetryTask, runSuite, runTask, importFile)'
+      name: Runner API
+      summary: custom runner class with lifecycle hooks (onBeforeRunTask, onAfterRetryTask, runSuite, runTask, importFile)
       lenses:
       - composability
       signature: 'test.runner: ''./custom-runner.ts'''
@@ -3121,8 +3121,8 @@ groups:
       - extend `TestRunner` to keep snapshot support
       ref: /api/advanced/runner.md
     - id: vt-adv-reporter-api
-      name: 'Reporter hooks'
-      summary: 'ordered events from onInit and onTestRunStart through module, suite, case and hook events to onTestRunEnd'
+      name: Reporter hooks
+      summary: ordered events from onInit and onTestRunStart through module, suite, case and hook events to onTestRunEnd
       lenses:
       - observability
       import: vitest/node
@@ -3131,7 +3131,7 @@ groups:
       - '`onHookStart` and `onHookEnd` fire for beforeAll, beforeEach, afterEach and afterAll'
       ref: /api/advanced/reporters.md
     - id: vt-adv-metadata
-      name: 'Task metadata'
+      name: Task metadata
       summary: '`task.meta` shares serializable data one way from tests to the Node process and reporters'
       lenses:
       - observability
@@ -3141,8 +3141,8 @@ groups:
       - populate on test context or in beforeAll/afterAll for suites
       ref: /api/advanced/metadata.md
     - id: vt-adv-artifacts
-      name: 'Test artifacts (4.0.11)'
-      summary: 'low-level `recordArtifact` for structured data and attachments; `annotate` is built on it'
+      name: Test artifacts (4.0.11)
+      summary: low-level `recordArtifact` for structured data and attachments; `annotate` is built on it
       lenses:
       - observability
       import: vitest
@@ -3153,28 +3153,28 @@ groups:
       - attachments are copied to `attachmentsDir`
       - end users should prefer `context.annotate`
       ref: /api/advanced/artifacts.md
-- title: 'Versions and migrations'
+- title: Versions and migrations
   sections:
   - id: vt-versions
-    title: 'Vitest 5 migration and support policy'
+    title: Vitest 5 migration and support policy
     level: basic
     requires: []
     ref: /guide/migration.md
     entries:
     - id: vt-migrate-5
-      name: 'Migrating to Vitest 5'
-      summary: 'clearMocks on by default, top-level-only vi.mock, awaited async assertions, expect.poll timeout'
+      name: Migrating to Vitest 5
+      summary: clearMocks on by default, top-level-only vi.mock, awaited async assertions, expect.poll timeout
         failure
       lenses: [reliability]
       notes: [configs not found in parent dirs; reports in `.vitest`, 'class mocks keep prototype methods; fake timers also mock Temporal', 'toThrow("") now matches any error message']
       ref: /guide/migration.md
     - id: vt-support-policy
-      name: 'Support policy'
-      summary: 'current minor gets fixes, previous major only its last minor; pin pre-releases exactly'
+      name: Support policy
+      summary: current minor gets fixes, previous major only its last minor; pin pre-releases exactly
       lenses: [reliability]
       ref: /releases.md
     - id: vt-jest-compat
-      name: 'Jest globals'
+      name: Jest globals
       summary: '`jest.fn`, `jest.mock` (use `vi.*`)'
       lenses: [best-practice]
       signature: jest.fn, jest.mock, vi.*

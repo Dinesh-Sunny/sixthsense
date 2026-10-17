@@ -13,42 +13,42 @@ toc:
 - index: 'https://anyio.readthedocs.io/en/stable/'
   match: '^https://anyio\.readthedocs\.io/en/stable/testing\.html'
 groups:
-- title: 'AI tooling'
+- title: AI tooling
   sections:
   - id: ai-tooling
-    title: 'AI tooling and docs routes'
+    title: AI tooling and docs routes
     level: basic
     requires: []
     ref: /contents.html
     entries:
     - id: ai-llms-txt
-      name: 'llms.txt (absent)'
-      summary: 'docs.pytest.org serves no llms.txt (404, checked 2026-10-05); read the HTML pages directly'
+      name: llms.txt (absent)
+      summary: docs.pytest.org serves no llms.txt (404, checked 2026-10-05); read the HTML pages directly
       lenses: [reuse]
       ref: /contents.html
     - id: ai-context7
-      name: 'Context7 docs route'
-      summary: 'Context7 ids /websites/pytest_en_stable, /pytest-dev/pytest (9.0.0), /agronholm/anyio (4.11.0);'
+      name: Context7 docs route
+      summary: Context7 ids /websites/pytest_en_stable, /pytest-dev/pytest (9.0.0), /agronholm/anyio (4.11.0);
         lag the 9.1.1 docs
       lenses: [reuse]
       ref: /contents.html
     - id: ai-third-party-mcp
-      name: 'pytest MCP servers'
-      summary: 'Only third-party pytest MCP servers exist (mcp-pytest-runner, pytest-mcp-server); no official'
+      name: pytest MCP servers
+      summary: Only third-party pytest MCP servers exist (mcp-pytest-runner, pytest-mcp-server); no official
         pytest-dev MCP or skill
       lenses: [security]
       ref: https://github.com/jwilger/mcp-pytest-runner
-- title: 'Writing tests'
+- title: Writing tests
   sections:
   - id: asserts
-    title: 'Assertions and expected failures'
+    title: Assertions and expected failures
     level: basic
     requires: []
     ref: /how-to/assert.html
     entries:
     - id: assert-plain
-      name: 'Plain assert and introspection'
-      summary: 'Plain `assert` statements; pytest rewrites them at import to show operand values and diffs'
+      name: Plain assert and introspection
+      summary: Plain `assert` statements; pytest rewrites them at import to show operand values and diffs
         on failure
       lenses: [best-practice, testing]
       signature: assert expr, message
@@ -56,8 +56,8 @@ groups:
           need register_assert_rewrite']
       ref: /how-to/assert.html#asserting-with-the-assert-statement
     - id: assert-raises
-      name: 'Expected exceptions'
-      summary: 'Context manager asserting a block raises an exception type (or subclass); optionally match'
+      name: Expected exceptions
+      summary: Context manager asserting a block raises an exception type (or subclass); optionally match
         its message and check it
       lenses: [testing, best-practice]
       signature: with pytest.raises(expected_exception, *, match=None, check=None) as excinfo
@@ -74,8 +74,8 @@ groups:
           returns ExceptionInfo directly']
       ref: /how-to/assert.html#assertions-about-expected-exceptions
     - id: assert-raises-group
-      name: 'Exception groups'
-      summary: 'Assert an ExceptionGroup with an exact structure of sub-exceptions, stricter than except*'
+      name: Exception groups
+      summary: Assert an ExceptionGroup with an exact structure of sub-exceptions, stricter than except*
       lenses: [testing, reliability]
       signature: with pytest.RaisesGroup(*exceptions, match=None, check=None, allow_unwrapped=False, flatten_subgroups=False)
       params:
@@ -90,8 +90,8 @@ groups:
           a sub-exception inside the group']
       ref: /how-to/assert.html#assertions-about-expected-exception-groups
     - id: assert-approx
-      name: 'Tolerant numbers'
-      summary: 'Compare floats, sequences, dicts or numpy arrays within a tolerance instead of exact equality'
+      name: Tolerant numbers
+      summary: Compare floats, sequences, dicts or numpy arrays within a tolerance instead of exact equality
       lenses: [reliability, testing]
       signature: pytest.approx(expected, rel=None, abs=None, nan_ok=False)
       params:
@@ -105,8 +105,8 @@ groups:
           itself; NaN equals nothing unless nan_ok=True]
       ref: /how-to/assert.html#assertions-about-approximate-equality
     - id: assert-warns
-      name: 'Expected warnings'
-      summary: 'Assert code emits a warning of a class (optionally matching text); unmatched warnings re-emit'
+      name: Expected warnings
+      summary: Assert code emits a warning of a class (optionally matching text); unmatched warnings re-emit
         on exit
       lenses: [testing, observability]
       signature: with pytest.warns(expected_warning=Warning, *, match=None) as record
@@ -121,29 +121,29 @@ groups:
           = DeprecationWarning, PendingDeprecationWarning or FutureWarning']
       ref: /how-to/capture-warnings.html#warns
     - id: assert-custom-explain
-      name: 'Custom failure output'
-      summary: 'Customise failure text with the pytest_assertrepr_compare hook, and hide helper frames'
+      name: Custom failure output
+      summary: Customise failure text with the pytest_assertrepr_compare hook, and hide helper frames
         with __tracebackhide__
       lenses: [typing-dx, reuse]
       signature: pytest_assertrepr_compare(config, op, left, right)
       ref: /how-to/assert.html#defining-your-own-explanation-for-failed-assertions
     - id: assert-return-none
-      name: 'Return-not-None guard'
-      summary: 'A test that returns a non-None value triggers PytestReturnNotNoneWarning and never fails'
+      name: Return-not-None guard
+      summary: A test that returns a non-None value triggers PytestReturnNotNoneWarning and never fails
         on a returned False
       lenses: [best-practice, reliability]
       signature: PytestReturnNotNoneWarning
       notes: [warning only; returned bool never fails; use filterwarnings=error]
       ref: /how-to/assert.html#returning-non-none-value-in-test-functions
   - id: fixtures
-    title: 'Fixtures'
+    title: Fixtures
     level: basic
     requires: []
     ref: /how-to/fixtures.html
     entries:
     - id: fx-basic
-      name: 'Request by argument name'
-      summary: 'Declare a setup function with @pytest.fixture; tests and other fixtures receive its value'
+      name: Request by argument name
+      summary: Declare a setup function with @pytest.fixture; tests and other fixtures receive its value
         by naming it as an argument
       lenses: [composability, reuse]
       signature: '@pytest.fixture(scope="function", params=None, autouse=False, ids=None, name=None)'
@@ -161,13 +161,13 @@ groups:
       returns: the decorated function, registered as a fixture; return/yield value is injected into requesters
       ref: /how-to/fixtures.html#requesting-fixtures
     - id: fx-factory
-      name: 'Factory as fixture'
-      summary: 'Return a callable from a fixture when a test needs several differently configured instances'
+      name: Factory as fixture
+      summary: Return a callable from a fixture when a test needs several differently configured instances
       lenses: [composability, reuse]
       ref: /how-to/fixtures.html#factories-as-fixtures
     - id: fx-yield
-      name: 'Teardown'
-      summary: 'yield in a fixture runs the code after it as teardown whatever the test outcome; use one'
+      name: Teardown
+      summary: yield in a fixture runs the code after it as teardown whatever the test outcome; use one
         fixture per resource
       lenses: [reliability, best-practice]
       signature: yield value
@@ -175,29 +175,29 @@ groups:
           leak]
       ref: /how-to/fixtures.html#teardown-cleanup-aka-fixture-finalization
     - id: fx-autouse
-      name: 'Autouse'
-      summary: 'autouse=True activates a fixture for every test in its scope without requesting it; runs'
+      name: Autouse
+      summary: autouse=True activates a fixture for every test in its scope without requesting it; runs
         before explicit fixtures of the same scope
       lenses: [reliability, testing]
       signature: '@pytest.fixture(autouse=True)'
       ref: /how-to/fixtures.html#autouse-fixtures-fixtures-you-don-t-have-to-request
     - id: fx-scope
-      name: 'Scope'
-      summary: 'Share one fixture instance across tests; scope trades speed against isolation'
+      name: Scope
+      summary: Share one fixture instance across tests; scope trades speed against isolation
       lenses: [perf, reliability]
       signature: '@pytest.fixture(scope="session")'
       notes: [a fixture may only depend on fixtures of equal or wider scope, 'dynamic scope: pass a callable
           (fixture_name, config) returning a scope name']
       ref: /how-to/fixtures.html#scope-sharing-fixtures-across-classes-modules-packages-or-session
     - id: fx-params
-      name: 'Parametrized fixtures'
-      summary: 'Run the fixture and each test using it once per params value, read via request.param'
+      name: Parametrized fixtures
+      summary: Run the fixture and each test using it once per params value, read via request.param
       lenses: [testing, composability]
       signature: '@pytest.fixture(params=[...], ids=...)'
       ref: /how-to/fixtures.html#parametrizing-fixtures
     - id: fx-request
-      name: 'Requesting-test context'
-      summary: 'The request fixture exposes the requesting test (node, config, param) and lets a fixture'
+      name: Requesting-test context
+      summary: The request fixture exposes the requesting test (node, config, param) and lets a fixture
         add finalizers or resolve fixtures lazily
       lenses: [composability]
       signature: FixtureRequest.getfixturevalue/applymarker/node/config
@@ -205,62 +205,62 @@ groups:
         prefer argument injection to getfixturevalue]
       ref: /how-to/fixtures.html#fixtures-can-introspect-the-requesting-test-context
     - id: fx-usefixtures
-      name: 'Declarative use'
-      summary: 'Apply fixtures to a test, class or module without an argument (for side effects); the ini'
+      name: Declarative use
+      summary: Apply fixtures to a test, class or module without an argument (for side effects); the ini
         option applies them to all tests
       lenses: [composability, reuse]
       signature: '@pytest.mark.usefixtures(*names)'
       notes: [has no effect when applied to fixtures]
       ref: /how-to/fixtures.html#use-fixtures-in-classes-and-modules-with-usefixtures
     - id: fx-usefixtures-ini
-      name: 'Fixtures for every test'
-      summary: 'Apply listed fixtures to all tests, equivalent to usefixtures on each'
+      name: Fixtures for every test
+      summary: Apply listed fixtures to all tests, equivalent to usefixtures on each
       lenses: [composability, reuse]
       signature: usefixtures = ["name", ...]
       ref: /reference/reference.html#confval-usefixtures
     - id: fx-override
-      name: 'Override per conftest, module or test'
-      summary: 'A fixture of the same name in a closer conftest, module or test overrides the outer one'
+      name: Override per conftest, module or test
+      summary: A fixture of the same name in a closer conftest, module or test overrides the outer one
       lenses: [composability, testing]
       notes: [9.1.1 fixed a 9.1.0 regression overriding a parametrized fixture with indirect parametrize]
       ref: /how-to/fixtures.html#overriding-fixtures-on-various-levels
     - id: fx-conftest
-      name: 'conftest.py sharing and order'
-      summary: 'Fixtures in conftest.py are visible to tests in that directory and below without imports'
+      name: conftest.py sharing and order
+      summary: Fixtures in conftest.py are visible to tests in that directory and below without imports
       lenses: [reuse, composability]
       ref: /reference/fixtures.html#conftest-py-sharing-fixtures-across-multiple-files
     - id: fx-builtin
-      name: 'Built-in fixtures'
-      summary: 'pytest ships fixtures for config, caching, temp paths, output capture, logging, monkeypatching,'
+      name: Built-in fixtures
+      summary: pytest ships fixtures for config, caching, temp paths, output capture, logging, monkeypatching,
         warnings and subtests
       lenses: [reuse]
       signature: request, pytestconfig, cache, record_property, tmp_path_factory, subtests
       ref: /reference/fixtures.html#built-in-fixtures
     - id: fx-typing
-      name: 'Typed fixtures and tests'
-      summary: 'Annotate fixtures and tests (pytest.MonkeyPatch, CaptureFixture[str], LogCaptureFixture,'
+      name: Typed fixtures and tests
+      summary: Annotate fixtures and tests (pytest.MonkeyPatch, CaptureFixture[str], LogCaptureFixture,
         Path) so type checkers see fixture values
       lenses: [typing-dx]
       signature: pytest.MonkeyPatch
       notes: ['mypy files cover src and feature scripts only, so tests stay unchecked']
       ref: /explanation/types.html#using-typing-in-test-suites
     - id: fx-register-fixture
-      name: 'Imperative registration'
-      summary: 'Plugin-author API to register a fixture imperatively on a collection node; normal code'
+      name: Imperative registration
+      summary: Plugin-author API to register a fixture imperatively on a collection node; normal code
         uses @pytest.fixture
       lenses: [composability]
       signature: pytest.register_fixture(*, name, func, node, scope="function", params=None, ids=None,
         autouse=False)
       ref: /reference/reference.html#pytest-register-fixture
   - id: parametrize
-    title: 'Parametrization and subtests'
+    title: Parametrization and subtests
     level: basic
     requires: [fixtures]
     ref: /how-to/parametrize.html
     entries:
     - id: pm-parametrize
-      name: 'Table-driven tests'
-      summary: 'Run one test body over a table of argument values, one collected test per row'
+      name: Table-driven tests
+      summary: Run one test body over a table of argument values, one collected test per row
       lenses: [testing, reuse]
       signature: '@pytest.mark.parametrize(argnames, argvalues, indirect=False, ids=None, scope=None)'
       params:
@@ -278,8 +278,8 @@ groups:
         stacked decorators combine as a cartesian product]
       ref: /how-to/parametrize.html#pytest-mark-parametrize-parametrizing-test-functions
     - id: pm-param
-      name: 'Per-case id and marks'
-      summary: 'Wrap one parametrize row to give it an explicit id and per-row marks (xfail, skip)'
+      name: Per-case id and marks
+      summary: Wrap one parametrize row to give it an explicit id and per-row marks (xfail, skip)
       lenses: [reliability, testing]
       signature: pytest.param(*values, id=None, marks=())
       params:
@@ -293,22 +293,22 @@ groups:
           needs id=)]
       ref: /reference/reference.html#pytest.param
     - id: pm-ids
-      name: 'Readable ids'
-      summary: 'Control parametrized test ids with an ids list or callable so failures are identifiable'
+      name: Readable ids
+      summary: Control parametrized test ids with an ids list or callable so failures are identifiable
         and stable for -k and node ids
       lenses: [typing-dx, observability]
       signature: ids=[...] | ids=callable
       ref: /example/parametrize.html#different-options-for-test-ids
     - id: pm-indirect
-      name: 'Indirect parametrization'
-      summary: 'Route parametrize values through a fixture (via request.param) so expensive setup happens'
+      name: Indirect parametrization
+      summary: Route parametrize values through a fixture (via request.param) so expensive setup happens
         at test setup, not collection
       lenses: [composability]
       signature: indirect=True|[names], request.param
       ref: /example/parametrize.html#indirect-parametrization
     - id: pm-generate
-      name: 'Dynamic parametrization'
-      summary: 'Generate parametrized calls programmatically from fixtures names, CLI options or data in'
+      name: Dynamic parametrization
+      summary: Generate parametrized calls programmatically from fixtures names, CLI options or data in
         a pytest_generate_tests hook
       lenses: [composability]
       signature: pytest_generate_tests(metafunc); metafunc.parametrize(argnames, argvalues, ...)
@@ -316,8 +316,8 @@ groups:
           test directory and parents are consulted]
       ref: /how-to/parametrize.html#basic-pytest-generate-tests-example
     - id: pm-subtests
-      name: 'Subtests (core since 9.0)'
-      summary: 'Report several independent assertions inside one test, each failing separately (built in'
+      name: Subtests (core since 9.0)
+      summary: Report several independent assertions inside one test, each failing separately (built in
         since pytest 9.0)
       lenses: [testing]
       signature: 'with subtests.test(msg=None, **kwargs):'
@@ -330,7 +330,7 @@ groups:
       notes: ['runtime-generated, not selectable by node id or --lf; prefer parametrize for tables']
       ref: /how-to/subtests.html#parametrization-vs-subtests
     - id: pm-empty-set
-      name: 'Empty parameter sets'
+      name: Empty parameter sets
       summary: 'ini option choosing what happens when parametrize collects an empty value set: skip, xfail
         or fail_at_collect'
       lenses: [reliability, best-practice]
@@ -339,21 +339,21 @@ groups:
           xfail]
       ref: /reference/reference.html#confval-empty_parameter_set_mark
   - id: marks
-    title: 'Marks, skip and xfail'
+    title: Marks, skip and xfail
     level: basic
     requires: []
     ref: /how-to/mark.html
     entries:
     - id: mk-register
-      name: 'Registered markers'
-      summary: 'Declare custom marks in ini and turn typos into errors with strict_markers; unregistered'
+      name: Registered markers
+      summary: Declare custom marks in ini and turn typos into errors with strict_markers; unregistered
         marks are otherwise silent
       lenses: [best-practice, reliability]
       signature: 'markers = ["name: description"]; strict_markers = true'
       ref: /how-to/mark.html#raising-errors-on-unknown-marks
     - id: mk-skip
-      name: 'Skips'
-      summary: 'Skip tests unconditionally, on a condition, or at runtime when a module is unavailable'
+      name: Skips
+      summary: Skip tests unconditionally, on a condition, or at runtime when a module is unavailable
       lenses: [reliability, testing]
       signature: '@pytest.mark.skip(reason=None); @pytest.mark.skipif(condition, *, reason=None); pytest.skip(reason,
         allow_module_level=False)'
@@ -365,8 +365,8 @@ groups:
       notes: [importorskip default exc_type ModuleNotFoundError since 9.1]
       ref: /how-to/skipping.html#skipping-test-functions
     - id: mk-importorskip
-      name: 'Skip a module when a dependency is missing'
-      summary: 'Import a module or skip the test/module when it is unavailable or too old'
+      name: Skip a module when a dependency is missing
+      summary: Import a module or skip the test/module when it is unavailable or too old
       lenses: [reliability, testing]
       signature: pytest.importorskip(modname, minversion=None, reason=None, *, exc_type=None)
       params:
@@ -379,8 +379,8 @@ groups:
       notes: [default exc_type ModuleNotFoundError since 9.1]
       ref: /reference/reference.html#pytest-importorskip
     - id: mk-xfail
-      name: 'Expected failures'
-      summary: 'Mark a test as expected to fail; strict makes an unexpected pass fail the run'
+      name: Expected failures
+      summary: Mark a test as expected to fail; strict makes an unexpected pass fail the run
       lenses: [reliability, best-practice]
       signature: '@pytest.mark.xfail(condition=False, *, reason=None, raises=None, run=True, strict=strict_xfail)'
       params:
@@ -393,63 +393,63 @@ groups:
       notes: ['non-strict xfail is quarantine, risky long-term']
       ref: /how-to/skipping.html#strict-parameter
     - id: mk-select
-      name: 'Selecting tests'
-      summary: 'Choose tests with -m mark expressions, -k name expressions or node ids; a custom option'
+      name: Selecting tests
+      summary: Choose tests with -m mark expressions, -k name expressions or node ids; a custom option
         plus marker can gate slow runs
       lenses: [composability, cost]
       signature: -m expr, -k expr, pytest_addoption
       ref: /example/markers.html#custom-marker-and-command-line-option-to-control-test-runs
     - id: mk-auto-mark
-      name: 'Automatic marks'
-      summary: 'Add marks to collected tests from name, path or content in the pytest_collection_modifyitems'
+      name: Automatic marks
+      summary: Add marks to collected tests from name, path or content in the pytest_collection_modifyitems
         hook
       lenses: [composability]
       signature: pytest_collection_modifyitems(session, config, items)
       ref: /example/markers.html#automatically-adding-markers-based-on-test-names
   - id: test-design
-    title: 'Anatomy and fixture design'
+    title: Anatomy and fixture design
     level: basic
     requires: []
     ref: /explanation/anatomy.html
     entries:
     - id: td-anatomy
-      name: 'Arrange-Act-Assert-Cleanup'
-      summary: 'A test is Arrange, Act, Assert, Cleanup; act and assert are the core and arrange only supplies'
+      name: Arrange-Act-Assert-Cleanup
+      summary: A test is Arrange, Act, Assert, Cleanup; act and assert are the core and arrange only supplies
         context
       lenses: [best-practice, testing]
       notes: [one state-changing act per test keeps failures attributable; fixtures carry the arrange
           and cleanup steps]
       ref: /explanation/anatomy.html
     - id: td-fixture-model
-      name: 'Fixture model'
-      summary: 'Fixtures are explicit, modular and scalable; they define the arrange phase (and optionally'
+      name: Fixture model
+      summary: Fixtures are explicit, modular and scalable; they define the arrange phase (and optionally
         act) and are requested by argument name
       lenses: [best-practice, composability]
       notes: [improves on xunit setup/teardown with named, composable fixtures that may themselves use
           fixtures and be parametrized or scoped]
       ref: /explanation/fixtures.html#what-fixtures-are
     - id: td-fixture-errors
-      name: 'Fixture errors'
-      summary: 'A fixture raising stops later fixtures and the test; the test reports ERROR (could not'
+      name: Fixture errors
+      summary: A fixture raising stops later fixtures and the test; the test reports ERROR (could not
         run), not FAILED
       lenses: [reliability, testing]
       notes: [keep fixture dependency chains short so one broken fixture does not hide unrelated problems]
       ref: /explanation/fixtures.html#fixture-errors
     - id: td-test-data
-      name: 'Sharing test data'
-      summary: 'Load file-based test data in a fixture (uses pytest caching) or keep data files in the'
+      name: Sharing test data
+      summary: Load file-based test data in a fixture (uses pytest caching) or keep data files in the
         tests directory
       lenses: [reuse, composability]
       notes: [community plugins pytest-datadir and pytest-datafiles exist; not vetted here]
       ref: /explanation/fixtures.html#sharing-test-data
     - id: td-cleanup-signals
-      name: 'Fixture cleanup and signals'
-      summary: 'pytest does no special SIGTERM or SIGQUIT handling, so fixtures managing external resources'
+      name: Fixture cleanup and signals
+      summary: pytest does no special SIGTERM or SIGQUIT handling, so fixtures managing external resources
         can leak them when killed by those signals
       lenses: [reliability]
       notes: [SIGINT is handled via KeyboardInterrupt; handlers are global so pytest leaves them alone]
       ref: /explanation/fixtures.html#a-note-about-fixture-cleanup
-- title: 'Isolation and observation'
+- title: Isolation and observation
   sections:
   - id: isolation
     title: 'Isolation: env, files, output, logs, warnings'
@@ -458,8 +458,8 @@ groups:
     ref: /how-to/monkeypatch.html
     entries:
     - id: iso-monkeypatch
-      name: 'Reversible patching'
-      summary: 'Patch attributes, dict items, env vars, cwd or sys.path for one test and undo automatically'
+      name: Reversible patching
+      summary: Patch attributes, dict items, env vars, cwd or sys.path for one test and undo automatically
         afterwards
       lenses: [testing, reliability]
       signature: monkeypatch.setattr(target, name, value, raising=True)
@@ -472,23 +472,23 @@ groups:
           value) also works']
       ref: /how-to/monkeypatch.html#monkeypatching-functions
     - id: iso-network-block
-      name: 'Offline guard'
-      summary: 'Autouse fixture replacing socket connection primitives so any real network call fails the'
+      name: Offline guard
+      summary: Autouse fixture replacing socket connection primitives so any real network call fails the
         test
       lenses: [security, reliability]
       signature: monkeypatch.setattr(socket.socket, "connect", guard)
       ref: /how-to/monkeypatch.html#global-patch-example-preventing-requests-from-remote-operations
     - id: iso-conftest-env
-      name: 'Env before import'
-      summary: 'Set os.environ at conftest import time when code reads settings at import, before the app'
+      name: Env before import
+      summary: Set os.environ at conftest import time when code reads settings at import, before the app
         is imported
       lenses: [reliability, testing]
       signature: os.environ
       notes: [Settings read env at import; LANGSMITH_TRACING=false (else StopIteration)]
       ref: /reference/fixtures.html#conftest-py
     - id: iso-tmp-path
-      name: 'Temp files'
-      summary: 'Per-test unique temporary directory as pathlib.Path; tmp_path_factory.mktemp makes shared'
+      name: Temp files
+      summary: Per-test unique temporary directory as pathlib.Path; tmp_path_factory.mktemp makes shared
         ones for wider scopes
       lenses: [reliability, security]
       signature: tmp_path; tmp_path_factory.mktemp(basename, numbered=True)
@@ -500,16 +500,16 @@ groups:
       returns: Path under the base temp dir; the base is created per session (see --basetemp)
       ref: /reference/reference.html#tmp-path
     - id: iso-capture
-      name: 'Output capture'
-      summary: 'Capture and assert what code writes to stdout/stderr (capsys) or file descriptors (capfd);'
+      name: Output capture
+      summary: Capture and assert what code writes to stdout/stderr (capsys) or file descriptors (capfd);
         capteesys also passes output through
       lenses: [testing, security]
       signature: capsys.readouterr()
       returns: namedtuple (out, err) of text since the last call; resets the buffer
       ref: /how-to/capture-stdout-stderr.html#accessing-captured-output-from-a-test-function
     - id: iso-caplog
-      name: 'Log assertions'
-      summary: 'Capture and assert log records; adjust logger levels for the test only'
+      name: Log assertions
+      summary: Capture and assert log records; adjust logger levels for the test only
       lenses: [observability, testing]
       signature: caplog.set_level(level, logger=None); with caplog.at_level(level, logger=None)
       params:
@@ -521,8 +521,8 @@ groups:
         .clear()
       ref: /how-to/logging.html#caplog-fixture
     - id: iso-warnings
-      name: 'Warning policy'
-      summary: 'Control warnings per run or per test; "error" turns them into failures, and max_warnings'
+      name: Warning policy
+      summary: Control warnings per run or per test; "error" turns them into failures, and max_warnings
         caps the total
       lenses: [best-practice, reliability]
       signature: filterwarnings = ["error", ...]; @pytest.mark.filterwarnings(filter)
@@ -530,46 +530,46 @@ groups:
           strings; later entries override earlier]
       ref: /how-to/capture-warnings.html#controlling-warnings
     - id: iso-max-warnings
-      name: 'Warning budget'
-      summary: 'Fail the run when the total warning count exceeds a limit even though all tests pass'
+      name: Warning budget
+      summary: Fail the run when the total warning count exceeds a limit even though all tests pass
       lenses: [best-practice, reliability]
       signature: max_warnings = N | --max-warnings N
       since: '9.1'
       notes: [exit code 6 (MAX_WARNINGS_ERROR); warnings removed by filterwarnings do not count]
       ref: /reference/reference.html#confval-max_warnings
     - id: iso-tmpdir
-      name: 'Legacy py.path temp dir'
-      summary: 'Legacy py.path temp dir fixtures; superseded by tmp_path/tmp_path_factory'
+      name: Legacy py.path temp dir
+      summary: Legacy py.path temp dir fixtures; superseded by tmp_path/tmp_path_factory
       lenses: [best-practice]
       signature: tmpdir, tmpdir_factory
       deprecated: replaced by tmp_path; docs call it deprecated
       ref: /how-to/tmp_path.html#the-tmpdir-and-tmpdir-factory-fixtures
-- title: 'Async tests (anyio)'
+- title: Async tests (anyio)
   sections:
   - id: async
-    title: 'Async tests with the anyio plugin'
+    title: Async tests with the anyio plugin
     level: intermediate
     requires: [fixtures]
     ref: anyio:/testing.html
     entries:
     - id: an-marker
-      name: 'Mark async tests'
-      summary: 'Mark coroutine tests for the anyio plugin, per test or for a whole module via pytestmark'
+      name: Mark async tests
+      summary: Mark coroutine tests for the anyio plugin, per test or for a whole module via pytestmark
       lenses: [testing, composability]
       signature: '@pytest.mark.anyio; pytestmark = pytest.mark.anyio'
       notes: [prove the coroutine path by making sync raise (patch Pregel.invoke), marking is equivalent
           to usefixtures("anyio_backend"); only async functions are affected]
       ref: anyio:/testing.html#creating-asynchronous-tests
     - id: an-mode
-      name: 'Auto mode'
-      summary: 'Run every async test function through anyio without markers by setting anyio_mode to auto'
+      name: Auto mode
+      summary: Run every async test function through anyio without markers by setting anyio_mode to auto
       lenses: [reuse, typing-dx]
       signature: anyio_mode = "auto"
       notes: [removes per-test markers; conflicts with pytest-asyncio auto mode (not installed)]
       ref: anyio:/testing.html#creating-asynchronous-tests
     - id: an-backend
-      name: 'Backend selection'
-      summary: 'Override the anyio_backend fixture to restrict or configure the event loops tests and fixtures'
+      name: Backend selection
+      summary: Override the anyio_backend fixture to restrict or configure the event loops tests and fixtures
         run on
       lenses: [reliability, testing]
       signature: 'def anyio_backend(): return "asyncio" | ("asyncio", {options})'
@@ -577,34 +577,34 @@ groups:
           derive from it]
       ref: anyio:/testing.html#specifying-the-backends-to-run-on
     - id: an-async-fixture
-      name: 'Async fixtures'
-      summary: 'Write async def fixtures (with yield for teardown); run in anyio-enabled tests or any fixture'
+      name: Async fixtures
+      summary: Write async def fixtures (with yield for teardown); run in anyio-enabled tests or any fixture
         depending on anyio_backend
       lenses: [composability, reliability]
       signature: '@pytest.fixture async def name(): ...'
       notes: [autouse needs anyio_backend; non-function scope needs same-scope anyio_backend]
       ref: anyio:/testing.html#asynchronous-fixtures
     - id: an-ports
-      name: 'Free ports'
-      summary: 'Fixtures returning unused TCP/UDP ports for network-service tests'
+      name: Free ports
+      summary: Fixtures returning unused TCP/UDP ports for network-service tests
       lenses: [reliability]
       signature: free_tcp_port, free_udp_port, free_tcp_port_factory, free_udp_port_factory
       ref: anyio:/testing.html#built-in-utility-fixtures
     - id: an-contextvars
-      name: 'Context variables'
-      summary: 'ContextVar values set in async fixtures propagate to tests; sync fixtures do not share'
+      name: Context variables
+      summary: ContextVar values set in async fixtures propagate to tests; sync fixtures do not share
         them
       lenses: [reliability]
       ref: anyio:/testing.html#context-variable-propagation
     - id: an-mode-flag
-      name: 'Auto mode flag'
-      summary: 'Enable auto mode for one run from the command line instead of config'
+      name: Auto mode flag
+      summary: Enable auto mode for one run from the command line instead of config
       lenses: [reuse]
       signature: --anyio-mode=auto
       ref: anyio:/testing.html#creating-asynchronous-tests
     - id: an-parametrize-backend
-      name: 'Single-backend test'
-      summary: 'Pin one test to one backend by parametrizing the anyio_backend argument, which the test'
+      name: Single-backend test
+      summary: Pin one test to one backend by parametrizing the anyio_backend argument, which the test
         function must accept
       lenses: [testing, reliability]
       signature: "@pytest.mark.parametrize('anyio_backend', ['asyncio'])"
@@ -612,45 +612,45 @@ groups:
           derive from the fixture]
       ref: anyio:/testing.html#specifying-the-backends-to-run-on
     - id: an-higher-scope
-      name: 'Higher-scoped async fixtures'
-      summary: 'Async fixtures above function scope need an anyio_backend fixture of the same scope, since'
+      name: Higher-scoped async fixtures
+      summary: Async fixtures above function scope need an anyio_backend fixture of the same scope, since
         the default is function-scoped
       lenses: [perf, reliability]
       signature: '@pytest.fixture(scope="module") def anyio_backend(): return "asyncio"'
       ref: anyio:/testing.html#using-async-fixtures-with-higher-scopes
     - id: an-runner
-      name: 'Test runner lifetime'
-      summary: 'Each backend''s test runner keeps one event loop open; one runner per test unless a higher-scoped'
+      name: Test runner lifetime
+      summary: Each backend's test runner keeps one event loop open; one runner per test unless a higher-scoped
         async fixture shares it
       lenses: [perf, reliability]
       notes: [fixtures and tests run in the same task, so task groups and cancel scopes work across fixture
           setup/teardown]
       ref: anyio:/testing.html#technical-details
     - id: an-compare
-      name: 'Comparison with other async runners'
-      summary: 'pytest-asyncio is asyncio-only and runs each fixture phase in a new task; pytest-trio is'
+      name: Comparison with other async runners
+      summary: pytest-asyncio is asyncio-only and runs each fixture phase in a new task; pytest-trio is
         Trio-only with function-scoped async fixtures
       notes: [new-task-per-phase blocks contextvar propagation and breaks task groups and cancel scopes]
       lenses: [best-practice, composability]
       ref: anyio:/testing.html#comparison-with-other-async-test-runners
-- title: 'Configuration and collection'
+- title: Configuration and collection
   sections:
   - id: config
-    title: 'Configuration, discovery and layout'
+    title: Configuration, discovery and layout
     level: intermediate
     requires: []
     ref: /reference/customize.html
     entries:
     - id: cfg-format
-      name: 'Config file formats'
-      summary: 'pytest reads config from pytest.toml, .pytest.toml, pyproject.toml ([tool.pytest] native'
+      name: Config file formats
+      summary: pytest reads config from pytest.toml, .pytest.toml, pyproject.toml ([tool.pytest] native
         TOML, or [tool.pytest.ini_options]) or ini files
       lenses: [best-practice, typing-dx]
       signature: '[tool.pytest] | [tool.pytest.ini_options]'
       ref: /reference/customize.html#configuration-file-formats
     - id: cfg-strict-flags
-      name: 'Individual strictness'
-      summary: 'Turn config typos, unknown marks, non-strict xfail and duplicate parametrize ids into errors,'
+      name: Individual strictness
+      summary: Turn config typos, unknown marks, non-strict xfail and duplicate parametrize ids into errors,
         each individually
       lenses: [best-practice, reliability]
       signature: strict_config = true; strict_markers = true; strict_xfail = true; strict_parametrization_ids
@@ -658,8 +658,8 @@ groups:
       notes: [strict_parametrization_ids is the missing fourth (since 9.0)]
       ref: /reference/reference.html#confval-strict_config
     - id: cfg-strict
-      name: 'Umbrella strict mode'
-      summary: 'One switch enabling every current and future strictness option; an explicit individual'
+      name: Umbrella strict mode
+      summary: One switch enabling every current and future strictness option; an explicit individual
         option overrides it
       lenses: [best-practice, reliability]
       signature: strict = true
@@ -668,38 +668,38 @@ groups:
         collection fails on duplicate lambda ids in test_gateways_omniroute.py (verified 2026-10-05)]
       ref: /explanation/goodpractices.html#using-pytest-s-strict-mode
     - id: cfg-pythonpath
-      name: 'Import path'
-      summary: 'Prepend directories (rootdir-relative) to sys.path for the session, e.g. to import non-package'
+      name: Import path
+      summary: Prepend directories (rootdir-relative) to sys.path for the session, e.g. to import non-package
         script dirs
       lenses: [composability, best-practice]
       signature: pythonpath = ["dir", ...]
       ref: /reference/reference.html#confval-pythonpath
     - id: cfg-discovery
-      name: 'Discovery'
-      summary: 'Narrow where and what pytest collects with testpaths and python_files/classes/functions'
+      name: Discovery
+      summary: Narrow where and what pytest collects with testpaths and python_files/classes/functions
       lenses: [best-practice]
       signature: testpaths = ["tests"]; python_files; python_classes; python_functions; norecursedirs
       notes: [testpaths applies only when no paths or node ids are given on the command line]
       ref: /explanation/goodpractices.html#conventions-for-python-test-discovery
     - id: cfg-addopts
-      name: 'Default options'
-      summary: 'Default CLI arguments and a minimum pytest version or required plugins, enforced for every'
+      name: Default options
+      summary: Default CLI arguments and a minimum pytest version or required plugins, enforced for every
         run
       lenses: [reliability, reuse]
       signature: addopts = ["-ra", ...]; minversion = "9"; required_plugins = ["pkg>=x"]
       notes: [required_plugins fails fast when a plugin is missing; none set]
       ref: /reference/reference.html#confval-required_plugins
     - id: cfg-import-mode
-      name: 'Import mode and layout'
-      summary: 'How pytest imports test modules and adjusts sys.path; importlib avoids unique-basename'
+      name: Import mode and layout
+      summary: How pytest imports test modules and adjusts sys.path; importlib avoids unique-basename
         and sys.path side effects
       lenses: [best-practice, reliability]
       signature: --import-mode=prepend|append|importlib
       notes: [importlib advised for new projects; prepend needs unique basenames]
       ref: /explanation/pythonpath.html#import-modes
     - id: cfg-exit-codes
-      name: 'Exit codes'
-      summary: 'Stable exit codes 0-6 (pass, failures, interrupted, internal, usage, nothing collected,'
+      name: Exit codes
+      summary: Stable exit codes 0-6 (pass, failures, interrupted, internal, usage, nothing collected,
         max warnings) as pytest.ExitCode
       lenses: [reliability]
       signature: pytest.ExitCode
@@ -707,45 +707,45 @@ groups:
           these]
       ref: /reference/exit-codes.html
     - id: cfg-plugin-autoload
-      name: 'Plugin control'
-      summary: 'Disable entry-point plugin autoloading or single plugins to remove hidden test-environment'
+      name: Plugin control
+      summary: Disable entry-point plugin autoloading or single plugins to remove hidden test-environment
         dependencies
       lenses: [security, reliability]
       signature: -p no:NAME; PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 / --disable-plugin-autoload
       notes: [disabling autoload also drops anyio's plugin unless re-added with -p]
       ref: /how-to/plugins.html#disabling-plugins-from-autoloading
     - id: cfg-ci
-      name: 'CI detection'
-      summary: 'A non-empty CI or BUILD_NUMBER env var marks a CI run; the short summary is then no longer'
+      name: CI detection
+      summary: A non-empty CI or BUILD_NUMBER env var marks a CI run; the short summary is then no longer
         truncated to terminal width
       lenses: [reliability, observability]
       signature: CI, BUILD_NUMBER
       ref: /explanation/ci.html
-- title: 'Extending pytest'
+- title: Extending pytest
   sections:
   - id: extend
-    title: 'Hooks, plugins and testing the test tooling'
+    title: Hooks, plugins and testing the test tooling
     level: advanced
     requires: [fixtures, config]
     ref: /how-to/writing_plugins.html
     entries:
     - id: ex-conftest-hooks
-      name: 'Local hooks'
-      summary: 'Implement hooks directly in conftest.py to add options, mutate collection, or parametrize'
+      name: Local hooks
+      summary: Implement hooks directly in conftest.py to add options, mutate collection, or parametrize
         without writing a plugin package
       lenses: [composability, reuse]
       signature: 'def pytest_addoption(parser, pluginmanager): parser.addoption(...) / parser.addini(...)'
       ref: /how-to/writing_plugins.html#conftest-py-local-per-directory-plugins
     - id: ex-hook-wrapper
-      name: 'Hook wrappers'
-      summary: 'Wrap other hook implementations with a generator that yields once, to run code before and'
+      name: Hook wrappers
+      summary: Wrap other hook implementations with a generator that yields once, to run code before and
         after them
       lenses: [composability]
       signature: '@pytest.hookimpl(wrapper=True) def hook(...): result = yield; return result'
       ref: /how-to/writing_hook_functions.html#hook-wrappers-executing-around-other-hooks
     - id: ex-pytester
-      name: 'Test pytest config and plugins'
-      summary: 'Run pytest in an isolated directory to assert a plugin or config behaves as intended'
+      name: Test pytest config and plugins
+      summary: Run pytest in an isolated directory to assert a plugin or config behaves as intended
       lenses: [testing, reliability]
       signature: pytester.makepyfile(...); result = pytester.runpytest(); result.assert_outcomes(passed=0,
         ...)
@@ -754,97 +754,97 @@ groups:
       notes: [off by default; set `pytest_plugins = "pytester"` in the top conftest]
       ref: /how-to/writing_plugins.html#testing-plugins
     - id: ex-assert-helper
-      name: 'Assertion helpers'
-      summary: 'Hide helper frames from tracebacks so failures point at the test line'
+      name: Assertion helpers
+      summary: Hide helper frames from tracebacks so failures point at the test line
       lenses: [typing-dx, reuse]
       signature: __tracebackhide__ = True
       ref: /example/simple.html#writing-well-integrated-assertion-helpers
     - id: ex-assert-rewrite
-      name: 'Rewrite helper modules'
-      summary: 'Enable assertion rewriting for helper modules imported before pytest collects them'
+      name: Rewrite helper modules
+      summary: Enable assertion rewriting for helper modules imported before pytest collects them
       lenses: [typing-dx]
       signature: pytest.register_assert_rewrite(*names)
       ref: /how-to/writing_plugins.html#assertion-rewriting
-- title: 'Quality, speed and CI'
+- title: Quality, speed and CI
   sections:
   - id: quality
-    title: 'Reliability, hygiene and runs'
+    title: Reliability, hygiene and runs
     level: intermediate
     requires: [config]
     ref: /explanation/flaky.html
     entries:
     - id: q-flaky
-      name: 'Flaky-test causes'
+      name: Flaky-test causes
       summary: 'Docs list the usual flaky-test causes: shared state, order dependence, time and threading,
         and strict asserts'
       lenses: [reliability, testing]
       notes: [pytest.raises/warns not thread-safe; PYTEST_CURRENT_TEST names a stuck test]
       ref: /explanation/flaky.html#potential-root-causes
     - id: q-random-order
-      name: 'Order randomizers'
-      summary: 'Third-party order randomizers surface order dependence; not part of pytest'
+      name: Order randomizers
+      summary: Third-party order randomizers surface order dependence; not part of pytest
       lenses: [reliability]
       notes: ['third-party, not admitted; gate with lib_check.sh first']
       ref: /explanation/flaky.html#related-features
     - id: q-lint
-      name: 'Test-style lint'
-      summary: 'Lint pytest idioms (fixture parens, parametrize names, raises usage) with ruff PT rules'
+      name: Test-style lint
+      summary: Lint pytest idioms (fixture parens, parametrize names, raises usage) with ruff PT rules
         (flake8-pytest-style)
       lenses: [best-practice, typing-dx]
       notes: [ruff select omits PT; ruff rules list names flake8-pytest-style (PT)]
       ref: /explanation/goodpractices.html#checking-with-flake8-pytest-style
     - id: q-fail-fast
-      name: 'Stop and debug'
-      summary: 'Stop after first or N failures and drop into the debugger on failure'
+      name: Stop and debug
+      summary: Stop after first or N failures and drop into the debugger on failure
       lenses: [reliability, cost]
       signature: -x | --maxfail=N | --pdb
       ref: /how-to/failures.html#stopping-after-the-first-or-n-failures
     - id: q-cache
-      name: 'Cache provider'
-      summary: 'Rerun only last failures or failures first using the .pytest_cache provider'
+      name: Cache provider
+      summary: Rerun only last failures or failures first using the .pytest_cache provider
       lenses: [perf, cost]
       signature: --lf | --ff | --sw | --cache-clear; config.cache.get/set(key, value)
       notes: ['state lives in .pytest_cache; `-p no:cacheprovider` for read-only runs']
       ref: /how-to/cache.html#rerunning-only-failures-or-failures-first
     - id: q-durations
-      name: 'Slow-test profile'
-      summary: 'List the slowest N test phases to find slow tests'
+      name: Slow-test profile
+      summary: List the slowest N test phases to find slow tests
       lenses: [perf]
       signature: --durations=N --durations-min=SECONDS
       notes: ['failure-path tests must set retries to 0, else real backoff sleeps (1s+2s) dominate']
       ref: /how-to/usage.html#profiling-test-execution-duration
     - id: q-unittest
-      name: 'unittest.TestCase interop'
-      summary: 'Run unittest.TestCase classes; fixtures and marks work with them via autouse and usefixtures'
+      name: unittest.TestCase interop
+      summary: Run unittest.TestCase classes; fixtures and marks work with them via autouse and usefixtures
       lenses: [reuse]
       ref: /how-to/unittest.html
     - id: q-xunit-setup
-      name: 'xunit-style setup_/teardown_'
-      summary: 'Legacy xunit-style setup_/teardown_ hooks; fixtures are preferred'
+      name: xunit-style setup_/teardown_
+      summary: Legacy xunit-style setup_/teardown_ hooks; fixtures are preferred
       lenses: [best-practice]
       signature: setup_module, setup_method
       ref: /how-to/xunit_setup.html
     - id: q-doctest
-      name: 'Doctests'
-      summary: 'Collect doctests from modules or text files; doctest_namespace fixture injects names'
+      name: Doctests
+      summary: Collect doctests from modules or text files; doctest_namespace fixture injects names
       lenses: [testing]
       signature: --doctest-modules; doctest_namespace
       ref: /how-to/doctest.html
     - id: q-compat
-      name: 'Compatibility policy'
-      summary: 'Deprecation roadmap and supported Python versions; check before major bumps'
+      name: Compatibility policy
+      summary: Deprecation roadmap and supported Python versions; check before major bumps
       lenses: [reliability, best-practice]
       notes: [read before bumping majors]
       ref: /backwards-compatibility.html#deprecation-roadmap
   - id: output
-    title: 'Managing output and reports'
+    title: Managing output and reports
     level: basic
     requires: []
     ref: /how-to/output.html
     entries:
     - id: out-traceback
-      name: 'Traceback and capture flags'
-      summary: 'Control traceback style, local variables, output capture and full traces on interrupt'
+      name: Traceback and capture flags
+      summary: Control traceback style, local variables, output capture and full traces on interrupt
       lenses: [observability, ux-a11y]
       signature: --tb=auto|long|short|line|native|no; -l/--showlocals (--no-showlocals); -s/--capture=fd|sys|no|tee-sys;
         --full-trace
@@ -852,8 +852,8 @@ groups:
           is fd]
       ref: /how-to/output.html#modifying-python-traceback-printing
     - id: out-verbosity
-      name: 'Verbosity levels'
-      summary: '-q quiets, -v lists each test and widens assertion diffs, -vv removes assertion truncation'
+      name: Verbosity levels
+      summary: -q quiets, -v lists each test and widens assertion diffs, -vv removes assertion truncation
         entirely; -vvv has no pytest effect
       lenses: [observability, ux-a11y]
       signature: -q | -v | -vv
@@ -861,60 +861,60 @@ groups:
           _-prefixed fixtures with --fixtures -v]
       ref: /how-to/output.html#verbosity
     - id: out-fine-verbosity
-      name: 'Fine-grained verbosity'
-      summary: 'Per-aspect verbosity and string-diff rendering set in config, independent of -v'
+      name: Fine-grained verbosity
+      summary: Per-aspect verbosity and string-diff rendering set in config, independent of -v
       lenses: [observability, typing-dx]
       signature: verbosity_assertions; verbosity_test_cases; assertion_text_diff_style = "ndiff"|"block"
       notes: ['assertion_text_diff_style=block prints Left:/Right: blocks, easier for whitespace diffs;
           can be set per run with -o']
       ref: /how-to/output.html#fine-grained-verbosity
     - id: out-summary
-      name: 'Short summary report'
-      summary: '-r chars list outcomes in the end-of-run short test summary; default fE'
+      name: Short summary report
+      summary: -r chars list outcomes in the end-of-run short test summary; default fE
       lenses: [observability, ux-a11y]
       signature: -r[fEsxXpPaAN]
       notes: ['f failed, E error, s skipped, x xfailed, X xpassed, p passed, P passed with output, a all
           except pP, A all, N none; --no-fold-skipped lists each skipped parametrized variant']
       ref: /how-to/output.html#producing-a-detailed-summary-report
     - id: out-truncation
-      name: 'Truncation limits'
-      summary: 'Assertion output is cut at 8 lines or 640 characters by default; tune or disable via config'
+      name: Truncation limits
+      summary: Assertion output is cut at 8 lines or 640 characters by default; tune or disable via config
       lenses: [observability]
       signature: truncation_limit_lines = N; truncation_limit_chars = N
       notes: [setting both to 0 disables truncation; setting one to 0 disables only that mode]
       ref: /how-to/output.html#modifying-truncation-limits
     - id: out-junit
-      name: 'JUnit XML reports'
-      summary: 'Write a JUnit XML result file for CI servers, with suite name and duration reporting options'
+      name: JUnit XML reports
+      summary: Write a JUnit XML result file for CI servers, with suite name and duration reporting options
       lenses: [observability, reliability]
       signature: --junit-xml=PATH; junit_suite_name; junit_duration_report = "total"|"call"
       ref: /how-to/output.html#creating-junitxml-format-files
     - id: out-record-property
-      name: 'record_property'
-      summary: 'Fixture adding a name/value property to the testcase element of the JUnit report'
+      name: record_property
+      summary: Fixture adding a name/value property to the testcase element of the JUnit report
       lenses: [observability]
       signature: record_property(name, value)
       notes: [breaks validation against the latest JUnit XML schema; custom marks can add the same via
           item.user_properties in pytest_collection_modifyitems]
       ref: /how-to/output.html#record-property
     - id: out-record-xml-attribute
-      name: 'record_xml_attribute'
-      summary: 'Fixture adding or overriding an attribute on the testcase element (e.g. classname)'
+      name: record_xml_attribute
+      summary: Fixture adding or overriding an attribute on the testcase element (e.g. classname)
       lenses: [observability]
       signature: record_xml_attribute(name, value)
       notes: [experimental; stricter CI schemas (Jenkins xsd) may reject unknown attributes]
       ref: /how-to/output.html#record-xml-attribute
     - id: out-testsuite-property
-      name: 'record_testsuite_property'
-      summary: 'Session-scoped fixture adding name/value properties at the testsuite level; schema-compatible'
+      name: record_testsuite_property
+      summary: Session-scoped fixture adding name/value properties at the testsuite level; schema-compatible
       lenses: [observability]
       signature: record_testsuite_property(name, value)
       since: '4.5'
       notes: [name must be a string; value is stringified and XML-escaped]
       ref: /how-to/output.html#record-testsuite-property
     - id: out-pastebin
-      name: 'Pastebin reporting'
-      summary: 'Submit failure details or the whole session log to a paste service and print URLs'
+      name: Pastebin reporting
+      summary: Submit failure details or the whole session log to a paste service and print URLs
       lenses: [security]
       signature: --pastebin=failed|all
       notes: [sends test output to a third-party service (bpaste.net only); a creation failure only warns]

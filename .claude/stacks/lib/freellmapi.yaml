@@ -9,10 +9,10 @@ toc:
   match: '/blob/v0\.13\.4/docs/en/.*\.md$'
   base: 'https://github.com/tashfeenahmed/freellmapi/blob/v0.13.4'
 groups:
-- title: 'AI tooling'
+- title: AI tooling
   sections:
   - id: ai-tooling
-    title: 'Repo-shipped AI tooling'
+    title: Repo-shipped AI tooling
     level: basic
     requires: []
     ref: /blob/v0.13.4/docs/en/clients/01-agent-clients.md
@@ -45,10 +45,10 @@ groups:
       summary: 'The repo ships no llms.txt, AGENTS.md or skills; the docs/en tree and server/src are the references.'
       lenses: [best-practice]
       ref: /tree/v0.13.4
-- title: 'Inference surface'
+- title: Inference surface
   sections:
   - id: inference-api
-    title: 'OpenAI-compatible /v1'
+    title: OpenAI-compatible /v1
     level: basic
     requires: []
     ref: /blob/v0.13.4/docs/en/api/01-rest-api.md
@@ -160,10 +160,10 @@ groups:
       lenses: [composability]
       signature: '/v1/responses, /v1/messages, /v1beta'
       ref: /blob/v0.13.4/docs/en/clients/01-agent-clients.md
-- title: 'Routing and failover'
+- title: Routing and failover
   sections:
   - id: routing-engine
-    title: 'Strategy and chain order'
+    title: Strategy and chain order
     level: intermediate
     requires: [inference-api]
     ref: /blob/v0.13.4/docs/en/architecture/01-routing-and-bandit-scoring.md
@@ -209,7 +209,7 @@ groups:
       - {name: 'share', type: 'float 0..1 | null', default: '0.3', desc: '0 disables the bias; null clears back to the default; effective next request.'}
       ref: /blob/v0.13.4/server/src/routes/settings.ts
   - id: failover-limits
-    title: 'Failover budgets and limits'
+    title: Failover budgets and limits
     level: intermediate
     requires: [inference-api]
     ref: /blob/v0.13.4/docs/en/env/01-variables.md
@@ -270,10 +270,10 @@ groups:
       notes:
       - 'with TRUST_PROXY the limiter keys on the left-most untrusted X-Forwarded-For entry'
       ref: /blob/v0.13.4/server/src/middleware/rateLimit.ts
-- title: 'Admin API and declarative config'
+- title: Admin API and declarative config
   sections:
   - id: admin-api
-    title: 'Admin API (/api, session Bearer)'
+    title: Admin API (/api, session Bearer)
     level: intermediate
     requires: []
     ref: /blob/v0.13.4/server/src/app.ts
@@ -378,7 +378,7 @@ groups:
       - 'PUT /api/cache/config {enabled: bool|null} flips at runtime, null reverts to env'
       ref: /blob/v0.13.4/server/src/routes/cache.ts
   - id: declarative-config
-    title: 'Declarative startup config'
+    title: Declarative startup config
     level: intermediate
     requires: [admin-api]
     ref: /blob/v0.13.4/docs/en/install/01-install.md
@@ -449,10 +449,10 @@ groups:
       - 'FREEAPI_BLOCK_PRIVATE_PROVIDER_URLS=true also blocks loopback and private ranges'
       - 'add `endpoint` in models/fallback entries when two endpoints share an id'
       ref: /blob/v0.13.4/docs/en/install/01-install.md
-- title: 'Container and operations'
+- title: Container and operations
   sections:
   - id: container-ops
-    title: 'Image, health, security'
+    title: Image, health, security
     level: basic
     requires: []
     ref: /blob/v0.13.4/docs/en/deployment/01-docker.md
@@ -517,7 +517,7 @@ groups:
       - 'update is `docker compose pull`'
       ref: /blob/v0.13.4/docs/en/deployment/02-updates-and-backup.md
   - id: optional-features
-    title: 'Off-by-default features'
+    title: Off-by-default features
     level: intermediate
     requires: [container-ops]
     ref: /blob/v0.13.4/docs/en/env/01-variables.md
@@ -561,10 +561,10 @@ groups:
       signature: 'GET /api/settings/guardrails'
       returns: '{requestMaxTokensBudget, maxConsecutiveUpstreamFails}; PUT takes either key partially, 0 disables a knob'
       ref: /blob/v0.13.4/server/src/lib/guardrails.ts
-- title: 'Catalog and quotas'
+- title: Catalog and quotas
   sections:
   - id: catalog-quotas
-    title: 'Catalog sync and quota accounting'
+    title: Catalog sync and quota accounting
     level: advanced
     requires: [routing-engine]
     ref: /blob/v0.13.4/docs/en/architecture/05-catalog-sync.md
@@ -599,10 +599,10 @@ groups:
       - {name: 'REQUEST_ANALYTICS_RETENTION_DAYS', type: 'env', default: '90', desc: 'Age bound; 0 disables the limit.'}
       - {name: 'REQUEST_ANALYTICS_MAX_ROWS', type: 'env', default: '100000', desc: 'Row cap; 0 disables the limit.'}
       ref: /blob/v0.13.4/docs/en/architecture/06-observability.md
-- title: 'Providers and quota engine'
+- title: Providers and quota engine
   sections:
   - id: provider-catalog
-    title: 'Supported platforms'
+    title: Supported platforms
     level: intermediate
     requires: []
     ref: /blob/v0.13.4/docs/en/providers/01-supported-platforms.md
@@ -651,7 +651,7 @@ groups:
       - 'failover is up to 20 attempts within the wall-clock budget'
       ref: /blob/v0.13.4/docs/en/architecture/00-high-level-index.md
   - id: quota-cooldowns
-    title: 'Quotas, cooldowns and key health'
+    title: Quotas, cooldowns and key health
     level: advanced
     requires: [provider-catalog, routing-engine]
     ref: /blob/v0.13.4/docs/en/providers/02-quotas-and-cooldowns.md
@@ -741,10 +741,10 @@ groups:
       - 'bandit router is Thompson sampling with 10% explore'
       - 'in-flight duplicates are not deduplicated by idempotency'
       ref: /blob/v0.13.4/docs/en/glossary/01-glossary.md
-- title: 'Outbound networking'
+- title: Outbound networking
   sections:
   - id: outbound-proxy
-    title: 'Provider-bound proxies'
+    title: Provider-bound proxies
     level: intermediate
     requires: [container-ops]
     ref: /blob/v0.13.4/docs/en/env/03-outbound-proxies.md
@@ -805,10 +805,10 @@ groups:
       - 'a number trusts that many hops; `true` trusts every hop, only on fully trusted networks'
       - 'behind one reverse proxy on the same host use TRUST_PROXY=1'
       ref: /blob/v0.13.4/docs/en/env/03-outbound-proxies.md
-- title: 'Operator tooling'
+- title: Operator tooling
   sections:
   - id: setup-cli
-    title: 'Setup CLI'
+    title: Setup CLI
     level: basic
     requires: []
     ref: /blob/v0.13.4/docs/en/cli/01-generators.md
@@ -843,7 +843,7 @@ groups:
       - 'generator output is pinned by snapshot tests'
       ref: /blob/v0.13.4/docs/en/cli/02-config-files.md
   - id: server-logs
-    title: 'Logs and troubleshooting'
+    title: Logs and troubleshooting
     level: intermediate
     requires: [admin-api]
     ref: /blob/v0.13.4/docs/en/logs/01-server-logs-viewer.md

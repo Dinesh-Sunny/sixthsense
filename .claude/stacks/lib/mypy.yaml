@@ -8,39 +8,39 @@ toc:
 - index: 'https://mypy.readthedocs.io/en/stable/'
   match: '^https://mypy\.readthedocs\.io/en/stable/[a-z_0-9]+\.html'
 groups:
-- title: 'AI tooling'
+- title: AI tooling
   sections:
   - id: ai-tooling
-    title: 'Agent-facing docs and tools'
+    title: Agent-facing docs and tools
     level: basic
     requires: []
     ref: /index.html
     entries:
     - id: ai-llms-txt
-      name: 'llms.txt (absent)'
-      summary: 'mypy.readthedocs.io serves no llms.txt (404, checked 2026-10-05); read the Sphinx HTML pages, or the rst sources in the git tag'
+      name: llms.txt (absent)
+      summary: mypy.readthedocs.io serves no llms.txt (404, checked 2026-10-05); read the Sphinx HTML pages, or the rst sources in the git tag
       lenses:
       - reuse
       notes:
       - docs/source/*.rst at the v<version> tag of github.com/python/mypy are the sources of the stable pages; CHANGELOG.md is the release-notes source
       ref: /index.html
     - id: ai-context7
-      name: 'Context7 docs route'
-      summary: 'Context7 id /websites/mypy_readthedocs_io_en_stable tracks the stable docs; /python/mypy is the source repo'
+      name: Context7 docs route
+      summary: Context7 id /websites/mypy_readthedocs_io_en_stable tracks the stable docs; /python/mypy is the source repo
       lenses:
       - reuse
       notes:
       - 'last tier in the docs order: no official MCP or skill exists for mypy'
       ref: /index.html
     - id: ai-mcp-skill
-      name: 'Official MCP and skill'
-      summary: 'No official mypy MCP server or agent skill; astral-sh/claude-code-plugins covers uv, ruff and ty only, not mypy'
+      name: Official MCP and skill
+      summary: No official mypy MCP server or agent skill; astral-sh/claude-code-plugins covers uv, ruff and ty only, not mypy
       lenses:
       - reuse
       ref: https://github.com/astral-sh/claude-code-plugins
     - id: ai-cli-lookup
-      name: 'CLI self-documentation'
-      summary: 'mypy --help and mypy -V report the installed flags and version; reveal_type(expr) prints an inferred type during a run'
+      name: CLI self-documentation
+      summary: mypy --help and mypy -V report the installed flags and version; reveal_type(expr) prints an inferred type during a run
       lenses:
       - reuse
       - typing-dx
@@ -49,17 +49,17 @@ groups:
       - --help prints the exact --strict flag list for the installed version
       - command-line flags are documented as liable to change between releases
       ref: /command_line.html
-- title: 'First steps'
+- title: First steps
   sections:
   - id: getting-started
-    title: 'Install, run and strict mode'
+    title: Install, run and strict mode
     level: basic
     requires: []
     ref: /getting_started.html
     entries:
     - id: run-basic
-      name: 'Installing and running mypy'
-      summary: 'Install mypy as a dev dependency and type check files or directories; directories are checked recursively'
+      name: Installing and running mypy
+      summary: Install mypy as a dev dependency and type check files or directories; directories are checked recursively
       lenses:
       - best-practice
       - reliability
@@ -69,7 +69,7 @@ groups:
       - mypy 2.4.0 requires Python >=3.10 to run (PyPI metadata)
       ref: /getting_started.html#installing-and-running-mypy
     - id: gs-gradual-typing
-      name: 'Dynamic vs static typing'
+      name: Dynamic vs static typing
       summary: 'Functions without annotations are dynamically typed: their bodies are skipped unless check_untyped_defs is on'
       lenses:
       - typing-dx
@@ -77,8 +77,8 @@ groups:
       - an unannotated call result is Any, so errors can hide behind it
       ref: /getting_started.html#dynamic-vs-static-typing
     - id: strict-mode
-      name: 'Strict mode'
-      summary: '--strict enables the flags that catch unsound typing; the goal for new code, with individual checks toggled off as needed'
+      name: Strict mode
+      summary: --strict enables the flags that catch unsound typing; the goal for new code, with individual checks toggled off as needed
       lenses:
       - best-practice
       - typing-dx
@@ -90,8 +90,8 @@ groups:
       - '2.4.0 members, cont.: warn-redundant-casts, warn-unused-ignores, warn-return-any, no-implicit-reexport, strict-equality, extra-checks (see mypy --help)'
       ref: /command_line.html#cmdoption-mypy-strict
     - id: library-types
-      name: 'Types from libraries'
-      summary: 'Typed (py.typed) packages and types-<dist> stub packages give real types; the rest import as Any'
+      name: Types from libraries
+      summary: Typed (py.typed) packages and types-<dist> stub packages give real types; the rest import as Any
       lenses:
       - best-practice
       - typing-dx
@@ -99,28 +99,28 @@ groups:
       - 'install stubs rather than ignoring the import: python -m pip install types-PyYAML'
       ref: /getting_started.html#types-from-libraries
   - id: cheat-sheet-page
-    title: 'Type hints cheat sheet'
+    title: Type hints cheat sheet
     level: basic
     requires: []
     ref: /cheat_sheet_py3.html
     entries:
     - id: cheat-sheet
-      name: 'Cheat sheet (Python 3)'
-      summary: 'One-page reference for variables, built-in collection types, functions, classes, duck types, forward references, decorators and coroutines'
+      name: Cheat sheet (Python 3)
+      summary: One-page reference for variables, built-in collection types, functions, classes, duck types, forward references, decorators and coroutines
       lenses:
       - reuse
       - typing-dx
       ref: /cheat_sheet_py3.html
   - id: existing-code
-    title: 'Adopting mypy in an existing codebase'
+    title: Adopting mypy in an existing codebase
     level: intermediate
     requires:
     - getting-started
     ref: /existing_code.html
     entries:
     - id: adopt-run-consistently
-      name: 'Run mypy consistently in CI'
-      summary: 'Check in one config, one file set and one pinned mypy version, and run it in CI so errors cannot regress'
+      name: Run mypy consistently in CI
+      summary: Check in one config, one file set and one pinned mypy version, and run it in CI so errors cannot regress
       lenses:
       - best-practice
       - reliability
@@ -128,15 +128,15 @@ groups:
       - wrap the invocation in one script or task (tox, make) so developers and CI share it
       ref: /existing_code.html#run-mypy-consistently-and-prevent-regressions
     - id: adopt-per-module-ignore
-      name: 'Ignore errors per module'
-      summary: 'Park modules not ready for checking with ignore_errors in a per-module section, or invert it and enable modules one by one'
+      name: Ignore errors per module
+      summary: Park modules not ready for checking with ignore_errors in a per-module section, or invert it and enable modules one by one
       lenses:
       - best-practice
       signature: '[[tool.mypy.overrides]] module = ''pkg.*''; ignore_errors = true'
       ref: /existing_code.html#ignoring-errors-from-certain-modules
     - id: adopt-import-errors
-      name: 'Fix import errors first'
-      summary: 'Install typed packages or stubs; suppress per library, not globally, because a global switch hides later errors'
+      name: Fix import errors first
+      summary: Install typed packages or stubs; suppress per library, not globally, because a global switch hides later errors
       lenses:
       - best-practice
       - typing-dx
@@ -144,8 +144,8 @@ groups:
       - docs advise avoiding global ignore_missing_imports when possible
       ref: /existing_code.html#fixing-errors-related-to-imports
     - id: adopt-getting-to-strict
-      name: 'Introduce stricter options gradually'
-      summary: 'Aim to pass mypy --strict; the docs list the equivalent flag set to enable one by one, starting with the easy ones'
+      name: Introduce stricter options gradually
+      summary: Aim to pass mypy --strict; the docs list the equivalent flag set to enable one by one, starting with the easy ones
       lenses:
       - best-practice
       - typing-dx
@@ -153,24 +153,24 @@ groups:
       - 'docs order: warn_unused_configs, redundant_casts, unused_ignores, strict_equality, check_untyped_defs, disallow_* flags, no_implicit_reexport, warn_return_any'
       ref: /existing_code.html#introduce-stricter-options
     - id: adopt-annotate-as-you-go
-      name: 'Annotate widely imported modules first'
-      summary: 'Annotate new code always and old code when touched, prioritising modules many others import'
+      name: Annotate widely imported modules first
+      summary: Annotate new code always and old code when touched, prioritising modules many others import
       lenses:
       - best-practice
       notes:
       - 'auto-annotation tools named by the docs: MonkeyType, autotyping, PyAnnotate'
       ref: /existing_code.html#prioritise-annotating-widely-imported-modules
-- title: 'Type system reference'
+- title: Type system reference
   sections:
   - id: inference
-    title: 'Inference and annotations'
+    title: Inference and annotations
     level: basic
     requires: []
     ref: /type_inference_and_annotations.html
     entries:
     - id: builtin-types
-      name: 'Built-in and generic types'
-      summary: 'Use the lowercase builtin generics (list[int], dict[str, int]) and collections.abc ABCs for parameters'
+      name: Built-in and generic types
+      summary: Use the lowercase builtin generics (list[int], dict[str, int]) and collections.abc ABCs for parameters
       lenses:
       - best-practice
       - typing-dx
@@ -178,8 +178,8 @@ groups:
       - 'parameters: prefer Sequence, Mapping, Iterable over list, dict; returns: concrete types'
       ref: /builtin_types.html#generic-types
     - id: type-inference
-      name: 'Local type inference'
-      summary: 'Mypy infers variable types from the first assignment; empty containers need an explicit annotation'
+      name: Local type inference
+      summary: Mypy infers variable types from the first assignment; empty containers need an explicit annotation
       lenses:
       - typing-dx
       signature: 'x: list[int] = []'
@@ -197,15 +197,15 @@ groups:
       - 'bare # type: ignore hides unrelated errors; ignore-without-code and warn_unused_ignores police this'
       ref: /type_inference_and_annotations.html#silencing-type-errors
   - id: kinds-of-types
-    title: 'Kinds of types'
+    title: Kinds of types
     level: basic
     requires:
     - inference
     ref: /kinds_of_types.html
     entries:
     - id: optional-none
-      name: 'Optional types and None'
-      summary: 'Write T | None; strict optional makes every None use need a guard such as is None or an early return'
+      name: Optional types and None
+      summary: Write T | None; strict optional makes every None use need a guard such as is None or an early return
       lenses:
       - best-practice
       - reliability
@@ -213,21 +213,21 @@ groups:
       - 'implicit Optional for `x: int = None` is off by default (implicit_optional)'
       ref: /kinds_of_types.html#optional-types-and-the-none-type
     - id: union-syntax
-      name: 'Union types'
-      summary: 'Use X | Y unions; operations must be valid on every member, so narrow before use'
+      name: Union types
+      summary: Use X | Y unions; operations must be valid on every member, so narrow before use
       lenses:
       - typing-dx
       ref: /kinds_of_types.html#alternative-union-syntax
     - id: callable-types
-      name: 'Callable types'
-      summary: 'Callable[[A, B], R] types callbacks; use a callback protocol for keyword, variadic or overloaded signatures'
+      name: Callable types
+      summary: Callable[[A, B], R] types callbacks; use a callback protocol for keyword, variadic or overloaded signatures
       lenses:
       - typing-dx
       - composability
       import: collections.abc
       ref: /kinds_of_types.html#callable-types-and-lambdas
     - id: type-aliases
-      name: 'Type aliases'
+      name: Type aliases
       summary: 'Prefer the explicit `type X = ...` statement (3.12+): lazily evaluated, allows forward and recursive refs'
       lenses:
       - best-practice
@@ -237,22 +237,22 @@ groups:
       - a `type` alias cannot be a base class or be instantiated, unlike an implicit alias
       ref: /kinds_of_types.html#type-aliases
   - id: classes
-    title: 'Classes'
+    title: Classes
     level: basic
     requires:
     - kinds-of-types
     ref: /class_basics.html
     entries:
     - id: class-vars
-      name: 'Instance and class attributes'
-      summary: 'ClassVar[T] marks an attribute as class-level; assigning it through an instance is an error'
+      name: Instance and class attributes
+      summary: ClassVar[T] marks an attribute as class-level; assigning it through an instance is an error
       lenses:
       - typing-dx
       import: typing
       ref: /class_basics.html#class-attribute-annotations
     - id: override-compat
-      name: 'Override compatibility'
-      summary: 'Overrides must accept at least the base parameters and may return a subtype (covariant return, contravariant arguments)'
+      name: Override compatibility
+      summary: Overrides must accept at least the base parameters and may return a subtype (covariant return, contravariant arguments)
       lenses:
       - reliability
       - typing-dx
@@ -269,15 +269,15 @@ groups:
       - typing.override is 3.12+; the opt-in code explicit-override makes it mandatory (skips __init__ and __new__)
       ref: /class_basics.html#overriding-statically-typed-methods
     - id: abstract-classes
-      name: 'Abstract base classes'
-      summary: 'abc.ABC with @abstractmethod; mypy errors on instantiating a class with unimplemented abstract members'
+      name: Abstract base classes
+      summary: abc.ABC with @abstractmethod; mypy errors on instantiating a class with unimplemented abstract members
       lenses:
       - typing-dx
       - composability
       ref: /class_basics.html#abstract-base-classes-and-multiple-inheritance
     - id: final-names
-      name: 'Final names, methods and classes'
-      summary: 'Final prevents reassignment, @final prevents overriding or subclassing; enforced by mypy only, not at runtime'
+      name: Final names, methods and classes
+      summary: Final prevents reassignment, @final prevents overriding or subclassing; enforced by mypy only, not at runtime
       lenses:
       - best-practice
       - reliability
@@ -285,35 +285,35 @@ groups:
       signature: 'MAX: Final = 3 | @final class C | @final def m(self)'
       ref: /final_attrs.html
   - id: dynamic-typing
-    title: 'Any and dynamic code'
+    title: Any and dynamic code
     level: intermediate
     requires:
     - kinds-of-types
     ref: /dynamic_typing.html
     entries:
     - id: any-vs-object
-      name: 'Any versus object'
-      summary: 'Any disables checking for a value; object accepts anything but allows only universal operations. Prefer object, narrow it'
+      name: Any versus object
+      summary: Any disables checking for a value; object accepts anything but allows only universal operations. Prefer object, narrow it
       lenses:
       - best-practice
       - typing-dx
       ref: /dynamic_typing.html#any-vs-object
     - id: duck-compat
-      name: 'Duck type compatibility'
-      summary: 'int is accepted where float or complex is expected, float where complex; bytearray no longer passes for bytes since 2.0'
+      name: Duck type compatibility
+      summary: int is accepted where float or complex is expected, float where complex; bytearray no longer passes for bytes since 2.0
       lenses:
       - typing-dx
       ref: /duck_type_compatibility.html
   - id: narrowing
-    title: 'Type narrowing'
+    title: Type narrowing
     level: intermediate
     requires:
     - kinds-of-types
     ref: /type_narrowing.html
     entries:
     - id: narrow-expressions
-      name: 'Narrowing expressions'
-      summary: 'isinstance, issubclass, type(x) is, callable and is None checks narrow within a branch, after early return, and after assert'
+      name: Narrowing expressions
+      summary: isinstance, issubclass, type(x) is, callable and is None checks narrow within a branch, after early return, and after assert
       lenses:
       - best-practice
       - typing-dx
@@ -321,8 +321,8 @@ groups:
       - narrowing is not carried into inner functions or lambdas for captured variables; copy to a local after narrowing
       ref: /type_narrowing.html#type-narrowing-expressions
     - id: narrow-cast
-      name: 'cast'
-      summary: 'typing.cast asserts a type with no runtime check; prefer isinstance narrowing or assert, and keep casts rare'
+      name: cast
+      summary: typing.cast asserts a type with no runtime check; prefer isinstance narrowing or assert, and keep casts rare
       lenses:
       - best-practice
       - reliability
@@ -332,16 +332,16 @@ groups:
       - warn_redundant_casts reports casts to the already-inferred type
       ref: /type_narrowing.html#casts
     - id: type-guard
-      name: 'TypeGuard'
-      summary: 'A function returning TypeGuard[T] narrows its first argument to T in the true branch only; not strict narrowing'
+      name: TypeGuard
+      summary: A function returning TypeGuard[T] narrows its first argument to T in the true branch only; not strict narrowing
       lenses:
       - typing-dx
       import: typing
       signature: 'def is_x(v: object) -> TypeGuard[X]'
       ref: /type_narrowing.html#user-defined-type-guards
     - id: type-is
-      name: 'TypeIs'
-      summary: 'A function returning TypeIs[T] narrows in both branches (intersection / complement); preferred for runtime-check predicates'
+      name: TypeIs
+      summary: A function returning TypeIs[T] narrows in both branches (intersection / complement); preferred for runtime-check predicates
       lenses:
       - best-practice
       - typing-dx
@@ -352,8 +352,8 @@ groups:
       - TypeIs needs T compatible with the input type; use typing_extensions below Python 3.13
       ref: /type_narrowing.html#typeis
     - id: assert-never
-      name: 'Exhaustiveness with assert_never'
-      summary: 'assert_never(x) in the final branch makes the type checker fail when a Literal or Enum case is unhandled'
+      name: Exhaustiveness with assert_never
+      summary: assert_never(x) in the final branch makes the type checker fail when a Literal or Enum case is unhandled
       lenses:
       - best-practice
       - reliability
@@ -363,15 +363,15 @@ groups:
       - match statements get the same check from the opt-in exhaustive-match error code
       ref: /literal_types.html#exhaustiveness-checking
   - id: protocols
-    title: 'Protocols and structural typing'
+    title: Protocols and structural typing
     level: intermediate
     requires:
     - classes
     ref: /protocols.html
     entries:
     - id: protocol-basic
-      name: 'User-defined protocols'
-      summary: 'Subclass typing.Protocol to accept any object with matching members, without inheritance'
+      name: User-defined protocols
+      summary: Subclass typing.Protocol to accept any object with matching members, without inheritance
       lenses:
       - composability
       - testing
@@ -380,8 +380,8 @@ groups:
       - 'handy for test fakes: a fake needs only the members the protocol names'
       ref: /protocols.html#simple-user-defined-protocols
     - id: protocol-callback
-      name: 'Callback protocols'
-      summary: 'A Protocol with __call__ types callbacks that Callable cannot express (keyword names, variadics, overloads)'
+      name: Callback protocols
+      summary: A Protocol with __call__ types callbacks that Callable cannot express (keyword names, variadics, overloads)
       lenses:
       - typing-dx
       - composability
@@ -389,27 +389,27 @@ groups:
       - parameter names in __call__ must match unless positional-only
       ref: /protocols.html#callback-protocols
     - id: protocol-invariance
-      name: 'Attribute invariance'
-      summary: 'Mutable protocol attributes are invariant; declare read-only members as @property to accept narrower types'
+      name: Attribute invariance
+      summary: Mutable protocol attributes are invariant; declare read-only members as @property to accept narrower types
       lenses:
       - typing-dx
       ref: /protocols.html#invariance-of-protocol-attributes
     - id: protocol-runtime
-      name: 'runtime_checkable'
+      name: runtime_checkable
       summary: '@runtime_checkable allows isinstance checks, which verify member names only, not signatures or types'
       lenses:
       - reliability
       import: typing
       ref: /protocols.html#using-isinstance-with-protocols
   - id: generics
-    title: 'Generics'
+    title: Generics
     level: advanced
     requires:
     - classes
     ref: /generics.html
     entries:
     - id: generic-classes
-      name: 'Generic classes and functions'
+      name: Generic classes and functions
       summary: 'Prefer PEP 695 syntax: class Stack[T] and def first[T](xs: Sequence[T]) -> T; variance is inferred'
       lenses:
       - best-practice
@@ -419,21 +419,21 @@ groups:
       - old TypeVar/Generic syntax stays supported with no plans to deprecate; do not mix both within one class
       ref: /generics.html#defining-generic-classes
     - id: generic-bounds
-      name: 'Bounds and constraints'
+      name: Bounds and constraints
       summary: 'T: Bound restricts a type variable to subtypes; T: (A, B) restricts it to exactly those types'
       lenses:
       - typing-dx
       ref: /generics.html#type-variables-with-upper-bounds
     - id: self-type
-      name: 'Self'
-      summary: 'typing.Self types methods that return the receiver''s own class, so subclasses keep their type; not a synonym for the class name'
+      name: Self
+      summary: typing.Self types methods that return the receiver's own class, so subclasses keep their type; not a synonym for the class name
       lenses:
       - typing-dx
       import: typing
       ref: /generics.html#automatic-self-types-using-typing-self
     - id: generic-decorators
-      name: 'Typed decorators'
-      summary: 'Annotate decorators with ParamSpec and a callable bound so decorated functions keep their signature; untyped ones are flagged by strict'
+      name: Typed decorators
+      summary: Annotate decorators with ParamSpec and a callable bound so decorated functions keep their signature; untyped ones are flagged by strict
       lenses:
       - best-practice
       - typing-dx
@@ -442,20 +442,20 @@ groups:
       - decorating a class never erases its type
       ref: /generics.html#declaring-decorators
     - id: variance
-      name: 'Variance'
-      summary: 'Immutable containers (Sequence) are covariant, list and dict invariant, Callable arguments contravariant'
+      name: Variance
+      summary: Immutable containers (Sequence) are covariant, list and dict invariant, Callable arguments contravariant
       lenses:
       - typing-dx
       ref: /generics.html#variance-of-generic-types
   - id: more-types
-    title: 'More types'
+    title: More types
     level: intermediate
     requires:
     - kinds-of-types
     ref: /more_types.html
     entries:
     - id: overloads
-      name: 'Function overloading'
+      name: Function overloading
       summary: '@overload stubs map argument types to return types; the single implementation must accept all variants'
       lenses:
       - typing-dx
@@ -464,52 +464,52 @@ groups:
       - reach for overloads when return type depends on arguments; a Union return is looser
       ref: /more_types.html#function-overloading
     - id: newtype
-      name: 'NewType'
-      summary: 'NewType(''UserId'', int) makes a distinct type with almost no runtime cost, for ids that must not be mixed up'
+      name: NewType
+      summary: NewType('UserId', int) makes a distinct type with almost no runtime cost, for ids that must not be mixed up
       lenses:
       - typing-dx
       - reliability
       import: typing
       ref: /more_types.html#newtypes
     - id: async-typing
-      name: 'Typing async/await'
-      summary: 'async def f() -> T is typed by the awaited result; calling without await yields Coroutine[Any, Any, T]'
+      name: Typing async/await
+      summary: async def f() -> T is typed by the awaited result; calling without await yields Coroutine[Any, Any, T]
       lenses:
       - typing-dx
       notes:
       - forgetting await is caught by unused-coroutine (default) and unused-awaitable (opt-in)
       ref: /more_types.html#typing-async-await
   - id: literals-enums
-    title: 'Literals, enums and TypedDict'
+    title: Literals, enums and TypedDict
     level: intermediate
     requires:
     - kinds-of-types
     ref: /literal_types.html
     entries:
     - id: literal-types
-      name: 'Literal types'
-      summary: 'Literal[''a'', ''b''] restricts values to exact constants; combine with overloads for value-dependent return types'
+      name: Literal types
+      summary: Literal['a', 'b'] restricts values to exact constants; combine with overloads for value-dependent return types
       lenses:
       - typing-dx
       - reliability
       import: typing
       ref: /literal_types.html#literal-types
     - id: enums
-      name: 'Enums'
-      summary: 'Enum members are narrowable singletons; enumerating all members in if/elif or match enables exhaustiveness checks'
+      name: Enums
+      summary: Enum members are narrowable singletons; enumerating all members in if/elif or match enables exhaustiveness checks
       lenses:
       - typing-dx
       ref: /literal_types.html#enums
     - id: typeddict
-      name: 'TypedDict'
-      summary: 'TypedDict types dicts with a fixed key set; use class syntax, and total=False on a subclass for optional keys'
+      name: TypedDict
+      summary: TypedDict types dicts with a fixed key set; use class syntax, and total=False on a subclass for optional keys
       lenses:
       - typing-dx
       import: typing
       ref: /typed_dict.html#class-based-syntax
     - id: typeddict-readonly
-      name: 'ReadOnly items'
-      summary: 'ReadOnly[T] marks TypedDict items immutable; a mutable item is assignable to a read-only one'
+      name: ReadOnly items
+      summary: ReadOnly[T] marks TypedDict items immutable; a mutable item is assignable to a read-only one
       lenses:
       - typing-dx
       - reliability
@@ -519,37 +519,37 @@ groups:
       - typing_extensions.ReadOnly below Python 3.13
       ref: /typed_dict.html#read-only-items
     - id: typeddict-closed
-      name: 'Closed TypedDict'
-      summary: 'closed=True forbids extra keys in structural subtypes (PEP 728); the extra_items argument is still unsupported'
+      name: Closed TypedDict
+      summary: closed=True forbids extra keys in structural subtypes (PEP 728); the extra_items argument is still unsupported
       lenses:
       - typing-dx
       since: '2.2'
       ref: /typed_dict.html#closing
   - id: stubs-pages
-    title: 'Stub files'
+    title: Stub files
     level: advanced
     requires:
     - classes
     ref: /stubs.html
     entries:
     - id: stub-files
-      name: 'Writing stubs'
-      summary: 'A .pyi next to a module (or under MYPYPATH) overrides its inline types; the stub wins when both exist'
+      name: Writing stubs
+      summary: A .pyi next to a module (or under MYPYPATH) overrides its inline types; the stub wins when both exist
       lenses:
       - typing-dx
       notes:
       - PEP 561 stub-only packages (foo-stubs) must be installed; MYPYPATH cannot point at them
       ref: /stubs.html#creating-a-stub
   - id: runtime-annotations
-    title: 'Annotation issues at runtime'
+    title: Annotation issues at runtime
     level: intermediate
     requires:
     - kinds-of-types
     ref: /runtime_troubles.html
     entries:
     - id: rt-type-checking
-      name: 'typing.TYPE_CHECKING'
-      summary: 'Imports under `if TYPE_CHECKING:` are seen by mypy but never run, which breaks import cycles and avoids stub-only runtime imports'
+      name: typing.TYPE_CHECKING
+      summary: Imports under `if TYPE_CHECKING:` are seen by mypy but never run, which breaks import cycles and avoids stub-only runtime imports
       lenses:
       - best-practice
       - reliability
@@ -560,7 +560,7 @@ groups:
       - stub-only modules such as _typeshed can be imported only under TYPE_CHECKING
       ref: /runtime_troubles.html#typing-type-checking
     - id: rt-future-annotations
-      name: 'Future annotations import (PEP 563)'
+      name: Future annotations import (PEP 563)
       summary: '`from __future__ import annotations` makes all annotations lazy strings, so forward references need no quotes'
       lenses:
       - typing-dx
@@ -569,32 +569,32 @@ groups:
       - libraries that evaluate annotations at runtime (typing.get_type_hints, eval) can break on lazily-stringified annotations
       ref: /runtime_troubles.html#future-annotations-import-pep-563
     - id: rt-forward-refs
-      name: 'String literal types and forward references'
-      summary: 'Quote a class used before its definition (`list[''A'']`); quotes resolve within one module, so other modules need TYPE_CHECKING'
+      name: String literal types and forward references
+      summary: Quote a class used before its definition (`list['A']`); quotes resolve within one module, so other modules need TYPE_CHECKING
       lenses:
       - typing-dx
       notes:
       - '`# type:` comment annotations are deprecated; use annotations'
       ref: /runtime_troubles.html#string-literal-types-and-type-comments
     - id: rt-import-cycles
-      name: 'Import cycles'
-      summary: 'Put annotation-only imports under TYPE_CHECKING and quote the annotations (or use future annotations) so the cycle never runs'
+      name: Import cycles
+      summary: Put annotation-only imports under TYPE_CHECKING and quote the annotations (or use future annotations) so the cycle never runs
       lenses:
       - reliability
       notes:
       - the cycle still exists for the type checker; has-type errors can follow
       ref: /runtime_troubles.html#import-cycles
     - id: rt-stub-only-generics
-      name: 'Types generic only in stubs'
-      summary: 'A class generic in stubs but not at runtime fails when subscripted; use future annotations, or a TYPE_CHECKING alias for base classes'
+      name: Types generic only in stubs
+      summary: A class generic in stubs but not at runtime fails when subscripted; use future annotations, or a TYPE_CHECKING alias for base classes
       lenses:
       - reliability
       notes:
       - Python 3.9+ fixes stdlib cases like queue.Queue via __class_getitem__; third-party classes can still hit it
       ref: /runtime_troubles.html#using-classes-that-are-generic-in-stubs-but-not-at-runtime
     - id: rt-typing-additions
-      name: 'New typing additions on older Pythons'
-      summary: 'Import newer typing names from typing_extensions, or gate on sys.version_info and add a PEP 508 python_version-marked dependency'
+      name: New typing additions on older Pythons
+      summary: Import newer typing names from typing_extensions, or gate on sys.version_info and add a PEP 508 python_version-marked dependency
       lenses:
       - best-practice
       - reliability
@@ -603,15 +603,15 @@ groups:
       - PEP 585 builtin generics (list[str]) and PEP 604 unions (X | Y) are runtime-safe from Python 3.9 and 3.10 respectively
       ref: /runtime_troubles.html#using-new-additions-to-the-typing-module
   - id: metaclasses
-    title: 'Metaclasses'
+    title: Metaclasses
     level: advanced
     requires:
     - classes
     ref: /metaclasses.html
     entries:
     - id: metaclass-support
-      name: 'Metaclass support'
-      summary: 'Mypy resolves attributes through the metaclass and inherits it, but only for plain `type` subclasses; dynamic metaclasses are not understood'
+      name: Metaclass support
+      summary: Mypy resolves attributes through the metaclass and inherits it, but only for plain `type` subclasses; dynamic metaclasses are not understood
       lenses:
       - typing-dx
       - reliability
@@ -621,18 +621,18 @@ groups:
       - Self is not allowed in metaclasses (PEP 673)
       - 'mypy may treat some builtin types as ABCMeta; subclass abc.ABCMeta or ignore with # type: ignore[metaclass]'
       ref: /metaclasses.html#gotchas-and-limitations-of-metaclass-support
-- title: 'Configuring and running mypy'
+- title: Configuring and running mypy
   sections:
   - id: running-mypy
-    title: 'Running mypy and imports'
+    title: Running mypy and imports
     level: basic
     requires:
     - getting-started
     ref: /running_mypy.html
     entries:
     - id: run-specify-code
-      name: 'Specifying code to check'
-      summary: 'Pass paths, or -m module, -p package (recursive), -c string; with none given, the files/modules/packages config applies'
+      name: Specifying code to check
+      summary: Pass paths, or -m module, -p package (recursive), -c string; with none given, the files/modules/packages config applies
       lenses:
       - reliability
       signature: mypy [paths] | mypy -m MOD | mypy -p PKG | mypy -c 'code'
@@ -640,15 +640,15 @@ groups:
       - --exclude only prunes directory discovery; explicitly passed paths and followed imports are still checked
       ref: /running_mypy.html#specifying-code-to-be-checked
     - id: run-path-mapping
-      name: 'Mapping file paths to modules'
-      summary: 'Without __init__.py, set explicit_package_bases plus mypy_path so mypy derives the right module names'
+      name: Mapping file paths to modules
+      summary: Without __init__.py, set explicit_package_bases plus mypy_path so mypy derives the right module names
       lenses:
       - reliability
       notes:
       - namespace_packages is on by default (PEP 420)
       ref: /running_mypy.html#mapping-file-paths-to-modules
     - id: run-missing-imports
-      name: 'Missing imports'
+      name: Missing imports
       summary: 'Resolve missing-stub errors in order: upgrade, install types-<dist>, write stubs, follow_untyped_imports, then suppress per library'
       lenses:
       - best-practice
@@ -657,16 +657,16 @@ groups:
       - an unresolved import makes the whole module Any, which spreads silently through callers
       ref: /running_mypy.html#missing-imports
     - id: run-follow-imports
-      name: 'Following imports'
-      summary: 'follow_imports normal (default, recommended) | silent | skip | error; skip replaces modules with Any and is discouraged globally'
+      name: Following imports
+      summary: follow_imports normal (default, recommended) | silent | skip | error; skip replaces modules with Any and is discouraged globally
       lenses:
       - reliability
       notes:
       - per-module follow_imports=skip is the acceptable use for one problematic module
       ref: /running_mypy.html#following-imports
     - id: cli-install-types
-      name: 'Install missing stubs'
-      summary: 'mypy --install-types pip-installs the stub packages suggested by the previous run, limited to typeshed-vetted stub-only packages'
+      name: Install missing stubs
+      summary: mypy --install-types pip-installs the stub packages suggested by the previous run, limited to typeshed-vetted stub-only packages
       lenses:
       - security
       - reuse
@@ -675,15 +675,15 @@ groups:
       - add the stubs to dev dependencies instead of installing ad hoc, so CI is reproducible
       ref: /command_line.html#cmdoption-mypy-install-types
   - id: command-line
-    title: 'Command line'
+    title: Command line
     level: intermediate
     requires:
     - running-mypy
     ref: /command_line.html
     entries:
     - id: cli-config-file
-      name: '--config-file'
-      summary: 'Reads settings from the given file; an empty value (--config-file=) ignores every config file'
+      name: --config-file
+      summary: Reads settings from the given file; an empty value (--config-file=) ignores every config file
       lenses:
       - reliability
       - testing
@@ -692,34 +692,34 @@ groups:
       - use --config-file= to prove what the defaults flag, ignoring project config
       ref: /command_line.html#cmdoption-mypy-config-file
     - id: cli-output-json
-      name: 'Machine-readable output'
-      summary: '-O json prints errors as JSON; --junit-xml writes a JUnit report; --show-error-end adds end positions'
+      name: Machine-readable output
+      summary: -O json prints errors as JSON; --junit-xml writes a JUnit report; --show-error-end adds end positions
       lenses:
       - observability
       - testing
       signature: mypy -O json
       params:
-      - name: '-O / --output'
+      - name: -O / --output
         type: json
         default: null
         desc: Custom output format
-      - name: '--junit-xml'
+      - name: --junit-xml
         type: file path
         default: null
         desc: Write a JUnit XML report for CI
-      - name: '--show-error-end'
+      - name: --show-error-end
         type: flag
         default: 'off'
         desc: Show end line/column for each error
       ref: /command_line.html#optional-arguments
     - id: cli-parallel
-      name: 'Parallel type checking'
-      summary: '-n N / --num-workers N checks independent modules in parallel (up to 5x faster on big projects); auto picks CPU-based count capped at 8'
+      name: Parallel type checking
+      summary: -n N / --num-workers N checks independent modules in parallel (up to 5x faster on big projects); auto picks CPU-based count capped at 8
       lenses:
       - perf
       signature: mypy -n auto
       params:
-      - name: 'num_workers'
+      - name: num_workers
         type: integer | auto
         default: '0'
         desc: Worker process count; 0 disables; env MYPY_NUM_WORKERS has lower priority than the flag
@@ -729,21 +729,21 @@ groups:
       - reports cannot be generated in parallel mode (fails fast); beyond physical cores gives no benefit
       ref: /command_line.html#parallel
     - id: cli-incremental
-      name: 'Incremental mode and cache'
-      summary: 'Incremental caching is on by default (SQLite cache in .mypy_cache); share or relocate it with cache_dir for CI'
+      name: Incremental mode and cache
+      summary: Incremental caching is on by default (SQLite cache in .mypy_cache); share or relocate it with cache_dir for CI
       lenses:
       - perf
       - reliability
       params:
-      - name: 'incremental'
+      - name: incremental
         type: boolean
         default: 'True'
         desc: Reuse results from earlier runs
-      - name: 'cache_dir'
+      - name: cache_dir
         type: string
         default: .mypy_cache
         desc: Cache location; MYPY_CACHE_DIR overrides; /dev/null (or nul) disables writing
-      - name: 'sqlite_cache'
+      - name: sqlite_cache
         type: boolean
         default: 'True'
         desc: Store the cache in one SQLite database
@@ -751,15 +751,15 @@ groups:
       - pip install mypy[faster-cache] adds orjson for faster cache IO
       ref: /command_line.html#incremental-mode
   - id: config-file
-    title: 'Configuration file'
+    title: Configuration file
     level: basic
     requires:
     - running-mypy
     ref: /config_file.html
     entries:
     - id: config-discovery
-      name: 'Config file discovery'
-      summary: 'Walks up from the working dir for mypy.ini, .mypy.ini, pyproject.toml [tool.mypy], setup.cfg [mypy]; first found wins, no merging'
+      name: Config file discovery
+      summary: Walks up from the working dir for mypy.ini, .mypy.ini, pyproject.toml [tool.mypy], setup.cfg [mypy]; first found wins, no merging
       lenses:
       - reliability
       - best-practice
@@ -767,7 +767,7 @@ groups:
       - 'fallbacks: $XDG_CONFIG_HOME/mypy/config, ~/.config/mypy/config, ~/.mypy.ini; --config-file beats all'
       ref: /config_file.html
     - id: config-pyproject
-      name: 'pyproject.toml format'
+      name: pyproject.toml format
       summary: '[tool.mypy] holds global options; per-module sections become [[tool.mypy.overrides]] with module = ''pkg.*'' or a list'
       lenses:
       - best-practice
@@ -776,8 +776,8 @@ groups:
       - TOML booleans are lowercase; strings are quoted; exclude may be a regex string or an array of them
       ref: /config_file.html#using-a-pyproject-toml-file
     - id: config-per-module
-      name: 'Per-module and global options'
-      summary: 'A module section overrides global values; with several matching patterns the most specific pattern wins'
+      name: Per-module and global options
+      summary: A module section overrides global values; with several matching patterns the most specific pattern wins
       lenses:
       - best-practice
       - typing-dx
@@ -786,20 +786,20 @@ groups:
       - disallow_untyped_calls in a section applies inside that module; use untyped_calls_exclude for callers
       ref: /config_file.html#per-module-and-global-options
     - id: cfg-python-version
-      name: 'python_version'
-      summary: 'Target Python version for parsing and checking (MAJOR.MINOR); defaults to the interpreter running mypy'
+      name: python_version
+      summary: Target Python version for parsing and checking (MAJOR.MINOR); defaults to the interpreter running mypy
       lenses:
       - reliability
       params:
-      - name: 'python_version'
+      - name: python_version
         type: string
         default: running interpreter
         desc: e.g. 3.13; versions below 3.10 are unsupported since 2.0
-      - name: 'platform'
+      - name: platform
         type: string
         default: sys.platform
         desc: Target OS for platform checks
-      - name: 'always_true / always_false'
+      - name: always_true / always_false
         type: comma-separated list of strings
         default: null
         desc: Names treated as compile-time constants
@@ -807,28 +807,28 @@ groups:
       - the native parser lets you target newer syntax than the running Python, e.g. --python-version 3.15
       ref: /config_file.html#confval-python_version
     - id: cfg-files
-      name: 'files, modules, packages, exclude'
-      summary: 'What mypy checks when no paths are given on the command line; files supports globs, packages recurses'
+      name: files, modules, packages, exclude
+      summary: What mypy checks when no paths are given on the command line; files supports globs, packages recurses
       lenses:
       - reliability
       params:
-      - name: 'files'
+      - name: files
         type: comma-separated list of strings
         default: null
         desc: Paths and globs (** supported) to check by default
-      - name: 'modules'
+      - name: modules
         type: comma-separated list of strings
         default: null
         desc: Modules to check (no recursion)
-      - name: 'packages'
+      - name: packages
         type: comma-separated list of strings
         default: null
         desc: Packages to check recursively
-      - name: 'exclude'
+      - name: exclude
         type: regex or list (TOML)
         default: null
         desc: Regex(es) pruning recursive discovery; forward slashes on all platforms
-      - name: 'exclude_gitignore'
+      - name: exclude_gitignore
         type: boolean
         default: 'False'
         desc: Add .gitignore matches to exclude
@@ -836,17 +836,17 @@ groups:
       - files/modules/packages are global-only settings
       ref: /config_file.html#confval-files
     - id: cfg-ignore-missing-imports
-      name: 'ignore_missing_imports'
-      summary: 'Silences unresolved-import errors and types the module as Any; scope it per module, not globally'
+      name: ignore_missing_imports
+      summary: Silences unresolved-import errors and types the module as Any; scope it per module, not globally
       lenses:
       - best-practice
       - reliability
       params:
-      - name: 'ignore_missing_imports'
+      - name: ignore_missing_imports
         type: boolean
         default: 'False'
         desc: Suppress import-not-found / import-untyped for the matched imported modules
-      - name: 'follow_untyped_imports'
+      - name: follow_untyped_imports
         type: boolean
         default: 'False'
         desc: Analyze installed packages lacking py.typed or stubs; slower, may produce noise
@@ -854,13 +854,13 @@ groups:
       - still reports missing names inside resolved modules; prefer a types-<dist> package where one exists
       ref: /config_file.html#confval-ignore_missing_imports
     - id: cfg-strict
-      name: 'strict'
-      summary: 'Turns on the strict flag bundle (see strict-mode); flags set explicitly override it either way'
+      name: strict
+      summary: Turns on the strict flag bundle (see strict-mode); flags set explicitly override it either way
       lenses:
       - best-practice
       - typing-dx
       params:
-      - name: 'strict'
+      - name: strict
         type: boolean
         default: 'False'
         desc: Enable all optional error-checking flags; the member list can change between releases
@@ -868,97 +868,97 @@ groups:
       - pin the mypy version when relying on strict, since upgrades can add checks
       ref: /config_file.html#confval-strict
     - id: cfg-untyped-defs
-      name: 'Untyped definitions and calls'
-      summary: 'disallow_untyped_defs / incomplete_defs require annotations; check_untyped_defs type-checks unannotated bodies'
+      name: Untyped definitions and calls
+      summary: disallow_untyped_defs / incomplete_defs require annotations; check_untyped_defs type-checks unannotated bodies
       lenses:
       - best-practice
       - typing-dx
       params:
-      - name: 'disallow_untyped_defs'
+      - name: disallow_untyped_defs
         type: boolean
         default: 'False'
         desc: Error on defs without or with partial annotations
-      - name: 'disallow_incomplete_defs'
+      - name: disallow_incomplete_defs
         type: boolean
         default: 'False'
         desc: Error only on partially annotated defs
-      - name: 'check_untyped_defs'
+      - name: check_untyped_defs
         type: boolean
         default: 'False'
         desc: Check bodies of unannotated functions
-      - name: 'disallow_untyped_calls'
+      - name: disallow_untyped_calls
         type: boolean
         default: 'False'
         desc: Typed code may not call untyped functions
-      - name: 'untyped_calls_exclude'
+      - name: untyped_calls_exclude
         type: comma-separated list of strings
         default: null
         desc: Packages/modules/classes exempt from disallow_untyped_calls (global only)
-      - name: 'disallow_untyped_decorators'
+      - name: disallow_untyped_decorators
         type: boolean
         default: 'False'
         desc: Typed function wrapped by an untyped decorator is an error
       ref: /config_file.html#untyped-definitions-and-calls
     - id: cfg-any-flags
-      name: 'Disallow dynamic typing'
-      summary: 'disallow_any_* flags forbid Any in specific places; disallow_any_generics requires type arguments on generics'
+      name: Disallow dynamic typing
+      summary: disallow_any_* flags forbid Any in specific places; disallow_any_generics requires type arguments on generics
       lenses:
       - typing-dx
       - reliability
       params:
-      - name: 'disallow_any_generics'
+      - name: disallow_any_generics
         type: boolean
         default: 'False'
         desc: Bare list/dict/CompiledStateGraph without type args is an error
-      - name: 'disallow_any_unimported'
+      - name: disallow_any_unimported
         type: boolean
         default: 'False'
         desc: Types from unfollowed imports (Any) are an error
-      - name: 'disallow_any_explicit'
+      - name: disallow_any_explicit
         type: boolean
         default: 'False'
         desc: No explicit Any in annotations
-      - name: 'disallow_any_expr'
+      - name: disallow_any_expr
         type: boolean
         default: 'False'
         desc: No expression may have type Any
-      - name: 'disallow_any_decorated'
+      - name: disallow_any_decorated
         type: boolean
         default: 'False'
         desc: No function with Any in its decorated signature
-      - name: 'disallow_subclassing_any'
+      - name: disallow_subclassing_any
         type: boolean
         default: 'False'
         desc: Cannot subclass an Any-typed base
       ref: /config_file.html#disallow-dynamic-typing
     - id: cfg-warnings
-      name: 'Configuring warnings'
-      summary: 'warn_* flags catch redundant casts, stale ignores, Any returns and unreachable code'
+      name: Configuring warnings
+      summary: warn_* flags catch redundant casts, stale ignores, Any returns and unreachable code
       lenses:
       - best-practice
       - reliability
       params:
-      - name: 'warn_return_any'
+      - name: warn_return_any
         type: boolean
         default: 'False'
         desc: Warn when returning Any from a function declared to return a concrete type
-      - name: 'warn_unused_ignores'
+      - name: warn_unused_ignores
         type: boolean
         default: 'False'
         desc: 'Report type: ignore comments that suppress nothing'
-      - name: 'warn_redundant_casts'
+      - name: warn_redundant_casts
         type: boolean
         default: 'False'
         desc: Report casts to the already inferred type
-      - name: 'warn_unreachable'
+      - name: warn_unreachable
         type: boolean
         default: 'False'
         desc: Report unreachable or redundant code; not in strict
-      - name: 'warn_no_return'
+      - name: warn_no_return
         type: boolean
         default: 'True'
         desc: Report missing return on some paths
-      - name: 'deprecated_calls_exclude'
+      - name: deprecated_calls_exclude
         type: comma-separated list of strings
         default: null
         desc: Packages/classes exempt from the deprecated error code (global only)
@@ -966,52 +966,52 @@ groups:
       - 'warn_return_any is the usual friction with untyped or Any-returning library calls: narrow with isinstance or annotate the local'
       ref: /config_file.html#configuring-warnings
     - id: cfg-strictness-misc
-      name: 'Miscellaneous strictness'
-      summary: 'extra_checks, strict_equality and no implicit re-export catch correct-but-impractical patterns'
+      name: Miscellaneous strictness
+      summary: extra_checks, strict_equality and no implicit re-export catch correct-but-impractical patterns
       lenses:
       - best-practice
       - reliability
       params:
-      - name: 'extra_checks'
+      - name: extra_checks
         type: boolean
         default: 'False'
         desc: Additional checks such as TypedDict update overlap, Concatenate positional-only
-      - name: 'strict_equality'
+      - name: strict_equality
         type: boolean
         default: 'False'
         desc: Forbid ==, is, in between non-overlapping types
-      - name: 'implicit_reexport'
+      - name: implicit_reexport
         type: boolean
         default: 'True'
         desc: False requires `import x as x` or __all__ to re-export
-      - name: 'local_partial_types'
+      - name: local_partial_types
         type: boolean
         default: 'True'
         desc: Do not infer container type from updates in other scopes; required by daemon and parallel mode
-      - name: 'strict_bytes'
+      - name: strict_bytes
         type: boolean
         default: 'True'
         desc: bytearray/memoryview are not bytes subtypes (since 2.0)
-      - name: 'implicit_optional'
+      - name: implicit_optional
         type: boolean
         default: 'False'
         desc: 'Treat `x: int = None` as int | None'
-      - name: 'strict_optional'
+      - name: strict_optional
         type: boolean
         default: 'True'
         desc: 'Never set False: it disables None checking'
       ref: /config_file.html#miscellaneous-strictness-flags
     - id: cfg-allow-redefinition
-      name: 'allow_redefinition'
-      summary: 'Lets an unannotated variable change type across blocks (flow-sensitive); behaves like the old allow_redefinition_new since 2.0'
+      name: allow_redefinition
+      summary: Lets an unannotated variable change type across blocks (flow-sensitive); behaves like the old allow_redefinition_new since 2.0
       lenses:
       - typing-dx
       params:
-      - name: 'allow_redefinition'
+      - name: allow_redefinition
         type: boolean
         default: 'False'
         desc: Flexible redefinition; planned default in a future release
-      - name: 'allow_redefinition_old'
+      - name: allow_redefinition_old
         type: boolean
         default: 'False'
         desc: Legacy same-block redefinition after use
@@ -1020,17 +1020,17 @@ groups:
       - allow_redefinition_new is a deprecated alias; double annotation of one variable still errors
       ref: /config_file.html#confval-allow_redefinition
     - id: cfg-error-codes
-      name: 'Enabling and disabling error codes'
-      summary: 'enable_error_code turns on opt-in checks without a dedicated flag; disable_error_code mutes codes globally or per module'
+      name: Enabling and disabling error codes
+      summary: enable_error_code turns on opt-in checks without a dedicated flag; disable_error_code mutes codes globally or per module
       lenses:
       - best-practice
       - reliability
       params:
-      - name: 'enable_error_code'
+      - name: enable_error_code
         type: comma-separated list of strings
         default: null
         desc: Codes to enable globally (overrides disable_error_code)
-      - name: 'disable_error_code'
+      - name: disable_error_code
         type: comma-separated list of strings
         default: null
         desc: Codes to disable; per-module sections adjust the global set
@@ -1038,31 +1038,31 @@ groups:
       - 'opt-in codes worth enabling: ignore-without-code, possibly-undefined, truthy-bool, explicit-override, redundant-expr, deprecated'
       ref: /config_file.html#confval-enable_error_code
     - id: cfg-warn-unused-configs
-      name: 'warn_unused_configs'
-      summary: 'Warns about per-module sections that matched no file, catching misspelled module patterns'
+      name: warn_unused_configs
+      summary: Warns about per-module sections that matched no file, catching misspelled module patterns
       lenses:
       - reliability
       params:
-      - name: 'warn_unused_configs'
+      - name: warn_unused_configs
         type: boolean
         default: 'False'
         desc: Report unused [mypy-pattern] sections / overrides (global only)
       ref: /config_file.html#confval-warn_unused_configs
     - id: cfg-native-parser
-      name: 'Native parser'
-      summary: 'The Rust-based native parser is the default since 2.4 (faster; can target newer syntax); the legacy ast parser goes away in early 2027'
+      name: Native parser
+      summary: The Rust-based native parser is the default since 2.4 (faster; can target newer syntax); the legacy ast parser goes away in early 2027
       lenses:
       - perf
       - reliability
       params:
-      - name: 'native_parser'
+      - name: native_parser
         type: boolean
         default: 'True'
         desc: False falls back to the stdlib ast parser; type comments on for/with targets are ignored by the native one
       since: '2.4'
       ref: /config_file.html#confval-native_parser
   - id: inline-config
-    title: 'Inline configuration'
+    title: Inline configuration
     level: intermediate
     requires:
     - config-file
@@ -1078,15 +1078,15 @@ groups:
       - '# mypy: ignore-errors skips a whole file; enable-error-code / disable-error-code work inline too'
       ref: /inline_config.html#configuration-comment-format
   - id: daemon
-    title: 'Mypy daemon'
+    title: Mypy daemon
     level: intermediate
     requires:
     - running-mypy
     ref: /mypy_daemon.html
     entries:
     - id: dmypy-run
-      name: 'dmypy run'
-      summary: 'dmypy run -- <flags> <files> starts a long-lived checker that re-checks only changes; 10x or more faster on large code'
+      name: dmypy run
+      summary: dmypy run -- <flags> <files> starts a long-lived checker that re-checks only changes; 10x or more faster on large code
       lenses:
       - perf
       signature: dmypy run -- [flags] [files]
@@ -1095,15 +1095,15 @@ groups:
       - one user and one file set per daemon; dmypy status/stop/restart control it; status file .dmypy.json
       ref: /mypy_daemon.html#basic-usage
   - id: installed-packages
-    title: 'Installed packages and stubs'
+    title: Installed packages and stubs
     level: intermediate
     requires:
     - running-mypy
     ref: /installed_packages.html
     entries:
     - id: pep561-packages
-      name: 'PEP 561 packages'
-      summary: 'Mypy reads py.typed packages and types-<dist> stub packages from the environment it runs in; --python-executable points at another env'
+      name: PEP 561 packages
+      summary: Mypy reads py.typed packages and types-<dist> stub packages from the environment it runs in; --python-executable points at another env
       lenses:
       - reliability
       - typing-dx
@@ -1112,19 +1112,19 @@ groups:
       - errors inside installed packages are hidden by default; no_silence_site_packages reports them
       ref: /installed_packages.html#using-installed-packages-with-mypy-pep-561
   - id: plugins
-    title: 'Plugins'
+    title: Plugins
     level: advanced
     requires:
     - config-file
     ref: /extending_mypy.html
     entries:
     - id: mypy-plugins
-      name: 'Plugins'
-      summary: 'plugins = module or path lists plugin files exposing plugin(version) -> Plugin subclass; API is experimental with no compatibility promise'
+      name: Plugins
+      summary: plugins = module or path lists plugin files exposing plugin(version) -> Plugin subclass; API is experimental with no compatibility promise
       lenses:
       - composability
       params:
-      - name: 'plugins'
+      - name: plugins
         type: comma-separated list of strings
         default: null
         desc: Plugin modules or file paths; module:entry_point selects a custom entry function
@@ -1132,22 +1132,22 @@ groups:
       - 'plugins must work with incremental and daemon modes: no global state'
       ref: /extending_mypy.html#configuring-mypy-to-use-plugins
   - id: stub-tools
-    title: 'stubgen and stubtest'
+    title: stubgen and stubtest
     level: advanced
     requires:
     - stub-files
     ref: /stubgen.html
     entries:
     - id: stubgen
-      name: 'stubgen'
-      summary: 'Generates draft .pyi stubs from source or modules (-o dir, -m, -p); refine by hand before use'
+      name: stubgen
+      summary: Generates draft .pyi stubs from source or modules (-o dir, -m, -p); refine by hand before use
       lenses:
       - reuse
       signature: stubgen -p PKG -o DIR
       ref: /stubgen.html
     - id: stubtest
-      name: 'stubtest'
-      summary: 'Compares a stub against the runtime module via introspection and reports mismatches; imports and executes the code'
+      name: stubtest
+      summary: Compares a stub against the runtime module via introspection and reports mismatches; imports and executes the code
       lenses:
       - testing
       - security
@@ -1155,18 +1155,18 @@ groups:
       notes:
       - not a type checker; run mypy on the stubs first
       ref: /stubtest.html
-- title: 'Miscellaneous'
+- title: Miscellaneous
   sections:
   - id: common-issues
-    title: 'Common issues'
+    title: Common issues
     level: intermediate
     requires:
     - getting-started
     ref: /common_issues.html
     entries:
     - id: issue-unreachable
-      name: 'Unreachable code is not checked'
-      summary: 'Mypy skips code it proves unreachable (after return, impossible asserts), hiding errors; warn_unreachable reports it'
+      name: Unreachable code is not checked
+      summary: Mypy skips code it proves unreachable (after return, impossible asserts), hiding errors; warn_unreachable reports it
       lenses:
       - reliability
       - best-practice
@@ -1174,14 +1174,14 @@ groups:
       - an assert that narrows to an impossible type makes everything below unchecked unless warn_unreachable is on
       ref: /common_issues.html#unreachable-code
     - id: issue-inner-narrowing
-      name: 'Narrowing and inner functions'
-      summary: 'Narrowing of a captured variable is not kept inside closures; assign the narrowed value to a new local or assert inside'
+      name: Narrowing and inner functions
+      summary: Narrowing of a captured variable is not kept inside closures; assign the narrowed value to a new local or assert inside
       lenses:
       - typing-dx
       ref: /common_issues.html#narrowing-and-inner-functions
     - id: issue-reveal-type
-      name: 'reveal_type'
-      summary: 'reveal_type(expr) shows the inferred type during a run; import it from typing (3.11+) so leftover calls are safe at runtime'
+      name: reveal_type
+      summary: reveal_type(expr) shows the inferred type during a run; import it from typing (3.11+) so leftover calls are safe at runtime
       lenses:
       - typing-dx
       - testing
@@ -1190,14 +1190,14 @@ groups:
       - opt-in code unimported-reveal flags the unimported builtin form
       ref: /common_issues.html#displaying-the-type-of-an-expression
   - id: error-codes
-    title: 'Error codes'
+    title: Error codes
     level: intermediate
     requires:
     - config-file
     ref: /error_codes.html
     entries:
     - id: codes-ignore-with-code
-      name: 'Coded ignores'
+      name: Coded ignores
       summary: '# type: ignore[code, ...] silences only named codes; ignore-without-code makes the code mandatory'
       lenses:
       - best-practice
@@ -1207,7 +1207,7 @@ groups:
       - a narrower code can be a subcode of a wider one, e.g. method-assign is covered by assignment
       ref: /error_code_list2.html#code-ignore-without-code
     - id: codes-opt-in
-      name: 'Opt-in error codes'
+      name: Opt-in error codes
       summary: 'Off by default: possibly-undefined, truthy-bool, redundant-expr, unused-awaitable, explicit-override, deprecated, exhaustive-match, more'
       lenses:
       - best-practice
@@ -1216,8 +1216,8 @@ groups:
       - 'enable via enable_error_code, per module with overrides, or per file with # mypy: enable-error-code=...'
       ref: /error_code_list2.html
     - id: code-deprecated
-      name: 'deprecated code (PEP 702)'
-      summary: 'With the deprecated code on, using anything marked @warnings.deprecated is an error; report as notes or exclude packages'
+      name: deprecated code (PEP 702)
+      summary: With the deprecated code on, using anything marked @warnings.deprecated is an error; report as notes or exclude packages
       lenses:
       - best-practice
       - reliability
@@ -1227,14 +1227,14 @@ groups:
       - warnings.deprecated exists from 3.13; typing_extensions.deprecated before; --report-deprecated-as-note downgrades to notes
       ref: /error_code_list2.html#code-deprecated
     - id: code-unused-ignore
-      name: 'unused-ignore'
+      name: unused-ignore
       summary: 'Reports type: ignore comments that suppress nothing; enabled by warn_unused_ignores (part of strict)'
       lenses:
       - reliability
       ref: /error_code_list2.html#code-unused-ignore
     - id: codes-default-list
-      name: 'Default-on error codes'
-      summary: 'Codes emitted with default options (attr-defined, arg-type, return, assignment, override, import-*, abstract, more); each ignorable by name'
+      name: Default-on error codes
+      summary: Codes emitted with default options (attr-defined, arg-type, return, assignment, override, import-*, abstract, more); each ignorable by name
       lenses:
       - reuse
       - reliability
@@ -1243,27 +1243,27 @@ groups:
       - misc is a catch-all for checks without a dedicated code; some codes are subcodes of misc or assignment for backward compatibility
       ref: /error_code_list.html
     - id: code-var-annotated
-      name: 'var-annotated'
-      summary: 'Empty collections or None initialisers need an explicit annotation, or mypy infers Any in place of the unknown parts'
+      name: var-annotated
+      summary: Empty collections or None initialisers need an explicit annotation, or mypy infers Any in place of the unknown parts
       lenses:
       - typing-dx
       signature: 'self.items: list[str] = []'
       ref: /error_code_list.html#require-annotation-if-variable-type-is-unclear-var-annotated
     - id: code-override
-      name: 'override'
-      summary: 'An overriding method must accept all base arguments (contravariant) and return a subtype (covariant); extra params need defaults'
+      name: override
+      summary: An overriding method must accept all base arguments (contravariant) and return a subtype (covariant); extra params need defaults
       lenses:
       - reliability
       ref: /error_code_list.html#check-validity-of-overrides-override
     - id: code-has-type
-      name: 'has-type'
-      summary: 'Raised when a referenced variable''s type is not inferred yet (circular definitions, import cycles); add an explicit annotation or reorder'
+      name: has-type
+      summary: Raised when a referenced variable's type is not inferred yet (circular definitions, import cycles); add an explicit annotation or reorder
       lenses:
       - typing-dx
       ref: /error_code_list.html#check-that-type-of-target-is-known-has-type
     - id: code-import
-      name: 'import, import-not-found, import-untyped'
-      summary: 'import is the parent of import-not-found (no source or stub) and import-untyped (found but no py.typed or stubs); fix per Missing imports'
+      name: import, import-not-found, import-untyped
+      summary: import is the parent of import-not-found (no source or stub) and import-untyped (found but no py.typed or stubs); fix per Missing imports
       lenses:
       - reliability
       - best-practice
@@ -1271,85 +1271,85 @@ groups:
       - 'ignore per module with # type: ignore[import-untyped] or an override, not a global flag'
       ref: /error_code_list.html#check-for-an-issue-with-imports-import
     - id: code-exit-return
-      name: 'exit-return'
-      summary: 'An `__exit__` that always returns False must be typed `-> None` or `Literal[False]`, not bool, which tells mypy exceptions may be swallowed'
+      name: exit-return
+      summary: An `__exit__` that always returns False must be typed `-> None` or `Literal[False]`, not bool, which tells mypy exceptions may be swallowed
       lenses:
       - reliability
       signature: 'def __exit__(self, exc, value, tb) -> Literal[False]'
       ref: /error_code_list.html#check-the-return-type-of-exit-exit-return
     - id: code-annotation-unchecked
-      name: 'annotation-unchecked'
-      summary: 'A note (exit code 0) when an unchecked function carries annotations, e.g. a forgotten `-> None`; check_untyped_defs checks its body'
+      name: annotation-unchecked
+      summary: A note (exit code 0) when an unchecked function carries annotations, e.g. a forgotten `-> None`; check_untyped_defs checks its body
       lenses:
       - reliability
       ref: /error_code_list.html#notify-about-an-annotation-in-an-unchecked-function-annotation-unchecked
     - id: code-prop-decorator
-      name: 'prop-decorator'
-      summary: 'A decorator placed above @property is not analysed; move it below @property or ignore with the prop-decorator code'
+      name: prop-decorator
+      summary: A decorator placed above @property is not analysed; move it below @property or ignore with the prop-decorator code
       lenses:
       - typing-dx
       ref: /error_code_list.html#decorator-preceding-property-not-supported-prop-decorator
     - id: code-narrowed-type
-      name: 'narrowed-type-not-subtype'
-      summary: 'TypeIs[T] requires T to be a subtype of the parameter type (PEP 742); use TypeGuard when it is not'
+      name: narrowed-type-not-subtype
+      summary: TypeIs[T] requires T to be a subtype of the parameter type (PEP 742); use TypeGuard when it is not
       lenses:
       - typing-dx
       ref: /error_code_list.html#check-that-typeis-narrows-types-narrowed-type-not-subtype
   - id: additional-features
-    title: 'Additional features'
+    title: Additional features
     level: advanced
     requires:
     - classes
     ref: /additional_features.html
     entries:
     - id: dataclass-support
-      name: 'dataclasses and dataclass_transform'
-      summary: 'dataclasses are checked natively; dataclass_transform (PEP 681) lets mypy treat other libraries'' decorators as dataclasses'
+      name: dataclasses and dataclass_transform
+      summary: dataclasses are checked natively; dataclass_transform (PEP 681) lets mypy treat other libraries' decorators as dataclasses
       lenses:
       - typing-dx
       - composability
       ref: /additional_features.html#data-class-transforms
   - id: supported-features
-    title: 'Supported Python features'
+    title: Supported Python features
     level: intermediate
     requires: []
     ref: /supported_python_features.html
     entries:
     - id: runtime-defined-methods
-      name: 'Runtime-defined methods and functions'
-      summary: 'Functions added to a class or module outside its definition are flagged when visible; Any, dynamic code or setattr bypass it, sparingly'
+      name: Runtime-defined methods and functions
+      summary: Functions added to a class or module outside its definition are flagged when visible; Any, dynamic code or setattr bypass it, sparingly
       lenses:
       - reliability
       notes:
       - the list of unsupported features is kept in the mypy wiki, not in the docs
       ref: /supported_python_features.html#runtime-definition-of-methods-and-functions
   - id: faq-page
-    title: 'Frequently asked questions'
+    title: Frequently asked questions
     level: basic
     requires: []
     ref: /faq.html
     entries:
     - id: faq-nominal-vs-structural
-      name: 'Nominal versus structural typing'
+      name: Nominal versus structural typing
       summary: 'Mypy is mainly nominal; built-in protocols (Iterable) are structural. Use nominal classes where possible, Protocols where necessary'
       lenses:
       - composability
       - best-practice
       ref: /faq.html#can-i-use-duck-typing-with-mypy
     - id: faq-metaprogramming
-      name: 'Limits for dynamic code'
-      summary: 'Heavy introspection, metaprogramming and monkey patching are impractical to check; keep that code dynamic and type the rest'
+      name: Limits for dynamic code
+      summary: Heavy introspection, metaprogramming and monkey patching are impractical to check; keep that code dynamic and type the rest
       lenses:
       - reliability
       ref: /faq.html#how-are-mypy-programs-different-from-normal-python
   - id: release-notes
-    title: 'Release notes'
+    title: Release notes
     level: intermediate
     requires: []
     ref: /changelog.html
     entries:
     - id: rel-2-x-changes
-      name: 'Changes since 2.0'
+      name: Changes since 2.0
       summary: '2.0: local_partial_types, strict_bytes on; allow_redefinition reworked; 3.9 target dropped. 2.4: native parser default, parallel stable'
       lenses:
       - reliability
@@ -1358,8 +1358,8 @@ groups:
       - '2.4: PEP 661 sentinels, Python 3.15 support'
       ref: /changelog.html#mypy-2-4
     - id: cfg-allow-redefinition-new
-      name: 'allow_redefinition_new (alias)'
-      summary: 'Deprecated alias for allow_redefinition'
+      name: allow_redefinition_new (alias)
+      summary: Deprecated alias for allow_redefinition
       lenses:
       - reuse
       deprecated: alias of allow_redefinition since 2.0; use allow_redefinition

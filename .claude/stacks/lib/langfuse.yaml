@@ -16,57 +16,57 @@ toc:
   match: '/faq/all/(missing-traces|enable-disable-tracing|unwanted-http-database-spans|existing-otel-setup|custom-langchain-run-names|empty-trace-input-and-output|tracing-data-updates|how-long-until-traces-appear|error-handling-and-timeouts|aws-lambda-and-serverless-functions|managing-different-environments|old-prompt-version-caching|link-prompt-management-with-tracing|costs-tokens-langfuse|using-external-templating-libraries|manage-score-configs|retrieve-experiment-scores|deprecated-api-migration|api-limits)\.md'
   why: 'SDK/tracing/prompt/eval troubleshooting FAQs; the rest are self-hosting, account, marketing.'
 groups:
-- title: 'AI tooling'
+- title: AI tooling
   sections:
   - id: lf-ai-tooling
-    title: 'Agent access to Langfuse docs and data'
+    title: Agent access to Langfuse docs and data
     level: basic
     requires: []
     ref: /llms.txt
     entries:
     - id: docs-mcp
-      name: 'Langfuse Docs MCP'
-      summary: 'Hosted HTTP MCP server that searches Langfuse docs, GitHub issues and discussions; no auth'
+      name: Langfuse Docs MCP
+      summary: Hosted HTTP MCP server that searches Langfuse docs, GitHub issues and discussions; no auth
       lenses: [reuse]
       notes:
       - 'URL https://langfuse.com/api/mcp; add with `claude mcp add --transport http langfuse-docs https://langfuse.com/api/mcp --scope user`'
       - 'REST equivalent: GET https://langfuse.com/api/search-docs?query=<text>'
       ref: /docs/docs-mcp.md
     - id: agent-skill
-      name: 'Langfuse agent skill'
-      summary: 'Official skill for instrumentation, prompt management and CLI/API access; the docs say install it before using them'
+      name: Langfuse agent skill
+      summary: Official skill for instrumentation, prompt management and CLI/API access; the docs say install it before using them
       lenses: [reuse]
       notes:
       - 'install: npx skills add langfuse/skills --skill langfuse (repo github.com/langfuse/skills, path skills/langfuse)'
       - review the SKILL.md diff before locking it
       ref: /docs/api-and-data-platform/features/agent-skill.md
     - id: cli
-      name: 'Langfuse CLI'
-      summary: 'npx @langfuse/cli exposes the REST API resources for scripts and agents; run `--help` first'
+      name: Langfuse CLI
+      summary: npx @langfuse/cli exposes the REST API resources for scripts and agents; run `--help` first
       lenses: [observability, reuse]
       notes:
       - 'shape: npx @langfuse/cli api <resource> <action>; credentials via the usual LANGFUSE_* env vars'
       - useful for read-only trace and observation lookups when verifying instrumentation live
       ref: /docs/api-and-data-platform/features/cli.md
     - id: llms-txt
-      name: 'llms.txt index'
-      summary: 'Root index with per-area page lists; every docs route also serves raw markdown at the same path plus `.md`'
+      name: llms.txt index
+      summary: Root index with per-area page lists; every docs route also serves raw markdown at the same path plus `.md`
       lenses: [reuse]
       notes:
       - '/llms-docs.txt lists every docs page; /llms-users.txt lists user guides'
       - the observability section links "What does a good trace look like?" as required reading
       ref: /llms.txt
-- title: 'Client setup'
+- title: Client setup
   sections:
   - id: lf-client
-    title: 'Client and configuration'
+    title: Client and configuration
     level: basic
     requires: []
     ref: /docs/observability/sdk/overview.md
     entries:
     - id: client-init
-      name: 'Langfuse client'
-      summary: 'Process singleton keyed by public key; later constructor calls for the same key reuse the first and ignore their arguments'
+      name: Langfuse client
+      summary: Process singleton keyed by public key; later constructor calls for the same key reuse the first and ignore their arguments
       lenses: [best-practice, reliability, testing]
       import: langfuse
       signature: Langfuse(*, public_key, secret_key, base_url, environment, release, sample_rate, mask_otel_spans, should_export_span, tracer_provider, span_exporter, flush_at, flush_interval, tracing_enabled=True, debug=False)
@@ -85,8 +85,8 @@ groups:
       - the singleton is never evicted, even by shutdown(); tests use a unique public key per client
       ref: /docs/observability/sdk/overview.md#client-setup
     - id: env-vars
-      name: 'Environment variables'
-      summary: 'SDK-read variables; BASE_URL is current, HOST is deprecated'
+      name: Environment variables
+      summary: SDK-read variables; BASE_URL is current, HOST is deprecated
       lenses: [best-practice, security]
       notes:
       - 'LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, LANGFUSE_BASE_URL, LANGFUSE_TRACING_ENVIRONMENT, LANGFUSE_RELEASE'
@@ -94,32 +94,32 @@ groups:
       - 'read straight from os.environ at construction, so a loaded .env reaches the SDK without extra wiring'
       ref: /docs/observability/sdk/overview.md#client-setup
     - id: get-client
-      name: 'get_client'
-      summary: 'Returns the singleton client for a public key (any client when omitted); used for flush/shutdown and trace ids'
+      name: get_client
+      summary: Returns the singleton client for a public key (any client when omitted); used for flush/shutdown and trace ids
       lenses: [composability]
       import: langfuse
       signature: get_client(*, public_key=None)
       returns: 'the Langfuse client for that key, or a disabled client when none was constructed'
       ref: /docs/observability/sdk/overview.md
     - id: enable-disable
-      name: 'Enable and disable tracing'
-      summary: 'LANGFUSE_TRACING_ENABLED=false or tracing_enabled=False makes the client a no-op with an info log; OTEL_SDK_DISABLED also stops spans'
+      name: Enable and disable tracing
+      summary: LANGFUSE_TRACING_ENABLED=false or tracing_enabled=False makes the client a no-op with an info log; OTEL_SDK_DISABLED also stops spans
       lenses: [best-practice, testing]
       notes:
       - 'the env var is read in the constructor; with it false, an injected provider and exporter receive no Langfuse spans'
       - 'OTEL_SDK_DISABLED=true logs a WARNING and yields no spans from the OTel SDK provider at all'
       ref: /faq/all/enable-disable-tracing.md
-- title: 'Instrumentation'
+- title: Instrumentation
   sections:
   - id: lf-instrumentation
-    title: 'Creating observations'
+    title: Creating observations
     level: basic
     requires: [lf-client]
     ref: /docs/observability/sdk/instrumentation.md
     entries:
     - id: observe-decorator
-      name: 'observe decorator'
-      summary: 'Wraps a sync/async function so inputs, outputs, timing and errors become an observation nested under the active one'
+      name: observe decorator
+      summary: Wraps a sync/async function so inputs, outputs, timing and errors become an observation nested under the active one
       lenses: [observability, composability]
       import: langfuse
       signature: 'observe(func=None, *, name=None, as_type=None, capture_input=None, capture_output=None, transform_to_string=None)'
@@ -133,8 +133,8 @@ groups:
       - 'in multi-project setups pass langfuse_public_key as a keyword to the top-most decorated call; nested calls inherit it'
       ref: /docs/observability/sdk/instrumentation.md#observe-wrapper
     - id: start-as-current-observation
-      name: 'start_as_current_observation'
-      summary: 'Context manager that creates an observation and makes it the active parent for everything started inside the block'
+      name: start_as_current_observation
+      summary: Context manager that creates an observation and makes it the active parent for everything started inside the block
       lenses: [observability, reliability]
       import: langfuse
       signature: 'Langfuse.start_as_current_observation(*, name, as_type="span", trace_context=None, input=None, output=None, metadata=None, version=None, level=None, status_message=None, completion_start_time=None, model=None, model_parameters=None, usage_details=None, cost_details=None, prompt=None, end_on_exit=None)'
@@ -149,8 +149,8 @@ groups:
       - 'root-observation input/output become the trace input/output (trace-level I/O is deprecated in v4)'
       ref: /docs/observability/sdk/instrumentation.md#context-manager
     - id: start-observation
-      name: 'start_observation'
-      summary: 'Creates an observation without changing the active OTel context; the caller must call .end() or the observation is lost'
+      name: start_observation
+      summary: Creates an observation without changing the active OTel context; the caller must call .end() or the observation is lost
       lenses: [observability, reliability]
       import: langfuse
       signature: 'Langfuse.start_observation(*, name, as_type="span", trace_context=None, input=None, output=None, metadata=None, ...)'
@@ -160,8 +160,8 @@ groups:
       - 'create its children with methods on that observation object (manual_span.start_observation)'
       ref: /docs/observability/sdk/instrumentation.md#manual-observations
     - id: update-observation
-      name: 'update and update_current_*'
-      summary: 'Mutate an observation from its object (.update) or the active one via langfuse.update_current_span / update_current_generation'
+      name: update and update_current_*
+      summary: Mutate an observation from its object (.update) or the active one via langfuse.update_current_span / update_current_generation
       lenses: [observability]
       signature: 'Langfuse.update_current_span(*, name, input, output, metadata, version, level, status_message) -> None'
       params:
@@ -171,14 +171,14 @@ groups:
       - 'update_current_generation adds model, model_parameters, usage_details, cost_details, prompt, completion_start_time'
       ref: /docs/observability/sdk/instrumentation.md#update-observations
     - id: trace-io
-      name: 'Trace input and output'
-      summary: 'Trace I/O mirrors the root observation; set_trace_io and set_current_trace_io exist only for trace-level evaluator compatibility'
+      name: Trace input and output
+      summary: Trace I/O mirrors the root observation; set_trace_io and set_current_trace_io exist only for trace-level evaluator compatibility
       lenses: [best-practice]
       deprecated: 'set_trace_io() / set_current_trace_io() are backward-compat only in v4; set input/output on the root observation instead'
       ref: /docs/observability/sdk/instrumentation.md#trace-inputoutput-behavior
     - id: trace-id-api
-      name: 'Trace and observation ids'
-      summary: 'W3C ids (32-hex trace, 16-hex observation); create_trace_id(seed) is deterministic for correlating external request ids'
+      name: Trace and observation ids
+      summary: W3C ids (32-hex trace, 16-hex observation); create_trace_id(seed) is deterministic for correlating external request ids
       lenses: [composability, observability]
       signature: 'Langfuse.create_trace_id(*, seed=None) -> str; get_current_trace_id() -> str | None; get_current_observation_id() -> str | None'
       notes:
@@ -186,34 +186,34 @@ groups:
       - 'to continue an upstream trace pass trace_context={"trace_id": ..., "parent_span_id": ...} to start_as_current_observation'
       ref: /docs/observability/sdk/instrumentation.md#trace-ids
     - id: cross-service-baggage
-      name: 'Cross-service attribute propagation'
-      summary: 'propagate_attributes(as_baggage=True) rides OTel baggage on outbound HTTP so a downstream service inherits user, session and environment'
+      name: Cross-service attribute propagation
+      summary: propagate_attributes(as_baggage=True) rides OTel baggage on outbound HTTP so a downstream service inherits user, session and environment
       lenses: [composability, security]
       notes:
       - 'attributes go on ALL outbound HTTP headers; send only non-sensitive values'
       - 'environment travels as langfuse_environment baggage and beats the downstream LANGFUSE_TRACING_ENVIRONMENT'
       ref: /docs/observability/sdk/instrumentation.md#cross-service-propagation
     - id: auth-check
-      name: 'auth_check'
-      summary: 'Verifies credentials and connectivity once at setup; docs say not to call it in production request paths'
+      name: auth_check
+      summary: Verifies credentials and connectivity once at setup; docs say not to call it in production request paths
       lenses: [reliability]
       signature: Langfuse.auth_check() -> bool
       ref: /docs/observability/sdk/overview.md#client-setup
   - id: lf-sdk-advanced
-    title: 'Advanced SDK features'
+    title: Advanced SDK features
     level: intermediate
     requires: [lf-instrumentation]
     ref: /docs/observability/sdk/advanced-features.md
     entries:
     - id: debug-logging
-      name: 'Debug logging'
-      summary: 'debug=True or LANGFUSE_DEBUG=True turns on the "langfuse" stdlib logger at DEBUG (default WARNING); shows dropped spans and scopes'
+      name: Debug logging
+      summary: debug=True or LANGFUSE_DEBUG=True turns on the "langfuse" stdlib logger at DEBUG (default WARNING); shows dropped spans and scopes
       lenses: [observability, best-practice]
       notes:
       - 'to find which scope a filtered span came from, enable debug, then compose is_default_export_span with the scope'
       ref: /docs/observability/sdk/advanced-features.md#logging--debugging
     - id: multi-project
-      name: 'Multi-project routing'
+      name: Multi-project routing
       summary: 'Experimental: one client per public key; every integration call must carry its public key or traces go to the default project'
       lenses: [security, composability]
       notes:
@@ -221,14 +221,14 @@ groups:
       - 'third-party OTel spans that pass the filter carry no public key and reach every project'
       ref: /docs/observability/sdk/advanced-features.md#multi-project-setup-experimental
     - id: ttft
-      name: 'Time to first token'
-      summary: 'Set completion_start_time on a generation to record TTFT latency'
+      name: Time to first token
+      summary: Set completion_start_time on a generation to record TTFT latency
       lenses: [perf, observability]
       signature: generation.update(completion_start_time=datetime)
       ref: /docs/observability/sdk/advanced-features.md#time-to-first-token-ttft
     - id: threading-context
-      name: 'Thread pools and multiprocessing'
-      summary: 'Context does not cross worker threads by default; instrument with OpenTelemetry ThreadingInstrumentor'
+      name: Thread pools and multiprocessing
+      summary: Context does not cross worker threads by default; instrument with OpenTelemetry ThreadingInstrumentor
       lenses: [reliability, composability]
       import: opentelemetry.instrumentation.threading
       signature: ThreadingInstrumentor().instrument()
@@ -236,30 +236,30 @@ groups:
       - 'multiprocessing needs the OpenTelemetry guidance; cross-process traces use trace ids (trace-id-api)'
       ref: /docs/observability/sdk/advanced-features.md#thread-pools-and-multiprocessing
     - id: self-signed-ssl
-      name: 'Self-signed certificates'
-      summary: 'Self-hosted only; trust the cert for the OTLP exporter via OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE and for API calls via httpx_client'
+      name: Self-signed certificates
+      summary: Self-hosted only; trust the cert for the OTLP exporter via OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE and for API calls via httpx_client
       lenses: [security]
       signature: Langfuse(httpx_client=httpx.Client(verify=cert_path))
       ref: /docs/observability/sdk/advanced-features.md#self-signed-ssl-certificates-self-hosted-langfuse
     - id: sdk-troubleshooting
-      name: 'SDK troubleshooting'
+      name: SDK troubleshooting
       summary: 'No traces, wrong nesting, media: check keys and sample_rate, flush/shutdown, end manual observations, async context'
       lenses: [reliability]
       notes:
       - 'a child whose parent was never exported is shown at the trace root; make sure parents are exported'
       - 'self-hosted needs server >= 3.63.0 for the OTel-based SDKs'
       ref: /docs/observability/sdk/troubleshooting-and-faq.md
-- title: 'LangChain and LangGraph'
+- title: LangChain and LangGraph
   sections:
   - id: lf-langchain
-    title: 'Callback handler'
+    title: Callback handler
     level: basic
     requires: [lf-client]
     ref: /integrations/frameworks/langchain.md
     entries:
     - id: callback-handler
-      name: 'CallbackHandler'
-      summary: 'LangChain callback that turns runs into Langfuse observations; create a fresh handler per run to avoid shared run state'
+      name: CallbackHandler
+      summary: LangChain callback that turns runs into Langfuse observations; create a fresh handler per run to avoid shared run state
       lenses: [observability, reliability]
       import: langfuse.langchain
       signature: CallbackHandler(*, public_key=None, trace_context=None)
@@ -273,7 +273,7 @@ groups:
       - 'each fallback/retry attempt is its own generation under the model chain; wrap_* middleware spans never appear (verified 4.15.6)'
       ref: /integrations/frameworks/langchain.md
     - id: langgraph-server
-      name: 'LangGraph Agent Server setup'
+      name: LangGraph Agent Server setup
       summary: 'Docs pattern for tracing graphs served by the Agent Server: build the handler in the served graph and attach it to the config'
       lenses: [observability]
       notes:
@@ -282,38 +282,38 @@ groups:
       - 'verified live on langgraph-api 0.15.1: factory-entered propagate_attributes reached every exported span; client built at import raised no BlockingError'
       ref: /integrations/frameworks/langgraph.md
     - id: handler-metadata-attrs
-      name: 'Handler metadata attributes'
-      summary: 'langfuse_session_id, langfuse_user_id and langfuse_tags in run metadata are read at the ROOT run only'
+      name: Handler metadata attributes
+      summary: langfuse_session_id, langfuse_user_id and langfuse_tags in run metadata are read at the ROOT run only
       lenses: [observability]
       notes:
       - 'prefer propagate_attributes: it covers every span and is the v4 mechanism'
       - 'root run metadata becomes propagated metadata; values over 200 chars are dropped with a WARNING each'
       ref: /integrations/frameworks/langchain.md
     - id: observation-type-mapping
-      name: 'Observation types'
-      summary: 'Types span, generation, tool, chain, agent, retriever, embedding, evaluator, guardrail, event drive display and the agent graph view'
+      name: Observation types
+      summary: Types span, generation, tool, chain, agent, retriever, embedding, evaluator, guardrail, event drive display and the agent graph view
       lenses: [observability]
       notes:
       - 'the agent graph view infers from any type other than span/event/generation, so chain and tool runs from LangGraph appear without renaming'
       ref: /docs/observability/features/observation-types.md
     - id: interrupt-resume
-      name: 'Interrupt and resume linkage'
-      summary: 'The handler links a resumed LangGraph run to its interrupted trace per handler instance, keyed by thread id'
+      name: Interrupt and resume linkage
+      summary: The handler links a resumed LangGraph run to its interrupted trace per handler instance, keyed by thread id
       lenses: [reliability]
       notes:
       - 'a fresh handler per run does not link resumes; revisit if human-in-the-loop interrupts are added'
       ref: /integrations/frameworks/langgraph.md
-- title: 'Trace attributes'
+- title: Trace attributes
   sections:
   - id: lf-attributes
-    title: 'Propagated attributes'
+    title: Propagated attributes
     level: basic
     requires: [lf-client]
     ref: /docs/observability/sdk/instrumentation.md
     entries:
     - id: propagate-attributes
-      name: 'propagate_attributes'
-      summary: 'Context manager that stamps session, user, tags, metadata, version and environment on every span started inside it'
+      name: propagate_attributes
+      summary: Context manager that stamps session, user, tags, metadata, version and environment on every span started inside it
       lenses: [observability, best-practice]
       import: langfuse
       signature: propagate_attributes(*, user_id, session_id, metadata, version, tags, trace_name, environment, prompt, as_baggage=False)
@@ -327,57 +327,57 @@ groups:
       - 'works with an injected tracer provider, unlike the client environment which rides the provider Resource'
       ref: /docs/observability/sdk/instrumentation.md
     - id: sessions
-      name: 'Sessions'
-      summary: 'Group traces into a conversation by session_id; thread ids are a natural fit'
+      name: Sessions
+      summary: Group traces into a conversation by session_id; thread ids are a natural fit
       lenses: [observability]
       notes:
       - 'session_id must be US-ASCII and at most 200 chars'
       ref: /docs/observability/features/sessions.md
     - id: users
-      name: 'Users'
-      summary: 'Attribute traces to an end user via user_id for per-user cost and usage views'
+      name: Users
+      summary: Attribute traces to an end user via user_id for per-user cost and usage views
       lenses: [observability, security]
       notes:
       - 'only identifiers you are allowed to send to the vendor; Cloud stores them'
       ref: /docs/observability/features/users.md
     - id: tags
-      name: 'Tags'
-      summary: 'Low-cardinality labels on traces for filtering'
+      name: Tags
+      summary: Low-cardinality labels on traces for filtering
       lenses: [observability]
       ref: /docs/observability/features/tags.md
     - id: metadata
-      name: 'Metadata'
-      summary: 'Key-value context on traces and observations; propagated keys obey the 200-char value limit'
+      name: Metadata
+      summary: Key-value context on traces and observations; propagated keys obey the 200-char value limit
       lenses: [observability]
       ref: /docs/observability/features/metadata.md
     - id: environments
-      name: 'Environments'
-      summary: 'Separate dev, staging and production data in one project via langfuse.environment'
+      name: Environments
+      summary: Separate dev, staging and production data in one project via langfuse.environment
       lenses: [observability, best-practice]
       notes:
       - 'value must match ^(?!langfuse)[a-z0-9_-]+$ and be at most 40 chars'
       ref: /docs/observability/features/environments.md
     - id: release-version
-      name: 'Release and version'
-      summary: 'LANGFUSE_RELEASE (auto-detected from common CI variables) and the version attribute tag runs with the code revision'
+      name: Release and version
+      summary: LANGFUSE_RELEASE (auto-detected from common CI variables) and the version attribute tag runs with the code revision
       lenses: [observability]
       ref: /docs/observability/features/releases-and-versioning.md
     - id: trace-ids
-      name: 'Trace ids and distributed tracing'
-      summary: 'Deterministic trace ids, trace_context on the handler, and propagating a trace across services'
+      name: Trace ids and distributed tracing
+      summary: Deterministic trace ids, trace_context on the handler, and propagating a trace across services
       lenses: [composability]
       ref: /docs/observability/features/trace-ids-and-distributed-tracing.md
-- title: 'Export and lifecycle'
+- title: Export and lifecycle
   sections:
   - id: lf-export
-    title: 'Filtering, batching, shutdown'
+    title: Filtering, batching, shutdown
     level: intermediate
     requires: [lf-client]
     ref: /docs/observability/sdk/advanced-features.md
     entries:
     - id: span-filter
-      name: 'should_export_span'
-      summary: 'Predicate on each finished span; a custom one REPLACES the default filter, so compose with is_default_export_span'
+      name: should_export_span
+      summary: Predicate on each finished span; a custom one REPLACES the default filter, so compose with is_default_export_span
       lenses: [cost, observability, best-practice]
       import: langfuse.span_filter
       signature: 'Langfuse(should_export_span=lambda span: is_default_export_span(span) and ...)'
@@ -392,45 +392,45 @@ groups:
       - 'verified 4.15.6: filter composed with the default drops foreign non-LLM spans and the named leaves, keeps the rest'
       ref: /docs/observability/sdk/advanced-features.md
     - id: sampling
-      name: 'Sampling'
-      summary: 'Trace-level client-side sampling via sample_rate or LANGFUSE_SAMPLE_RATE; whole traces are dropped'
+      name: Sampling
+      summary: Trace-level client-side sampling via sample_rate or LANGFUSE_SAMPLE_RATE; whole traces are dropped
       lenses: [cost]
       notes:
       - 'only applied when the SDK builds the TracerProvider; ignored with an injected or already-registered provider (verified 4.15.6)'
       ref: /docs/observability/features/sampling.md
     - id: queuing-batching
-      name: 'Queuing and batching'
-      summary: 'Spans are batched by a BatchSpanProcessor; tune flush_at and flush_interval; flush() sends what is queued'
+      name: Queuing and batching
+      summary: Spans are batched by a BatchSpanProcessor; tune flush_at and flush_interval; flush() sends what is queued
       lenses: [perf, reliability]
       notes:
       - 'in short-lived scripts call flush() or shutdown() before exit; the SDK also registers an atexit shutdown'
       - 'delivery failures are logged and retried, never raised to the caller'
       ref: /docs/observability/features/queuing-batching.md
     - id: flush
-      name: 'Langfuse.flush'
-      summary: 'Blocks until queued spans, scores and media are exported; use in tests before reading an in-memory exporter'
+      name: Langfuse.flush
+      summary: Blocks until queued spans, scores and media are exported; use in tests before reading an in-memory exporter
       lenses: [testing, reliability]
       signature: Langfuse.flush() -> None
       ref: /docs/observability/features/queuing-batching.md
     - id: shutdown
-      name: 'Langfuse.shutdown'
-      summary: 'Flushes, stops consumer threads and unregisters atexit; terminal for that client'
+      name: Langfuse.shutdown
+      summary: Flushes, stops consumer threads and unregisters atexit; terminal for that client
       lenses: [reliability]
       signature: Langfuse.shutdown() -> None
       notes:
       - 'safe when the backend is unreachable (logs, never throws); the singleton stays registered afterwards'
       ref: /docs/observability/features/queuing-batching.md
     - id: masking
-      name: 'mask_otel_spans'
-      summary: 'Export-stage hook returning sparse patches to redact span attributes before they leave the process'
+      name: mask_otel_spans
+      summary: Export-stage hook returning sparse patches to redact span attributes before they leave the process
       lenses: [security]
       signature: Langfuse(mask_otel_spans=fn)
       notes:
       - 'synchronous and runs on the export worker thread; keep it fast'
       ref: /docs/observability/features/masking.md
     - id: isolated-tracer-provider
-      name: 'Isolated TracerProvider'
-      summary: 'Pass tracer_provider=TracerProvider() so Langfuse spans never mix with other OTel instrumentation'
+      name: Isolated TracerProvider
+      summary: Pass tracer_provider=TracerProvider() so Langfuse spans never mix with other OTel instrumentation
       lenses: [testing, composability]
       signature: Langfuse(tracer_provider=TracerProvider(), span_exporter=InMemorySpanExporter())
       notes:
@@ -439,17 +439,17 @@ groups:
       - 'for deterministic tests pass sampler=ALWAYS_ON (beats OTEL_TRACES_SAMPLER) and clear OTEL_SDK_DISABLED; the provider has no disabled parameter'
       - 'spans of all providers share one OTel context; mixing providers can orphan spans'
       ref: /docs/observability/sdk/advanced-features.md#isolated-tracer-provider
-- title: 'Tracing concepts and features'
+- title: Tracing concepts and features
   sections:
   - id: lf-trace-concepts
-    title: 'Data model and getting started'
+    title: Data model and getting started
     level: basic
     requires: []
     ref: /docs/observability/data-model.md
     entries:
     - id: observability-data-model
-      name: 'Observability data model'
-      summary: 'Observations nest into traces and sessions; trace attributes are copied onto every observation (observations-first v4)'
+      name: Observability data model
+      summary: Observations nest into traces and sessions; trace attributes are copied onto every observation (observations-first v4)
       lenses: [observability]
       notes:
       - 'span is one observation type; generation, event, tool, chain, agent, retriever and others add LLM-specific fields'
@@ -457,26 +457,26 @@ groups:
       - 'short-lived processes must flush() before exit or buffered traces are lost'
       ref: /docs/observability/data-model.md
     - id: tracing-overview
-      name: 'Observability overview'
-      summary: 'Entry page for tracing, what it captures and how it ties to evaluation, prompts and dashboards'
+      name: Observability overview
+      summary: Entry page for tracing, what it captures and how it ties to evaluation, prompts and dashboards
       lenses: [observability]
       ref: /docs/observability/overview.md
     - id: tracing-get-started
-      name: 'Get started with tracing'
-      summary: 'Agentic install (skill plus Docs MCP) or manual install per framework; keys from project settings, same code for Cloud and self-host'
+      name: Get started with tracing
+      summary: Agentic install (skill plus Docs MCP) or manual install per framework; keys from project settings, same code for Cloud and self-host
       lenses: [observability, reuse]
       notes:
       - 'if the app already emits OTel spans, start from the OpenTelemetry integration page'
       ref: /docs/observability/get-started.md
   - id: lf-trace-features
-    title: 'Tracing features'
+    title: Tracing features
     level: intermediate
     requires: [lf-instrumentation]
     ref: /docs/observability/features/log-levels.md
     entries:
     - id: log-levels
-      name: 'Log levels'
-      summary: 'level is one of DEBUG, DEFAULT, WARNING, ERROR with an optional status_message; set at creation or via update'
+      name: Log levels
+      summary: level is one of DEBUG, DEFAULT, WARNING, ERROR with an optional status_message; set at creation or via update
       lenses: [observability]
       signature: 'span.update(level="ERROR", status_message="...")'
       notes:
@@ -484,16 +484,16 @@ groups:
       - 'the LangChain callback handler sets level and status_message per step automatically'
       ref: /docs/observability/features/log-levels.md
     - id: trace-url
-      name: 'Trace URLs and sharing'
-      summary: 'langfuse.get_trace_url() returns the link for logs and notebooks; set_current_trace_as_public makes a trace viewable without login'
+      name: Trace URLs and sharing
+      summary: langfuse.get_trace_url() returns the link for logs and notebooks; set_current_trace_as_public makes a trace viewable without login
       lenses: [observability, security]
       signature: Langfuse.get_trace_url(*, trace_id=None) -> str | None
       notes:
       - 'only project members see a trace unless it is published; publishing is a deliberate data-sharing step'
       ref: /docs/observability/features/url.md
     - id: media
-      name: 'Multi-modal media'
-      summary: 'Base64 data URIs are extracted, uploaded and replaced by reference tokens automatically; wrap other files in LangfuseMedia'
+      name: Multi-modal media
+      summary: Base64 data URIs are extracted, uploaded and replaced by reference tokens automatically; wrap other files in LangfuseMedia
       lenses: [cost, observability]
       import: langfuse.media
       signature: LangfuseMedia(content_bytes=..., content_type="application/pdf")
@@ -502,21 +502,21 @@ groups:
       - 'self-hosted needs an object-storage bucket (LANGFUSE_S3_MEDIA_UPLOAD_*); default max attachment 1 GB'
       ref: /docs/observability/features/multi-modality.md
     - id: comments
-      name: 'Comments'
-      summary: 'Threaded comments on traces, observations, sessions and prompts, in the UI or via GET/POST /api/public/comments'
+      name: Comments
+      summary: Threaded comments on traces, observations, sessions and prompts, in the UI or via GET/POST /api/public/comments
       lenses: [observability]
       ref: /docs/observability/features/comments.md
     - id: corrections
-      name: 'Corrected outputs'
-      summary: 'A correction is a score with data_type CORRECTION and name output on a trace or observation; one per object'
+      name: Corrected outputs
+      summary: A correction is a score with data_type CORRECTION and name output on a trace or observation; one per object
       lenses: [testing, observability]
       signature: 'langfuse.create_score(trace_id=..., observation_id=..., name="output", value=text, data_type="CORRECTION")'
       notes:
       - 'feeds fine-tuning datasets and annotation-queue review; the UI shows a diff against the original output'
       ref: /docs/observability/features/corrections.md
     - id: user-feedback
-      name: 'User feedback'
-      summary: 'Feedback is a score on the trace; return the trace id to the UI, send explicit feedback with the public key only'
+      name: User feedback
+      summary: Feedback is a score on the trace; return the trace id to the UI, send explicit feedback with the public key only
       lenses: [observability, testing]
       signature: 'langfuse.create_score(trace_id=..., name="user-feedback", value=1, comment=...)'
       notes:
@@ -524,31 +524,31 @@ groups:
       - 'a stable score id (e.g. user-feedback-<message id>) makes re-sent feedback overwrite instead of duplicate'
       ref: /docs/observability/features/user-feedback.md
     - id: mcp-tracing
-      name: 'MCP tracing'
-      summary: 'Link MCP client and server traces by injecting W3C trace context into the tool call _meta field and restoring it server-side'
+      name: MCP tracing
+      summary: Link MCP client and server traces by injecting W3C trace context into the tool call _meta field and restoring it server-side
       lenses: [composability, observability]
       ref: /docs/observability/features/mcp-tracing.md
     - id: observability-agentic-access
-      name: 'Agent access to observability data'
-      summary: 'Pick the Agent Skill plus CLI when the agent can run shell, the Langfuse MCP server when it cannot, CLI or Public API in CI'
+      name: Agent access to observability data
+      summary: Pick the Agent Skill plus CLI when the agent can run shell, the Langfuse MCP server when it cannot, CLI or Public API in CI
       lenses: [reuse, observability]
       ref: /docs/observability/features/agentic-access.md
   - id: lf-trace-troubleshooting
-    title: 'Troubleshooting and operations'
+    title: Troubleshooting and operations
     level: intermediate
     requires: [lf-client]
     ref: /docs/observability/troubleshooting-and-faq.md
     entries:
     - id: missing-traces
-      name: 'No traces in the dashboard'
+      name: No traces in the dashboard
       summary: 'Checklist: keys set before import, BASE_URL, debug logs, flush in short jobs, network, batching, OTel conflicts'
       lenses: [reliability]
       notes:
       - 'tracing is asynchronous; traces usually appear seconds after a flush'
       ref: /faq/all/missing-traces.md
     - id: tracing-data-updates
-      name: 'Immutability of traces and scores'
-      summary: 'Traces and observations are immutable once ingested; re-sending an id creates duplicates; correct data with scores'
+      name: Immutability of traces and scores
+      summary: Traces and observations are immutable once ingested; re-sending an id creates duplicates; correct data with scores
       lenses: [best-practice, reliability]
       notes:
       - 'building up a span before the SDK flushes is normal; the rule is about re-ingesting'
@@ -556,104 +556,104 @@ groups:
       - 'the 30-day partial-merge of re-ingested scores is deprecated'
       ref: /faq/all/tracing-data-updates.md
     - id: ingestion-latency
-      name: 'Time until traces appear'
-      summary: 'Seconds after flush; Python SDK 4.7.0+ with the v4 preview ingests in real time'
+      name: Time until traces appear
+      summary: Seconds after flush; Python SDK 4.7.0+ with the v4 preview ingests in real time
       lenses: [observability]
       ref: /faq/all/how-long-until-traces-appear.md
     - id: empty-trace-io
-      name: 'Empty trace input and output'
-      summary: 'Trace-level I/O is deprecated in v4; put the overall request and response on the root observation instead'
+      name: Empty trace input and output
+      summary: Trace-level I/O is deprecated in v4; put the overall request and response on the root observation instead
       lenses: [best-practice]
       notes:
       - 'trace-level LLM-as-a-judge evaluators need migrating to observation-level evaluators'
       ref: /faq/all/empty-trace-input-and-output.md
     - id: unwanted-spans
-      name: 'Unwanted HTTP and database spans'
-      summary: 'Python v4 filters non-LLM spans by default; they bill as observations when exported, so keep the default filter or compose it'
+      name: Unwanted HTTP and database spans
+      summary: Python v4 filters non-LLM spans by default; they bill as observations when exported, so keep the default filter or compose it
       lenses: [cost, observability]
       ref: /faq/all/unwanted-http-database-spans.md
     - id: existing-otel-setup
-      name: 'Langfuse next to another OTel setup'
-      summary: 'Every processor on the global TracerProvider sees every span; init order, scope filters and isolated providers decide'
+      name: Langfuse next to another OTel setup
+      summary: Every processor on the global TracerProvider sees every span; init order, scope filters and isolated providers decide
       lenses: [composability, reliability]
       notes:
       - 'find a span scope name in the UI under metadata.scope.name'
       - 'isolated providers still share one OTel context, so filtered parents orphan their children'
       ref: /faq/all/existing-otel-setup.md
     - id: serverless-flush
-      name: 'Serverless and short-lived runtimes'
-      summary: 'Background export may never run before the process freezes; call flush(), use waitUntil where available, or lower the batch size'
+      name: Serverless and short-lived runtimes
+      summary: Background export may never run before the process freezes; call flush(), use waitUntil where available, or lower the batch size
       lenses: [reliability]
       ref: /faq/all/aws-lambda-and-serverless-functions.md
     - id: environments-vs-projects
-      name: 'Environments or separate projects'
-      summary: 'Built-in environments share prompts, datasets and evaluators; use separate projects only for different access control'
+      name: Environments or separate projects
+      summary: Built-in environments share prompts, datasets and evaluators; use separate projects only for different access control
       lenses: [security, best-practice]
       notes:
       - 'a shared proxy can take the caller environment via propagate_attributes(environment=..., as_baggage=True)'
       ref: /faq/all/managing-different-environments.md
     - id: cost-token-ingestion
-      name: 'Cost and token ingestion'
-      summary: 'Langfuse infers cost for supported models with matching names, or you ingest usage_details and cost_details explicitly'
+      name: Cost and token ingestion
+      summary: Langfuse infers cost for supported models with matching names, or you ingest usage_details and cost_details explicitly
       lenses: [cost]
       ref: /faq/all/costs-tokens-langfuse.md
     - id: langchain-run-names
-      name: 'LangChain run names'
+      name: LangChain run names
       summary: 'Observation names come from the run name; set with with_config({"run_name": ...}) on the runnable'
       lenses: [observability]
       ref: /faq/all/custom-langchain-run-names.md
-- title: 'Evaluation'
+- title: Evaluation
   sections:
   - id: lf-eval-concepts
-    title: 'Evaluation concepts'
+    title: Evaluation concepts
     level: basic
     requires: []
     ref: /docs/evaluation/core-concepts.md
     entries:
     - id: eval-overview
-      name: 'Evaluation overview'
-      summary: 'Score live traces online, test against datasets offline, and pick a feature from the overview table; CI gate via the experiment action'
+      name: Evaluation overview
+      summary: Score live traces online, test against datasets offline, and pick a feature from the overview table; CI gate via the experiment action
       lenses: [testing]
       ref: /docs/evaluation/overview.md
     - id: eval-core-concepts
-      name: 'Evaluation concepts'
-      summary: 'Offline evaluation (datasets and experiments before deploy) and online evaluation (scoring live traces) feed one loop via scores'
+      name: Evaluation concepts
+      summary: Offline evaluation (datasets and experiments before deploy) and online evaluation (scoring live traces) feed one loop via scores
       lenses: [testing, best-practice]
       ref: /docs/evaluation/core-concepts.md
     - id: eval-agentic-access
-      name: 'Agent access to evaluation'
-      summary: 'Agent Skill plus CLI when shell is available, the Langfuse MCP server otherwise, CLI or Public API in CI'
+      name: Agent access to evaluation
+      summary: Agent Skill plus CLI when shell is available, the Langfuse MCP server otherwise, CLI or Public API in CI
       lenses: [reuse, testing]
       ref: /docs/evaluation/agentic-access.md
     - id: eval-troubleshooting
-      name: 'Evaluation troubleshooting'
-      summary: 'Index of evaluation FAQs, including upgrading trace-level evaluators to observation-level ones'
+      name: Evaluation troubleshooting
+      summary: Index of evaluation FAQs, including upgrading trace-level evaluators to observation-level ones
       lenses: [reliability]
       ref: /docs/evaluation/troubleshooting-and-faq.md
   - id: lf-scores
-    title: 'Scores'
+    title: Scores
     level: basic
     requires: [lf-client]
     ref: /docs/evaluation/scores/overview.md
     entries:
     - id: score-types
-      name: 'Score types and levels'
-      summary: 'Four data types (numeric, categorical, boolean, text) attached to a trace, observation, session or dataset run'
+      name: Score types and levels
+      summary: Four data types (numeric, categorical, boolean, text) attached to a trace, observation, session or dataset run
       lenses: [testing, observability]
       notes:
       - 'scores feed score analytics, custom dashboards and the API; typical sources are annotation, LLM judge, code check and end-user feedback'
       ref: /docs/evaluation/scores/overview.md
     - id: score-data-model
-      name: 'Score and ScoreConfig data model'
-      summary: 'A score references exactly one of trace, observation, session or dataset run; source is API, EVAL or ANNOTATION'
+      name: Score and ScoreConfig data model
+      summary: A score references exactly one of trace, observation, session or dataset run; source is API, EVAL or ANNOTATION
       lenses: [testing]
       notes:
       - 'id doubles as an idempotency key; value is numeric for numeric and boolean, string_value for categorical and text'
       - 'a ScoreConfig pins name, data type and constraints (min/max, categories, text 1-500 chars); configs are immutable but archivable'
       ref: /docs/evaluation/scores/data-model.md
     - id: score-methods-python
-      name: 'Score creation methods'
-      summary: 'create_score (explicit ids) plus span.score, span.score_trace, score_current_span and score_current_trace inside a context'
+      name: Score creation methods
+      summary: create_score (explicit ids) plus span.score, span.score_trace, score_current_span and score_current_trace inside a context
       lenses: [testing, observability]
       signature: 'Langfuse.create_score(*, name, value, trace_id, observation_id, session_id, dataset_run_id, score_id, data_type, comment, config_id, metadata, timestamp, environment)'
       params:
@@ -665,24 +665,24 @@ groups:
       - 'observation scores need both observation_id and trace_id'
       ref: /docs/evaluation/evaluation-methods/scores-via-sdk.md
     - id: score-config
-      name: 'Create and manage score configs'
-      summary: 'Configs are required for human annotation and optional for API scores; manage them via the SDK api property or project settings'
+      name: Create and manage score configs
+      summary: Configs are required for human annotation and optional for API scores; manage them via the SDK api property or project settings
       lenses: [best-practice]
       ref: /faq/all/manage-score-configs.md
     - id: score-analytics
-      name: 'Score analytics'
-      summary: 'Zero-config analysis of score distributions and agreement (Pearson, Cohen''s kappa, F1) between evaluation methods'
+      name: Score analytics
+      summary: Zero-config analysis of score distributions and agreement (Pearson, Cohen's kappa, F1) between evaluation methods
       lenses: [testing]
       ref: /docs/evaluation/scores/score-analytics.md
   - id: lf-datasets-experiments
-    title: 'Datasets and experiments'
+    title: Datasets and experiments
     level: intermediate
     requires: [lf-scores]
     ref: /docs/evaluation/experiments/datasets.md
     entries:
     - id: datasets
-      name: 'Datasets'
-      summary: 'Named collections of items with input and optional expected_output; folders by slash in the name; versioned by item changes'
+      name: Datasets
+      summary: Named collections of items with input and optional expected_output; folders by slash in the name; versioned by item changes
       lenses: [testing]
       signature: 'Langfuse.create_dataset(*, name, description, metadata, input_schema, expected_output_schema); create_dataset_item(*, dataset_name, input, expected_output, metadata, source_trace_id, source_observation_id, status, id); get_dataset(name, *, fetch_items_page_size=50, version=None)'
       notes:
@@ -690,15 +690,15 @@ groups:
       - 'item ids are upserted and unique per project; media goes in via LangfuseMedia (Python >= 4.10.0 for multi-modal experiments)'
       ref: /docs/evaluation/experiments/datasets.md
     - id: experiments-data-model
-      name: 'Experiments data model'
-      summary: 'Datasets, items, runs and run items; read runs via the Experiments API, create them only through the SDK runner, UI or OTel'
+      name: Experiments data model
+      summary: Datasets, items, runs and run items; read runs via the Experiments API, create them only through the SDK runner, UI or OTel
       lenses: [testing]
       notes:
       - 'POST /dataset-run-items is deprecated; there is no public endpoint to create experiment runs'
       ref: /docs/evaluation/experiments/data-model.md
     - id: run-experiment
-      name: 'run_experiment'
-      summary: 'Experiment runner over local data or a dataset; concurrent tasks, item and run evaluators, automatic tracing, isolated failures'
+      name: run_experiment
+      summary: Experiment runner over local data or a dataset; concurrent tasks, item and run evaluators, automatic tracing, isolated failures
       lenses: [testing, perf]
       signature: 'Langfuse.run_experiment(*, name, data, task, run_name=None, description=None, evaluators=[], composite_evaluator=None, run_evaluators=[], max_concurrency=50, metadata=None) -> ExperimentResult'
       params:
@@ -710,8 +710,8 @@ groups:
       - 'dataset.run_experiment(name=..., task=...) runs a hosted dataset; the run name becomes the dataset run name'
       ref: /docs/evaluation/experiments/experiments-via-sdk.md
     - id: experiment-evaluators
-      name: 'Experiment evaluators'
-      summary: 'Item evaluators receive input, output, expected_output and metadata and return Evaluation; run evaluators receive item_results'
+      name: Experiment evaluators
+      summary: Item evaluators receive input, output, expected_output and metadata and return Evaluation; run evaluators receive item_results
       lenses: [testing]
       import: langfuse
       signature: 'Evaluation(*, name, value, comment=None, metadata=None, data_type=None, config_id=None)'
@@ -720,8 +720,8 @@ groups:
       - 'autoevals evaluators wrap with langfuse.experiment.create_evaluator_from_autoevals(...)'
       ref: /docs/evaluation/experiments/experiments-via-sdk.md#evaluators
     - id: experiments-ci-cd
-      name: 'Experiments in CI/CD'
-      summary: 'langfuse/experiment-action runs experiment(context) scripts per PR; raise RegressionError to fail the job'
+      name: Experiments in CI/CD
+      summary: langfuse/experiment-action runs experiment(context) scripts per PR; raise RegressionError to fail the job
       lenses: [testing, reliability]
       import: langfuse
       signature: 'RegressionError(*, result, metric=None, value=None, threshold=None, message=None); RunnerContext.run_experiment(...)'
@@ -731,29 +731,29 @@ groups:
       - 'a failing first run is not an approved baseline; review known failures explicitly'
       ref: /docs/evaluation/experiments/experiments-ci-cd.md
     - id: compare-experiments
-      name: 'Compare experiments'
-      summary: 'Compare runs against a reviewed baseline with the same dataset and evaluator versions; inspect regressions through traces'
+      name: Compare experiments
+      summary: Compare runs against a reviewed baseline with the same dataset and evaluator versions; inspect regressions through traces
       lenses: [testing]
       ref: /docs/evaluation/experiments/compare-experiments.md
     - id: experiment-scores-retrieval
-      name: 'Retrieve experiment scores'
-      summary: 'Experiment-level scores are immutable aggregates; item-level scores per output; read them via the Experiments API or the runner result'
+      name: Retrieve experiment scores
+      summary: Experiment-level scores are immutable aggregates; item-level scores per output; read them via the Experiments API or the runner result
       lenses: [testing]
       ref: /faq/all/retrieve-experiment-scores.md
     - id: experiments-otel
-      name: 'Experiments via OpenTelemetry'
-      summary: 'Attach experiment and item attributes to OTel spans so Langfuse groups traces into a run; for non-Python/JS clients'
+      name: Experiments via OpenTelemetry
+      summary: Attach experiment and item attributes to OTel spans so Langfuse groups traces into a run; for non-Python/JS clients
       lenses: [composability]
       ref: /docs/evaluation/experiments/experiments-via-opentelemetry.md
   - id: lf-eval-methods
-    title: 'Evaluation methods'
+    title: Evaluation methods
     level: intermediate
     requires: [lf-scores]
     ref: /docs/evaluation/evaluation-methods/llm-as-a-judge.md
     entries:
     - id: llm-as-a-judge
-      name: 'LLM-as-a-Judge'
-      summary: 'Server-side judge evaluators and rules scoring observations or experiments; also manageable via the Evaluators and Evaluation Rules API'
+      name: LLM-as-a-Judge
+      summary: Server-side judge evaluators and rules scoring observations or experiments; also manageable via the Evaluators and Evaluation Rules API
       lenses: [testing]
       notes:
       - 'the Langfuse worker runs the judge through the project LLM connection, so a self-hosted worker needs egress to that gateway'
@@ -761,49 +761,49 @@ groups:
       - 'calibrate a judge against labeled examples or human scores before trusting it'
       ref: /docs/evaluation/evaluation-methods/llm-as-a-judge.md
     - id: code-evaluators
-      name: 'Code evaluators'
-      summary: 'Deterministic Python or TypeScript evaluate(ctx) functions run by Langfuse on observations and experiments'
+      name: Code evaluators
+      summary: Deterministic Python or TypeScript evaluate(ctx) functions run by Langfuse on observations and experiments
       lenses: [testing]
       notes:
       - 'limits: stdlib only, no network, 2 s runtime, source under 256 KB; self-hosted Python needs the aws-lambda dispatcher'
       - 'needs observations from an OTel-based SDK'
       ref: /docs/evaluation/evaluation-methods/code-evaluators.md
     - id: jev-as-a-judge
-      name: 'Jev as a judge'
-      summary: 'Experimental typed-question judge from TypeSafe (decision-model evaluator); typed answers with probabilities as scores'
+      name: Jev as a judge
+      summary: Experimental typed-question judge from TypeSafe (decision-model evaluator); typed answers with probabilities as scores
       lenses: [testing, cost]
       ref: /docs/evaluation/evaluation-methods/jev-as-a-judge.md
     - id: annotation-queues
-      name: 'Annotation queues'
-      summary: 'Human review workflow where domain experts score traces, observations or sessions and add corrected outputs'
+      name: Annotation queues
+      summary: Human review workflow where domain experts score traces, observations or sessions and add corrected outputs
       lenses: [testing]
       ref: /docs/evaluation/evaluation-methods/annotation-queues.md
-- title: 'Prompt management'
+- title: Prompt management
   sections:
   - id: lf-prompt-basics
-    title: 'Prompts, versions and labels'
+    title: Prompts, versions and labels
     level: basic
     requires: [lf-client]
     ref: /docs/prompt-management/get-started.md
     entries:
     - id: prompt-overview
-      name: 'Prompt management overview'
-      summary: 'Versioned prompts managed outside code, cached in the SDKs, linkable to traces and metrics'
+      name: Prompt management overview
+      summary: Versioned prompts managed outside code, cached in the SDKs, linkable to traces and metrics
       lenses: [reuse]
       ref: /docs/prompt-management/overview.md
     - id: prompt-get-started
-      name: 'Get started with prompt management'
-      summary: 'Create a prompt (UI, SDK or API), fetch the production label at runtime, compile variables, optionally migrate code prompts with the skill'
+      name: Get started with prompt management
+      summary: Create a prompt (UI, SDK or API), fetch the production label at runtime, compile variables, optionally migrate code prompts with the skill
       lenses: [reuse]
       ref: /docs/prompt-management/get-started.md
     - id: prompt-data-model
-      name: 'Prompt data model'
-      summary: 'A prompt is text or chat (type is immutable) plus optional config, versions and labels'
+      name: Prompt data model
+      summary: A prompt is text or chat (type is immutable) plus optional config, versions and labels
       lenses: [best-practice]
       ref: /docs/prompt-management/data-model.md
     - id: create-prompt
-      name: 'create_prompt'
-      summary: 'Creates a new version when the name exists; labels promote it (for example production)'
+      name: create_prompt
+      summary: Creates a new version when the name exists; labels promote it (for example production)
       lenses: [reuse]
       signature: 'Langfuse.create_prompt(*, name, prompt, labels=[], tags=None, type="text", config=None, commit_message=None)'
       params:
@@ -812,8 +812,8 @@ groups:
       - {name: config, type: 'Any | None', default: null, desc: 'free-form JSON versioned with the prompt, e.g. model parameters or tool schemas'}
       ref: /docs/prompt-management/get-started.md#create-update-prompt-diy
     - id: get-prompt
-      name: 'get_prompt'
-      summary: 'Fetches a prompt by name and label or version; client-side cached; returns a Text or Chat prompt client'
+      name: get_prompt
+      summary: Fetches a prompt by name and label or version; client-side cached; returns a Text or Chat prompt client
       lenses: [reuse, reliability]
       signature: 'Langfuse.get_prompt(name, *, version=None, label=None, type="text", cache_ttl_seconds=None, fallback=None, max_retries=None, fetch_timeout_seconds=None)'
       params:
@@ -827,8 +827,8 @@ groups:
       - 'a missing label returns 404, never a silent fallback to production or latest'
       ref: /docs/prompt-management/features/prompt-version-control.md
     - id: prompt-version-control
-      name: 'Versions and labels'
-      summary: 'Every save is a new version; labels (production, staging, latest, custom) deploy it; update_prompt moves labels'
+      name: Versions and labels
+      summary: Every save is a new version; labels (production, staging, latest, custom) deploy it; update_prompt moves labels
       lenses: [best-practice]
       signature: 'Langfuse.update_prompt(*, name, version, new_labels=[])'
       notes:
@@ -836,7 +836,7 @@ groups:
       - 'labels can express environments, tenants or A/B variants'
       ref: /docs/prompt-management/features/prompt-version-control.md
     - id: prompt-variables
-      name: 'Variables and compile'
+      name: Variables and compile
       summary: '{{variable}} placeholders filled with prompt.compile(**kwargs); variables lists the names'
       lenses: [reuse]
       signature: 'TextPromptClient.compile(**kwargs) -> str; ChatPromptClient.compile(**kwargs) -> list[message]'
@@ -845,55 +845,55 @@ groups:
       - 'external templating (Jinja, Liquid) works client-side on prompt.prompt but loses Playground and UI experiments'
       ref: /docs/prompt-management/features/variables.md
     - id: message-placeholders
-      name: 'Message placeholders'
-      summary: 'Chat prompts reserve slots for whole message lists; compile(**vars, <placeholder_name>=messages) fills them'
+      name: Message placeholders
+      summary: Chat prompts reserve slots for whole message lists; compile(**vars, <placeholder_name>=messages) fills them
       lenses: [composability]
       notes:
       - 'unresolved placeholders become MessagesPlaceholder via get_langchain_prompt'
       ref: /docs/prompt-management/features/message-placeholders.md
     - id: prompt-composability
-      name: 'Prompt composability'
-      summary: 'Text prompts reference others with @@@langfusePrompt:name=X|version=1@@@ or label=production, resolved on fetch'
+      name: Prompt composability
+      summary: Text prompts reference others with @@@langfusePrompt:name=X|version=1@@@ or label=production, resolved on fetch
       lenses: [reuse]
       ref: /docs/prompt-management/features/composability.md
     - id: prompt-config
-      name: 'Prompt config'
-      summary: 'Arbitrary JSON versioned with the prompt, for model, temperature, response_format or tool definitions'
+      name: Prompt config
+      summary: Arbitrary JSON versioned with the prompt, for model, temperature, response_format or tool definitions
       lenses: [reuse, best-practice]
       ref: /docs/prompt-management/features/config.md
     - id: prompt-folders
-      name: 'Prompt folders'
-      summary: 'Slashes in the prompt name create virtual folders; fetch with the full name'
+      name: Prompt folders
+      summary: Slashes in the prompt name create virtual folders; fetch with the full name
       lenses: [best-practice]
       ref: /docs/prompt-management/features/folders.md
   - id: lf-prompt-runtime
-    title: 'Prompts at runtime'
+    title: Prompts at runtime
     level: intermediate
     requires: [lf-prompt-basics]
     ref: /docs/prompt-management/features/caching.md
     entries:
     - id: prompt-caching
-      name: 'Prompt caching'
-      summary: 'Fresh cache returns instantly, stale cache is served while revalidating in the background; TTL 60 s, 0 disables'
+      name: Prompt caching
+      summary: Fresh cache returns instantly, stale cache is served while revalidating in the background; TTL 60 s, 0 disables
       lenses: [perf, reliability]
       notes:
       - 'a prompt edit can take up to the TTL to show; use cache_ttl_seconds=0 and label="latest" in development'
       ref: /docs/prompt-management/features/caching.md
     - id: prompt-guaranteed-availability
-      name: 'Guaranteed availability'
-      summary: 'get_prompt raises only with an empty cache and a failed fetch; pre-fetch at startup or pass a fallback prompt'
+      name: Guaranteed availability
+      summary: get_prompt raises only with an empty cache and a failed fetch; pre-fetch at startup or pass a fallback prompt
       lenses: [reliability]
       notes:
       - 'a fallback prompt never links to traces'
       ref: /docs/prompt-management/features/guaranteed-availability.md
     - id: prompt-fetch-retries
-      name: 'Fetch retries and timeouts'
-      summary: 'max_retries (default 2) and fetch_timeout_seconds (default 20) tune get_prompt resilience'
+      name: Fetch retries and timeouts
+      summary: max_retries (default 2) and fetch_timeout_seconds (default 20) tune get_prompt resilience
       lenses: [reliability]
       ref: /faq/all/error-handling-and-timeouts.md
     - id: prompt-link-to-traces
-      name: 'Link prompts to traces'
-      summary: 'Pass prompt= to the generation (or propagate_attributes(prompt=...), SDK >= 4.14.0) so metrics aggregate per prompt version'
+      name: Link prompts to traces
+      summary: Pass prompt= to the generation (or propagate_attributes(prompt=...), SDK >= 4.14.0) so metrics aggregate per prompt version
       lenses: [observability]
       notes:
       - 'LangChain: set metadata={"langfuse_prompt": prompt} on the prompt template; with_config must repeat it'
@@ -901,61 +901,61 @@ groups:
       - 'an explicit prompt on a generation wins over a propagated one'
       ref: /docs/prompt-management/features/link-to-traces.md
     - id: prompt-tracing-faq
-      name: 'Prompt management with tracing FAQ'
-      summary: 'How linking prompts to generations works across integrations'
+      name: Prompt management with tracing FAQ
+      summary: How linking prompts to generations works across integrations
       lenses: [observability]
       ref: /faq/all/link-prompt-management-with-tracing.md
     - id: prompt-stale-cache-faq
-      name: 'Not seeing the latest prompt'
-      summary: 'Cache TTL and label choice explain stale prompts; wait, disable caching in dev, or fetch label latest'
+      name: Not seeing the latest prompt
+      summary: Cache TTL and label choice explain stale prompts; wait, disable caching in dev, or fetch label latest
       lenses: [reliability]
       ref: /faq/all/old-prompt-version-caching.md
     - id: prompt-external-templating
-      name: 'External templating libraries'
-      summary: 'Use Jinja or Liquid client-side on prompt.prompt; Playground, variable detection and UI experiments will not see the variables'
+      name: External templating libraries
+      summary: Use Jinja or Liquid client-side on prompt.prompt; Playground, variable detection and UI experiments will not see the variables
       lenses: [composability]
       ref: /faq/all/using-external-templating-libraries.md
     - id: prompt-ab-testing
-      name: 'A/B testing prompts'
-      summary: 'Label versions prod-a and prod-b, pick one at random per request and link it to the generation to compare metrics'
+      name: A/B testing prompts
+      summary: Label versions prod-a and prod-b, pick one at random per request and link it to the generation to compare metrics
       lenses: [testing]
       ref: /docs/prompt-management/features/a-b-testing.md
     - id: prompt-webhooks
-      name: 'Prompt webhooks'
-      summary: 'Notify external systems when a prompt version is created, updated or deleted; optional HMAC x-langfuse-signature'
+      name: Prompt webhooks
+      summary: Notify external systems when a prompt version is created, updated or deleted; optional HMAC x-langfuse-signature
       lenses: [composability]
       ref: /docs/prompt-management/features/webhooks-slack-integrations.md
     - id: prompt-github-integration
-      name: 'GitHub integration for prompts'
-      summary: 'Trigger repository_dispatch workflows on prompt changes or sync prompts to a repository via a webhook server'
+      name: GitHub integration for prompts
+      summary: Trigger repository_dispatch workflows on prompt changes or sync prompts to a repository via a webhook server
       lenses: [composability]
       ref: /docs/prompt-management/features/github-integration.md
     - id: prompt-agentic-access
-      name: 'Agent access to prompts'
-      summary: 'Agent Skill plus CLI, Langfuse MCP server or the Public API to read and edit prompts'
+      name: Agent access to prompts
+      summary: Agent Skill plus CLI, Langfuse MCP server or the Public API to read and edit prompts
       lenses: [reuse]
       ref: /docs/prompt-management/features/agentic-access.md
     - id: prompt-troubleshooting
-      name: 'Prompt management troubleshooting'
-      summary: 'Index of prompt FAQs (sub-prompts, agent skills, perf, caching)'
+      name: Prompt management troubleshooting
+      summary: Index of prompt FAQs (sub-prompts, agent skills, performance, caching)
       lenses: [reliability]
       ref: /docs/prompt-management/troubleshooting-and-faq.md
-- title: 'Integrations and OpenTelemetry'
+- title: Integrations and OpenTelemetry
   sections:
   - id: lf-integrations
-    title: 'Integrations and OTLP ingestion'
+    title: Integrations and OTLP ingestion
     level: intermediate
     requires: [lf-client]
     ref: /integrations/native/opentelemetry.md
     entries:
     - id: integrations-overview
-      name: 'Integrations overview'
-      summary: 'Native SDK integrations plus the OTLP endpoint for any language; catalog of frameworks, providers and gateways'
+      name: Integrations overview
+      summary: Native SDK integrations plus the OTLP endpoint for any language; catalog of frameworks, providers and gateways
       lenses: [composability]
       ref: /integrations.md
     - id: otlp-endpoint
-      name: 'OTLP endpoint'
-      summary: 'POST OTLP/HTTP (JSON or protobuf, no gRPC) to /api/public/otel with Basic Auth; add x-langfuse-ingestion-version 4 for real-time ingestion'
+      name: OTLP endpoint
+      summary: POST OTLP/HTTP (JSON or protobuf, no gRPC) to /api/public/otel with Basic Auth; add x-langfuse-ingestion-version 4 for real-time ingestion
       lenses: [composability, reliability]
       notes:
       - 'env form: OTEL_EXPORTER_OTLP_ENDPOINT=<host>/api/public/otel and OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic <b64 pk:sk>,x-langfuse-ingestion-version=4"'
@@ -963,8 +963,8 @@ groups:
       - 'signal-specific endpoint is /api/public/otel/v1/traces'
       ref: /integrations/native/opentelemetry.md
     - id: otel-attribute-mapping
-      name: 'OTel attribute mapping'
-      summary: 'langfuse.* attributes win over GenAI conventions; metadata is filterable only under langfuse.*.metadata.* prefixes'
+      name: OTel attribute mapping
+      summary: langfuse.* attributes win over GenAI conventions; metadata is filterable only under langfuse.*.metadata.* prefixes
       lenses: [observability]
       notes:
       - 'trace-wide attributes (user, session, tags, version, release, metadata) must be on every span; use baggage plus a BaggageSpanProcessor or propagate_attributes'
@@ -972,61 +972,61 @@ groups:
       - 'unmapped OTel attributes land under metadata.attributes and are not filterable'
       ref: /integrations/native/opentelemetry.md#property-mapping
     - id: otel-migration-v4
-      name: 'Migrate custom ingestion to v4'
-      summary: 'Replace legacy /api/public/ingestion events with complete OTLP spans; input and output belong on observations, spans are exported once'
+      name: Migrate custom ingestion to v4
+      summary: Replace legacy /api/public/ingestion events with complete OTLP spans; input and output belong on observations, spans are exported once
       lenses: [best-practice]
       deprecated: 'POST /api/public/ingestion trace and observation events (Cloud stops accepting all but scores on 2026-11-16); use OTLP'
       notes:
       - 'score-create events to /ingestion remain supported'
       ref: /integrations/native/opentelemetry/migration-to-v4.md
     - id: otel-experiments
-      name: 'Ingest experiment spans via OTel'
-      summary: 'Attribute list and per-item loop for grouping direct-OTLP traces into experiment runs'
+      name: Ingest experiment spans via OTel
+      summary: Attribute list and per-item loop for grouping direct-OTLP traces into experiment runs
       lenses: [testing]
       ref: /integrations/native/opentelemetry/experiments.md
     - id: deepagents-integration
-      name: 'LangChain DeepAgents'
-      summary: 'Pass a CallbackHandler in the agent config callbacks; sub-agent runs appear in the same trace'
+      name: LangChain DeepAgents
+      summary: Pass a CallbackHandler in the agent config callbacks; sub-agent runs appear in the same trace
       lenses: [observability]
       notes:
       - 'agent.invoke(inputs, config={"callbacks": [CallbackHandler()]})'
       ref: /integrations/frameworks/langchain-deepagents.md
     - id: ragas-integration
-      name: 'Ragas evaluators'
-      summary: 'Ragas metrics run as (async) evaluator functions in run_experiment, so scores land on traces and dataset runs'
+      name: Ragas evaluators
+      summary: Ragas metrics run as (async) evaluator functions in run_experiment, so scores land on traces and dataset runs
       lenses: [testing]
       ref: /integrations/frameworks/ragas.md
     - id: openai-python-wrapper
-      name: 'OpenAI Python drop-in'
-      summary: 'from langfuse.openai import openai traces calls, usage and cost; langfuse_prompt= and langfuse_public_key= are extra call kwargs'
+      name: OpenAI Python drop-in
+      summary: from langfuse.openai import openai traces calls, usage and cost; langfuse_prompt= and langfuse_public_key= are extra call kwargs
       lenses: [observability]
       import: langfuse.openai
       notes:
       - 'also OpenAI, AsyncOpenAI, AzureOpenAI, AsyncAzureOpenAI; streaming and async need OpenAI SDK >= 1.0.0'
       ref: /integrations/model-providers/openai-py.md
-- title: 'Data platform and API'
+- title: Data platform and API
   sections:
   - id: lf-data-api
-    title: 'Reading and managing data'
+    title: Reading and managing data
     level: intermediate
     requires: [lf-client]
     ref: /docs/api-and-data-platform/overview.md
     entries:
     - id: data-platform-overview
-      name: 'API and data platform overview'
-      summary: 'Decision table from goal to path - CLI, MCP, Metrics API, Experiments API, Observations API, SDK, blob export, UI export'
+      name: API and data platform overview
+      summary: Decision table from goal to path - CLI, MCP, Metrics API, Experiments API, Observations API, SDK, blob export, UI export
       lenses: [composability]
       ref: /docs/api-and-data-platform/overview.md
     - id: public-api
-      name: 'Public API'
-      summary: 'Project-level REST under /api/public with Basic Auth (pk:sk); OpenAPI at cloud.langfuse.com/generated/api/openapi.yml'
+      name: Public API
+      summary: Project-level REST under /api/public with Basic Auth (pk:sk); OpenAPI at cloud.langfuse.com/generated/api/openapi.yml
       lenses: [composability]
       notes:
       - 'self-hosted v4.36.0+ serves /api/openapi.yaml and /api/docs; the reference is api.reference.langfuse.com'
       ref: /docs/api-and-data-platform/features/public-api.md
     - id: query-via-sdk
-      name: 'Query data via the SDK api namespace'
-      summary: 'langfuse.api.* is generated from OpenAPI; observations and metrics are the v2 defaults in Python SDK v4, scores_v3 reads scores'
+      name: Query data via the SDK api namespace
+      summary: langfuse.api.* is generated from OpenAPI; observations and metrics are the v2 defaults in Python SDK v4, scores_v3 reads scores
       lenses: [testing, observability]
       signature: 'langfuse.api.observations.get_many(*, fields, limit, cursor, trace_id, session_id, type, level, name, filter, from_start_time, to_start_time, ...)'
       params:
@@ -1039,170 +1039,170 @@ groups:
       - 'new data is queryable about 15-30 s after ingestion'
       ref: /docs/api-and-data-platform/features/query-via-sdk.md
     - id: data-mcp-server
-      name: 'Langfuse data MCP server'
-      summary: 'Authenticated MCP at <host>/api/public/mcp (streamableHttp, Basic Auth, project key); read and write tools, allowlist for read-only'
+      name: Langfuse data MCP server
+      summary: Authenticated MCP at <host>/api/public/mcp (streamableHttp, Basic Auth, project key); read and write tools, allowlist for read-only
       lenses: [reuse, security]
       notes:
       - 'docs recommend the Agent Skill plus CLI instead when the agent can run shell; tool reference at mcp.reference.langfuse.com'
       - 'behind a reverse proxy keep the Host header or set LANGFUSE_MCP_ALLOWED_HOSTS to avoid 403'
       ref: /docs/api-and-data-platform/features/mcp-server.md
     - id: metrics-overview
-      name: 'Metrics overview'
-      summary: 'Quality, cost, latency and volume metrics sliced by trace name, user, tags, release and version'
+      name: Metrics overview
+      summary: Quality, cost, latency and volume metrics sliced by trace name, user, tags, release and version
       lenses: [observability, cost]
       ref: /docs/metrics/overview.md
     - id: metrics-api
-      name: 'Metrics API v2'
-      summary: 'GET /api/public/v2/metrics aggregates cost, tokens, volume, latency and scores by dimension, filter and time granularity'
+      name: Metrics API v2
+      summary: GET /api/public/v2/metrics aggregates cost, tokens, volume, latency and scores by dimension, filter and time granularity
       lenses: [observability, cost]
       notes:
       - 'deprecated GET /api/public/metrics and /metrics/daily are replaced by v2'
       ref: /docs/metrics/features/metrics-api.md
     - id: custom-dashboards
-      name: 'Custom dashboards'
-      summary: 'Self-serve dashboards over the observations data model; curated Latency, Cost and Langfuse Usage dashboards ship by default'
+      name: Custom dashboards
+      summary: Self-serve dashboards over the observations data model; curated Latency, Cost and Langfuse Usage dashboards ship by default
       lenses: [observability]
       ref: /docs/metrics/features/custom-dashboards.md
     - id: export-from-ui
-      name: 'Export from the UI'
-      summary: 'Table batch export to CSV or JSON honoring filters; all columns are exported regardless of column settings'
+      name: Export from the UI
+      summary: Table batch export to CSV or JSON honoring filters; all columns are exported regardless of column settings
       lenses: [reuse]
       ref: /docs/api-and-data-platform/features/export-from-ui.md
     - id: export-blob-storage
-      name: 'Export to blob storage'
-      summary: 'Scheduled S3, GCS or Azure exports (every 20 min to weekly); Pro needs the Teams add-on, Enterprise and self-hosted only'
+      name: Export to blob storage
+      summary: Scheduled S3, GCS or Azure exports (every 20 min to weekly); Pro needs the Teams add-on, Enterprise and self-hosted only
       lenses: [cost]
       ref: /docs/api-and-data-platform/features/export-to-blob-storage.md
     - id: deprecated-api-migration
-      name: 'Deprecated API migration'
-      summary: 'Maps deprecated endpoints and SDK methods to v2 observations, v2 metrics, v3 scores, experiments and OTLP ingestion'
+      name: Deprecated API migration
+      summary: Maps deprecated endpoints and SDK methods to v2 observations, v2 metrics, v3 scores, experiments and OTLP ingestion
       lenses: [best-practice]
       deprecated: 'GET /traces, /sessions, /observations, /metrics, /scores v1 and v2, dataset-run endpoints, POST /ingestion trace events; Cloud serves them until 2026-11-16'
       notes:
       - 'Python: client.api.trace.list becomes client.api.observations.get_many filtered by trace id; scores become client.api.scores_v3.get_many_v3'
       ref: /faq/all/deprecated-api-migration.md
     - id: api-limits
-      name: 'API limits'
-      summary: 'Cloud payloads cap at 5 MB; per-organization rate buckets per resource (tracing, deletion, metrics, datasets) scale with plan'
+      name: API limits
+      summary: Cloud payloads cap at 5 MB; per-organization rate buckets per resource (tracing, deletion, metrics, datasets) scale with plan
       lenses: [reliability, cost]
       notes:
       - 'prompt GETs are not rate-limited; trace deletion batches should stay at 30-50 ids'
       ref: /faq/all/api-limits.md
-- title: 'Platform and administration'
+- title: Platform and administration
   sections:
   - id: lf-platform
-    title: 'Versions, usage and data controls'
+    title: Versions, usage and data controls
     level: advanced
     requires: []
     ref: /docs/compatibility.md
     entries:
     - id: compatibility
-      name: 'Versions and compatibility'
-      summary: 'Server v4 and Python SDK v4 are GA; Cloud serves only v4 and drops legacy APIs on 2026-11-16; SDK majors need minimum server versions'
+      name: Versions and compatibility
+      summary: Server v4 and Python SDK v4 are GA; Cloud serves only v4 and drops legacy APIs on 2026-11-16; SDK majors need minimum server versions
       lenses: [reliability]
       ref: /docs/compatibility.md
     - id: billable-units-doc
-      name: 'Billable units'
-      summary: 'Units = traces + observations + scores, including those created by judges, annotation queues and experiments'
+      name: Billable units
+      summary: Units = traces + observations + scores, including those created by judges, annotation queues and experiments
       lenses: [cost]
       notes:
       - 'read counts from the Langfuse Usage Management dashboard'
       ref: /docs/administration/billable-units.md
     - id: data-retention
-      name: 'Data retention'
-      summary: 'Pro and Enterprise setting that expires traces, observations, scores and media; dataset items outlive their source trace'
+      name: Data retention
+      summary: Pro and Enterprise setting that expires traces, observations, scores and media; dataset items outlive their source trace
       lenses: [security, cost]
       ref: /docs/administration/data-retention.md
     - id: data-deletion
-      name: 'Data deletion'
-      summary: 'Delete traces singly, in batches, by session, by filter, or whole projects and organizations'
+      name: Data deletion
+      summary: Delete traces singly, in batches, by session, by filter, or whole projects and organizations
       lenses: [security]
       ref: /docs/administration/data-deletion.md
     - id: llm-connections
-      name: 'LLM connections'
-      summary: 'Project-level model credentials for the Playground and LLM judges via /api/public/llm-connections; do not affect trace pricing'
+      name: LLM connections
+      summary: Project-level model credentials for the Playground and LLM judges via /api/public/llm-connections; do not affect trace pricing
       lenses: [security]
       ref: /docs/administration/llm-connection.md
     - id: spend-alerts
-      name: 'Spend alerts'
-      summary: 'Email when the Langfuse Cloud bill passes a threshold; not model-cost alerts, Core plan and up'
+      name: Spend alerts
+      summary: Email when the Langfuse Cloud bill passes a threshold; not model-cost alerts, Core plan and up
       lenses: [cost]
       ref: /docs/administration/spend-alerts.md
     - id: admin-troubleshooting
-      name: 'Administration troubleshooting'
-      summary: 'Index of admin FAQs (support, access, 2FA, environments)'
+      name: Administration troubleshooting
+      summary: Index of admin FAQs (support, access, 2FA, environments)
       lenses: [reliability]
       ref: /docs/administration/troubleshooting-and-faq.md
-- title: 'Quality and operations'
+- title: Quality and operations
   sections:
   - id: lf-quality
-    title: 'Scores, cost and graphs'
+    title: Scores, cost and graphs
     level: advanced
     requires: [lf-attributes]
     ref: /docs/observability/best-practices.md
     entries:
     - id: best-practices
-      name: 'What does a good trace look like'
-      summary: 'Trace scope, stable low-cardinality observation names, meaningful input/output and the attributes evaluators rely on'
+      name: What does a good trace look like
+      summary: Trace scope, stable low-cardinality observation names, meaningful input/output and the attributes evaluators rely on
       lenses: [best-practice, observability]
       ref: /docs/observability/best-practices.md
     - id: token-and-cost
-      name: 'Token and cost tracking'
-      summary: 'Usage comes from usage_metadata; cost needs a model name Langfuse can match to a price definition'
+      name: Token and cost tracking
+      summary: Usage comes from usage_metadata; cost needs a model name Langfuse can match to a price definition
       lenses: [cost, observability]
       notes:
       - 'custom gateway aliases do not match built-in prices; add a custom model definition or accept unpriced generations'
       ref: /docs/observability/features/token-and-cost-tracking.md
     - id: agent-graphs
-      name: 'Agent graphs'
-      summary: 'Graph view built from observation types and parent links; LangGraph integration shows automatically'
+      name: Agent graphs
+      summary: Graph view built from observation types and parent links; LangGraph integration shows automatically
       lenses: [observability]
       ref: /docs/observability/features/agent-graphs.md
     - id: scores
-      name: 'Scores via SDK'
-      summary: 'create_score and score_current_trace attach evaluation or user feedback to traces and observations'
+      name: Scores via SDK
+      summary: create_score and score_current_trace attach evaluation or user feedback to traces and observations
       lenses: [observability, testing]
       notes:
       - 'scores count toward billable units'
       ref: /docs/evaluation/evaluation-methods/scores-via-sdk.md
     - id: billable-units
-      name: 'Billable units and Hobby limits'
-      summary: 'Units = traces + observations + scores; Hobby is 50k units per month with 30-day data access'
+      name: Billable units and Hobby limits
+      summary: Units = traces + observations + scores; Hobby is 50k units per month with 30-day data access
       lenses: [cost]
       notes:
       - 'behaviour at quota exhaustion is not documented in the pages read; treat as unverified'
       ref: /pricing.md
-- title: 'Upgrade'
+- title: Upgrade
   sections:
   - id: lf-upgrade
-    title: 'Migration notes'
+    title: Migration notes
     level: advanced
     requires: []
     ref: /docs/observability/sdk/upgrade-path/python-v3-to-v4.md
     entries:
     - id: python-v3-to-v4
-      name: 'Python SDK v3 to v4'
-      summary: 'update_current_trace is split into propagate_attributes; smarter default span filter; blocked_instrumentation_scopes deprecated'
+      name: Python SDK v3 to v4
+      summary: update_current_trace is split into propagate_attributes; smarter default span filter; blocked_instrumentation_scopes deprecated
       lenses: [best-practice]
       deprecated: 'update_current_trace, CallbackHandler(update_trace=), langfuse.callback, blocked_instrumentation_scopes; use propagate_attributes and should_export_span'
       ref: /docs/observability/sdk/upgrade-path/python-v3-to-v4.md
     - id: otel-floor
-      name: 'OpenTelemetry floor'
-      summary: '4.15.6 needs opentelemetry >=1.33.1,<2; 4.16+ needs >=1.45.0, which can conflict with hosts that pin an older OTel'
+      name: OpenTelemetry floor
+      summary: 4.15.6 needs opentelemetry >=1.33.1,<2; 4.16+ needs >=1.45.0, which can conflict with hosts that pin an older OTel
       lenses: [reliability]
       notes:
       - 'bound the dependency (>=4.15.6,<4.16) while the host pins OTel 1.42.x, then lift the ceiling together with the host'
       - '4.16.0 caps default exporter batches at 64 MiB; 4.17.0 adds opt-in gzip for the default OTLP exporter (release notes)'
       ref: https://pypi.org/project/langfuse/#history
   - id: lf-upgrade-paths
-    title: 'Upgrade path index'
+    title: Upgrade path index
     level: advanced
     requires: [lf-upgrade]
     ref: /docs/observability/sdk/upgrade-path.md
     entries:
     - id: upgrade-path-index
-      name: 'SDK upgrade paths'
-      summary: 'Index of migration guides; Python v3 to v4 and JS/TS v4 to v5 are the latest, older majors are deprecated on Cloud v4'
+      name: SDK upgrade paths
+      summary: Index of migration guides; Python v3 to v4 and JS/TS v4 to v5 are the latest, older majors are deprecated on Cloud v4
       lenses: [best-practice]
       ref: /docs/observability/sdk/upgrade-path.md
 skipped:

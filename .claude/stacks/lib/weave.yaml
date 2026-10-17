@@ -169,6 +169,6 @@ groups:
     - id: wv-gotcha-video
       name: 'Large video data URLs'
       summary: 'base64 `video_url` payloads inflate trace size and request time'
-      lenses: [gotcha, cost]
+      lenses: [reliability, cost]
       notes: ['use `postprocess_inputs` on the wrapping op to replace the data URL with a clip id; autopatched openai spans still log raw inputs, so test what is logged', 'this repo has not verified NIM `video_url` limits from these docs; check the NIM docs']
       ref: /guides/tracking/ops.md

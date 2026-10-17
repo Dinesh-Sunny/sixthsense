@@ -11,16 +11,16 @@ toc:
   why: machine-translated copies of the English docs
   base: 'https://github.com/diegosouzapw/OmniRoute/blob/3.8.51'
 groups:
-- title: 'AI tooling'
+- title: AI tooling
   sections:
   - id: ai-tooling
-    title: 'Repo-shipped AI tooling'
+    title: Repo-shipped AI tooling
     level: basic
     requires: []
     ref: /blob/3.8.51/AGENTS.md
     entries:
     - id: mcp-server
-      name: 'MCP server'
+      name: MCP server
       summary: 'Built-in MCP server (110 tools) over stdio or HTTP; use it to let an agent drive routing, cache, memory and skills.'
       lenses: [composability, security]
       signature: 'omniroute --mcp'
@@ -30,7 +30,7 @@ groups:
       notes: ['/api/mcp/* is loopback-only unless the Bearer key carries the `manage` scope', '`omniroute mcp status|enable|disable|restart` CLI parity arrived in 3.8.51']
       ref: /blob/3.8.51/docs/frameworks/MCP-SERVER.md
     - id: agent-skills
-      name: 'Generated agent skills'
+      name: Generated agent skills
       summary: 'Generated SKILL.md catalog teaching agents the REST API and CLI; read it live from the API or the repo skills dir.'
       lenses: [reuse, composability]
       signature: 'GET /api/agent-skills?category=api|cli&area=<name>'
@@ -41,13 +41,13 @@ groups:
       notes: [auto-generated; diff before locking, docs say 45 skills while the dir has more]
       ref: /blob/3.8.51/docs/frameworks/AGENT-SKILLS.md
     - id: agents-md
-      name: 'AGENTS.md'
+      name: AGENTS.md
       summary: 'Contributor agent guide (plus CLAUDE.md, GEMINI.md) with 23 Hard Rules; not an integration manual.'
       lenses: [best-practice]
       notes: ['contributor rules, not integration docs']
       ref: /blob/3.8.51/AGENTS.md
     - id: openapi-spec
-      name: 'OpenAPI spec'
+      name: OpenAPI spec
       summary: 'Hand-maintained OpenAPI 3.1 file, also served parsed as a JSON catalog; verify routes against source.'
       lenses: [typing-dx, testing]
       signature: 'GET /api/openapi/spec'
@@ -55,25 +55,25 @@ groups:
       notes: ['file header says version 3.8.35 at tag 3.8.51 and lists ~200 paths: stale, trust route source']
       ref: /blob/3.8.51/public/openapi.yaml
     - id: a2a-server
-      name: 'A2A server'
+      name: A2A server
       summary: 'Agent-to-agent protocol server exposed at `/a2a` and `/api/a2a`.'
       lenses: [composability]
       ref: /blob/3.8.51/docs/frameworks/A2A-SERVER.md
     - id: no-llms-txt
-      name: 'llms.txt'
+      name: llms.txt
       summary: 'No llms.txt shipped at the tag.'
       lenses: [best-practice]
       ref: /blob/3.8.51/docs/reference/API_REFERENCE.md
-- title: 'Inference surface'
+- title: Inference surface
   sections:
   - id: inference-api
-    title: 'OpenAI-compatible /v1'
+    title: OpenAI-compatible /v1
     level: basic
     requires: []
     ref: /blob/3.8.51/docs/reference/API_REFERENCE.md
     entries:
     - id: chat-completions
-      name: 'Chat completions'
+      name: Chat completions
       summary: 'OpenAI-compatible `POST /v1/chat/completions`, Bearer `sk-` key; model is a provider id, combo name or `auto`.'
       lenses: [reuse, composability]
       signature: 'POST /v1/chat/completions {model, messages, stream}'
@@ -85,14 +85,14 @@ groups:
       notes: [image sets `REQUIRE_API_KEY=true`]
       ref: /blob/3.8.51/docs/reference/API_REFERENCE.md
     - id: model-id-format
-      name: 'Model ids'
+      name: Model ids
       summary: 'Model ids are `<provider>/<id>`; the first segment is the provider alias, so bare ids misroute.'
       lenses: [reliability, typing-dx]
       signature: 'model: "<provider>/<id>"'
       notes: ['ids with their own slash (qwen/.., @cf/..) still need the provider prefix: openrouter/deepgram/nova-3']
       ref: /blob/3.8.51/src/lib/combos/steps.ts
     - id: models-prefix-mode
-      name: 'Model id prefixes'
+      name: Model id prefixes
       summary: '`GET /v1/models?prefix=` picks alias, dual or canonical id forms; server default is the `MODELS_CATALOG_PREFIX_MODE` flag.'
       lenses: [ux-a11y, reuse]
       signature: 'GET /v1/models?prefix=<alias|dual|canonical>'
@@ -102,7 +102,7 @@ groups:
       notes: ['`REQUIRE_API_KEY` does not gate GET /v1/models; it follows the dashboard login posture']
       ref: /blob/3.8.51/docs/reference/API_REFERENCE.md
     - id: request-headers
-      name: 'Request headers'
+      name: Request headers
       summary: 'Per-request switches for cache, memory injection, session tagging and 5-second idempotent dedup.'
       lenses: [cost, reliability]
       signature: 'X-OmniRoute-No-Cache: true'
@@ -114,7 +114,7 @@ groups:
       notes: [first two sent always]
       ref: /blob/3.8.51/docs/reference/API_REFERENCE.md
     - id: response-headers
-      name: 'Response headers'
+      name: Response headers
       summary: 'Routing and cost telemetry on responses: decision trace, served model and provider, cost, tokens, fallback attempts.'
       lenses: [observability, cost]
       signature: 'X-OmniRoute-Decision: strategy=<name>; provider=<alias>; latency_ms=<n>'
@@ -126,7 +126,7 @@ groups:
       notes: [non-stream only]
       ref: /blob/3.8.51/docs/reference/API_REFERENCE.md
     - id: compression-request-header
-      name: 'Compression header'
+      name: Compression header
       summary: '`x-omniroute-compression` overrides the compression plan for one request; highest precedence but cannot enable a disabled master switch.'
       lenses: [cost, perf]
       signature: 'x-omniroute-compression: <off|default|safe|allow-lossy|engine:<id>|<combo>>'
@@ -134,7 +134,7 @@ groups:
       notes: [a combo named off or default must be referenced by id]
       ref: /blob/3.8.51/docs/reference/API_REFERENCE.md
     - id: auto-combo-controls
-      name: 'Auto-combo controls'
+      name: Auto-combo controls
       summary: '`X-OmniRoute-Mode`, `-Budget`, `-Budget-Fallback`, `-Effort` steer the `auto` strategy per request.'
       lenses: [cost, perf]
       signature: 'X-OmniRoute-Mode: <fast|balanced|quality|cheap|reliable|offline>'
@@ -144,20 +144,20 @@ groups:
       - {name: X-OmniRoute-Effort, type: auto, default: null, desc: 'Adaptive reasoning_effort when the request has no reasoning field; OpenAI-shaped upstream targets only.'}
       ref: /blob/3.8.51/docs/routing/AUTO-COMBO.md
     - id: other-surfaces
-      name: 'Other surfaces'
+      name: Other surfaces
       summary: 'Embeddings, images, OCR, files, batches, search, WebSocket, Responses and `/v1/messages` endpoints.'
       lenses: [composability]
       ref: /blob/3.8.51/docs/reference/API_REFERENCE.md
-- title: 'Combos and routing'
+- title: Combos and routing
   sections:
   - id: combos
-    title: 'Combos'
+    title: Combos
     level: intermediate
     requires: [inference-api]
     ref: /blob/3.8.51/docs/routing/AUTO-COMBO.md
     entries:
     - id: combo-strategies
-      name: 'Strategies'
+      name: Strategies
       summary: 'Combo `strategy` enum has 20 values (docs say 19); `priority` is the default ordered failover.'
       lenses: [best-practice, reliability]
       options:
@@ -165,7 +165,7 @@ groups:
       notes: ['`quota-weighted` is in the enum but absent from the docs table', 'fusion fans out to a panel then judges; pipeline threads each step output into the next']
       ref: /blob/3.8.51/src/shared/constants/routingStrategies.ts
     - id: combo-api
-      name: 'Combo CRUD'
+      name: Combo CRUD
       summary: '`POST /api/combos` creates a named, ordered model list with a strategy; `PUT /api/combos/:id` edits it.'
       lenses: [reliability]
       signature: 'POST /api/combos {name, models, strategy, config}'
@@ -179,7 +179,7 @@ groups:
       notes: ['PUT merges over the stored record; null clears a field; models cannot be emptied']
       ref: /blob/3.8.51/src/app/api/combos/route.ts
     - id: combo-step-normalization
-      name: 'Step shape'
+      name: Step shape
       summary: 'Steps are normalized on store; the stored form has providerId and a full model string but no `provider` key.'
       lenses: [typing-dx, testing]
       signature: 'models: [{model: "<provider>/<id>", providerId, connectionId, weight}]'
@@ -192,7 +192,7 @@ groups:
       notes: ['`provider/pattern*` strings become kind provider-wildcard steps', 'combo-ref steps nest combos up to maxComboDepth (default 3)', fakes must match]
       ref: /blob/3.8.51/src/lib/combos/steps.ts
     - id: combo-config
-      name: 'Combo config'
+      name: Combo config
       summary: '`config` tunes per-combo retries, per-target and whole-combo timeouts, attempt budget and zero-latency options.'
       lenses: [reliability, perf]
       signature: 'config: {maxRetries, targetTimeoutMs, comboTimeoutMs, maxGlobalAttempts}'
@@ -207,7 +207,7 @@ groups:
       - {name: compressionMode, type: enum, default: null, desc: 'off, lite, standard, aggressive, ultra, rtk, stacked, codex-responses or omniglyph for this combo.'}
       ref: /blob/3.8.51/src/shared/validation/schemas/combo.ts
     - id: auto-combo
-      name: 'Auto combo'
+      name: Auto combo
       summary: '`auto/<category>:<tier>` is zero-config routing over connected providers; filters fail open to the full pool.'
       lenses: [cost, perf]
       signature: 'model: "auto/<category>:<tier>"'
@@ -218,7 +218,7 @@ groups:
       notes: ['`GET /v1/auto-combo/{channel}/candidates` lists the live candidate pool read-only']
       ref: /blob/3.8.51/docs/routing/AUTO-COMBO.md
     - id: model-combo-mappings
-      name: 'Model-to-combo mappings'
+      name: Model-to-combo mappings
       summary: '`/api/model-combo-mappings` redirects a model id pattern to a combo so clients keep their model string.'
       lenses: [composability]
       signature: 'POST /api/model-combo-mappings {pattern, comboId}'
@@ -230,7 +230,7 @@ groups:
       returns: '201 `{mapping}`; `GET` returns `{mappings,total}`.'
       ref: /blob/3.8.51/src/app/api/model-combo-mappings/route.ts
     - id: combo-test
-      name: 'Combo live test'
+      name: Combo live test
       summary: '`POST /api/combos/test {comboName}` probes every target through the real dispatch path and reports which one answered.'
       lenses: [testing, observability]
       signature: 'POST /api/combos/test {comboName}'
@@ -239,23 +239,23 @@ groups:
       returns: 'Per-target results (status, latency, error) plus `resolvedBy`.'
       notes: [uses an internally picked active API key; 60 s per target, 180 s total]
       ref: /blob/3.8.51/src/app/api/combos/test/route.ts
-- title: 'Management API'
+- title: Management API
   sections:
   - id: management-api
-    title: 'Management API (/api)'
+    title: Management API (/api)
     level: intermediate
     requires: []
     ref: /blob/3.8.51/docs/guides/MANAGEMENT-AUTH.md
     entries:
     - id: management-auth
-      name: 'Management auth'
+      name: Management auth
       summary: '`/api/*` accepts a login cookie, CLI token, `oma_live_` token or an `sk-` key with the `manage` scope.'
       lenses: [security]
       signature: 'Authorization: Bearer <sk- key with manage scope>'
       notes: [inference keys cannot manage]
       ref: /blob/3.8.51/docs/guides/MANAGEMENT-AUTH.md
     - id: admin-login
-      name: 'Admin login'
+      name: Admin login
       summary: '`POST /api/auth/login` exchanges the admin password for an `auth_token` cookie that authorizes `/api/*`.'
       lenses: [security]
       signature: 'POST /api/auth/login {password}'
@@ -265,7 +265,7 @@ groups:
       notes: [500 if JWT_SECRET is unset, image bootstraps it into server.env]
       ref: /blob/3.8.51/src/app/api/auth/login/route.ts
     - id: provider-connections
-      name: 'Connections'
+      name: Connections
       summary: '`/api/providers` creates and lists provider connections (credentials); each starts inactive until a test passes.'
       lenses: [reliability]
       signature: 'POST /api/providers {provider, name, apiKey}'
@@ -278,7 +278,7 @@ groups:
       notes: ['`:id` in /api/providers/:id/* is the connection id, not the provider id', passing test activates]
       ref: /blob/3.8.51/src/app/api/providers/route.ts
     - id: sync-models
-      name: 'Sync models'
+      name: Sync models
       summary: '`POST /api/providers/:id/sync-models` refreshes a connection''s model list; degraded discovery returns 502, a freshness check.'
       lenses: [testing, reliability]
       signature: 'POST /api/providers/:id/sync-models?mode=sync|import'
@@ -289,7 +289,7 @@ groups:
       notes: [curated and search providers return `skipped` with empty models]
       ref: /blob/3.8.51/src/app/api/providers/[id]/sync-models/route.ts
     - id: provider-models-list
-      name: 'Model ids list'
+      name: Model ids list
       summary: '`GET /api/providers/:id/models` lists the discovered model ids for a connection, optionally forcing a refresh.'
       lenses: [reliability]
       signature: 'GET /api/providers/:id/models?refresh=true'
@@ -301,7 +301,7 @@ groups:
       returns: '`{source:"api"|"cache"|"local_catalog", models:[{id}]}`, plus `warning` when degraded.'
       ref: /blob/3.8.51/src/app/api/providers/[id]/models/route.ts
     - id: api-keys
-      name: 'API keys'
+      name: API keys
       summary: '`POST /api/keys` mints an inference key with scoped combo and connection access; the full key is shown once.'
       lenses: [security]
       signature: 'POST /api/keys {name, scopes, allowedCombos, allowedConnections}'
@@ -315,7 +315,7 @@ groups:
       notes: ['`GET` masks the key']
       ref: /blob/3.8.51/src/app/api/keys/route.ts
     - id: key-access-policy
-      name: 'Key policy'
+      name: Key policy
       summary: '`PATCH /api/keys/:id` edits a key''s policy; `connectionAccessMode` is write-only and never read back.'
       lenses: [security]
       signature: 'PATCH /api/keys/:id {connectionAccessMode, allowedConnections, ...}'
@@ -328,7 +328,7 @@ groups:
       notes: ['allowedCombos gates combos, not direct models']
       ref: /blob/3.8.51/src/app/api/keys/[id]/route.ts
     - id: feature-flags
-      name: 'Feature flags'
+      name: Feature flags
       summary: '`PUT /api/settings/feature-flags` sets or removes a DB override of a runtime flag, no restart for most.'
       lenses: [best-practice, reliability]
       signature: 'PUT /api/settings/feature-flags {key, value}'
@@ -339,7 +339,7 @@ groups:
       notes: ['values are strings; DB override beats env; DELETE clears every override']
       ref: /blob/3.8.51/src/app/api/settings/feature-flags/route.ts
     - id: resilience-settings
-      name: 'Resilience'
+      name: Resilience
       summary: '`PATCH /api/resilience` tunes request queue, cooldown waits and breakers; GET returns the resolved settings.'
       lenses: [reliability]
       signature: 'PATCH /api/resilience {waitForCooldown, comboCooldownWait}'
@@ -351,7 +351,7 @@ groups:
       notes: [sync turns both off]
       ref: /blob/3.8.51/src/lib/resilience/settings.ts
     - id: usage-api
-      name: 'Usage and cost API'
+      name: Usage and cost API
       summary: '`/api/usage/*` exposes history, request logs, per-model latency stats and per-key budgets or token limits.'
       lenses: [observability, cost]
       signature: 'GET /api/usage/model-latency-stats?windowHours=<n>'
@@ -360,16 +360,16 @@ groups:
       returns: 'Rolling per-provider/model avg, p50, p95, p99 latency and success rate.'
       notes: ['also /api/usage/logs, /request-logs, /budget, /token-limits']
       ref: /blob/3.8.51/docs/reference/API_REFERENCE.md
-- title: 'Resilience and prompt safety'
+- title: Resilience and prompt safety
   sections:
   - id: resilience
-    title: 'Resilience and rewrites'
+    title: Resilience and rewrites
     level: intermediate
     requires: [combos]
     ref: /blob/3.8.51/docs/architecture/RESILIENCE_GUIDE.md
     entries:
     - id: breaker-cooldown-lockout
-      name: 'Breaker, cooldown, lockout'
+      name: Breaker, cooldown, lockout
       summary: 'Provider circuit breaker, connection cooldown and model lockout layers; reset them all with one management call.'
       lenses: [reliability]
       signature: 'POST /api/resilience/reset'
@@ -377,13 +377,13 @@ groups:
       notes: ['also GET /api/resilience/model-cooldowns', 'live breaker state in /api/monitoring/health']
       ref: /blob/3.8.51/docs/architecture/RESILIENCE_GUIDE.md
     - id: stream-keepalive
-      name: 'Early stream keepalive'
+      name: Early stream keepalive
       summary: 'Streams return 200 plus keepalive after about 1 s; a later failure arrives as an in-band error frame.'
       lenses: [reliability, ux-a11y]
       notes: [hides upstream status from clients]
       ref: /blob/3.8.51/open-sse/utils/earlyStreamKeepalive.ts
     - id: emergency-fallback
-      name: 'Emergency fallback'
+      name: Emergency fallback
       summary: 'On HTTP 402 or budget-keyword errors, redirects to nvidia/openai/gpt-oss-120b unless `OMNIROUTE_EMERGENCY_FALLBACK` is false.'
       lenses: [cost, reliability]
       options:
@@ -391,7 +391,7 @@ groups:
       notes: [skipped for requests with tools; output capped at 4096 tokens, forced false]
       ref: /blob/3.8.51/open-sse/services/emergencyFallback.ts
     - id: context-handoff
-      name: 'Context handoff'
+      name: Context handoff
       summary: 'When combo routing switches models, injects generated conversation summaries; disable via the flag.'
       lenses: [reliability]
       options:
@@ -399,7 +399,7 @@ groups:
       notes: [forced false]
       ref: /blob/3.8.51/docs/reference/FEATURE_FLAGS.md
     - id: global-fallback-model
-      name: 'Global fallback'
+      name: Global fallback
       summary: 'Setting `globalFallbackModel` reroutes to one model when a combo exhausts with 502 or 503.'
       lenses: [reliability]
       signature: 'PATCH /api/settings {globalFallbackModel: "<provider>/<id>"}'
@@ -407,7 +407,7 @@ groups:
       notes: [sync asserts unset]
       ref: /blob/3.8.51/src/sse/handlers/chat.ts
     - id: semantic-cache
-      name: 'Semantic cache'
+      name: Semantic cache
       summary: 'Responses can be served from a semantic cache; opt out per key with `cacheDefaultMode` or per request with a header.'
       lenses: [cost, perf]
       signature: 'X-OmniRoute-No-Cache: true'
@@ -417,7 +417,7 @@ groups:
       notes: [header sent on every call]
       ref: /blob/3.8.51/docs/reference/API_REFERENCE.md
     - id: prompt-compression
-      name: 'Compression'
+      name: Compression
       summary: 'Global, per-key, per-combo and per-request prompt compression; the global master switch gates all of them.'
       lenses: [cost, perf]
       signature: 'PUT /api/settings/compression {enabled, defaultMode}'
@@ -429,13 +429,13 @@ groups:
       notes: [sync asserts off]
       ref: /blob/3.8.51/docs/compression/COMPRESSION_GUIDE.md
     - id: memory-injection
-      name: 'Memory and skills injection'
+      name: Memory and skills injection
       summary: '`x-omniroute-no-memory: true` skips memory and skills injection for one request.'
       lenses: [cost, security]
       signature: 'x-omniroute-no-memory: true'
       ref: /blob/3.8.51/docs/reference/API_REFERENCE.md
     - id: guardrails
-      name: 'Guardrails'
+      name: Guardrails
       summary: 'Prompt-injection and PII guards are feature flags; guardrails fail open if a guard throws.'
       lenses: [security]
       signature: 'PUT /api/settings/feature-flags {key: "INJECTION_GUARD_MODE", value: "off"}'
@@ -444,23 +444,23 @@ groups:
       - {name: PII_REDACTION_ENABLED, type: bool, default: 'false', desc: 'Redact personal data from requests.'}
       notes: [sync asserts both off]
       ref: /blob/3.8.51/docs/security/GUARDRAILS.md
-- title: 'Container and operations'
+- title: Container and operations
   sections:
   - id: container-ops
-    title: 'Image, data, health'
+    title: Image, data, health
     level: basic
     requires: []
     ref: /blob/3.8.51/docs/guides/DOCKER_GUIDE.md
     entries:
     - id: image-tags
-      name: 'Image tags'
+      name: Image tags
       summary: 'Image `diegosouzapw/omniroute:<version>` has no `v` prefix; also `latest`, `next`, `main` and a `-web` Chromium variant.'
       lenses: [reliability, security]
       signature: 'diegosouzapw/omniroute:<version>'
       notes: [pin exact version]
       ref: /blob/3.8.51/docs/guides/DOCKER_GUIDE.md
     - id: require-api-key
-      name: 'Inference auth'
+      name: Inference auth
       summary: 'The image sets `REQUIRE_API_KEY=true`, so `/v1/*` needs a Bearer key (not `GET /v1/models`).'
       lenses: [security]
       options:
@@ -468,7 +468,7 @@ groups:
       notes: [compose sets it explicitly]
       ref: /blob/3.8.51/Dockerfile
     - id: initial-password
-      name: 'Initial password'
+      name: Initial password
       summary: '`INITIAL_PASSWORD` seeds the admin password; the saved hash wins afterwards.'
       lenses: [security]
       options:
@@ -476,14 +476,14 @@ groups:
       notes: [default CHANGEME is refused off-loopback]
       ref: /blob/3.8.51/docs/reference/ENVIRONMENT.md
     - id: data-volume
-      name: 'Data volume'
+      name: Data volume
       summary: 'Mount a volume at `/app/data` (DB, keys, config); the unit of persistence for the gateway.'
       lenses: [reliability]
       options:
       - {name: DATA_DIR, type: path, default: '~/.omniroute/', desc: 'Image sets /app/data; must support durable file primitives or startup fails.'}
       ref: /blob/3.8.51/docs/guides/DOCKER_GUIDE.md
     - id: server-env-bootstrap
-      name: 'Secret bootstrap'
+      name: Secret bootstrap
       summary: 'First boot generates JWT_SECRET and STORAGE_ENCRYPTION_KEY into `DATA_DIR/server.env` (mode 0600); losing it orphans encrypted data.'
       lenses: [security, reliability]
       options:
@@ -492,13 +492,13 @@ groups:
       notes: [env vars beat server.env; back up the volume as one unit]
       ref: /blob/3.8.51/scripts/build/bootstrap-env.mjs
     - id: stop-grace
-      name: 'Stop grace'
+      name: Stop grace
       summary: 'A 40 s stop grace lets SQLite checkpoint the WAL on `docker stop`; use `--stop-timeout 40` with plain docker.'
       lenses: [reliability]
       signature: 'stop_grace_period: 40s'
       ref: /blob/3.8.51/docs/guides/DOCKER_GUIDE.md
     - id: storage-encryption
-      name: 'DB encryption'
+      name: DB encryption
       summary: '`STORAGE_ENCRYPTION_KEY` encrypts SQLite at rest; bootstrap generates one, and losing it loses data.'
       lenses: [security]
       options:
@@ -506,7 +506,7 @@ groups:
       - {name: STORAGE_ENCRYPTION_KEY_VERSION, type: string, default: v1, desc: 'Bump when rotating the key so old backups still decrypt.'}
       ref: /blob/3.8.51/docs/reference/ENVIRONMENT.md
     - id: health-checks
-      name: 'Health checks'
+      name: Health checks
       summary: 'Dockerfile HEALTHCHECK runs `node healthcheck.mjs` (30 s) against the in-memory `/healthz`; `/api/monitoring/health` is the deep check.'
       lenses: [observability, reliability]
       signature: 'GET /healthz'
@@ -514,25 +514,25 @@ groups:
       notes: [compose waits on the image healthcheck, the deep probe can fail under event-loop load]
       ref: /blob/3.8.51/Dockerfile
     - id: single-replica
-      name: 'Single replica'
+      name: Single replica
       summary: 'Default SQLite is single-replica; scale-out means N independent processes, never shared storage.'
       lenses: [reliability]
       ref: /blob/3.8.51/docs/guides/DOCKER_GUIDE.md
     - id: free-tier-providers
-      name: 'Free-tier providers'
+      name: Free-tier providers
       summary: 'API-key providers mistral, openrouter and cloudflare-ai; see the free-tier guide and provider reference.'
       lenses: [cost]
       ref: /blob/3.8.51/docs/getting-started/FREE-TIERS-GUIDE.md
-- title: 'Routing policies and cost guards'
+- title: Routing policies and cost guards
   sections:
   - id: routing-policies
-    title: 'Auto variants, cost and exposure policies'
+    title: Auto variants, cost and exposure policies
     level: intermediate
     requires: [combos]
     ref: /blob/3.8.51/docs/getting-started/AUTO-COMBO-GUIDE.md
     entries:
     - id: auto-variants
-      name: 'auto model variants'
+      name: auto model variants
       summary: 'Send model auto or auto/coding|fast|cheap|smart|offline; OmniRoute scores all connections, picks one and falls through on failure.'
       lenses: [cost, reliability]
       signature: 'POST /v1/chat/completions {"model": "auto/coding"}'
@@ -546,7 +546,7 @@ groups:
       notes: ['each account of one provider is scored as a separate candidate', 'score < 0.2 excludes a connection 5 min; breaker-open is auto-excluded; >50% of providers down disables exploration', 'to pin a provider use a priority combo and send its exact name, not auto']
       ref: /blob/3.8.51/docs/getting-started/AUTO-COMBO-GUIDE.md
     - id: strict-zero-cost
-      name: 'Strict zero-cost policy'
+      name: Strict zero-cost policy
       summary: 'Setting `freeAccessPolicy: strict` keeps every `auto/*` pool to candidates that can never bill; new or uncurated models start excluded.'
       lenses: [cost, security]
       signature: 'PUT /api/settings {"freeAccessPolicy": "strict", "excludeTosAvoid": false}'
@@ -557,7 +557,7 @@ groups:
       notes: ['only auto/* pools are filtered; an explicit provider/model id is never blocked', 'hidePaidModels only asks "is it catalogued free", strict also checks exhaustion and billing risk']
       ref: /blob/3.8.51/docs/routing/STRICT_ZERO_COST.md
     - id: subscription-ladder
-      name: 'Subscription ladder'
+      name: Subscription ladder
       summary: 'auto/subscription uses only plan-included connections (fails closed); auto/thrifty steps up one paid rung at a time.'
       lenses: [cost]
       signature: '{"model": "auto/coding:thrifty"}'
@@ -568,7 +568,7 @@ groups:
       notes: ['billing class (subscription|metered|keyless|unknown) comes from a curated per-connection catalog; unknown counts as metered', 'composes with categories: auto/coding:thrifty, auto/reasoning:subscription', 'deliberately has no enabled flag']
       ref: /blob/3.8.51/docs/routing/SUBSCRIPTION_LADDER.md
     - id: model-exposure-list
-      name: 'Model exposure allow/deny list'
+      name: Model exposure allow/deny list
       summary: 'Settings arrays hide models from `/v1/models` and from `auto/*` candidate pools; they do not block an explicitly named model at dispatch.'
       lenses: [security, best-practice]
       signature: 'PUT /api/settings {"modelVisibilityAllowlist": ["openai/gpt-4*"]}'
@@ -578,7 +578,7 @@ groups:
       notes: ['ids may be bare (`gpt-4o`) or provider-prefixed (`openai/gpt-4o`)', 'composes AND-wise with hidePaidModels and hideAutoCombos']
       ref: /blob/3.8.51/docs/routing/MODEL_EXPOSURE_LIST.md
     - id: reasoning-routing
-      name: 'Reasoning routing rules'
+      name: Reasoning routing rules
       summary: 'Rules rewrite reasoning effort and thinking budget per key, combo, model or globally; a simulate route previews them.'
       lenses: [cost, composability]
       signature: 'POST /api/settings/reasoning-routing-rules'
@@ -590,7 +590,7 @@ groups:
       notes: ['scope precedence apiKey > combo > model > global, then priority, then exact over glob', 'rules never widen API-key model or combo permissions', 'covers chat completions, responses and anthropic messages', 'routes: GET/POST /api/settings/reasoning-routing-rules, GET/PATCH/DELETE .../[id], POST .../simulate']
       ref: /blob/3.8.51/docs/routing/REASONING_ROUTING.md
     - id: reasoning-replay
-      name: 'Reasoning replay cache'
+      name: Reasoning replay cache
       summary: 'Re-injects cached reasoning_content on follow-up turns for thinking models whose upstream 400s when clients strip it.'
       lenses: [reliability]
       signature: 'GET|DELETE /api/cache/reasoning[?provider=&model=&limit=&toolCallId=]'
@@ -598,7 +598,7 @@ groups:
       notes: ['2 h TTL, 200 memory entries, backed by a SQLite table', 'management-auth only', 'a cache miss sends empty reasoning_content as a legacy fallback']
       ref: /blob/3.8.51/docs/routing/REASONING_REPLAY.md
     - id: quota-share
-      name: 'Quota sharing engine'
+      name: Quota sharing engine
       summary: 'Fair-share a connection''s time-window quota across several API keys with hard, soft or burst policies and optional absolute caps.'
       lenses: [cost, reliability]
       signature: 'GET|POST /api/quota/pools; PUT /api/quota/plans/{connectionId}'
@@ -610,7 +610,7 @@ groups:
       notes: ['DB settings quotaStore.* override env vars', 'checked before dispatch in the chat hot path']
       ref: /blob/3.8.51/docs/routing/QUOTA_SHARE.md
     - id: deterministic-routing
-      name: 'Deterministic strategy block'
+      name: Deterministic strategy block
       summary: 'Self-hosted strategy: YAML block filters and orders providers by rules; responses carry x-omniroute-route-decision.'
       lenses: [observability, reliability]
       signature: 'OMNIROUTE_SELF_HOSTED_STRATEGY[_FILE]'
@@ -624,7 +624,7 @@ groups:
       notes: ['a pin (x-omniroute-provider header or provider/model prefix) excluded by a filter fails 400, never silently re-routes', 'no eligible candidate returns 503 with the full decision']
       ref: /blob/3.8.51/docs/routing/DETERMINISTIC_ROUTING.md
     - id: self-hosted-entry
-      name: 'Self-hosted OpenAI entry'
+      name: Self-hosted OpenAI entry
       summary: 'Env-configured YAML provider list makes /v1/chat/completions a gateway over your own endpoints, picked by header or prefix.'
       lenses: [composability, security]
       signature: 'OMNIROUTE_SELF_HOSTED_PROVIDERS[_FILE]'
@@ -634,23 +634,23 @@ groups:
       - {name: x-omniroute-provider, type: header, default: null, desc: 'Pins a provider id; otherwise the model prefix `provider/model` or `provider::model`, else the first provider.'}
       notes: ['unparseable config returns 500 and never falls through to cloud routing', 'prefix is stripped before forwarding']
       ref: /blob/3.8.51/docs/routing/SELF_HOSTED_OPENAI_ENTRY.md
-- title: 'Providers and onboarding'
+- title: Providers and onboarding
   sections:
   - id: onboarding
-    title: 'Install, connect, first request'
+    title: Install, connect, first request
     level: basic
     requires: []
     ref: /blob/3.8.51/docs/getting-started/QUICK-START.md
     entries:
     - id: quick-start
-      name: 'Quick start'
+      name: Quick start
       summary: 'Install via npm or Docker, connect a free provider in the dashboard, create a gateway key, then call `/v1` with model `auto`.'
       lenses: [best-practice]
       signature: 'omniroute | docker run -p 20128:20128 diegosouzapw/omniroute:<version>'
       notes: ['gateway keys (dashboard API Keys) are for tools to reach OmniRoute, not upstream providers; the key is shown once', '`omniroute launch-codex --model auto` and `omniroute run <claude|codex|aider|goose|opencode|qwen|gemini>` configure CLIs', ':latest is the highest published stable tag, not git main']
       ref: /blob/3.8.51/docs/getting-started/QUICK-START.md
     - id: self-host-compose
-      name: 'Self-host compose flow'
+      name: Self-host compose flow
       summary: 'From 3.8.51 a selfhost compose file plus env example runs the gateway; ports 20128, 20129 and 20132 bind loopback only.'
       lenses: [security, reliability]
       signature: 'docker compose -f docker-compose.selfhost.yml up -d'
@@ -659,26 +659,26 @@ groups:
       notes: ['20128 dashboard plus /v1 proxy, 20129 server API, 20132 live websocket', 'Redis is not published to the host', 'npm install keeps data in ~/.omniroute (DATA_DIR overrides)']
       ref: /blob/3.8.51/docs/getting-started/SELF_HOST_GUIDE.md
     - id: provider-types
-      name: 'Provider types'
+      name: Provider types
       summary: 'Providers are free/no-auth, API key, OAuth, web cookie or local; add them in the dashboard, then they join combos and auto pools.'
       lenses: [best-practice, cost]
       notes: ['first-run wizard offers an explicit free-provider setup card and never creates connections silently', 'local MLX models run via mlx-lm.server as OpenAI-compatible providers; OmniRoute does not manage their processes']
       ref: /blob/3.8.51/docs/getting-started/PROVIDERS-GUIDE.md
     - id: provider-reference
-      name: 'Provider reference'
+      name: Provider reference
       summary: 'Generated catalog of 358 providers by category (no-auth 10, OAuth 25, web cookie 33, API key 241, local 14, search 17, audio 12).'
       lenses: [reuse]
       notes: ['regenerate with npm run gen:provider-reference; counts are as of 2026-09-24']
       ref: /blob/3.8.51/docs/reference/PROVIDER_REFERENCE.md
     - id: free-tiers-reference
-      name: 'Free-tier budgets and ToS flags'
+      name: Free-tier budgets and ToS flags
       summary: 'Per-model free quota catalog (about 1.62B tokens/month deduped) plus advisory ToS caution flags per provider.'
       lenses: [cost, security]
       signature: 'GET /api/free-tier/summary?excludeTosAvoid=true'
       notes: ['the ToS flag is advisory, not a routing gate', 'counting reads the Radar-overlaid catalog while routing decisions read the shipped catalog only', 'many free providers carry caution flags for personal-use or proxy clauses (fireworks, kiro, opencode, ai21, modal, ...)']
       ref: /blob/3.8.51/docs/reference/FREE_TIERS.md
     - id: csv-import
-      name: 'Provider import from file'
+      name: Provider import from file
       summary: 'Dashboard import makes API-key connections from CSV (provider,name,apiKey,baseUrl?,priority?) or JSON; partial failure is allowed.'
       lenses: [reuse]
       params:
@@ -687,49 +687,49 @@ groups:
       notes: ['does not create OpenAI/Anthropic-compatible nodes; create them first (dashboard or `omniroute nodes add`)']
       ref: /blob/3.8.51/docs/providers/CSV-IMPORT.md
     - id: removed-providers
-      name: 'Removed providers register'
+      name: Removed providers register
       summary: 'Providers dropped at their operator''s request must not return; explicit requests fail with a retired-provider error.'
       lenses: [best-practice]
       notes: ['chatgpt-web and cgpt-web ids return HTTP 410 PROVIDER_RETIRED']
       ref: /blob/3.8.51/docs/reference/REMOVED_PROVIDERS.md
   - id: provider-specific
-    title: 'Provider-specific setup'
+    title: Provider-specific setup
     level: intermediate
     requires: [onboarding]
     ref: /blob/3.8.51/docs/getting-started/WEB-COOKIE-GUIDE.md
     entries:
     - id: web-cookie-providers
-      name: 'Web cookie providers'
+      name: Web cookie providers
       summary: 'Providers that reuse a browser session; copy credentials from a live network request, never DevTools cookie storage; no tool calling.'
       lenses: [security, best-practice]
       notes: ['not supported: function or tool calling, file editing, agentic IDE flows (use an API-key provider)', 'Test Connection only checks credential format, not that auth will succeed (issue 7857)']
       ref: /blob/3.8.51/docs/getting-started/WEB-COOKIE-GUIDE.md
     - id: claude-web
-      name: 'Claude Web provider'
+      name: Claude Web provider
       summary: '`claude-web` bridges OpenAI-format chat to a claude.ai session; seven static model ids and no dynamic discovery.'
       lenses: [security]
       notes: ['static ids include claude-opus-4-8, claude-sonnet-5, claude-haiku-4-5-20251001']
       ref: /blob/3.8.51/docs/providers/CLAUDE_WEB.md
     - id: chatgpt-web-codex
-      name: 'ChatGPT Web (Codex)'
+      name: ChatGPT Web (Codex)
       summary: 'Bridges Codex Responses turns through a ChatGPT browser session; needs Chromium and, for tool turns, a tunnel plus connector.'
       lenses: [security, reliability]
       notes: ['the raw cookie is replaced by verified Playwright storage state after save', 'Docker needs the `web` profile Chromium service', 'tool-capable setups need a connector named exactly `OmniRoute Codex v2`']
       ref: /blob/3.8.51/docs/providers/CHATGPT_WEB.md
     - id: copilot-m365
-      name: 'Microsoft 365 Copilot'
+      name: Microsoft 365 Copilot
       summary: '`copilot-m365-web` uses a WebSocket URL query parameter and path segment from DevTools as its credential, not a cookie; unofficial.'
       lenses: [security]
       notes: ['token lifetime is about 75 minutes unless a refreshToken is supplied', 'HAR import is an alternative capture path']
       ref: /blob/3.8.51/docs/providers/COPILOT-M365.md
     - id: agentrouter-provider
-      name: 'AgentRouter'
+      name: AgentRouter
       summary: 'Built-in agentrouter provider ships the Claude Code wire image the relay requires; a CC-compatible type is the advanced path.'
       lenses: [reliability]
       notes: ['relay only accepts traffic matching Claude Code user-agent, anthropic-beta and Stainless headers', 'per-connection toggles add redact-thinking beta or summarized thinking display']
       ref: /blob/3.8.51/docs/providers/AGENTROUTER.md
     - id: alibaba-qwen-families
-      name: 'Alibaba and Qwen families'
+      name: Alibaba and Qwen families
       summary: 'Four ids (alibaba, bailian-coding-plan, qwen-cloud, qwen-cloud-token-plan); region is connection data in `providerSpecificData.region`.'
       lenses: [best-practice]
       options:
@@ -737,68 +737,68 @@ groups:
       notes: ['bailian-coding-plan speaks the Anthropic wire format, the others OpenAI', 'alibaba-cn stays a runtime alias for saved connections', 'a non-preset providerSpecificData.baseUrl overrides the preset']
       ref: /blob/3.8.51/docs/providers/ALIBABA-QWEN-PROVIDER-FAMILIES.md
     - id: cursor-api
-      name: 'Cursor API and CLI passthrough'
+      name: Cursor API and CLI passthrough
       summary: 'API-key provider `cursor-api` (alias `cua`) exposes Cursor models as `cursor-api/<model>`; the Cursor CLI can be pointed at OmniRoute.'
       lenses: [composability]
       signature: 'CURSOR_API_ENDPOINT=http://localhost:20128/api/cursor-cli'
       notes: ['CLI needs `network.useHttp1ForAgent: true` in ~/.cursor/cli-config.json', 'exact live-catalog model ids (including suffixes like -low) are preserved']
       ref: /blob/3.8.51/docs/providers/CURSOR-API-KEY-AND-CLI.md
     - id: cursor-docker
-      name: 'Cursor in Docker'
+      name: Cursor in Docker
       summary: 'IDE import fails in containers; use the Login with Cursor PKCE flow, which stores access and refresh tokens.'
       lenses: [reliability]
       notes: ['official images ship no cursor-agent binary', 'manual token import is the fallback']
       ref: /blob/3.8.51/docs/providers/CURSOR-DOCKER.md
     - id: cursor-image
-      name: 'Cursor image generation'
+      name: Cursor image generation
       summary: '`POST /v1/images/generations` with `cursor/auto`, `cursor/composer-2` or `cursor/composer-2.5`; spawns the agent CLI.'
       lenses: [security]
       signature: 'POST /v1/images/generations'
       notes: ['only image format that spawns a child process; concurrency gate is per instance']
       ref: /blob/3.8.51/docs/providers/CURSOR_IMAGE.md
     - id: zed-docker
-      name: 'Zed in Docker'
+      name: Zed in Docker
       summary: 'Keychain import fails in containers; import a token manually through the dashboard tab or `POST /api/providers/zed/manual-import`.'
       lenses: [reliability]
       signature: 'POST /api/providers/zed/manual-import {provider, token, label?}'
       notes: ['needs a manage-scoped Bearer key']
       ref: /blob/3.8.51/docs/providers/ZED-DOCKER.md
   - id: provider-infra
-    title: 'Embeddings, proxies and relays'
+    title: Embeddings, proxies and relays
     level: advanced
     requires: [onboarding]
     ref: /blob/3.8.51/docs/reference/EMBEDDINGS.md
     entries:
     - id: embeddings-runbook
-      name: 'Embeddings runbook'
+      name: Embeddings runbook
       summary: 'POST /v1/embeddings works with OpenRouter-prefixed Gemini ids and Jina omni ids; native gemini-embedding-2 400s without a key.'
       lenses: [reliability]
       signature: 'POST /v1/embeddings {"model": "openrouter/google/gemini-embedding-2", "input": [...]}'
       notes: ['Gemini embedding ids via OpenRouter return 3072 dims, jina omni small 1024, nano 768 (different vector spaces)', 'google/ prefix returns Unknown embedding provider unless a custom node uses it']
       ref: /blob/3.8.51/docs/reference/EMBEDDINGS.md
     - id: free-proxies-api
-      name: 'Free proxies pool API'
+      name: Free proxies pool API
       summary: 'Curated free proxy pool synced from external sources; list, add-to-pool, sync and stats routes under /api/settings/free-proxies.'
       lenses: [reuse]
       signature: 'GET /api/settings/free-proxies?protocol=&country=&minQuality='
       notes: ['sync pulls each source independently; failures land in syncErrors without wiping prior data']
       ref: /blob/3.8.51/docs/reference/FREE_PROXIES_API.md
     - id: relay-backend
-      name: 'Relay backend strategy'
+      name: Relay backend strategy
       summary: 'Relay chat endpoint runs in `ts`, `bifrost` or `auto` mode; auto prefers the Bifrost sidecar and falls back to TypeScript.'
       lenses: [reliability, perf]
       signature: 'OMNIROUTE_RELAY_BACKEND=auto BIFROST_ENABLED=1'
       notes: ['route is /api/v1/relay/chat/completions', 'API key, allowlist and rate-limit checks always run before forwarding']
       ref: /blob/3.8.51/docs/reference/RELAY_BACKEND_STRATEGY.md
     - id: relay-troubleshooting
-      name: 'Relay troubleshooting'
+      name: Relay troubleshooting
       summary: 'Serverless relay auth is stored under STORAGE_ENCRYPTION_KEY; rotation breaks it and a repair route re-derives it.'
       lenses: [reliability, security]
       signature: 'POST /api/settings/proxies/{id}/repair-relay'
       returns: '`{repaired: true, mode: recovered}` or `{repaired: false, mode: noop}`.'
       ref: /blob/3.8.51/docs/reference/RELAY_TROUBLESHOOTING.md
     - id: provider-plugin-manifest
-      name: 'Provider plugin manifest'
+      name: Provider plugin manifest
       summary: 'JSON-safe provider contract for out-of-process sidecars, served with ETag at `/api/v1/provider-plugin-manifest`.'
       lenses: [composability]
       signature: 'GET /api/v1/provider-plugin-manifest'
@@ -807,21 +807,21 @@ groups:
       notes: ['Cache-Control max-age 60; send If-None-Match to get 304']
       ref: /blob/3.8.51/docs/reference/PROVIDER_PLUGIN_MANIFEST.md
     - id: opencode-session-identity
-      name: 'OpenCode conversation identity'
+      name: OpenCode conversation identity
       summary: 'Session continuity for OpenCode providers resolves from `x-opencode-session` and related headers; opaque user ids never count.'
       lenses: [reliability]
       notes: ['empty, control-character or over-256-char ids are ignored', 'headers are preserved only for OpenCode providers']
       ref: /blob/3.8.51/docs/reference/OPENCODE-SESSION-IDENTITY.md
-- title: 'Agent protocols and frameworks'
+- title: Agent protocols and frameworks
   sections:
   - id: agent-surfaces
-    title: 'A2A, ACP, cloud agents, evals'
+    title: A2A, ACP, cloud agents, evals
     level: advanced
     requires: [ai-tooling]
     ref: /blob/3.8.51/docs/frameworks/AGENT_PROTOCOLS_GUIDE.md
     entries:
     - id: a2a-methods
-      name: 'A2A JSON-RPC methods'
+      name: A2A JSON-RPC methods
       summary: 'A2A v0.3 at `POST /a2a` with message/send, message/stream, tasks/get and tasks/cancel plus six built-in routing skills.'
       lenses: [composability]
       signature: 'POST /a2a'
@@ -833,14 +833,14 @@ groups:
       notes: ['built-in skills: smart-routing, quota-management, provider-discovery, cost-analysis, health-report, list-capabilities']
       ref: /blob/3.8.51/docs/frameworks/AGENT_PROTOCOLS_GUIDE.md
     - id: acp-registry
-      name: 'ACP CLI agents'
+      name: ACP CLI agents
       summary: 'ACP spawns installed CLI agents (codex, claude, goose, aider, gemini, ...) as stdio child processes; list at GET /api/acp/agents.'
       lenses: [composability]
       signature: 'GET /api/acp/agents'
       notes: ['15 built-in agents; custom agents can be added in settings', 'reuses the CLI authentication so no API key is needed']
       ref: /blob/3.8.51/docs/frameworks/ACP.md
     - id: cloud-agent-tasks
-      name: 'Cloud agent tasks'
+      name: Cloud agent tasks
       summary: 'Durable long-running tasks on Codex Cloud, Cursor, Devin or Jules via `/api/v1/agents/tasks` with approve, message and cancel actions.'
       lenses: [composability, reliability]
       signature: 'POST /api/v1/agents/tasks {providerId, prompt, source, options}'
@@ -850,7 +850,7 @@ groups:
       notes: ['management auth required on every route', 'POST /api/v1/agents/tasks/{id} actions: approve, message, cancel; DELETE removes the record without cancelling upstream', 'GET lazily syncs status from upstream']
       ref: /blob/3.8.51/docs/frameworks/CLOUD_AGENT.md
     - id: evals
-      name: 'Evals'
+      name: Evals
       summary: 'Benchmark a combo, provider or model against built-in or custom suites with scoring rubrics; REST under `/api/evals`.'
       lenses: [testing, reliability]
       signature: 'POST /api/evals {suiteId, target: {type, id}, apiKeyId?}'
@@ -861,26 +861,26 @@ groups:
       notes: ['custom suites: POST/PUT/DELETE /api/evals/suites[/{id}]']
       ref: /blob/3.8.51/docs/frameworks/EVALS.md
     - id: embedded-services
-      name: 'Embedded services'
+      name: Embedded services
       summary: 'OmniRoute installs and supervises loopback sidecars (9Router, CLIProxyAPI, Mux, Bifrost, open-wa) as routing targets via `/api/services/*`.'
       lenses: [composability, reliability]
       signature: 'POST /api/services/9router/{install|start|stop|restart|update|rotate-key}'
       notes: ['lifecycle is a state machine with an operation lock', 'also GET status and logs, POST auto-start per service']
       ref: /blob/3.8.51/docs/frameworks/EMBEDDED-SERVICES.md
     - id: open-sse-architecture
-      name: 'open-sse engine'
+      name: open-sse engine
       summary: 'Core streaming engine published as @omniroute/open-sse: pipeline stages route (combo.ts), translate, execute, stream, record.'
       lenses: [best-practice]
       notes: ['chatCore.ts is the central request handler', 'no Next.js dependency, usable from CLI or serverless']
       ref: /blob/3.8.51/docs/frameworks/OPEN_SSE_ARCHITECTURE.md
   - id: platform-features
-    title: 'Memory, skills, webhooks, log export'
+    title: Memory, skills, webhooks, log export
     level: intermediate
     requires: [management-api]
     ref: /blob/3.8.51/docs/frameworks/MEMORY.md
     entries:
     - id: memory-system
-      name: 'Memory system'
+      name: Memory system
       summary: 'Per-API-key memory extracted from responses and injected as a system message; off by default; SQLite FTS plus optional Qdrant.'
       lenses: [best-practice, security]
       signature: 'PUT /api/settings/memory {"memoryEnabled": false}'
@@ -893,7 +893,7 @@ groups:
       notes: ['settings live in the DB, not env; embedding cache and local model env vars are MEMORY_* optional', 'other routes: /api/memory/{engine-status,health,reindex,retrieve-preview,summarize}']
       ref: /blob/3.8.51/docs/frameworks/MEMORY.md
     - id: omni-skills
-      name: 'Omni skills framework'
+      name: Omni skills framework
       summary: 'Skills injected as tools into outbound requests; OmniRoute intercepts tool calls and runs handlers, optionally in a Docker sandbox.'
       lenses: [composability, security]
       signature: 'POST /api/skills/install; POST /api/skills/executions'
@@ -905,7 +905,7 @@ groups:
       notes: ['distinct from generated Agent Skills (SKILL.md files for coding agents)']
       ref: /blob/3.8.51/docs/frameworks/SKILLS.md
     - id: webhooks
-      name: 'Webhooks'
+      name: Webhooks
       summary: 'HMAC-signed callbacks for request.completed, request.failed, quota.exceeded and test.ping; retried, auto-disabled on repeated failure.'
       lenses: [observability, reliability]
       signature: 'POST /api/webhooks {url, secret?, events: ["quota.exceeded"], description}'
@@ -914,14 +914,14 @@ groups:
       notes: ['events accept "*"; 10 s timeout, up to 3 retries on 5xx or network error, 10 failures disable the hook', 'secret defaults to generated whsec_<hex>; GET list masks it', 'some non-test events lack production call sites at 3.8.51']
       ref: /blob/3.8.51/docs/frameworks/WEBHOOKS.md
     - id: log-export
-      name: 'Log export'
+      name: Log export
       summary: 'Scheduled incremental export of call logs to an external store (BigQuery first) through `/api/log-export/destinations`.'
       lenses: [observability]
       signature: 'POST /api/log-export/destinations; POST .../{id}/run'
       notes: ['secret-bearing destinations require STORAGE_ENCRYPTION_KEY or the write returns 400', 'stored secrets read back as `__stored__`', 'GET /api/log-export/status shows cron state and backlog']
       ref: /blob/3.8.51/docs/frameworks/LOG-EXPORT.md
     - id: radar
-      name: 'Radar free-model catalog'
+      name: Radar free-model catalog
       summary: 'Optional signed free-model catalog overlaid on the shipped baseline; gated by `RADAR_ENABLED` plus a separate data-sync opt-in.'
       lenses: [cost, security]
       options:
@@ -929,34 +929,34 @@ groups:
       notes: ['Ed25519 signature over exact bytes with a pinned key', 'payments and the research agent are private service, not in the OSS client']
       ref: /blob/3.8.51/docs/frameworks/RADAR.md
   - id: context-sources
-    title: 'Context sources, plugins, tooling UIs'
+    title: Context sources, plugins, tooling UIs
     level: advanced
     requires: [mcp-server]
     ref: /blob/3.8.51/docs/frameworks/NOTION_CONTEXT.md
     entries:
     - id: notion-context
-      name: 'Notion context source'
+      name: Notion context source
       summary: 'Save a Notion integration token at `/api/settings/notion` to expose six MCP tools for searching and editing pages.'
       lenses: [composability, security]
       signature: 'POST /api/settings/notion {"token": "ntn_..."}'
       notes: ['POST validates with a 1-result search and clears the token on failure', 'scoped MCP tools']
       ref: /blob/3.8.51/docs/frameworks/NOTION_CONTEXT.md
     - id: obsidian-context
-      name: 'Obsidian context source'
+      name: Obsidian context source
       summary: 'Connect a vault via the Obsidian Local REST API (22 MCP tools, read:obsidian and write:obsidian scopes) or WebDAV sync.'
       lenses: [composability, security]
       signature: 'POST /api/settings/obsidian {"token": "...", "baseUrl": "http://127.0.0.1:27123"}'
       notes: ['URLs on port 27124 are rejected']
       ref: /blob/3.8.51/docs/frameworks/OBSIDIAN_CONTEXT.md
     - id: local-corpus-context
-      name: 'Local corpus context source'
+      name: Local corpus context source
       summary: 'Expose one approved directory of text files to the MCP server through three read-only tools (read:local-corpus scope).'
       lenses: [composability, security]
       signature: 'POST /api/settings/local-corpus {"rootPath": "/absolute/dir"}'
       notes: ['only the root path is stored; search returns up to 20 bounded snippets with relative paths']
       ref: /blob/3.8.51/docs/frameworks/LOCAL_CORPUS_CONTEXT.md
     - id: plugins-runtime
-      name: 'Request-pipeline plugins'
+      name: Request-pipeline plugins
       summary: 'Plugins with a plugin.json manifest hook onRequest, onResponse and onError, run in a sandboxed VM, and are managed via `/api/plugins`.'
       lenses: [composability, security]
       options:
@@ -964,7 +964,7 @@ groups:
       notes: ['plugin routes are loopback-only; marketplace registry URL has an SSRF guard']
       ref: /blob/3.8.51/docs/frameworks/PLUGIN_MARKETPLACE.md
     - id: plugin-sdk
-      name: 'Plugin SDK'
+      name: Plugin SDK
       summary: '`definePlugin` with blockRequest, modifyBody and addMetadata helpers; globals are unavailable without declared permissions.'
       lenses: [composability, security]
       import: 'import { definePlugin } from "omniroute/plugins/sdk"'
@@ -973,25 +973,25 @@ groups:
       - {name: permissions, type: 'network|file-read|file-write|env|exec', default: null, desc: 'Each grants the matching sandbox globals; absent means unavailable.'}
       ref: /blob/3.8.51/docs/frameworks/PLUGIN_SDK.md
     - id: cli-plugins
-      name: 'CLI plugins'
+      name: CLI plugins
       summary: 'Extend the `omniroute` CLI with `omniroute-cmd-*` packages installed through `omniroute plugin install|list`.'
       lenses: [composability]
       signature: 'omniroute plugin install <npm-name|./path>'
       ref: /blob/3.8.51/docs/frameworks/PLUGINS.md
     - id: opencode-provider
-      name: 'OpenCode integration'
+      name: OpenCode integration
       summary: 'Generate the OpenCode provider config with a CLI generator or the @omniroute/opencode-provider npm package.'
       lenses: [composability]
       notes: ['writes ~/.config/opencode/opencode.json']
       ref: /blob/3.8.51/docs/frameworks/OPENCODE.md
     - id: agentbridge
-      name: 'AgentBridge MITM'
+      name: AgentBridge MITM
       summary: 'TLS-intercepting proxy that reroutes ten IDE agents (Antigravity, Kiro, Copilot, Codex and more) through OmniRoute without agent changes.'
       lenses: [security, composability]
       notes: ['needs a trusted CA cert and DNS routing; Electron IDEs ignore the OS trust store (set NODE_EXTRA_CA_CERTS)', 'the docs carry a risk notice']
       ref: /blob/3.8.51/docs/frameworks/AGENTBRIDGE.md
     - id: traffic-inspector
-      name: 'Traffic Inspector'
+      name: Traffic Inspector
       summary: 'LLM-aware HTTPS traffic debugger with five capture modes, including an explicit HTTP_PROXY listener on port 8080.'
       lenses: [observability]
       options:
@@ -999,27 +999,27 @@ groups:
       notes: ['HTTPS CONNECT bodies are metadata only unless the decrypt toggle is enabled']
       ref: /blob/3.8.51/docs/frameworks/TRAFFIC_INSPECTOR.md
     - id: playground-studio
-      name: 'Playground Studio'
+      name: Playground Studio
       summary: 'Dashboard workspace with chat, compare, API and build tabs; prompt-improver and preset routes under `/api/playground`.'
       lenses: [testing, ux-a11y]
       signature: 'POST /api/playground/improve-prompt; /api/playground/presets'
       ref: /blob/3.8.51/docs/frameworks/PLAYGROUND_STUDIO.md
     - id: search-tools-studio
-      name: 'Search Tools Studio'
+      name: Search Tools Studio
       summary: 'Dashboard workspace unifying web search, scraping and provider comparison, backed by an extended `GET /api/search/providers`.'
       lenses: [composability]
       signature: 'GET /api/search/providers'
       ref: /blob/3.8.51/docs/frameworks/SEARCH_TOOLS_STUDIO.md
-- title: 'Client and CLI integration'
+- title: Client and CLI integration
   sections:
   - id: cli-clients
-    title: 'Pointing coding tools at the gateway'
+    title: Pointing coding tools at the gateway
     level: intermediate
     requires: [inference-api]
     ref: /blob/3.8.51/docs/guides/CLI-INTEGRATIONS.md
     entries:
     - id: cli-setup-commands
-      name: 'setup-* commands'
+      name: setup-* commands
       summary: 'omniroute setup-codex|claude|opencode|cline|kilo|continue|crush|goose|aider|qwen read the live catalog and write each tool''s own config.'
       lenses: [reuse, composability]
       signature: 'omniroute setup-<tool> [--remote <url> --api-key <key>] [--only <patterns>] [--dry-run]'
@@ -1030,13 +1030,13 @@ groups:
       notes: ['`omniroute run <target>`, `omniroute launch` (Claude Code) and `launch-codex` spawn the CLI with env injected and write nothing', 'the API key is referenced by env var where the tool supports it']
       ref: /blob/3.8.51/docs/guides/CLI-INTEGRATIONS.md
     - id: cli-tools-reference
-      name: 'CLI tools catalog'
+      name: CLI tools catalog
       summary: 'Dashboard catalogs 26 coding CLIs and 10 agents pointed at OmniRoute, plus ACP agents OmniRoute spawns; apply route `/api/cli-tools/apply`.'
       lenses: [reuse]
       notes: ['legacy /dashboard/cli-tools redirects 308 to /dashboard/cli-code']
       ref: /blob/3.8.51/docs/reference/CLI-TOOLS.md
     - id: claude-code-config
-      name: 'Claude Code config'
+      name: Claude Code config
       summary: 'Claude Code uses the Anthropic Messages API via ANTHROPIC_BASE_URL (no /v1 suffix) and ANTHROPIC_AUTH_TOKEN; env is read once at startup.'
       lenses: [composability]
       signature: 'ANTHROPIC_BASE_URL=http://localhost:20128 ANTHROPIC_AUTH_TOKEN=<key> claude'
@@ -1046,68 +1046,68 @@ groups:
       notes: ['ANTHROPIC_AUTH_TOKEN wins over ANTHROPIC_API_KEY', 'profiles via CLAUDE_CONFIG_DIR']
       ref: /blob/3.8.51/docs/guides/CLAUDE-CODE-CONFIGURATION.md
     - id: codex-cli-config
-      name: 'Codex CLI config'
+      name: Codex CLI config
       summary: 'Codex reads only ~/.codex/config.toml; point a model_providers entry at /v1 with wire_api responses and the key in an env var.'
       lenses: [composability]
       signature: '[model_providers.omniroute] base_url="http://host:20128/v1" env_key="OMNIROUTE_API_KEY" wire_api="responses"'
       notes: ['old config.yaml is silently ignored', 'cx/ model prefix routes to the Codex provider', 'reasoning effort and context window keys live in the same TOML']
       ref: /blob/3.8.51/docs/guides/CODEX-CLI-CONFIGURATION.md
     - id: codex-app-server
-      name: 'Codex app-server provider'
+      name: Codex app-server provider
       summary: '`codex-app-server` drives the Codex CLI''s own app-server over JSON-RPC so OmniRoute never replays an OAuth token.'
       lenses: [security]
       notes: ['needs a reachable Codex CLI; the plain codex provider replays the ChatGPT OAuth token and carries a usage caveat']
       ref: /blob/3.8.51/docs/guides/CODEX-APP-SERVER-PROVIDER.md
     - id: cli-companion
-      name: 'CLI companion'
+      name: CLI companion
       summary: 'Copy-only dashboard helper; detection status describes the OmniRoute server machine, not the browser''s machine.'
       lenses: [ux-a11y]
       ref: /blob/3.8.51/docs/guides/CLI-COMPANION.md
     - id: cli-manual-models
-      name: 'CLI model catalog'
+      name: CLI model catalog
       summary: '`omniroute models` reads the public catalog (json/jsonl output returns all rows) and supports manual model metadata.'
       lenses: [reuse]
       signature: 'omniroute models --output json'
       notes: ['legacy /api/models fallback only on 404, 405 or 501']
       ref: /blob/3.8.51/docs/guides/CLI-MANUAL-MODELS.md
     - id: cli-smoke-tests
-      name: 'CLI smoke harness'
+      name: CLI smoke harness
       summary: 'Optional script runs installed Aider, Goose, OpenCode, Qwen Code or Codex against the gateway; exit 1 on FAIL, 2 on HOLD.'
       lenses: [testing]
       signature: 'node scripts/cli/smoke-cli-integrations.mjs --targets qwen,codex --json'
       ref: /blob/3.8.51/docs/guides/CLI-SMOKE-TESTS.md
     - id: remote-mode
-      name: 'Remote mode'
+      name: Remote mode
       summary: '`omniroute connect <host>` stores a scoped token so every CLI command targets a remote server; scopes read, write, admin.'
       lenses: [security, composability]
       signature: 'omniroute connect <host>'
       notes: ['scopes are hierarchical admin > write > read', 'routes that spawn processes (/api/services, /api/mcp) stay loopback-only for any token', 'insufficient scope returns 403']
       ref: /blob/3.8.51/docs/guides/REMOTE-MODE.md
     - id: opencode-v2-plugin
-      name: 'OpenCode v2 plugin'
+      name: OpenCode v2 plugin
       summary: '@omniroute/opencode-plugin-v2 puts models, combos and auto-combos into the OpenCode v2 picker; separate from the v1 plugin.'
       lenses: [composability]
       notes: ['uses a management token distinct from the inference key']
       ref: /blob/3.8.51/docs/guides/OPENCODE-V2-PLUGIN.md
     - id: vscode-copilot
-      name: 'OmniCopilot (VS Code)'
+      name: OmniCopilot (VS Code)
       summary: 'VS Code extension that lists every OmniRoute model in the native Copilot Chat picker.'
       lenses: [composability]
       ref: /blob/3.8.51/docs/guides/VSCODE-COPILOT.md
   - id: operator-guides
-    title: 'Operator guides'
+    title: Operator guides
     level: intermediate
     requires: [container-ops]
     ref: /blob/3.8.51/docs/guides/USER_GUIDE.md
     entries:
     - id: user-guide
-      name: 'User guide'
+      name: User guide
       summary: 'Provider setup, combos, deployment (npm, PM2, Docker), custom OpenAI-compatible nodes, sticky sessions and wildcard aliases.'
       lenses: [best-practice]
       notes: ['custom node prefixes cannot be built-in provider ids or aliases (reserved)', 'send X-Session-Id for external session affinity; the effective key returns in X-OmniRoute-Session-Id', 'wildcard model aliases support * and ? (claude-sonnet-* maps to a target)']
       ref: /blob/3.8.51/docs/guides/USER_GUIDE.md
     - id: setup-guide
-      name: 'Setup guide and timeouts'
+      name: Setup guide and timeouts
       summary: 'Install methods, MCP and A2A setup, split-port mode and the shared timeout variables.'
       lenses: [reliability]
       options:
@@ -1118,19 +1118,19 @@ groups:
       notes: ['reverse proxy timeouts must exceed OmniRoute stream and fetch timeouts', 'for streams FETCH_TIMEOUT_MS only covers waiting for the first response']
       ref: /blob/3.8.51/docs/guides/SETUP_GUIDE.md
     - id: features-gallery
-      name: 'Dashboard features gallery'
+      name: Dashboard features gallery
       summary: 'Tour of dashboard sections and headline features; lists auto prefixes lkgp and chaos and 19 public combo strategies.'
       lenses: [best-practice]
       ref: /blob/3.8.51/docs/guides/FEATURES.md
     - id: troubleshooting
-      name: 'Troubleshooting'
+      name: Troubleshooting
       summary: 'Runbook for 429s, circuit breakers stuck OPEN, cooldowns, proxies, Docker and chat admission 503s.'
       lenses: [reliability]
       signature: 'DELETE /api/resilience/model-cooldowns'
       notes: ['chat_admission_busy is a retryable 503 with Retry-After; inspect GET /api/monitoring/health chatAdmission before tuning', 'heavy means 200+ messages, 64+ tools or 32000+ estimated tokens', 'admission knobs: OMNIROUTE_CHAT_ADMISSION_QUEUE_MS, OMNIROUTE_CHAT_MAX_INFLIGHT_BYTES, OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT (count cap only when set)']
       ref: /blob/3.8.51/docs/guides/TROUBLESHOOTING.md
     - id: local-ollama-docker
-      name: 'Local Ollama behind Docker'
+      name: Local Ollama behind Docker
       summary: 'Containerized OmniRoute reaching host Ollama via host.docker.internal; slow local models need longer response-start and idle timeouts.'
       lenses: [reliability]
       options:
@@ -1138,24 +1138,24 @@ groups:
       - {name: RATE_LIMIT_EXECUTION_MAX_WAIT_MS, type: ms, default: null, desc: 'Raise with RATE_LIMIT_MAX_WAIT_MS when queued streams hit RATE_LIMIT_EXECUTION_TIMEOUT.'}
       ref: /blob/3.8.51/docs/guides/LOCAL_OLLAMA_DOCKER.md
     - id: kiro-setup
-      name: 'Kiro multi-account'
+      name: Kiro multi-account
       summary: 'Each Kiro OIDC client registration holds one session, so accounts need separate registrations; API-key import at `/api/oauth/kiro/api-key`.'
       lenses: [reliability]
       signature: 'POST /api/oauth/kiro/api-key {apiKey, region}'
       ref: /blob/3.8.51/docs/guides/KIRO_SETUP.md
     - id: antigravity-onboarding
-      name: 'Antigravity onboarding'
+      name: Antigravity onboarding
       summary: 'Google One AI Pro quota via Antigravity needs a projectId (auto or via the agy CLI) and an OAuth redirect workaround.'
       lenses: [best-practice]
       ref: /blob/3.8.51/docs/guides/ANTIGRAVITY-ONBOARDING.md
   - id: cost-and-reasoning
-    title: 'Cost, quota and reasoning controls'
+    title: Cost, quota and reasoning controls
     level: intermediate
     requires: [management-api]
     ref: /blob/3.8.51/docs/guides/COST_TRACKING.md
     entries:
     - id: cost-tracking
-      name: 'Cost tracking'
+      name: Cost tracking
       summary: 'Per-request USD cost from token counts times pricing; a savings tracker, not a bill; analytics, budgets and pricing routes.'
       lenses: [cost, observability]
       signature: 'GET /api/usage/analytics?range=; POST /api/usage/budget'
@@ -1163,7 +1163,7 @@ groups:
       notes: ['pricing: GET/PATCH/DELETE /api/pricing, POST /api/pricing/sync pulls LiteLLM rates', 'CLI: omniroute cost, usage, pricing', 'budget is scoped per API key (apiKeyId)']
       ref: /blob/3.8.51/docs/guides/COST_TRACKING.md
     - id: usage-quota
-      name: 'Usage and quota enforcement'
+      name: Usage and quota enforcement
       summary: 'Records tokens and cost per request and enforces per-API-key quota with a warning level, hard limit and day/week/month/all window.'
       lenses: [cost, reliability]
       options:
@@ -1172,7 +1172,7 @@ groups:
       - {name: quotaWindow, type: 'day|week|month|all', default: null, desc: 'Window the limits apply to.'}
       ref: /blob/3.8.51/docs/guides/USAGE_QUOTA_GUIDE.md
     - id: thinking-budget
-      name: 'Thinking budget setting'
+      name: Thinking budget setting
       summary: 'Global setting that passes through, strips (auto), fixes (custom) or scales (adaptive) client reasoning and thinking fields.'
       lenses: [cost, composability]
       signature: 'PUT /api/settings/thinking-budget {"mode": "passthrough"}'
@@ -1183,35 +1183,35 @@ groups:
       notes: ['also baseBudget and complexityMultiplier', 'keep passthrough for clients that need visible reasoning']
       ref: /blob/3.8.51/docs/guides/THINKING_BUDGET.md
     - id: tiers
-      name: 'Provider tiers'
+      name: Provider tiers
       summary: 'Providers grouped into subscription, cheap and free tiers tried in order, assignable in the dashboard.'
       lenses: [cost]
       ref: /blob/3.8.51/docs/guides/TIERS.md
     - id: chaos-mode
-      name: 'Chaos mode'
+      name: Chaos mode
       summary: 'Fans one task to several providers in parallel or collaborative mode via `auto/chaos` or `POST /api/skills/collect/chaos`.'
       lenses: [composability, cost]
       signature: 'POST /api/skills/collect/chaos {"task": "...", "mode": "parallel"}'
       notes: ['disabled by default; the API key needs the chaosModeEnabled permission', 'does not affect normal /v1/chat/completions traffic']
       ref: /blob/3.8.51/docs/guides/CHAOS-MODE.md
     - id: free-provider-rankings
-      name: 'Free provider rankings'
+      name: Free provider rankings
       summary: 'Arena-ELO ranking of free providers by task category via a public read endpoint.'
       lenses: [cost]
       signature: 'GET /api/free-provider-rankings?category=coding&limit=20'
       params:
       - {name: category, type: 'default|coding|review|documentation|debugging', default: null, desc: 'Omit for the combined ranking.'}
       ref: /blob/3.8.51/docs/guides/FREE_PROVIDER_RANKINGS.md
-- title: 'Prompt compression'
+- title: Prompt compression
   sections:
   - id: compression
-    title: 'Compression engines and rules'
+    title: Compression engines and rules
     level: advanced
     requires: [prompt-compression]
     ref: /blob/3.8.51/docs/compression/COMPRESSION_ENGINES.md
     entries:
     - id: compression-engines
-      name: 'Compression modes and routes'
+      name: Compression modes and routes
       summary: 'Modes off, lite, standard, aggressive, ultra, rtk, omniglyph, stacked over Caveman, RTK or LLMLingua-2 engines; routes under /api/context.'
       lenses: [cost, perf]
       signature: 'POST /api/compression/preview'
@@ -1221,7 +1221,7 @@ groups:
       notes: ['routes: /api/settings/compression, /api/compression/language-packs, /api/context/rtk/{config,filters,test}, /api/context/combos[/{id}/assignments], /api/context/analytics', 'five MCP tools omniroute_compression_* with read:compression and write:compression scopes']
       ref: /blob/3.8.51/docs/compression/COMPRESSION_ENGINES.md
     - id: rtk-compression
-      name: 'RTK engine'
+      name: RTK engine
       summary: 'Command-aware compression of terminal, test and build output with filters, dedup, grouping, comment stripping and 3 intensity levels.'
       lenses: [cost]
       signature: 'PUT /api/context/rtk/config'
@@ -1232,7 +1232,7 @@ groups:
       notes: ['raw output is recoverable through an authenticated redacted route', 'RTK reports 60-90% savings on command output']
       ref: /blob/3.8.51/docs/compression/RTK_COMPRESSION.md
     - id: compression-language-packs
-      name: 'Caveman language packs'
+      name: Caveman language packs
       summary: 'Language-specific Caveman rule packs chosen by a lightweight detector; configured through `languageConfig`.'
       lenses: [best-practice]
       options:
@@ -1240,32 +1240,32 @@ groups:
       - {name: languageConfig.enabledPacks, type: 'string[]', default: null, desc: 'Packs loaded (docs example en, pt-BR, es, id, de, fr, ja).'}
       ref: /blob/3.8.51/docs/compression/COMPRESSION_LANGUAGE_PACKS.md
     - id: compression-rules-format
-      name: 'Compression rule JSON'
+      name: Compression rule JSON
       summary: 'Data-only JSON packs for Caveman replacements and RTK filters, validated against `_schema.json`.'
       lenses: [typing-dx]
       ref: /blob/3.8.51/docs/compression/COMPRESSION_RULES_FORMAT.md
     - id: extending-compression
-      name: 'Extending compression'
+      name: Extending compression
       summary: 'Three extension points: custom CompressionEngine implementations, new language packs and stacked pipelines.'
       lenses: [composability]
       ref: /blob/3.8.51/docs/compression/EXTENDING_COMPRESSION.md
     - id: context-editing
-      name: 'Delegated context editing'
+      name: Delegated context editing
       summary: 'Claude-only `contextEditing.enabled` makes OmniRoute send `context_management.edits[]` so Anthropic clears stale tool results itself.'
       lenses: [cost]
       options:
       - {name: contextEditing.enabled, type: bool, default: 'false', desc: 'Part of the compression config; scoped to Claude and Claude Code compatible relays with a 400 fallback.'}
       ref: /blob/3.8.51/docs/compression/CONTEXT_EDITING.md
-- title: 'Security and access control'
+- title: Security and access control
   sections:
   - id: security-posture
-    title: 'Auth posture, CORS, route guard, audit'
+    title: Auth posture, CORS, route guard, audit
     level: intermediate
     requires: [container-ops]
     ref: /blob/3.8.51/docs/security/INFERENCE_AUTH_POSTURE.md
     entries:
     - id: inference-auth-posture
-      name: 'Inference auth posture'
+      name: Inference auth posture
       summary: 'Catalog and inference routes use different gates; probe POST /v1/chat/completions, where 401 means REQUIRE_API_KEY enforces.'
       lenses: [security, testing]
       signature: 'curl -X POST http://host:20128/v1/chat/completions -d {...}  # expect 401'
@@ -1274,7 +1274,7 @@ groups:
       notes: ['with REQUIRE_API_KEY=false an invalid bearer degrades to anonymous, so a junk key is not a valid probe']
       ref: /blob/3.8.51/docs/security/INFERENCE_AUTH_POSTURE.md
     - id: cors-config
-      name: 'CORS allowlist'
+      name: CORS allowlist
       summary: 'Fail-closed origin allowlist; set CORS_ALLOWED_ORIGINS and never CORS_ALLOW_ALL=true in production.'
       lenses: [security]
       options:
@@ -1283,26 +1283,26 @@ groups:
       notes: ['API keys are unaffected by CORS (non-browser clients)', 'do not forge X-Forwarded-For to bypass the loopback guard']
       ref: /blob/3.8.51/docs/security/CORS.md
     - id: route-guard-tiers
-      name: 'Route guard tiers'
+      name: Route guard tiers
       summary: 'Static three-tier classification: LOCAL_ONLY loopback routes that spawn processes, ALWAYS_PROTECTED, and MANAGEMENT default.'
       lenses: [security]
       notes: ['loopback check runs before any auth branch, so a leaked token over a tunnel cannot reach spawn routes', 'narrow carve-out for keys carrying the `manage` scope on selected prefixes', 'fresh-install bootstrap is loopback-only by real peer address']
       ref: /blob/3.8.51/docs/security/ROUTE_GUARD_TIERS.md
     - id: cli-token
-      name: 'CLI machine-id token'
+      name: CLI machine-id token
       summary: 'CLI authenticates to the local management API with an HMAC of the machine id in `x-omniroute-cli-token`, sent only to loopback URLs.'
       lenses: [security]
       options:
       - {name: x-omniroute-cli-token, type: header, default: null, desc: 'HMAC-SHA256(machine-id, salt) hex; requests use redirect:error so it cannot be forwarded.'}
       ref: /blob/3.8.51/docs/security/CLI_TOKEN.md
     - id: cli-config-routes
-      name: 'CLI config preview routes'
+      name: CLI config preview routes
       summary: 'The /api/cli-tools/config and /apply routes return redacted previews and reject unknown fields and credentialed URLs.'
       lenses: [security]
       notes: ['batch preview takes the key from the x-omniroute-config-api-key header, never the query string']
       ref: /blob/3.8.51/docs/security/CLI-CONFIGURATION.md
     - id: compliance-audit
-      name: 'Audit log and no-log keys'
+      name: Audit log and no-log keys
       summary: 'Admin, auth and MCP tool events go to audit tables; per-key `noLog` stops call logging; retention env vars bound table size.'
       lenses: [security, observability]
       signature: 'POST /api/keys {"name": "Privacy key", "noLog": true}'
@@ -1314,7 +1314,7 @@ groups:
       notes: ['query with GET /api/compliance/audit-log', 'audit writes never throw']
       ref: /blob/3.8.51/docs/security/COMPLIANCE.md
     - id: ban-detection
-      name: 'Account ban detection'
+      name: Account ban detection
       summary: 'Upstream error bodies matching banned signals mark a connection permanently banned (1-year cooldown); custom keywords add to built-ins.'
       lenses: [reliability, security]
       signature: 'PATCH /api/settings {"customBannedSignals": ["account permanently banned"]}'
@@ -1323,25 +1323,25 @@ groups:
       notes: ['raw substring match: broad words like quota or error ban healthy connections', 'each keyword max 200 chars']
       ref: /blob/3.8.51/docs/security/BAN_DETECTION.md
     - id: egress-policy
-      name: 'Egress IP family policy'
+      name: Egress IP family policy
       summary: 'Per-proxy `family` of auto, ipv4 or ipv6 pins outbound connections to one IP family, failing closed.'
       lenses: [security, reliability]
       signature: 'POST /api/v1/management/proxies {name, type, host, port, family: "ipv6"}'
       ref: /blob/3.8.51/docs/security/EGRESS_POLICY.md
     - id: error-sanitization
-      name: 'Error message sanitization'
+      name: Error message sanitization
       summary: 'Contributor rule: every client-facing error goes through public builders in error.ts that redact paths and secrets.'
       lenses: [security]
       notes: ['covers HTTP routes, SSE streams, executors and MCP handlers']
       ref: /blob/3.8.51/docs/security/ERROR_SANITIZATION.md
   - id: stealth-and-capture
-    title: 'Client fingerprints and TLS capture'
+    title: Client fingerprints and TLS capture
     level: advanced
     requires: [security-posture]
     ref: /blob/3.8.51/docs/security/STEALTH_GUIDE.md
     entries:
     - id: stealth-guide
-      name: 'Stealth and CLI compat'
+      name: Stealth and CLI compat
       summary: 'TLS and header fingerprinting so official-account CLIs work through the gateway; user-agent env overrides and CLI_COMPAT_* toggles.'
       lenses: [reliability]
       options:
@@ -1350,28 +1350,28 @@ groups:
       notes: ['toggles reshape the wire image only; provider egress IP is unchanged', 'ANTIGRAVITY_CREDITS=always is an account-ban risk']
       ref: /blob/3.8.51/docs/security/STEALTH_GUIDE.md
     - id: agentrouter-waf
-      name: 'AgentRouter WAF'
+      name: AgentRouter WAF
       summary: 'Upstream keyword filter returns 400 content-blocked; OmniRoute spaces requests 500 ms and retries twice with backoff.'
       lenses: [reliability]
       notes: ['burst-sensitive, partly probabilistic']
       ref: /blob/3.8.51/docs/security/AGENTROUTER_WAF.md
     - id: mitm-tproxy
-      name: 'TPROXY transparent decrypt'
+      name: TPROXY transparent decrypt
       summary: 'Linux capture mode 5: kernel TPROXY plus a per-SNI dynamic CA, started via `POST /api/tools/agent-bridge/tproxy`; needs root.'
       lenses: [security, observability]
       signature: 'POST /api/tools/agent-bridge/tproxy {dport, mark, onPort, routeTable, bypassMark}'
       notes: ['no environment variables; defaults dport 443, onPort 8443', 'firewall rules apply transactionally and flush on reboot']
       ref: /blob/3.8.51/docs/security/MITM-TPROXY-DECRYPT.md
-- title: 'Operations and observability'
+- title: Operations and observability
   sections:
   - id: ops-runtime
-    title: 'Health, storage, networking, deployment'
+    title: Health, storage, networking, deployment
     level: intermediate
     requires: [container-ops]
     ref: /blob/3.8.51/docs/ops/MONITORING_GUIDE.md
     entries:
     - id: monitoring-guide
-      name: 'Monitoring and probes'
+      name: Monitoring and probes
       summary: 'Light `/healthz` for readiness and deep `/api/monitoring/health` for dashboards; provider and combo health autopilots and quota monitors.'
       lenses: [observability, reliability]
       signature: 'GET /healthz | GET /livez | GET /api/monitoring/health'
@@ -1379,7 +1379,7 @@ groups:
       notes: ['deep health is too heavy for kubelet liveness; use /livez or TCP on PORT', 'all probes share the event loop with request handling', 'MCP tool observability_snapshot returns the full matrices']
       ref: /blob/3.8.51/docs/ops/MONITORING_GUIDE.md
     - id: adaptive-routing-events
-      name: 'Routing events and OTLP export'
+      name: Routing events and OTLP export
       summary: 'Routing outcome events feed auto-combo quality scoring, explain via `GET /v1/explain/routing`, and can export GenAI-convention OTLP spans.'
       lenses: [observability]
       signature: 'GET /v1/explain/routing'
@@ -1389,7 +1389,7 @@ groups:
       notes: ['events carry routing metadata only, never prompts or credentials', 'per-invocation combo trace header X-OmniRoute-Combo-Trace']
       ref: /blob/3.8.51/docs/architecture/ADAPTIVE_ROUTING.md
     - id: chat-admission-lanes
-      name: 'Chat admission lanes'
+      name: Chat admission lanes
       summary: 'Byte-budget admission sheds heavy chat bodies (413 body_exceeds_budget, 503 chat_admission_busy); optional virtual lanes per tenant key.'
       lenses: [reliability, perf]
       options:
@@ -1398,20 +1398,20 @@ groups:
       notes: ['a body that cannot fit the budget fails immediately with 413; contention queues up to OMNIROUTE_CHAT_ADMISSION_QUEUE_MS', 'one process-global controller; the key hash is only a fairness key']
       ref: /blob/3.8.51/docs/architecture/admission-lanes.md
     - id: database-guide
-      name: 'Database and backups'
+      name: Database and backups
       summary: 'SQLite WAL store with AES-256-GCM field encryption; versioned migrations and backup create or restore through CLI or `/api/db-backups`.'
       lenses: [reliability, security]
       signature: 'omniroute backup create --name <n> | PUT /api/db-backups {"name": "<n>"}'
       notes: ['backup includes settings and secrets (encrypted), plugin config and optional call-log artifacts']
       ref: /blob/3.8.51/docs/ops/DATABASE_GUIDE.md
     - id: sqlite-runtime
-      name: 'SQLite driver resolution'
+      name: SQLite driver resolution
       summary: 'Five-step fallback from bundled to runtime-installed better-sqlite3; single-writer, so no HA and restarts drop in-flight SSE.'
       lenses: [reliability]
       notes: ['never attach two replicas to one storage.sqlite', 'prefer TCP liveness plus /healthz readiness']
       ref: /blob/3.8.51/docs/ops/SQLITE_RUNTIME.md
     - id: redis-config
-      name: 'Redis configuration'
+      name: Redis configuration
       summary: 'Optional soft dependency (rate limiter, quota, breaker stores); key prefix and URL env vars, in-memory fallback when absent.'
       lenses: [reliability, perf]
       options:
@@ -1419,13 +1419,13 @@ groups:
       - {name: REDIS_KEY_PREFIX, type: string, default: 'omniroute:', desc: 'Prefix applied to every key.'}
       ref: /blob/3.8.51/docs/ops/REDIS_PRODUCTION_CONFIG.md
     - id: proxy-guide
-      name: 'Upstream proxies'
+      name: Upstream proxies
       summary: 'HTTP, HTTPS or SOCKS5 proxy registry resolved per connection, then provider, combo, then global; includes a free proxy marketplace.'
       lenses: [security, reliability]
       notes: ['first match wins, so a global fallback can be overridden per provider or connection']
       ref: /blob/3.8.51/docs/ops/PROXY_GUIDE.md
     - id: tunnels-guide
-      name: 'Tunnels'
+      name: Tunnels
       summary: 'Expose the local server through Cloudflare (quick or named), ngrok or Tailscale Funnel via `/api/tunnels`; needed for OAuth callbacks.'
       lenses: [security]
       options:
@@ -1434,23 +1434,23 @@ groups:
       notes: ['tunnel URL changes break OAuth redirect URIs']
       ref: /blob/3.8.51/docs/ops/TUNNELS_GUIDE.md
     - id: vm-deployment
-      name: 'VM deployment with Cloudflare'
+      name: VM deployment with Cloudflare
       summary: 'VPS install with Docker, nginx reverse proxy and Cloudflare origin certificates and DNS.'
       lenses: [security]
       ref: /blob/3.8.51/docs/ops/VM_DEPLOYMENT_GUIDE.md
     - id: flyio-deployment
-      name: 'Fly.io deployment'
+      name: Fly.io deployment
       summary: 'Verified Fly.io recipe: create the app, set INITIAL_PASSWORD and secrets, deploy, then post-deploy checks.'
       lenses: [reliability]
       ref: /blob/3.8.51/docs/ops/FLY_IO_DEPLOYMENT_GUIDE.md
   - id: platform-api
-    title: 'Gateway control-plane API and architecture'
+    title: Gateway control-plane API and architecture
     level: advanced
     requires: [management-api]
     ref: /blob/3.8.51/docs/architecture/AUTHZ_GUIDE.md
     entries:
     - id: authz-guide
-      name: 'Authorization pipeline'
+      name: Authorization pipeline
       summary: 'Fail-closed route classes; Bearer keys with `manage` scope or session cookies reach management routes; MCP scopes opt-in enforced.'
       lenses: [security]
       options:
@@ -1458,7 +1458,7 @@ groups:
       notes: ['access tokens oma_live_... carry read, write or admin scope', 'client API key enforcement reads isRequireApiKeyEnabled, not raw env, so the setting can change at runtime']
       ref: /blob/3.8.51/docs/architecture/AUTHZ_GUIDE.md
     - id: omniroute-routing-policy
-      name: 'Allocation, failover and route preview'
+      name: Allocation, failover and route preview
       summary: 'Deterministic route preview and status endpoints plus failover and quota-telemetry semantics for automation callers.'
       lenses: [testing, observability]
       signature: 'POST /api/omniroute/route/preview; GET /api/omniroute/status'
@@ -1466,50 +1466,50 @@ groups:
       notes: ['quota states healthy, approaching_limit, exhausted, unavailable, unknown; unknown is not exhausted', 'default cross-provider failover allows up to 3 attempts; auth and invalid-request errors are not retried', 'ensurePool is idempotent']
       ref: /blob/3.8.51/docs/OMNIROUTE_ROUTING_POLICY.md
     - id: omniroute-provider-failover
-      name: 'Provider failover policy'
+      name: Provider failover policy
       summary: 'Failures are classified before retry; transient errors fail over, auth and invalid requests do not; circuit states closed, open, half_open.'
       lenses: [reliability]
       ref: /blob/3.8.51/docs/OMNIROUTE_PROVIDER_FAILOVER.md
     - id: omniroute-quota-telemetry
-      name: 'Quota telemetry states'
+      name: Quota telemetry states
       summary: 'Provider quota telemetry is separate from internal accounting; unknown quota stays eligible and is never treated as exhausted.'
       lenses: [observability]
       ref: /blob/3.8.51/docs/OMNIROUTE_QUOTA_TELEMETRY.md
     - id: omniroute-allocation-handoff
-      name: 'Allocation handoff'
+      name: Allocation handoff
       summary: 'Quota pools govern which keys may consume a provider pool; ensurePool is idempotent and a read-only status route reports state.'
       lenses: [cost, composability]
       signature: 'GET /api/omniroute/status; npm run omniroute:verify'
       ref: /blob/3.8.51/docs/OMNIROUTE_ALLOCATION_HANDOFF.md
     - id: architecture-overview
-      name: 'Architecture overview'
+      name: Architecture overview
       summary: 'Next.js gateway with an SSE and translation core, combo and account fallback, SQLite persistence and embedded services.'
       lenses: [best-practice]
       ref: /blob/3.8.51/docs/architecture/ARCHITECTURE.md
     - id: router-backends
-      name: 'Router backends ADR'
+      name: Router backends ADR
       summary: 'Separates embedded services (supervised processes) from relay routing backends (ts, bifrost, cliproxy, 9router).'
       lenses: [composability]
       ref: /blob/3.8.51/docs/architecture/ROUTER_BACKENDS.md
     - id: cluster-profiles
-      name: 'Optional sidecar profiles'
+      name: Optional sidecar profiles
       summary: 'Proposal for opt-in compose profiles memory (Qdrant) and bifrost; default topology is replicas plus Caddy, Redis and CliproxyAPI.'
       lenses: [reliability]
       notes: ['status is proposal in the doc']
       ref: /blob/3.8.51/docs/architecture/cluster-decisions.md
     - id: persistence-boundary
-      name: 'Persistence boundary ADR'
+      name: Persistence boundary ADR
       summary: 'Proposed pluggable persistence boundary above the synchronous SQLite adapter; no external database is added or selected.'
       lenses: [best-practice]
       notes: ['status Proposed, SQLite stays the default']
       ref: /blob/3.8.51/docs/architecture/persistence-backend-boundary.md
     - id: monitoring-sections
-      name: 'Monitoring navigation'
+      name: Monitoring navigation
       summary: 'Dashboard sidebar structure for Costs and Monitoring and the activity versus audit log split.'
       lenses: [ux-a11y]
       ref: /blob/3.8.51/docs/architecture/MONITORING_SECTIONS.md
     - id: devin-claude-bridge
-      name: 'Devin Claude bridge'
+      name: Devin Claude bridge
       summary: '`devin-cli-agentic` runs Claude Code against OmniRoute''s Anthropic endpoint while the Devin CLI supplies responses over ACP stdio.'
       lenses: [composability]
       notes: ['pinned Claude Code 2.1.258, live validation last recorded on 2.1.220']

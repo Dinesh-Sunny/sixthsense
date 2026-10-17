@@ -13,87 +13,87 @@ toc:
   exclude: '^https://docs\.astral\.sh/ruff/rules/.'
   why: 'llms.txt omits settings, rules, default-rules; the sitemap lists them. ~970 per-rule pages are excluded: the rules index, default-rules and `ruff rule <CODE>` (installed version) cover them, and entries cite individual rule pages where concrete.'
 groups:
-- title: 'AI tooling'
+- title: AI tooling
   sections:
   - id: ai-tooling
-    title: 'Agent-facing docs and tools'
+    title: Agent-facing docs and tools
     level: basic
     requires: []
     ref: /llms.txt
     entries:
     - id: ai-llms-txt
-      name: 'llms.txt ToC'
-      summary: 'Page index for agents; read it first, then fetch pages as markdown.'
+      name: llms.txt ToC
+      summary: Page index for agents; read it first, then fetch pages as markdown.
       lenses: [reuse]
       signature: https://docs.astral.sh/ruff/llms.txt
       notes: ['dir pages via <dir>/index.md; settings, rules, default-rules are HTML only']
       ref: /llms.txt
     - id: ai-astral-skill
-      name: 'Astral agent skill'
-      summary: 'Official Claude Code plugin skill covering ruff CLI usage (bundled with uv and ty skills).'
+      name: Astral agent skill
+      summary: Official Claude Code plugin skill covering ruff CLI usage (bundled with uv and ty skills).
       lenses: [reuse]
       signature: astral-sh/claude-code-plugins plugins/astral/skills/ruff/SKILL.md
       notes: ['plugin bundles uv, ruff, ty skills; CLI how-to only']
       ref: https://github.com/astral-sh/claude-code-plugins
     - id: ai-cli-lookup
-      name: 'CLI lookups'
-      summary: 'The installed binary documents itself; use it to verify a rule or option before citing it.'
+      name: CLI lookups
+      summary: The installed binary documents itself; use it to verify a rule or option before citing it.
       lenses: [reuse, best-practice]
       signature: ruff rule <CODE>, ruff config [<option>], ruff linter, ruff check --show-settings, ruff version
       returns: Markdown rule docs (explanation, fix safety, preview status) or option docs for the installed version.
       notes: [always the installed version; beats the website for preview or deprecated status]
       ref: /configuration/index.md
     - id: ai-mcp
-      name: 'MCP server and AGENTS.md'
-      summary: 'none'
+      name: MCP server and AGENTS.md
+      summary: none
       lenses: [reuse]
       ref: /llms.txt
-- title: 'Getting started'
+- title: Getting started
   sections:
   - id: install
-    title: 'Install and invoke'
+    title: Install and invoke
     level: basic
     requires: []
     ref: /installation/index.md
     entries:
     - id: install-dev-dep
-      name: 'Dev dependency via uv'
-      summary: 'Add ruff as a project dev dependency so the lockfile pins one version for every environment.'
+      name: Dev dependency via uv
+      summary: Add ruff as a project dev dependency so the lockfile pins one version for every environment.
       lenses: [reuse, reliability]
       signature: uv add --dev ruff, uv run ruff check, uvx ruff@<version> check
       notes: [the lockfile owns the pin; uvx ruff@<ver> is a one-off]
       ref: /installation/index.md
   - id: tutorial
-    title: 'Tutorial workflow'
+    title: Tutorial workflow
     level: basic
     requires: [install]
     ref: /tutorial/index.md
     entries:
     - id: tutorial-incremental
-      name: 'Adopt rules step by step'
-      summary: 'Enable one rule family at a time, baseline legacy violations with --add-noqa, then autofix.'
+      name: Adopt rules step by step
+      summary: Enable one rule family at a time, baseline legacy violations with --add-noqa, then autofix.
       lenses: [best-practice]
       signature: extend-select, ruff check --add-noqa, ruff check --fix
       notes: [tutorial uses extend-select (inherits defaults); linter page prefers select]
       ref: /tutorial/index.md
-- title: 'Configuration'
+- title: Configuration
   sections:
   - id: config-files
-    title: 'Config files and discovery'
+    title: Config files and discovery
     level: basic
     requires: []
     ref: /configuration/index.md
     entries:
     - id: config-pyproject
-      name: 'Config location'
-      summary: 'Settings live in pyproject.toml under [tool.ruff], ruff.toml, or .ruff.toml.'
+      name: Config location
+      summary: Settings live in pyproject.toml under [tool.ruff], ruff.toml, or .ruff.toml.
       lenses: [best-practice]
       signature: '[tool.ruff], ruff.toml, .ruff.toml'
       notes: ['same dir precedence .ruff.toml > ruff.toml > pyproject.toml; lint settings nest under [tool.ruff.lint]']
       ref: /configuration/index.md
     - id: config-extend
-      name: 'Inherit a parent config'
-      summary: 'Share one base config across sub-projects with extend; the closest config file otherwise wins whole.'
+      name: Inherit a parent config
+      summary: Share one base config across sub-projects with extend; the closest config file otherwise wins whole.
       lenses: [composability]
       signature: extend = "../pyproject.toml"
       options:
@@ -101,8 +101,8 @@ groups:
       notes: [closest file wins and is never merged; extend is the only inheritance]
       ref: /configuration/index.md
     - id: config-target-version
-      name: 'Python target'
-      summary: 'Minimum Python the rules and formatter target; inferred from requires-python when unset.'
+      name: Python target
+      summary: Minimum Python the rules and formatter target; inferred from requires-python when unset.
       lenses: [typing-dx, best-practice]
       signature: target-version = "py313"
       options:
@@ -110,24 +110,24 @@ groups:
       notes: [docs recommend project.requires-python over target-version in pyproject-based projects]
       ref: /configuration/index.md
     - id: config-per-file-target
-      name: 'Per-file target'
-      summary: 'Override the target Python for a glob of files, e.g. scripts allowed newer syntax than the package.'
+      name: Per-file target
+      summary: Override the target Python for a glob of files, e.g. scripts allowed newer syntax than the package.
       lenses: [typing-dx]
       signature: '[tool.ruff.per-file-target-version] "<glob>" = "py314"'
       options:
       - {name: per-file-target-version, type: 'dict[glob, version]', default: '{}', desc: 'Glob-to-version map used by the linter and formatter for version-specific rules and formatting.'}
       ref: /settings/
     - id: config-required-version
-      name: 'Pin the tool version in config'
-      summary: 'Make ruff exit with an error when the running version does not satisfy the stated specifier.'
+      name: Pin the tool version in config
+      summary: Make ruff exit with an error when the running version does not satisfy the stated specifier.
       lenses: [reliability]
       signature: required-version = "==0.16.10"
       options:
       - {name: required-version, type: str (PEP 440), default: null, desc: 'Specifier like ==0.16.10 or >=0.16; ruff errors out if unmet; unifies results across environments.'}
       ref: /settings/
     - id: config-discovery
-      name: 'File discovery'
-      summary: 'Control which files ruff walks; gitignored files are skipped by default, explicit paths bypass excludes.'
+      name: File discovery
+      summary: Control which files ruff walks; gitignored files are skipped by default, explicit paths bypass excludes.
       lenses: [best-practice]
       signature: exclude, extend-exclude, include, extend-include, respect-gitignore, force-exclude
       options:
@@ -137,15 +137,15 @@ groups:
       notes: [include entries must match files; explicit paths bypass excludes]
       ref: /configuration/index.md
     - id: config-cli-override
-      name: 'CLI overrides'
-      summary: 'Override or isolate config per invocation without editing files, e.g. in tests or one-off runs.'
+      name: CLI overrides
+      summary: Override or isolate config per invocation without editing files, e.g. in tests or one-off runs.
       lenses: [composability, testing]
       signature: ruff check --config "key = value" | --isolated | --select <codes> | @argfile
       notes: [--isolated ignores all config files; dedicated flags beat --config]
       ref: /configuration/index.md
     - id: config-first-party
-      name: 'First-party detection'
-      summary: 'Tell isort which imports are first-party via src; defaults cover flat and src layouts.'
+      name: First-party detection
+      summary: Tell isort which imports are first-party via src; defaults cover flat and src layouts.
       lenses: [best-practice]
       signature: src = ["src"], lint.isort.known-first-party, known-third-party, detect-same-package
       options:
@@ -153,25 +153,25 @@ groups:
       - {name: lint.isort.known-first-party, type: 'list[str]', default: '[]', desc: Modules forced to first-party regardless of filesystem introspection (supports globs).}
       ref: /faq/
     - id: config-style
-      name: 'Line width and indent'
-      summary: 'One line-length drives E501, isort wrapping and the formatter; the formatter treats it as best-effort.'
+      name: Line width and indent
+      summary: One line-length drives E501, isort wrapping and the formatter; the formatter treats it as best-effort.
       lenses: [best-practice]
       signature: line-length = 100, indent-width = 4
       options:
       - {name: line-length, type: int, default: '88', desc: 'Width for E501, isort and the formatter; formatted lines may still exceed it.'}
       - {name: indent-width, type: int, default: '4', desc: 'Spaces per indent level; also the visual width of a tab for E501.'}
       ref: /settings/
-- title: 'Linter'
+- title: Linter
   sections:
   - id: rule-selection
-    title: 'Rule selection and defaults'
+    title: Rule selection and defaults
     level: basic
     requires: [config-files]
     ref: /linter/index.md
     entries:
     - id: select-explicit
-      name: 'Explicit rule set'
-      summary: 'select replaces the default set with exactly your prefixes; extend-select adds on top of defaults.'
+      name: Explicit rule set
+      summary: select replaces the default set with exactly your prefixes; extend-select adds on top of defaults.
       lenses: [best-practice]
       signature: '[tool.ruff.lint] select = [...], extend-select = [...], ignore = [...]'
       options:
@@ -183,27 +183,27 @@ groups:
         code
       ref: /linter/index.md
     - id: default-rules
-      name: 'Default set since 0.16.0'
-      summary: '413 rules are on without config (was 59); set select to replace them or extend-select to keep them.'
+      name: Default set since 0.16.0
+      summary: 413 rules are on without config (was 59); set select to replace them or extend-select to keep them.
       lenses: [best-practice, reliability]
-      notes: ['default set spans correctness, suspicious, complexity, perf, style categories; lists ASYNC2xx, B*, DTZ0xx, LOG015, G010, RUF012/013, RUF100']
+      notes: ['default set spans correctness, suspicious, complexity, performance, style categories; lists ASYNC2xx, B*, DTZ0xx, LOG015, G010, RUF012/013, RUF100']
       ref: /default-rules/
     - id: rule-categories
-      name: 'Rule categories'
-      summary: 'Selectors that group rules by intent; the first five form the default set.'
+      name: Rule categories
+      summary: Selectors that group rules by intent; the first five form the default set.
       lenses: [best-practice, security]
-      signature: correctness, suspicious, complexity, perf, style, security, formatting, pedantic, restriction
+      signature: correctness, suspicious, complexity, performance, style, security, formatting, pedantic, restriction
       notes: [category selectors need preview = true; first five form the default set]
       ref: /linter/index.md
   - id: fixes
-    title: 'Fixes'
+    title: Fixes
     level: basic
     requires: [rule-selection]
     ref: /linter/index.md
     entries:
     - id: fix-safety
-      name: 'Fix applicability'
-      summary: 'Only safe fixes (behavior-preserving) apply by default; unsafe fixes need opt-in and can change runtime behavior.'
+      name: Fix applicability
+      summary: Only safe fixes (behavior-preserving) apply by default; unsafe fixes need opt-in and can change runtime behavior.
       lenses: [reliability]
       signature: ruff check --fix [--unsafe-fixes], lint.fixable, lint.unfixable, lint.extend-safe-fixes, lint.extend-unsafe-fixes
       options:
@@ -214,47 +214,47 @@ groups:
       notes: [unsafe fixes can change runtime behavior or drop comments; a hint prints when unsafe fixes exist but are off]
       ref: /linter/index.md
     - id: fix-preview
-      name: 'Preview a fix first'
-      summary: 'Inspect what fixes would change before writing them.'
+      name: Preview a fix first
+      summary: Inspect what fixes would change before writing them.
       lenses: [reliability, best-practice]
       signature: ruff check --diff, --show-fixes, --fix-only
       ref: /linter/index.md
   - id: suppression
-    title: 'Suppression and stale ignores'
+    title: Suppression and stale ignores
     level: intermediate
     requires: [rule-selection]
     ref: /linter/index.md
     entries:
     - id: suppress-noqa
-      name: 'Line noqa'
-      summary: 'Silence specific rules on one line with a rule-coded noqa comment; baseline legacy code in bulk.'
+      name: Line noqa
+      summary: Silence specific rules on one line with a rule-coded noqa comment; baseline legacy code in bulk.
       lenses: [best-practice]
       signature: '# noqa: CODE, ruff check --add-noqa, --ignore-noqa'
       ref: /linter/index.md
     - id: suppress-ruff-ignore
       name: 'ruff: ignore comments'
-      summary: 'Native suppression comment; an own-line comment covers the next logical line.'
+      summary: Native suppression comment; an own-line comment covers the next logical line.
       lenses: [best-practice]
       signature: '# ruff: ignore[CODE], ruff check --add-ignore'
       since: "0.16.0"
       ref: /linter/index.md
     - id: suppress-range
-      name: 'Range and file scope'
-      summary: 'Disable rules over a block or a whole file with paired or file-level comments.'
+      name: Range and file scope
+      summary: Disable rules over a block or a whole file with paired or file-level comments.
       lenses: [best-practice]
       signature: '# ruff: disable[CODE] ... # ruff: enable[CODE], # ruff: file-ignore[CODE], # ruff: noqa'
       notes: [ranges have no blanket form; RUF104 flags an unmatched disable]
       ref: /linter/index.md
     - id: suppress-stale
-      name: 'Detect stale suppressions'
-      summary: 'Rules that flag unused, malformed or unmatched suppression comments so ignores do not rot.'
+      name: Detect stale suppressions
+      summary: Rules that flag unused, malformed or unmatched suppression comments so ignores do not rot.
       lenses: [best-practice, reliability]
       signature: RUF100 unused-noqa, RUF102 invalid-rule-code, RUF104 unmatched-suppression-comment, PGH004 blanket-noqa
       notes: [RUF100 is in the 0.16 default set but select replaces the defaults; its fix is unsafe when a whole comment is removed]
       ref: /rules/unused-noqa/
     - id: suppress-per-file
-      name: 'Per-file ignores'
-      summary: 'Disable rules for file globs (tests, scripts, sanctioned modules); extend- variant adds without replacing.'
+      name: Per-file ignores
+      summary: Disable rules for file globs (tests, scripts, sanctioned modules); extend- variant adds without replacing.
       lenses: [composability, best-practice]
       signature: '[tool.ruff.lint.per-file-ignores] "<glob>" = ["CODE"]'
       options:
@@ -262,38 +262,38 @@ groups:
       - {name: lint.extend-per-file-ignores, type: 'dict[glob, list[RuleSelector]]', default: '{}', desc: 'Added to per-file-ignores; useful when an extended parent config already sets some.'}
       ref: /settings/
   - id: exit-output
-    title: 'Exit codes and output'
+    title: Exit codes and output
     level: basic
     requires: []
     ref: /linter/index.md
     entries:
     - id: exit-codes
-      name: 'Exit codes'
-      summary: '0 clean or fixed, 1 violations, 2 abnormal termination; two flags adjust this for CI and hooks.'
+      name: Exit codes
+      summary: 0 clean or fixed, 1 violations, 2 abnormal termination; two flags adjust this for CI and hooks.
       lenses: [reliability, testing]
       signature: ruff check --exit-zero | --exit-non-zero-on-fix
       notes: ['--exit-non-zero-on-fix returns 1 even when everything was auto-fixed']
       ref: /linter/index.md
     - id: output-formats
-      name: 'Output formats'
-      summary: 'Pick human or machine output (json, junit, github, gitlab, azure) for logs and annotations.'
+      name: Output formats
+      summary: Pick human or machine output (json, junit, github, gitlab, azure) for logs and annotations.
       lenses: [observability, composability]
       signature: ruff check --output-format <fmt>, output-format = "full"
       options:
       - {name: output-format, type: 'full|concise|grouped|json|junit|github|gitlab|pylint|azure', default: '"full"', desc: 'Violation message style; github emits Actions annotations, json is machine-readable.'}
       notes: ['0.16.0: `format --check` accepts the same formats']
       ref: /settings/
-- title: 'Rule families'
+- title: Rule families
   sections:
   - id: tidy-imports
-    title: 'Import bans as choke-point guards'
+    title: Import bans as choke-point guards
     level: advanced
     requires: [rule-selection]
     ref: /rules/banned-api/
     entries:
     - id: tid251-banned-api
-      name: 'banned-api'
-      summary: 'Ban imports or accesses of named modules or members with a custom message pointing at the sanctioned wrapper.'
+      name: banned-api
+      summary: Ban imports or accesses of named modules or members with a custom message pointing at the sanctioned wrapper.
       lenses: [best-practice, reuse]
       signature: '[tool.ruff.lint.flake8-tidy-imports.banned-api] "<module.Symbol>".msg = "..."  (TID251)'
       options:
@@ -303,15 +303,15 @@ groups:
       - flags accidental use only; eval and importlib bypass it, so pair with a convention test
       ref: /settings/
     - id: tid251-sanctioned-home
-      name: 'Exempt the sanctioned module'
-      summary: 'Allow the one wrapper module to import the banned API via per-file-ignores or an inline ignore.'
+      name: Exempt the sanctioned module
+      summary: Allow the one wrapper module to import the banned API via per-file-ignores or an inline ignore.
       lenses: [reuse, best-practice]
       signature: 'per-file-ignores "<path>" = ["TID251"], # ruff: ignore[TID251]'
       notes: [blanket per-file ignores need a convention test behind them]
       ref: /linter/index.md
     - id: tid253-lazy-modules
-      name: 'Heavy modules lazily'
-      summary: 'Force named heavy modules to be imported inside functions or TYPE_CHECKING blocks to cut import time.'
+      name: Heavy modules lazily
+      summary: Force named heavy modules to be imported inside functions or TYPE_CHECKING blocks to cut import time.
       lenses: [perf]
       signature: TID253 banned-module-level-imports, lint.flake8-tidy-imports.banned-module-level-imports = ["mod"]
       options:
@@ -320,7 +320,7 @@ groups:
       ref: /rules/banned-module-level-imports/
     - id: tid252-relative
       name: '`TID252 relative-imports`'
-      summary: 'Ban relative imports, either all of them or only those climbing to a parent package (default).'
+      summary: Ban relative imports, either all of them or only those climbing to a parent package (default).
       lenses: [best-practice]
       signature: lint.flake8-tidy-imports.ban-relative-imports = "all"
       options:
@@ -328,8 +328,8 @@ groups:
       notes: [fix is unsafe]
       ref: /rules/relative-imports/
     - id: tid-lazy-pep810
-      name: 'PEP 810 lazy imports'
-      summary: 'Ban or require the `lazy` import keyword for chosen modules.'
+      name: PEP 810 lazy imports
+      summary: Ban or require the `lazy` import keyword for chosen modules.
       lenses: [perf]
       signature: lint.flake8-tidy-imports.ban-lazy, lint.flake8-tidy-imports.require-lazy
       options:
@@ -337,88 +337,88 @@ groups:
       - {name: require-lazy, type: '"all"|list[str]|{include,exclude}', default: '[]', desc: 'Modules that must be imported lazily where legal; enforced only when targeting Python 3.15+.'}
       ref: /settings/
   - id: rules-enabled
-    title: 'Core rule families'
+    title: Core rule families
     level: intermediate
     requires: [rule-selection]
     ref: /rules/
     entries:
     - id: rules-e-f
-      name: 'pycodestyle and Pyflakes'
+      name: pycodestyle and Pyflakes
       summary: 'Baseline style and error rules: unused imports and variables, undefined names, line length.'
       lenses: [best-practice]
       signature: E, F, F401 unused-import, F841 unused-variable, E501 line-too-long, E402
       notes: [E501 is category formatting; the formatter wraps best-effort only; E402 fix is unsafe]
       ref: /rules/
     - id: rules-isort
-      name: 'isort'
-      summary: 'Sorts and groups imports; configurable through lint.isort.*.'
+      name: isort
+      summary: Sorts and groups imports; configurable through lint.isort.*.
       lenses: [best-practice]
       signature: I001 unsorted-imports, lint.isort.*
       notes: [the formatter never sorts imports; run check --fix before format]
       ref: /rules/unsorted-imports/
     - id: rules-pyupgrade
-      name: 'pyupgrade'
-      summary: 'Rewrites old idioms to what target-version allows, including PEP 695 aliases and generics.'
+      name: pyupgrade
+      summary: Rewrites old idioms to what target-version allows, including PEP 695 aliases and generics.
       lenses: [typing-dx]
       signature: UP, UP040 non-pep695-type-alias, UP046 non-pep695-generic-class, UP035, UP006, UP007
       notes: ['follows target-version, so py313 gets PEP 695 rewrites; UP040 and UP046 fixes are unsafe (variance, runtime)']
       ref: /rules/non-pep695-type-alias/
     - id: rules-bugbear
-      name: 'flake8-bugbear'
+      name: flake8-bugbear
       summary: 'Likely-bug patterns: mutable defaults, call in default args, raise without from, zip without strict.'
       lenses: [reliability]
       signature: B, B006 mutable-argument-default, B008, B904 raise-without-from-inside-except, B905 zip-without-explicit-strict
       notes: [B006 and B905 fixes are unsafe]
       ref: /rules/mutable-argument-default/
     - id: rules-simplify
-      name: 'flake8-simplify'
-      summary: 'Collapses needless branching and nested with-statements into simpler forms.'
+      name: flake8-simplify
+      summary: Collapses needless branching and nested with-statements into simpler forms.
       lenses: [best-practice]
       signature: SIM, SIM102, SIM108, SIM117
       ref: /rules/collapsible-if/
   - id: rules-candidates
-    title: 'Further rule families'
+    title: Further rule families
     level: intermediate
     requires: [rule-selection]
     ref: /rules/
     entries:
     - id: rules-security
-      name: 'flake8-bandit'
-      summary: 'Security smells (assert, hardcoded secrets, pickle, subprocess, SQL strings); false-positive prone.'
+      name: flake8-bandit
+      summary: Security smells (assert, hardcoded secrets, pickle, subprocess, SQL strings); false-positive prone.
       lenses: [security]
       signature: S, S101 assert, S105, S301, S603, S608, security
       notes: [asserts in tests need a per-file ignore]
       ref: /rules/hardcoded-password-string/
     - id: rules-async
-      name: 'flake8-async'
-      summary: 'Flag blocking HTTP, file and sleep calls inside async functions, plus dangling asyncio tasks.'
+      name: flake8-async
+      summary: Flag blocking HTTP, file and sleep calls inside async functions, plus dangling asyncio tasks.
       lenses: [reliability]
       signature: ASYNC210, ASYNC230, ASYNC251, RUF006 asyncio-dangling-task, RUF029 unused-async
       notes: [ASYNC2xx are in the 0.16 default set; RUF029 is preview]
       ref: /rules/asyncio-dangling-task/
     - id: rules-logging
-      name: 'Logging hygiene'
-      summary: 'Enforce lazy logging args, no root-logger calls, exception tracebacks, and no print in library code.'
+      name: Logging hygiene
+      summary: Enforce lazy logging args, no root-logger calls, exception tracebacks, and no print in library code.
       lenses: [observability]
       signature: LOG015 root-logger-call, G004 logging-f-string, G010, TRY400 error-instead-of-exception, T201 print
       notes: [LOG015 and G010 are in the 0.16 default set; T201 fix is unsafe]
       ref: /rules/logging-f-string/
     - id: rules-pytest
-      name: 'flake8-pytest-style'
+      name: flake8-pytest-style
       summary: 'Enforce idiomatic pytest: tight raises, parametrize shapes, assertion style.'
       lenses: [testing]
       signature: PT006, PT011 pytest-raises-too-broad, PT018, lint.flake8-pytest-style
       ref: /rules/pytest-raises-too-broad/
     - id: rules-datetimez
-      name: 'flake8-datetimez'
-      summary: 'Ban naive datetime construction (now, today, utcnow) so time is always tz-aware.'
+      name: flake8-datetimez
+      summary: Ban naive datetime construction (now, today, utcnow) so time is always tz-aware.
       lenses: [testing, reliability]
       signature: DTZ005 call-datetime-now-without-tzinfo, DTZ011 call-date-today
       notes: [DTZ0xx rules are already in the 0.16 default set]
       ref: /rules/call-datetime-now-without-tzinfo/
     - id: rules-type-checking
-      name: 'Typing-only imports'
-      summary: 'Move imports used only for annotations under TYPE_CHECKING to cut import cost and cycles.'
+      name: Typing-only imports
+      summary: Move imports used only for annotations under TYPE_CHECKING to cut import cost and cycles.
       lenses: [typing-dx, perf]
       signature: TC001, TC002, TC003, TC004, FA102, lint.flake8-type-checking, lint.future-annotations
       options:
@@ -426,28 +426,28 @@ groups:
       - {name: lint.flake8-type-checking.strict, type: bool, default: 'false', desc: 'Enforce TC001-TC003 even when a runtime import of the same module exists.'}
       ref: /rules/typing-only-first-party-import/
     - id: rules-annotations
-      name: 'flake8-annotations'
-      summary: 'Require annotations on function signatures and ban bare Any.'
+      name: flake8-annotations
+      summary: Require annotations on function signatures and ban bare Any.
       lenses: [typing-dx]
       signature: ANN001, ANN401 any-type, lint.flake8-annotations
       notes: [overlaps mypy disallow_untyped_defs; keep one enforcer]
       ref: /rules/any-type/
     - id: rules-perf
-      name: 'Performance rules'
-      summary: 'Flag manual loops that should be comprehensions and accidentally quadratic idioms.'
+      name: Performance rules
+      summary: Flag manual loops that should be comprehensions and accidentally quadratic idioms.
       lenses: [perf]
       signature: PERF401 manual-list-comprehension, C416, RUF015, RUF017 quadratic-list-summation
       ref: /rules/manual-list-comprehension/
     - id: rules-ruff-specific
-      name: 'Ruff-specific'
-      summary: 'Ruff-original rules for mutable class defaults, implicit Optional, unused unpacked variables.'
+      name: Ruff-specific
+      summary: Ruff-original rules for mutable class defaults, implicit Optional, unused unpacked variables.
       lenses: [reliability, typing-dx]
       signature: RUF012 mutable-class-default, RUF013 implicit-optional, RUF059, RUF067
       notes: [RUF012 and RUF013 are in the 0.16 default set; RUF013 fix is unsafe; RUF067 is preview]
       ref: /rules/mutable-class-default/
     - id: rules-complexity
-      name: 'Complexity caps'
-      summary: 'Cap McCabe complexity and argument count to keep functions small.'
+      name: Complexity caps
+      summary: Cap McCabe complexity and argument count to keep functions small.
       lenses: [best-practice]
       signature: C901 complex-structure, lint.mccabe.max-complexity, PLR0913 too-many-arguments, lint.pylint.max-args
       options:
@@ -455,37 +455,37 @@ groups:
       notes: [C901 is category restriction]
       ref: /rules/complex-structure/
     - id: rules-pydocstyle
-      name: 'pydocstyle'
-      summary: 'Docstring presence and format rules; a convention setting prunes the set to Google, NumPy or PEP 257.'
+      name: pydocstyle
+      summary: Docstring presence and format rules; a convention setting prunes the set to Google, NumPy or PEP 257.
       lenses: [best-practice]
       signature: D100, lint.pydocstyle.convention
       options:
       - {name: lint.pydocstyle.convention, type: '"google"|"numpy"|"pep257"', default: null, desc: 'Disables all D rules outside the convention; enable it, then add or drop rules on top.'}
       ref: /rules/undocumented-public-module/
-- title: 'Formatter'
+- title: Formatter
   sections:
   - id: formatter
-    title: 'Formatter'
+    title: Formatter
     level: basic
     requires: []
     ref: /formatter/index.md
     entries:
     - id: fmt-format
-      name: 'Format and check'
-      summary: 'Black-compatible formatter; --check reports unformatted files without writing, for CI gates.'
+      name: Format and check
+      summary: Black-compatible formatter; --check reports unformatted files without writing, for CI gates.
       lenses: [best-practice]
       signature: ruff format [--check | --diff] [paths]
       returns: Non-zero exit under --check when any file would change.
       ref: /formatter/index.md
     - id: fmt-order
-      name: 'Lint-fix before format'
-      summary: 'Docs order is `ruff check --fix` then `ruff format`, since fixes can leave unformatted code.'
+      name: Lint-fix before format
+      summary: Docs order is `ruff check --fix` then `ruff format`, since fixes can leave unformatted code.
       lenses: [reliability]
       signature: ruff check --fix && ruff format
       ref: /integrations/index.md
     - id: fmt-config
-      name: 'Format settings'
-      summary: 'Style knobs under [tool.ruff.format]; docstring code formatting is opt-in.'
+      name: Format settings
+      summary: Style knobs under [tool.ruff.format]; docstring code formatting is opt-in.
       lenses: [best-practice]
       signature: '[tool.ruff.format] quote-style, indent-style, line-ending, skip-magic-trailing-comma, docstring-code-format, docstring-code-line-length'
       options:
@@ -493,44 +493,44 @@ groups:
       - {name: quote-style, type: '"double"|"single"|"preserve"', default: '"double"', desc: Preferred string quote.}
       ref: /formatter/index.md
     - id: fmt-markdown
-      name: 'Markdown code blocks'
-      summary: 'Python fenced blocks in .md files are formatted by default; opt out or extend extensions as needed.'
+      name: Markdown code blocks
+      summary: Python fenced blocks in .md files are formatted by default; opt out or extend extensions as needed.
       lenses: [reliability, composability]
       signature: 'extend-exclude = ["*.md"], <!-- fmt: off -->, format.extension = { mdx = "markdown" }'
       since: "0.16.0"
       notes: [blocks that fail to parse or would break are skipped; info strings python, py, python3, py3, pyi, pycon]
       ref: /formatter/index.md
     - id: fmt-suppress
-      name: 'Format suppression'
-      summary: 'Exempt statements from the formatter with fmt comments.'
+      name: Format suppression
+      summary: Exempt statements from the formatter with fmt comments.
       lenses: [best-practice]
       signature: '# fmt: off, # fmt: on, # fmt: skip, # yapf: disable'
       notes: [statement-level only; inside expressions they do nothing]
       ref: /formatter/index.md
     - id: fmt-conflicts
-      name: 'Rules that fight the formatter'
-      summary: 'A set of lint rules overlaps formatter output; avoid selecting them.'
+      name: Rules that fight the formatter
+      summary: A set of lint rules overlaps formatter output; avoid selecting them.
       lenses: [best-practice]
       signature: W191, E111, E114, E117, D203, D206, D300, Q000, Q004, COM812, COM819, ISC002
       notes: [format warns when one is enabled; E501 can still fire]
       ref: /formatter/index.md
     - id: fmt-black
-      name: 'Black parity'
-      summary: 'Documents the intentional deviations from Black''s output.'
+      name: Black parity
+      summary: Documents the intentional deviations from Black's output.
       lenses: [best-practice]
       signature: Known deviations
       ref: /formatter/black/index.md
-- title: 'Preview and versioning'
+- title: Preview and versioning
   sections:
   - id: preview
-    title: 'Preview mode'
+    title: Preview mode
     level: intermediate
     requires: [rule-selection]
     ref: /preview/index.md
     entries:
     - id: preview-flag
-      name: 'Enable preview'
-      summary: 'Opt into unstable rules, fixes and formatting; lint and format are toggled separately.'
+      name: Enable preview
+      summary: Opt into unstable rules, fixes and formatting; lint and format are toggled separately.
       lenses: [best-practice]
       signature: preview = true, lint.preview, format.preview, --preview
       options:
@@ -538,8 +538,8 @@ groups:
       notes: [preview rules are not enabled by ALL or prefixes without it]
       ref: /preview/index.md
     - id: preview-explicit
-      name: 'Select preview rules one by one'
-      summary: 'Stop prefixes from silently pulling in preview rules; require exact codes instead.'
+      name: Select preview rules one by one
+      summary: Stop prefixes from silently pulling in preview rules; require exact codes instead.
       lenses: [reliability]
       signature: lint.explicit-preview-rules = true
       options:
@@ -547,38 +547,38 @@ groups:
       notes: ['with preview on, a prefix otherwise pulls in every matching preview rule']
       ref: /preview/index.md
     - id: preview-deprecated
-      name: 'Deprecated rules'
-      summary: 'preview mode disables them; selecting one explicitly is an error'
+      name: Deprecated rules
+      summary: preview mode disables them; selecting one explicitly is an error
       lenses: [reliability]
       ref: /preview/index.md
   - id: versioning
-    title: 'Versioning policy'
+    title: Versioning policy
     level: basic
     requires: []
     ref: /versioning/index.md
     entries:
     - id: ver-policy
-      name: 'Minor bumps are breaking'
-      summary: 'new default rules, stable-format changes, rule promotions land in minors'
+      name: Minor bumps are breaking
+      summary: new default rules, stable-format changes, rule promotions land in minors
       lenses: [reliability, best-practice]
       notes: [0.16.0 grew the default set 59 to 413 and formats Markdown]
       ref: /versioning/index.md
     - id: ver-stabilization
-      name: 'Rule and fix stabilization'
-      summary: 'new rules stay in preview at least one minor; fix applicability may be demoted in a patch'
+      name: Rule and fix stabilization
+      summary: new rules stay in preview at least one minor; fix applicability may be demoted in a patch
       lenses: [reliability]
       ref: /versioning/index.md
-- title: 'Integrations and tooling'
+- title: Integrations and tooling
   sections:
   - id: integrations
-    title: 'Integrations'
+    title: Integrations
     level: intermediate
     requires: []
     ref: /integrations/index.md
     entries:
     - id: int-ruff-action
-      name: 'GitHub Action'
-      summary: 'Pass-fail lint step for CI; installs ruff and can run any ruff command via args.'
+      name: GitHub Action
+      summary: Pass-fail lint step for CI; installs ruff and can run any ruff command via args.
       lenses: [observability, reliability]
       signature: uses = astral-sh/ruff-action@v3 with {version, args, src}
       options:
@@ -587,21 +587,21 @@ groups:
       - {name: src, type: 'list[path]', default: '[".", "src"]', desc: Source paths passed to ruff.}
       ref: /integrations/index.md
     - id: int-pre-commit
-      name: 'pre-commit hooks'
-      summary: 'Official pre-commit repo with separate check and format hooks.'
+      name: pre-commit hooks
+      summary: Official pre-commit repo with separate check and format hooks.
       lenses: [reliability]
       signature: repo astral-sh/ruff-pre-commit, hooks ruff-check (args [--fix]) then ruff-format, types_or
       notes: [ruff-check --fix goes before ruff-format; add markdown to types_or to format it]
       ref: /integrations/index.md
     - id: int-lsp
-      name: 'Language server'
-      summary: 'Built-in LSP (`ruff server`) for editor diagnostics, fixes and formatting beside a full language server.'
+      name: Language server
+      summary: Built-in LSP (`ruff server`) for editor diagnostics, fixes and formatting beside a full language server.
       lenses: [typing-dx]
       signature: ruff server, lint.select, format.backend, codeAction.disableRuleComment
       ref: /editors/index.md
     - id: int-analyze
-      name: 'Import graph'
-      summary: 'Emit a file-to-file dependency map as JSON; basis for architecture or one-importer checks.'
+      name: Import graph
+      summary: Emit a file-to-file dependency map as JSON; basis for architecture or one-importer checks.
       lenses: [composability]
       signature: ruff analyze graph [--direction dependents]
       options:
@@ -610,14 +610,14 @@ groups:
       returns: JSON map of file to dependency (or dependent) files; analyze has its own preview switch.
       ref: /settings/
   - id: editors
-    title: 'Editor setup and server settings'
+    title: Editor setup and server settings
     level: intermediate
     requires: [integrations]
     ref: /editors/index.md
     entries:
     - id: editors-setup
-      name: 'Per-editor setup'
-      summary: 'Where to put the `ruff server` command and init options for VS Code, Neovim, Vim, Helix, Kate, Sublime, PyCharm, Emacs, TextMate and Zed.'
+      name: Per-editor setup
+      summary: Where to put the `ruff server` command and init options for VS Code, Neovim, Vim, Helix, Kate, Sublime, PyCharm, Emacs, TextMate and Zed.
       lenses: [typing-dx]
       signature: ruff server; Neovim vim.lsp.config('ruff', {init_options = {settings = {...}}}); VS Code charliermarsh.ruff
       notes:
@@ -626,8 +626,8 @@ groups:
       - logLevel and logFile settings control server logs; Neovim logs go to the LSP log file
       ref: /editors/setup/index.md
     - id: editors-features
-      name: 'Server features'
-      summary: 'Diagnostics, dynamic config reload, range formatting, code actions (fixAll, organizeImports), hover and notebooks.'
+      name: Server features
+      summary: Diagnostics, dynamic config reload, range formatting, code actions (fixAll, organizeImports), hover and notebooks.
       lenses: [typing-dx, reliability]
       signature: source.fixAll.ruff, source.organizeImports.ruff (editor.codeActionsOnSave)
       notes:
@@ -636,8 +636,8 @@ groups:
       - Markdown python blocks format via Format Document; no range formatting for Markdown
       ref: /editors/features/index.md
     - id: editors-settings
-      name: 'Server settings'
-      summary: 'Editor-level overrides for config resolution, line length, rule selection, preview and the format backend.'
+      name: Server settings
+      summary: Editor-level overrides for config resolution, line length, rule selection, preview and the format backend.
       lenses: [best-practice, composability]
       signature: configuration, configurationPreference, lineLength, exclude, lint.select, lint.extendSelect, lint.ignore, lint.preview, format.preview, format.backend
       options:
@@ -651,27 +651,27 @@ groups:
       - 'VS Code only: importStrategy (fromEnvironment|useBundled), nativeServer, path, interpreter, trace.server'
       ref: /editors/settings/index.md
     - id: editors-migration
-      name: 'Migrating from ruff-lsp'
-      summary: 'Map ruff-lsp settings to the native server; lint.args and format.args become granular settings.'
+      name: Migrating from ruff-lsp
+      summary: Map ruff-lsp settings to the native server; lint.args and format.args become granular settings.
       lenses: [best-practice]
       signature: ruff-lsp lint.args / format.args -> configuration, lint.select, format.preview
       notes: [native server stable since 0.5.3; lint.run, ignoreStandardLibrary and showNotifications are unsupported]
       ref: /editors/migration/index.md
   - id: faq
-    title: 'FAQ and comparisons'
+    title: FAQ and comparisons
     level: basic
     requires: []
     ref: /faq/
     entries:
     - id: faq-vs-type-checker
-      name: 'Linter is not a type checker'
-      summary: 'use with mypy, ty, Pyright'
+      name: Linter is not a type checker
+      summary: use with mypy, ty, Pyright
       lenses: [typing-dx, best-practice]
       notes: ['complementary; unused imports are Ruff, argument types are the checker']
       ref: /faq/
     - id: faq-fix-broke
-      name: 'Safe fix broke code'
-      summary: 'report it; unsafe fixes are opt-in'
+      name: Safe fix broke code
+      summary: report it; unsafe fixes are opt-in
       lenses: [reliability]
       ref: /faq/
 skipped:

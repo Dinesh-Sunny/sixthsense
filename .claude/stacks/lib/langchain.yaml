@@ -8,48 +8,48 @@ toc:
 - index: 'https://docs.langchain.com/_llms/agent-development-lifecycle/build/python.md'
   match: '^https://docs\.langchain\.com/oss/python/(langchain/|migrate/langchain)'
 groups:
-- title: 'AI tooling'
+- title: AI tooling
   sections:
   - id: ai-tooling
-    title: 'Docs access for coding agents'
+    title: Docs access for coding agents
     level: basic
     requires: []
     ref: /use-these-docs.md
     entries:
     - id: mcp-docs-langchain
-      name: 'docs-langchain MCP'
-      summary: 'Hosted MCP (https://docs.langchain.com/mcp) to search and read guides for LangChain, LangGraph and LangSmith.'
+      name: docs-langchain MCP
+      summary: Hosted MCP (https://docs.langchain.com/mcp) to search and read guides for LangChain, LangGraph and LangSmith.
       lenses: [best-practice]
       notes: ["tools search_docs_by_lang_chain and query_docs_filesystem", "pair with reference-langchain"]
       ref: /use-these-docs.md
     - id: mcp-reference-langchain
-      name: 'reference-langchain MCP'
-      summary: 'Hosted MCP (https://reference.langchain.com/mcp) for exact API signatures of all LangChain packages.'
+      name: reference-langchain MCP
+      summary: Hosted MCP (https://reference.langchain.com/mcp) for exact API signatures of all LangChain packages.
       lenses: [typing-dx]
       notes: ["tools search_api and get_symbol", "symbol lookups need the right package", "e.g. package=langchain for middleware classes"]
       ref: /use-these-docs.md
     - id: skills-langchain
-      name: 'LangChain agent skills'
-      summary: 'Official langchain-ai/langchain-skills pack (fundamentals, middleware, RAG, LangGraph) installed with npx skills add.'
+      name: LangChain agent skills
+      summary: Official langchain-ai/langchain-skills pack (fundamentals, middleware, RAG, LangGraph) installed with npx skills add.
       lenses: [reuse]
       ref: https://github.com/langchain-ai/langchain-skills
     - id: llms-txt
-      name: 'llms.txt shard index'
-      summary: '/llms.txt lists every page; pages also serve as markdown with a .md suffix, and llms-full.txt is the whole site.'
+      name: llms.txt shard index
+      summary: /llms.txt lists every page; pages also serve as markdown with a .md suffix, and llms-full.txt is the whole site.
       lenses: [reuse]
       notes: ["fetch shards with curl then rg", "page URLs accept a .md suffix"]
       ref: /llms.txt
-- title: 'Agent core'
+- title: Agent core
   sections:
   - id: agent-build
-    title: 'Build an agent'
+    title: Build an agent
     level: basic
     requires: []
     ref: /oss/python/langchain/agents.md
     entries:
     - id: create-agent
-      name: 'create_agent'
-      summary: 'Build a tool-calling agent graph from a model, tools and middleware; the single entry point for LangChain v1 agents.'
+      name: create_agent
+      summary: Build a tool-calling agent graph from a model, tools and middleware; the single entry point for LangChain v1 agents.
       import: langchain.agents
       signature: create_agent(model, tools=None, *, system_prompt=None, middleware=(), response_format=None, state_schema=None, context_schema=None, checkpointer=None, store=None, name=None, cache=None, transformers=None)
       params:
@@ -66,56 +66,56 @@ groups:
       lenses: [composability]
       ref: mcp:docs-langchain/oss/python/langchain/agents.md
     - id: agent-name
-      name: 'Agent name'
-      summary: 'Name each agent so nested runs are identifiable in traces and event streams.'
+      name: Agent name
+      summary: Name each agent so nested runs are identifiable in traces and event streams.
       signature: create_agent(..., name="researcher")
       lenses: [observability, composability]
       notes: ["names the agent as a subgraph in multi-agent traces", "stream.subagents only surfaces named create_agent runs"]
       ref: /oss/python/langchain/agents.md#name-your-agent
     - id: system-prompt
-      name: 'System prompt'
-      summary: 'Set the agent''s instructions with a string or SystemMessage; switch to @dynamic_prompt for state or context dependent prompts.'
+      name: System prompt
+      summary: Set the agent's instructions with a string or SystemMessage; switch to @dynamic_prompt for state or context dependent prompts.
       signature: create_agent(..., system_prompt="You are ...")
       lenses: [best-practice]
       ref: /oss/python/langchain/agents.md#system-prompt
     - id: agent-state
-      name: 'Custom agent state'
-      summary: 'Extend AgentState with typed extra keys via state_schema (or middleware state_schema) to share data across tools and hooks.'
+      name: Custom agent state
+      summary: Extend AgentState with typed extra keys via state_schema (or middleware state_schema) to share data across tools and hooks.
       import: langchain.agents
       signature: create_agent(..., state_schema=MyState)
       lenses: [typing-dx]
       ref: /oss/python/langchain/agents.md#agent-state
     - id: runtime-context
-      name: 'Runtime context'
-      summary: 'Pass immutable per-run data (user id, tenant) through context_schema instead of stuffing mutable state.'
+      name: Runtime context
+      summary: Pass immutable per-run data (user id, tenant) through context_schema instead of stuffing mutable state.
       signature: create_agent(..., context_schema=Ctx); agent.invoke(input, context=Ctx(...))
       lenses: [typing-dx, security]
       notes: ["read via ToolRuntime.context in tools and Runtime.context in middleware"]
       ref: /oss/python/langchain/runtime.md
     - id: thread-invocation
-      name: 'Thread persistence'
-      summary: 'Conversation memory is keyed by config["configurable"]["thread_id"] and needs a checkpointer.'
+      name: Thread persistence
+      summary: Conversation memory is keyed by config["configurable"]["thread_id"] and needs a checkpointer.
       signature: "agent.invoke(input, config={\"configurable\": {\"thread_id\": tid}})"
       lenses: [reliability]
       notes: ["tests may pass InMemorySaver"]
       ref: /oss/python/langchain/agents.md#invocation
     - id: recursion-limit
-      name: 'Recursion cap'
-      summary: 'create_agent compiles with a very high recursion_limit (9999); cap runaway loops with call-limit middleware instead.'
+      name: Recursion cap
+      summary: create_agent compiles with a very high recursion_limit (9999); cap runaway loops with call-limit middleware instead.
       lenses: [reliability]
       notes: ["docs graph-api page still says 1000", "a small per-invoke recursion_limit raises GraphRecursionError before middleware limits"]
       ref: /oss/python/langchain/middleware/built-in.md#model-call-limit
-- title: 'Models'
+- title: Models
   sections:
   - id: models-init
-    title: 'Model construction'
+    title: Model construction
     level: basic
     requires: []
     ref: /oss/python/langchain/models.md
     entries:
     - id: init-chat-model
-      name: 'init_chat_model'
-      summary: 'Provider-agnostic factory returning a chat model from "provider:model"; extra kwargs go to the provider class.'
+      name: init_chat_model
+      summary: Provider-agnostic factory returning a chat model from "provider:model"; extra kwargs go to the provider class.
       import: langchain.chat_models
       signature: init_chat_model(model=None, *, model_provider=None, configurable_fields=None, config_prefix=None, **kwargs)
       params:
@@ -127,8 +127,8 @@ groups:
       lenses: [best-practice, reuse]
       ref: /oss/python/langchain/models.md#initialize-a-model
     - id: model-params
-      name: 'Standard parameters'
-      summary: 'Common init kwargs (timeout, max_retries, temperature, max_tokens, rate_limiter) shared across providers.'
+      name: Standard parameters
+      summary: Common init kwargs (timeout, max_retries, temperature, max_tokens, rate_limiter) shared across providers.
       params:
       - {name: timeout, type: "number", default: null, desc: "Seconds to wait for a response before cancelling the request."}
       - {name: max_retries, type: "number", default: '6', desc: "Client-level attempts with backoff and jitter; 429/5xx/network are retried, 401/404 are not (provider defaults differ)."}
@@ -137,22 +137,22 @@ groups:
       notes: ["docs say max_retries default 6 and suggest 10-15 for long runs on flaky networks", "stacks multiplicatively with ModelRetryMiddleware"]
       ref: /oss/python/langchain/models.md#parameters
     - id: base-url
-      name: 'Custom base_url gateway'
-      summary: 'Point model_provider="openai" at any OpenAI-compatible endpoint with base_url and api_key.'
+      name: Custom base_url gateway
+      summary: Point model_provider="openai" at any OpenAI-compatible endpoint with base_url and api_key.
       signature: init_chat_model(model, model_provider="openai", base_url=..., api_key=...)
       lenses: [composability]
       notes: ["docs warn proxy-specific fields are dropped"]
       ref: mcp:docs-langchain/oss/python/langchain/models.md#base-url-and-proxy-settings
     - id: openai-gateway-kwargs
-      name: 'ChatOpenAI gateway kwargs'
-      summary: 'ChatOpenAI options that matter behind gateways (Responses API toggle, response headers, usage in streams).'
+      name: ChatOpenAI gateway kwargs
+      summary: ChatOpenAI options that matter behind gateways (Responses API toggle, response headers, usage in streams).
       import: langchain_openai
       signature: ChatOpenAI(model, *, base_url=None, use_responses_api=None, include_response_headers=False, stream_usage=None, http_client=None)
       lenses: [reliability]
       ref: mcp:reference-langchain/python/langchain-openai/chat_models/base/ChatOpenAI
     - id: model-profiles
-      name: 'Model profiles'
-      summary: 'model.profile is a capability dict (max_input_tokens, tool_calling, structured_output, reasoning levels) that features read.'
+      name: Model profiles
+      summary: model.profile is a capability dict (max_input_tokens, tool_calling, structured_output, reasoning levels) that features read.
       signature: model.profile; init_chat_model(model, profile={...})
       returns: Dict or None of capabilities; summarization fractions and structured-output strategy auto-pick depend on it.
       lenses: [typing-dx, reliability]
@@ -160,16 +160,16 @@ groups:
       notes: ["beta format", "sourced from models.dev", "override with profile= or model_copy(update={\"profile\": ...})", "langchain-profiles CLI refreshes package data", "may be None or {} for unknown models"]
       ref: /oss/python/langchain/models.md#model-profiles
     - id: model-exceptions
-      name: 'Model exceptions'
-      summary: 'Providers raise standard langchain_core.exceptions types that also subclass the provider SDK error, each with is_retryable.'
+      name: Model exceptions
+      summary: Providers raise standard langchain_core.exceptions types that also subclass the provider SDK error, each with is_retryable.
       import: langchain_core.exceptions
       signature: ModelError(is_retryable); ModelRateLimitError, ModelTimeoutError, ModelAuthenticationError, ContextOverflowError, ...
       lenses: [reliability, typing-dx]
       notes: ["rate-limit/API/connection/timeout are retryable", "auth/permission/invalid-request/not-found/context-overflow are not"]
       ref: mcp:docs-langchain/oss/python/langchain/models.md#model-exceptions
     - id: rate-limiter
-      name: 'Client rate limiting'
-      summary: 'Share one in-memory token-bucket limiter across models to stay under provider request-per-second quotas.'
+      name: Client rate limiting
+      summary: Share one in-memory token-bucket limiter across models to stay under provider request-per-second quotas.
       import: langchain.rate_limiters
       signature: InMemoryRateLimiter(*, requests_per_second=1, check_every_n_seconds=0.1, max_bucket_size=1)
       params:
@@ -180,64 +180,64 @@ groups:
       notes: ["request count only, not tokens", "thread-safe so share one instance per provider key"]
       ref: /oss/python/langchain/models.md#rate-limiting
     - id: dynamic-model
-      name: 'Dynamic model selection'
-      summary: 'Swap the model per request inside a wrap_model_call hook, e.g. cheap model for short chats.'
+      name: Dynamic model selection
+      summary: Swap the model per request inside a wrap_model_call hook, e.g. cheap model for short chats.
       import: langchain.agents.middleware
       signature: "@wrap_model_call def pick(request: ModelRequest, handler): return handler(request.override(model=m))"
       lenses: [cost, composability]
       notes: ["pre-bound models (bind_tools called) are unsupported here"]
       ref: /oss/python/langchain/models.md#dynamic-model-selection
     - id: configurable-model
-      name: 'Runtime-configurable model'
-      summary: 'Choose model and params at call time via config["configurable"] without rebuilding the agent.'
+      name: Runtime-configurable model
+      summary: Choose model and params at call time via config["configurable"] without rebuilding the agent.
       signature: init_chat_model(model=None, configurable_fields=("model", "temperature"), config_prefix="first")
       lenses: [composability]
       ref: /oss/python/langchain/models.md#configurable-models
     - id: reasoning-effort
-      name: 'Reasoning'
-      summary: 'Standard reasoning_effort kwarg plus reasoning content blocks to read what the model thought.'
+      name: Reasoning
+      summary: Standard reasoning_effort kwarg plus reasoning content blocks to read what the model thought.
       signature: model.invoke(input, reasoning_effort="high"); [b for b in msg.content_blocks if b["type"] == "reasoning"]
       lenses: [cost]
       notes: ["standard kwarg needs langchain-core>=1.5.2 and recent partner packages", "levels in profile[\"reasoning_effort_levels\"]", "providers may use native aliases (effort, thinking_level)"]
       ref: /oss/python/langchain/models.md#reasoning
     - id: messages
-      name: 'Messages'
-      summary: 'Provider-neutral message classes with content_blocks (text, reasoning, tool calls, media) and a .text accessor.'
+      name: Messages
+      summary: Provider-neutral message classes with content_blocks (text, reasoning, tool calls, media) and a .text accessor.
       import: langchain.messages
       signature: HumanMessage(content), AIMessage(content, tool_calls=[...]), ToolMessage(content, tool_call_id)
       lenses: [typing-dx]
       ref: /oss/python/langchain/messages.md
-- title: 'Middleware'
+- title: Middleware
   sections:
   - id: mw-core
-    title: 'Middleware model'
+    title: Middleware model
     level: intermediate
     requires: [agent-build]
     ref: /oss/python/langchain/middleware/overview.md
     entries:
     - id: mw-order
-      name: 'Execution order'
-      summary: 'before_* hooks run in list order, after_* in reverse, wrap_* nest with the first middleware outermost.'
+      name: Execution order
+      summary: before_* hooks run in list order, after_* in reverse, wrap_* nest with the first middleware outermost.
       lenses: [best-practice, reliability]
       notes: ["each before/after hook is its own graph node (one superstep)"]
       ref: /oss/python/langchain/middleware/custom.md#execution-order
     - id: mw-custom
-      name: 'Custom middleware'
-      summary: 'Write hooks as decorators for one concern or subclass AgentMiddleware to bundle hooks, state and tools.'
+      name: Custom middleware
+      summary: Write hooks as decorators for one concern or subclass AgentMiddleware to bundle hooks, state and tools.
       import: langchain.agents.middleware
       signature: "@before_model | @after_model | @wrap_model_call | @wrap_tool_call | @dynamic_prompt; class M(AgentMiddleware)"
       lenses: [composability, typing-dx]
       notes: ["node-style hooks for sequential logic", "wrap-style for retry/fallback/caching control flow", "hook_config(can_jump_to=) enables jumps"]
       ref: /oss/python/langchain/middleware/custom.md
     - id: mw-state-jumps
-      name: 'Middleware state and jumps'
-      summary: 'Middleware can add typed state keys and return Command-style updates or jump to model/tools/end.'
+      name: Middleware state and jumps
+      summary: Middleware can add typed state keys and return Command-style updates or jump to model/tools/end.
       signature: "@hook_config(can_jump_to=['end']); return {'jump_to': 'end', ...}"
       lenses: [composability]
       ref: /oss/python/langchain/middleware/custom.md#agent-jumps
     - id: mw-trace-policy
-      name: 'Trace policy'
-      summary: 'Control what middleware hook spans record in traces, e.g. drop large payloads for cost or privacy.'
+      name: Trace policy
+      summary: Control what middleware hook spans record in traces, e.g. drop large payloads for cost or privacy.
       import: langchain.agents.middleware
       signature: TracePolicy(*, process_inputs=None, process_outputs=None); configure_trace_policy(policy | None)
       lenses: [observability, security]
@@ -245,16 +245,16 @@ groups:
       notes: ["set per class with a trace_policy attribute", "per-middleware policy overrides the global default", "omit_payload drops the value"]
       ref: /oss/python/langchain/middleware/custom.md#configure-tracing
     - id: mw-stream-transformers
-      name: 'Middleware stream transformers'
-      summary: 'Middleware registers stream transformer factories that project extra channels or redact wire output.'
+      name: Middleware stream transformers
+      summary: Middleware registers stream transformer factories that project extra channels or redact wire output.
       signature: "class M(AgentMiddleware): transformers = (factory,)"
       lenses: [ux-a11y, composability]
       since: "1.3.2"
       notes: ["factory is Callable[[scope tuple], StreamTransformer]", "order is built-in ToolCallTransformer, middleware, then create_agent(transformers=)"]
       ref: /oss/python/langchain/middleware/custom.md#custom-stream-transformers
     - id: mw-tool-error
-      name: 'ToolErrorMiddleware'
-      summary: 'Convert tool exceptions into error ToolMessages the model can recover from; return None to propagate.'
+      name: ToolErrorMiddleware
+      summary: Convert tool exceptions into error ToolMessages the model can recover from; return None to propagate.
       import: langchain.agents.middleware
       signature: ToolErrorMiddleware(on_error=None, *, aon_error=None, tools=None)
       params:
@@ -267,8 +267,8 @@ groups:
       notes: ["place OUTER of ToolRetryMiddleware(on_failure=\"error\")", "GraphBubbleUp always propagates"]
       ref: /oss/python/langchain/middleware/built-in.md#tool-error
     - id: mw-tool-retry
-      name: 'ToolRetryMiddleware'
-      summary: 'Retry failed tool calls with exponential backoff, optionally scoped to specific tools.'
+      name: ToolRetryMiddleware
+      summary: Retry failed tool calls with exponential backoff, optionally scoped to specific tools.
       import: langchain.agents.middleware
       signature: ToolRetryMiddleware(*, max_retries=2, tools=None, retry_on=default_retry_on, on_failure="continue", backoff_factor=2.0, initial_delay=1.0, max_delay=60.0, jitter=True)
       params:
@@ -281,8 +281,8 @@ groups:
       notes: ["on_failure default continue swallows the exception", "use error when an outer handler decides", "delays use real time.sleep"]
       ref: /oss/python/langchain/middleware/built-in.md#tool-retry
     - id: mw-model-retry
-      name: 'ModelRetryMiddleware'
-      summary: 'Retry failed model calls with exponential backoff and jitter; the agent-level layer above the client max_retries.'
+      name: ModelRetryMiddleware
+      summary: Retry failed model calls with exponential backoff and jitter; the agent-level layer above the client max_retries.
       import: langchain.agents.middleware
       signature: ModelRetryMiddleware(*, max_retries=2, retry_on=default_retry_on, on_failure="continue", backoff_factor=2.0, initial_delay=1.0, max_delay=60.0, jitter=True)
       params:
@@ -295,8 +295,8 @@ groups:
       notes: ["ignores Retry-After headers", "use on_failure=\"error\" when ModelFallbackMiddleware sits outside"]
       ref: /oss/python/langchain/middleware/built-in.md#model-retry
     - id: mw-model-fallback
-      name: 'ModelFallbackMiddleware'
-      summary: 'Try alternative models in order when the primary raises; put it outside retry middleware.'
+      name: ModelFallbackMiddleware
+      summary: Try alternative models in order when the primary raises; put it outside retry middleware.
       import: langchain.agents.middleware
       signature: ModelFallbackMiddleware(first_model, *additional_models)
       params:
@@ -306,8 +306,8 @@ groups:
       notes: ["catches all exceptions (no filter)", "a retry middleware placed inside also wraps fallback calls"]
       ref: /oss/python/langchain/middleware/built-in.md#model-fallback
     - id: mw-call-limits
-      name: 'Call limits'
-      summary: 'Cap model or tool calls per run or per thread to stop runaway loops and control cost.'
+      name: Call limits
+      summary: Cap model or tool calls per run or per thread to stop runaway loops and control cost.
       import: langchain.agents.middleware
       signature: ModelCallLimitMiddleware(*, thread_limit=None, run_limit=None, exit_behavior="end"); ToolCallLimitMiddleware(*, tool_name=None, thread_limit=None, run_limit=None, exit_behavior="continue")
       params:
@@ -319,8 +319,8 @@ groups:
       notes: ["model \"end\" message looks like \"Model call limits exceeded: run limit (25/25)\"", "at least one of thread_limit/run_limit required", "instance names must be unique per tool"]
       ref: /oss/python/langchain/middleware/built-in.md#model-call-limit
     - id: mw-summarization
-      name: 'SummarizationMiddleware'
-      summary: 'Replace old history with an LLM summary when context nears a size threshold, keeping recent messages.'
+      name: SummarizationMiddleware
+      summary: Replace old history with an LLM summary when context nears a size threshold, keeping recent messages.
       import: langchain.agents.middleware
       signature: SummarizationMiddleware(model, *, trigger=None, keep=("messages", 20), token_counter=..., summary_prompt=..., trim_tokens_to_summarize=4000)
       params:
@@ -331,15 +331,15 @@ groups:
       notes: ["fraction thresholds need model profile max_input_tokens", "summary_prefix/max_tokens_before_summary/messages_to_keep are deprecated"]
       ref: /oss/python/langchain/middleware/built-in.md#summarization
     - id: mw-context-editing
-      name: 'ContextEditingMiddleware'
-      summary: 'Clear old tool outputs once the conversation passes a token threshold, without calling an LLM.'
+      name: ContextEditingMiddleware
+      summary: Clear old tool outputs once the conversation passes a token threshold, without calling an LLM.
       import: langchain.agents.middleware
       signature: ContextEditingMiddleware(*, edits=None, token_count_method="approximate"); ClearToolUsesEdit(trigger=100000, clear_at_least=0, keep=3, clear_tool_inputs=False, exclude_tools=(), placeholder="[cleared]")
       lenses: [cost, perf]
       ref: /oss/python/langchain/middleware/built-in.md#context-editing
     - id: mw-hitl
-      name: 'HumanInTheLoopMiddleware'
-      summary: 'Pause before chosen tool calls so a human can approve, edit, reject or respond; resume with Command.'
+      name: HumanInTheLoopMiddleware
+      summary: Pause before chosen tool calls so a human can approve, edit, reject or respond; resume with Command.
       import: langchain.agents.middleware
       signature: HumanInTheLoopMiddleware(interrupt_on, *, description_prefix="Tool execution requires approval")
       params:
@@ -350,8 +350,8 @@ groups:
       notes: ["requires a checkpointer (Agent Server provides one)", "InterruptOnConfig.when(request) predicate gates per call, see mcp-hitl-annotations"]
       ref: /oss/python/langchain/human-in-the-loop.md
     - id: mw-pii
-      name: 'PIIMiddleware'
-      summary: 'Detect and block, redact, mask or hash PII in inputs, outputs or tool results.'
+      name: PIIMiddleware
+      summary: Detect and block, redact, mask or hash PII in inputs, outputs or tool results.
       import: langchain.agents.middleware
       signature: PIIMiddleware(pii_type, *, strategy="redact", detector=None, apply_to_input=True, apply_to_output=False, apply_to_tool_results=False)
       params:
@@ -362,46 +362,46 @@ groups:
       notes: ["apply_to_output=True also redacts streamed wire output via a stream transformer (langchain>=1.3.2)"]
       ref: /oss/python/langchain/middleware/built-in.md#pii-detection
     - id: mw-tool-selection
-      name: 'Tool selection and search'
-      summary: 'Pre-filter large tool sets with an LLM selector, or defer tools behind provider server-side tool search.'
+      name: Tool selection and search
+      summary: Pre-filter large tool sets with an LLM selector, or defer tools behind provider server-side tool search.
       import: langchain.agents.middleware
       signature: LLMToolSelectorMiddleware(*, model=None, max_tools=None, always_include=None); ProviderToolSearchMiddleware(*, searchable_tools=None)
       lenses: [cost, perf]
       notes: ["for 10+ tools", "selector model defaults to the agent model"]
       ref: /oss/python/langchain/middleware/built-in.md#llm-tool-selector
     - id: mw-todo
-      name: 'TodoListMiddleware'
-      summary: 'Adds a write_todos planning tool and prompt so the agent tracks multi-step work.'
+      name: TodoListMiddleware
+      summary: Adds a write_todos planning tool and prompt so the agent tracks multi-step work.
       import: langchain.agents.middleware
       signature: TodoListMiddleware()
       lenses: [composability]
       ref: /oss/python/langchain/middleware/built-in.md#to-do-list
     - id: mw-tool-emulator
-      name: 'LLMToolEmulator'
-      summary: 'Replace real tool execution with LLM-generated responses for tests and demos.'
+      name: LLMToolEmulator
+      summary: Replace real tool execution with LLM-generated responses for tests and demos.
       import: langchain.agents.middleware
       signature: LLMToolEmulator(*, tools=None, model=None)
       lenses: [testing, cost]
       notes: ["tools=None emulates all, [] emulates none"]
       ref: /oss/python/langchain/middleware/built-in.md#llm-tool-emulator
-- title: 'Tools'
+- title: Tools
   sections:
   - id: tools-define
-    title: 'Defining tools'
+    title: Defining tools
     level: basic
     requires: [agent-build]
     ref: /oss/python/langchain/tools.md
     entries:
     - id: tool-decorator
       name: '@tool'
-      summary: 'Turn a typed, documented function into a tool; the docstring is the description and type hints the schema.'
+      summary: Turn a typed, documented function into a tool; the docstring is the description and type hints the schema.
       import: langchain.tools
       signature: "@tool(name=None, *, description=None, return_direct=False, args_schema=None, parse_docstring=False)"
       lenses: [typing-dx, best-practice]
       notes: ["names config and runtime are reserved argument names"]
       ref: /oss/python/langchain/tools.md#basic-tool-definition
     - id: tool-runtime
-      name: 'ToolRuntime'
+      name: ToolRuntime
       summary: "Add a runtime: ToolRuntime parameter to read state, context, store or write stream events; hidden from the model schema."
       import: langchain.tools
       signature: "def my_tool(arg: str, runtime: ToolRuntime) -> str"
@@ -410,33 +410,33 @@ groups:
       notes: ["reserved arg names apply", "execution_info needs langgraph>=1.1.5"]
       ref: /oss/python/langchain/tools.md#access-context
     - id: tool-return
-      name: 'Return values'
-      summary: 'Tools return a str, object, multimodal content, or a Command to update state.'
+      name: Return values
+      summary: Tools return a str, object, multimodal content, or a Command to update state.
       lenses: [composability]
       notes: ["Command(update=) for the current graph must include a ToolMessage with runtime.tool_call_id"]
       ref: /oss/python/langchain/tools.md#tool-return-values
     - id: tool-error-handling
-      name: 'Tool errors'
-      summary: 'Handle tool exceptions in middleware, preferring the prebuilt ToolErrorMiddleware over a hand-written wrap_tool_call.'
+      name: Tool errors
+      summary: Handle tool exceptions in middleware, preferring the prebuilt ToolErrorMiddleware over a hand-written wrap_tool_call.
       lenses: [reliability]
       notes: ["docs example hand-writes a wrap_tool_call"]
       ref: /oss/python/langchain/tools.md#error-handling
     - id: structured-tool-dual
-      name: 'StructuredTool.from_function'
-      summary: 'Build a tool with both sync func and async coroutine so it works on either execution path.'
+      name: StructuredTool.from_function
+      summary: Build a tool with both sync func and async coroutine so it works on either execution path.
       import: langchain_core.tools
       signature: StructuredTool.from_function(func=None, coroutine=None, name=None, description=None, *, return_direct=False, args_schema=None, infer_schema=True, response_format="content")
       lenses: [perf, reliability]
       ref: https://reference.langchain.com/python/langchain-core/tools/StructuredTool
     - id: tool-dynamic
-      name: 'Dynamic tool selection'
-      summary: 'Filter pre-registered tools per request in a wrap_model_call hook by state, permissions or context.'
+      name: Dynamic tool selection
+      summary: Filter pre-registered tools per request in a wrap_model_call hook by state, permissions or context.
       signature: handler(request.override(tools=[...]))
       lenses: [cost]
       ref: /oss/python/langchain/tools.md#dynamic-tool-selection
     - id: mcp-adapter
-      name: 'MCPAdapter'
-      summary: 'Load tools from MCP servers into an agent through langchain.mcp.'
+      name: MCPAdapter
+      summary: Load tools from MCP servers into an agent through langchain.mcp.
       import: langchain.mcp
       signature: "async with MCPAdapter(url) as adapter: tools = await adapter.list_tools()"
       returns: LangChain tools bound to the open FastMCP client; pass them to create_agent.
@@ -444,25 +444,25 @@ groups:
       since: "1.4.0"
       notes: ["beta", "extra langchain[mcp]", "needs fastmcp"]
       ref: /oss/python/langchain/mcp/index.md
-- title: 'MCP'
+- title: MCP
   sections:
   - id: mcp-core
-    title: 'Connect MCP servers'
+    title: Connect MCP servers
     level: intermediate
     requires: [agent-build, tools-define]
     ref: /oss/python/langchain/mcp/index.md
     entries:
     - id: mcp-install
-      name: 'langchain.mcp install and beta status'
-      summary: 'MCP ships in langchain[mcp]>=1.4.0 (pulls in FastMCP); importing langchain.mcp raises a LangChainBetaWarning once per process.'
+      name: langchain.mcp install and beta status
+      summary: MCP ships in langchain[mcp]>=1.4.0 (pulls in FastMCP); importing langchain.mcp raises a LangChainBetaWarning once per process.
       signature: uv add "langchain[mcp]"
       lenses: [best-practice, reliability]
       since: "1.4.0"
       notes: ["silence with warnings.filterwarnings('ignore', category=LangChainBetaWarning) or langchain_core._api.suppress_langchain_beta_warning()", "replaces the standalone langchain-mcp-adapters package"]
       ref: /oss/python/langchain/mcp/index.md#install
     - id: mcp-transports
-      name: 'MCPAdapter targets and transports'
-      summary: 'The adapter infers the transport from its target; a str must be an http(s) URL, a Path launches a stdio subprocess.'
+      name: MCPAdapter targets and transports
+      summary: The adapter infers the transport from its target; a str must be an http(s) URL, a Path launches a stdio subprocess.
       import: langchain.mcp
       signature: "MCPAdapter(target: MCPAdapterTarget)"
       params:
@@ -471,8 +471,8 @@ groups:
       notes: ["non-URL strings are rejected so config or model-supplied text cannot launch a local file", "an in-process FastMCP target needs no subprocess or socket: use it in tests"]
       ref: /oss/python/langchain/mcp/index.md#transports
     - id: mcp-list-tools
-      name: 'MCPAdapter.list_tools'
-      summary: 'Async context manager whose list_tools() discovers the server catalog and returns LangChain tools for create_agent.'
+      name: MCPAdapter.list_tools
+      summary: Async context manager whose list_tools() discovers the server catalog and returns LangChain tools for create_agent.
       import: langchain.mcp
       signature: "async with MCPAdapter(target) as adapter: tools = await adapter.list_tools(cache_mode='use')"
       params:
@@ -482,8 +482,8 @@ groups:
       since: "1.4.0"
       ref: /oss/python/langchain/mcp/tools.md#use-mcp-tools-in-an-agent
     - id: mcp-as-langchain-tool
-      name: 'as_langchain_tool'
-      summary: 'Convert a single fastmcp Tool into a LangChain tool bound to a client; a coroutine, renamed from convert_mcp_tool_to_langchain_tool.'
+      name: as_langchain_tool
+      summary: Convert a single fastmcp Tool into a LangChain tool bound to a client; a coroutine, renamed from convert_mcp_tool_to_langchain_tool.
       import: langchain.mcp
       signature: "await as_langchain_tool(tool: Tool, client: Client | ClientGroup) -> BaseTool"
       returns: A StructuredTool with only a coroutine, so invoke it with ainvoke (agent.ainvoke or astream), not sync invoke.
@@ -492,20 +492,20 @@ groups:
       notes: ["coroutine-only per langchain 1.4.3 source (langchain/mcp/tools.py): sync agent.invoke on MCP tools has no func"]
       ref: /oss/python/migrate/langchain-mcp-adapters.md#tool-results
   - id: mcp-tools-sec
-    title: 'MCP tool results, metadata and server requests'
+    title: MCP tool results, metadata and server requests
     level: intermediate
     requires: [mcp-core, mw-core]
     ref: /oss/python/langchain/mcp/tools.md
     entries:
     - id: mcp-multimodal-content
-      name: 'Multimodal MCP results'
-      summary: 'MCP image and file results become standard content blocks on the ToolMessage; read them from message.content_blocks.'
+      name: Multimodal MCP results
+      summary: MCP image and file results become standard content blocks on the ToolMessage; read them from message.content_blocks.
       lenses: [composability]
       notes: ["image blocks carry base64 and mime_type; text blocks carry text"]
       ref: /oss/python/langchain/mcp/tools.md#multimodal-content
     - id: mcp-structured-artifact
-      name: 'MCPToolArtifact'
-      summary: 'Structured tool content lands on ToolMessage.artifact["structured_content"], not in the model-visible text.'
+      name: MCPToolArtifact
+      summary: Structured tool content lands on ToolMessage.artifact["structured_content"], not in the model-visible text.
       import: langchain.mcp
       signature: "MCPToolArtifact(structured_content=...)"
       returns: artifact is None when the tool returned no structured content.
@@ -513,29 +513,29 @@ groups:
       notes: ["the artifact travels with the ToolMessage in state['messages'] and is checkpointed with it"]
       ref: /oss/python/langchain/mcp/tools.md#structured-content
     - id: mcp-errors
-      name: 'MCP tool errors'
-      summary: 'A server isError=True becomes ToolMessage(status="error") the model can read; transport and session failures raise.'
+      name: MCP tool errors
+      summary: A server isError=True becomes ToolMessage(status="error") the model can read; transport and session failures raise.
       lenses: [reliability]
       notes: ["the handle_tool_errors flag of langchain-mcp-adapters is removed; behavior is fixed"]
       ref: /oss/python/langchain/mcp/tools.md#errors
     - id: mcp-tool-metadata
-      name: 'MCP tool metadata'
+      name: MCP tool metadata
       summary: 'Adapted tools carry provenance under tool.metadata["mcp"]: tool annotations (hints), _meta and server name/version, all optional.'
       signature: 'tool.metadata["mcp"]["tool"]["annotations"]["destructive_hint"]'
       lenses: [security, best-practice]
       notes: ["every nested key is optional: chain .get with defaults", "metadata is None when the server supplied nothing"]
       ref: /oss/python/langchain/mcp/tools.md#tool-metadata
     - id: mcp-wrap-tool-call
-      name: 'Intercept MCP calls with wrap_tool_call'
-      summary: 'tool_interceptors are gone; use @wrap_tool_call middleware and branch on request.tool.metadata["mcp"]; it wraps all tools.'
+      name: Intercept MCP calls with wrap_tool_call
+      summary: tool_interceptors are gone; use @wrap_tool_call middleware and branch on request.tool.metadata["mcp"]; it wraps all tools.
       import: langchain.agents.middleware
       signature: "@wrap_tool_call def mw(request: ToolCallRequest, handler: Callable[[ToolCallRequest], ToolMessage]) -> ToolMessage"
       lenses: [composability, reliability]
       notes: ["ToolCallRequest has tool_call, tool (None if unregistered), state, runtime (langgraph.prebuilt.tool_node)", "guard request.tool is None before reading metadata", "re-raise GraphBubbleUp: an except Exception swallows MCP elicitation and HITL interrupts (built-in tool middleware already re-raises)", "wrap_tool_call is outermost-first like other wrap hooks"]
       ref: /oss/python/migrate/langchain-mcp-adapters.md#tool-interceptors
     - id: mcp-hitl-annotations
-      name: 'Gate MCP tools by annotation'
-      summary: 'Classify tools once from annotations, then give HumanInTheLoopMiddleware an InterruptOnConfig with a when predicate.'
+      name: Gate MCP tools by annotation
+      summary: Classify tools once from annotations, then give HumanInTheLoopMiddleware an InterruptOnConfig with a when predicate.
       import: langchain.agents.middleware.human_in_the_loop
       signature: "InterruptOnConfig(allowed_decisions=['approve', 'reject'], when=lambda request: bool)"
       params:
@@ -544,7 +544,7 @@ groups:
       notes: ["needs a checkpointer; resume with Command(resume={'decisions': [{'type': 'approve'}]})", "interrupt_on keys every discovered tool name so the predicate decides per call"]
       ref: /oss/python/langchain/mcp/tools.md#human-in-the-loop
     - id: mcp-elicitation
-      name: 'Elicitation as interrupt'
+      name: Elicitation as interrupt
       summary: "Server input requests pause the run with interrupt(); answer with Command(resume={\"responses\": {key: answer}}) on the same thread_id."
       import: langchain.mcp.elicitation
       signature: 'interrupt.value == {"type": "mcp_elicitation", "tool_name": str, "requests": [{"key", "message", "mode": "form"|"url", "requested_schema"|"url"}]}'
@@ -554,164 +554,164 @@ groups:
       notes: ["on by default; a prebuilt client's own elicitation_handler is honored instead", "needs a checkpointer (Agent Server provides one) and the same thread_id", "discriminate from HITL interrupts on value['type'] == 'mcp_elicitation'", "decline refuses one question and lets the call go on; cancel abandons the tool call", "only servers returning InputRequiredResult are answered, not legacy pushed elicitation"]
       ref: /oss/python/langchain/mcp/tools.md#elicitation
     - id: mcp-elicitation-rerun
-      name: 'Elicitation reruns the tool'
-      summary: 'Resuming re-issues the MCP call from the first round, so work done before the server asks repeats; make it idempotent.'
+      name: Elicitation reruns the tool
+      summary: Resuming re-issues the MCP call from the first round, so work done before the server asks repeats; make it idempotent.
       lenses: [reliability]
       notes: ["interrupt() unwinds the whole call; a server that asks before working repeats nothing", "continuation rounds with no input requests raise NotImplementedError"]
       ref: /oss/python/langchain/mcp/tools.md#elicitation
     - id: mcp-sampling-roots-unsupported
-      name: 'Sampling and roots unsupported'
-      summary: 'A tool call whose server asks for sampling or roots raises NotImplementedError; only elicitation is answered.'
+      name: Sampling and roots unsupported
+      summary: A tool call whose server asks for sampling or roots raises NotImplementedError; only elicitation is answered.
       lenses: [reliability, security]
       notes: ["the modern sessionless protocol has no live back-channel; FastMCP 4 removed ctx.sample() and ctx.list_roots()", "prompts and resources are also unwrapped: use fastmcp Client.get_prompt / read_resource"]
       ref: /oss/python/migrate/langchain-mcp-adapters.md#sampling-and-roots
   - id: mcp-connections-sec
-    title: 'MCP connections, lifetime and scaling'
+    title: MCP connections, lifetime and scaling
     level: advanced
     requires: [mcp-core]
     ref: /oss/python/langchain/mcp/connections.md
     entries:
     - id: mcp-lifecycle
-      name: 'Adapter connection lifecycle'
-      summary: 'Discover and build the agent inside async with MCPAdapter; the returned tools hold the client and outlive the context.'
+      name: Adapter connection lifecycle
+      summary: Discover and build the agent inside async with MCPAdapter; the returned tools hold the client and outlive the context.
       lenses: [best-practice, reliability]
       notes: ["no need to keep the adapter open for the agent's life"]
       ref: /oss/python/langchain/mcp/connections.md#connection-lifecycle
     - id: mcp-session-per-call
-      name: 'One session per tool call'
-      summary: 'Each tool invocation opens the client, makes the MCP call and releases it; keep the adapter open around the agent call to reuse one session.'
+      name: One session per tool call
+      summary: Each tool invocation opens the client, makes the MCP call and releases it; keep the adapter open around the agent call to reuse one session.
       lenses: [perf, reliability]
       notes: ["tools are reentrant, so an already-held connection is reused rather than doubled", "no idle connection is pinned between tool calls"]
       ref: /oss/python/langchain/mcp/connections.md#one-session-per-invocation
     - id: mcp-config-fleet
-      name: 'MCPConfig fleet'
+      name: MCPConfig fleet
       summary: "A {\"mcpServers\": {...}} dict puts several servers behind one connection; tools are prefixed with the config key."
       signature: 'MCPAdapter({"mcpServers": {"weather": {"command": ..., "args": [...]}, "calc": {"url": ...}}})'
       lenses: [composability]
       notes: ["mixed transports allowed", "the fleet shares one negotiated protocol era: one legacy-only server drops all to legacy"]
       ref: /oss/python/langchain/mcp/connections.md#one-aggregate-connection-with-mcpconfig
     - id: mcp-client-group
-      name: 'ClientGroup per-server connections'
-      summary: 'ClientGroup keeps one connection per server with its own era, auth and handlers, namespacing tools as {server}_{tool}.'
+      name: ClientGroup per-server connections
+      summary: ClientGroup keeps one connection per server with its own era, auth and handlers, namespacing tools as {server}_{tool}.
       import: fastmcp.client.group
       signature: 'ClientGroup({"weather": Client(url, mode="legacy"), "calc": Client(url, mode="auto")})'
       lenses: [composability, security]
       notes: ["the group routes each call to the client that advertised the tool"]
       ref: /oss/python/langchain/mcp/connections.md#independent-connections-with-clientgroup
     - id: mcp-graph-factory
-      name: 'MCP in a graph factory'
-      summary: 'In a deployment, build the agent per run in a langgraph graph factory with list_tools(cache_mode="use") so tool catalogs stay fresh.'
+      name: MCP in a graph factory
+      summary: In a deployment, build the agent per run in a langgraph graph factory with list_tools(cache_mode="use") so tool catalogs stay fresh.
       lenses: [reliability, perf]
       notes: ["factory parameter and return annotations must be runtime-importable, not under TYPE_CHECKING: langgraph-api uses typing.get_type_hints() and otherwise injects a config dict"]
       ref: /oss/python/langchain/mcp/connections.md#scale-a-deployment
     - id: mcp-shared-pool
-      name: 'Shared HTTP connection pool'
-      summary: 'Pass an httpx_client_factory on StreamableHttpTransport that lends one shared transport so a fleet does not open a pool per server.'
+      name: Shared HTTP connection pool
+      summary: Pass an httpx_client_factory on StreamableHttpTransport that lends one shared transport so a fleet does not open a pool per server.
       import: fastmcp.client.transports
       signature: StreamableHttpTransport(url, httpx_client_factory=factory)
       lenses: [perf]
       notes: ["the shared transport's aclose must be a no-op so no client closes the pool", "the docs example imports httpx2"]
       ref: /oss/python/langchain/mcp/connections.md#shared-connection-pool
     - id: mcp-list-cache
-      name: 'Tool-list caching'
-      summary: 'list_tools(cache_mode=use|refresh|bypass) reads a Client(cache=...) response cache that honors the server''s TTL hints.'
+      name: Tool-list caching
+      summary: list_tools(cache_mode=use|refresh|bypass) reads a Client(cache=...) response cache that honors the server's TTL hints.
       signature: "await adapter.list_tools(cache_mode='refresh')"
       lenses: [perf, security]
       notes: ["opt-in and only effective against modern-era servers that advertise cache hints", "isolate cached responses per verified user so one user never sees another's tool list"]
       ref: /oss/python/langchain/mcp/connections.md#caching
     - id: mcp-protocol-eras
-      name: 'Protocol eras'
-      summary: 'Legacy servers start with an initialize handshake; modern ones (2026-07-28+) are probed via server/discover; Client(mode=...) selects.'
+      name: Protocol eras
+      summary: Legacy servers start with an initialize handshake; modern ones (2026-07-28+) are probed via server/discover; Client(mode=...) selects.
       signature: 'Client(target, mode="legacy" | "auto")'
       lenses: [reliability]
       notes: ["mode='auto' (default) negotiates the newest the server supports", "give mixed-era servers separate connections (ClientGroup or one adapter per server)"]
       ref: /oss/python/langchain/mcp/connections.md#protocol-eras
   - id: mcp-auth-sec
-    title: 'MCP authentication'
+    title: MCP authentication
     level: advanced
     requires: [mcp-core]
     ref: /oss/python/langchain/mcp/auth.md
     entries:
     - id: mcp-auth-bearer
-      name: 'Bearer token auth'
-      summary: 'Pass a provisioned token as Client(url, auth=token); auth also accepts the literal "oauth" or any httpx.Auth.'
+      name: Bearer token auth
+      summary: Pass a provisioned token as Client(url, auth=token); auth also accepts the literal "oauth" or any httpx.Auth.
       import: fastmcp.client
       signature: "MCPAdapter(Client(url, auth=token))"
       lenses: [security]
       notes: ["no discovery, browser or refresh", "in an MCPConfig fleet each server entry takes the same auth key"]
       ref: /oss/python/langchain/mcp/auth.md#bearer-token
     - id: mcp-auth-oauth
-      name: 'OAuth 2.1 auth'
-      summary: 'auth="oauth" runs discovery, dynamic client registration, browser redirect and token exchange; persist tokens with OAuth(token_storage=).'
+      name: OAuth 2.1 auth
+      summary: auth="oauth" runs discovery, dynamic client registration, browser redirect and token exchange; persist tokens with OAuth(token_storage=).
       import: fastmcp.client.auth
       signature: 'Client(url, auth="oauth") | Client(url, auth=OAuth(mcp_url=url, token_storage=store))'
       lenses: [security, ux-a11y]
       notes: ["tokens are in-memory by default so each run repeats the browser step", "FastMCP ships providers for Auth0, WorkOS, Okta and more"]
       ref: /oss/python/langchain/mcp/auth.md#oauth-authentication
     - id: mcp-auth-per-server
-      name: 'Per-server authentication'
-      summary: 'Give each server its own Client(auth=...) inside a ClientGroup so credentials are independent.'
+      name: Per-server authentication
+      summary: Give each server its own Client(auth=...) inside a ClientGroup so credentials are independent.
       lenses: [security]
       ref: /oss/python/langchain/mcp/auth.md#per-server-authentication
     - id: mcp-auth-per-user
-      name: 'Per-user authentication'
-      summary: 'Authenticate the caller in a LangGraph auth handler, then build the MCP client in the graph factory with a per-user BearerAuth token.'
+      name: Per-user authentication
+      summary: Authenticate the caller in a LangGraph auth handler, then build the MCP client in the graph factory with a per-user BearerAuth token.
       import: fastmcp.client.auth
       signature: "async def make_graph(runtime): auth = BearerAuth(token_for(runtime.user.identity)); async with MCPAdapter(Client(CONFIG, auth=auth)) as adapter: ..."
       lenses: [security]
       notes: ["the credential is fixed when the client is built in the factory, not per tool call", "runtime.user may be None: handle anonymous", "token_for stands in for an OAuth gateway or fastmcp.client.auth provider", "isolate cached responses per verified identity"]
       ref: /oss/python/langchain/mcp/auth.md#per-user-authentication
   - id: mcp-migrate-sec
-    title: 'Migrate from langchain-mcp-adapters'
+    title: Migrate from langchain-mcp-adapters
     level: intermediate
     requires: [mcp-core]
     ref: /oss/python/migrate/langchain-mcp-adapters.md
     entries:
     - id: mcp-migrate-client
-      name: 'MultiServerMCPClient to MCPAdapter'
-      summary: 'Replace MultiServerMCPClient/load_mcp_tools with MCPAdapter and list_tools(); use mcpServers config with transport inferred.'
+      name: MultiServerMCPClient to MCPAdapter
+      summary: Replace MultiServerMCPClient/load_mcp_tools with MCPAdapter and list_tools(); use mcpServers config with transport inferred.
       signature: "async with MCPAdapter({'mcpServers': {...}}) as adapter: tools = await adapter.list_tools()"
       lenses: [reuse, composability]
       notes: ["get_tools(server_name=) has no equivalent: point the adapter at one server", "session() is not exposed", "tool_name_prefix is automatic for multi-server targets", "StdioConnection/StreamableHttpConnection become Path/URL or config entries; headers and httpx_client_factory move onto the fastmcp transport"]
       ref: /oss/python/migrate/langchain-mcp-adapters.md#client
     - id: mcp-migrate-callbacks
-      name: 'Progress and logging handlers'
-      summary: 'Callbacks is gone; pass progress_handler and log_handler to fastmcp.Client and give that client to MCPAdapter.'
+      name: Progress and logging handlers
+      summary: Callbacks is gone; pass progress_handler and log_handler to fastmcp.Client and give that client to MCPAdapter.
       signature: "Client(url, progress_handler=on_progress, log_handler=on_log)"
       lenses: [observability]
       notes: ["on_elicitation needs no handler: it is an interrupt"]
       ref: /oss/python/migrate/langchain-mcp-adapters.md#callbacks
     - id: mcp-migrate-prompts-resources
-      name: 'Prompts and resources not wrapped'
-      summary: 'MCP prompts and resources have no langchain.mcp wrapper; read them with fastmcp Client.get_prompt and Client.read_resource.'
+      name: Prompts and resources not wrapped
+      summary: MCP prompts and resources have no langchain.mcp wrapper; read them with fastmcp Client.get_prompt and Client.read_resource.
       lenses: [composability]
       notes: ["load_mcp_prompt, load_mcp_resources and to_fastmcp have no equivalent"]
       ref: /oss/python/migrate/langchain-mcp-adapters.md#prompts-and-resources
     - id: mcp-migrate-deprecated-transports
-      name: 'SSE and WebSocket transports'
-      summary: 'SSE works through Client(SSETransport(url)) but is protocol-deprecated; WebSocket has no FastMCP transport, move servers to Streamable HTTP.'
+      name: SSE and WebSocket transports
+      summary: SSE works through Client(SSETransport(url)) but is protocol-deprecated; WebSocket has no FastMCP transport, move servers to Streamable HTTP.
       signature: "MCPAdapter(Client(SSETransport(url)))"
       lenses: [reliability]
       notes: ["JSON-RPC batching was removed from the protocol (2025-06-18)"]
       ref: /oss/python/migrate/langchain-mcp-adapters.md#deprecated-transports
-- title: 'Structured output'
+- title: Structured output
   sections:
   - id: structured-out
-    title: 'Structured output'
+    title: Structured output
     level: intermediate
     requires: [agent-build]
     ref: /oss/python/langchain/structured-output.md
     entries:
     - id: response-format
-      name: 'response_format'
-      summary: 'Request a typed final answer; a schema type auto-selects native or tool-based extraction.'
+      name: response_format
+      summary: Request a typed final answer; a schema type auto-selects native or tool-based extraction.
       signature: create_agent(..., response_format=Schema); result["structured_response"]
       returns: Parsed instance of the schema under state key structured_response.
       lenses: [typing-dx]
       notes: ["JSON-schema dicts must be wrapped in an explicit strategy", "native support is read from model profile", "tools plus structured output needs simultaneous support"]
       ref: /oss/python/langchain/structured-output.md#response-format
     - id: strategies
-      name: 'ToolStrategy and ProviderStrategy'
+      name: ToolStrategy and ProviderStrategy
       summary: "Explicit strategies: ProviderStrategy uses native provider schemas, ToolStrategy emulates via a tool call with retries."
       import: langchain.agents.structured_output
       signature: ToolStrategy(schema, *, tool_message_content=None, handle_errors=True); ProviderStrategy(schema, *, strict=None)
@@ -721,574 +721,574 @@ groups:
       lenses: [reliability]
       notes: ["validation errors retried via ToolMessage"]
       ref: /oss/python/langchain/structured-output.md#provider-strategy
-- title: 'Streaming'
+- title: Streaming
   sections:
   - id: streaming-core
-    title: 'Streaming'
+    title: Streaming
     level: intermediate
     requires: [agent-build]
     ref: /oss/python/langchain/streaming.md
     entries:
     - id: stream-modes
-      name: 'Stream modes'
-      summary: 'stream/astream yield updates, messages (LLM tokens), custom or values per stream_mode, combinable in a list.'
+      name: Stream modes
+      summary: stream/astream yield updates, messages (LLM tokens), custom or values per stream_mode, combinable in a list.
       signature: agent.stream(input, stream_mode=["updates", "messages", "custom"])
       lenses: [ux-a11y]
       ref: /oss/python/langchain/streaming.md#supported-stream-modes
     - id: stream-v2
-      name: 'v2 stream format'
-      summary: 'Opt into uniform StreamPart dicts (type, ns, data) and typed GraphOutput results.'
+      name: v2 stream format
+      summary: Opt into uniform StreamPart dicts (type, ns, data) and typed GraphOutput results.
       signature: agent.stream(input, stream_mode=..., version="v2")
       returns: StreamPart items; invoke returns GraphOutput with .value and .interrupts.
       lenses: [typing-dx]
       notes: ["needs LangGraph 1.1+"]
       ref: /oss/python/langchain/streaming.md#v2-streaming-format
     - id: stream-events
-      name: 'Event streaming'
-      summary: 'Typed projections of one run (messages, tool_calls, values, subagents); docs recommend this for app and frontend use.'
+      name: Event streaming
+      summary: Typed projections of one run (messages, tool_calls, values, subagents); docs recommend this for app and frontend use.
       signature: agent.stream_events(input, version="v3")
       returns: Run object with .messages (per-LLM-call text/reasoning/tool_calls), .values, .output, .tool_calls, .subgraphs, .subagents, .extensions.
       lenses: [ux-a11y, typing-dx]
       notes: ["str(message.text) for final text", "PIIMiddleware redacts this wire stream when apply_to_output"]
       ref: /oss/python/langchain/event-streaming.md
     - id: stream-custom
-      name: 'Custom updates'
-      summary: 'Emit progress events from inside tools or nodes with a stream writer; consumed via stream_mode="custom".'
+      name: Custom updates
+      summary: Emit progress events from inside tools or nodes with a stream writer; consumed via stream_mode="custom".
       signature: runtime.stream_writer(payload) or langgraph.config.get_stream_writer()
       lenses: [ux-a11y]
       ref: /oss/python/langchain/streaming.md#custom-updates
     - id: stream-subagents
-      name: 'Streaming from subagents'
-      summary: 'Stream nested agent runs by enabling subgraphs; events carry namespaces identifying the subagent.'
+      name: Streaming from subagents
+      summary: Stream nested agent runs by enabling subgraphs; events carry namespaces identifying the subagent.
       signature: agent.stream(input, subgraphs=True, stream_mode=...)
       lenses: [ux-a11y]
       notes: ["messages mode metadata carries lc_agent_name from create_agent(name=)", "event streaming exposes named sub-agents on stream.subagents with .name and .cause"]
       ref: /oss/python/langchain/streaming.md#streaming-from-sub-agents
-- title: 'Multi-agent'
+- title: Multi-agent
   sections:
   - id: multi-agent
-    title: 'Multi-agent patterns'
+    title: Multi-agent patterns
     level: advanced
     requires: [agent-build, tools-define]
     ref: /oss/python/langchain/multi-agent/index.md
     entries:
     - id: subagents-pattern
-      name: 'Subagents as tools'
-      summary: 'A supervisor calls worker agents as tools (one per agent or a single dispatch tool); subagents stay stateless.'
+      name: Subagents as tools
+      summary: A supervisor calls worker agents as tools (one per agent or a single dispatch tool); subagents stay stateless.
       lenses: [composability]
       notes: ["sync is default", "async means a background job with start", "check-status and get-result tools"]
       ref: mcp:docs-langchain/oss/python/langchain/multi-agent/subagents.md
     - id: subagent-state-inspection
-      name: 'Subagent state'
-      summary: 'Subagents called inside tools cannot be statically discovered, so get_state(subgraphs=True) omits their state.'
+      name: Subagent state
+      summary: Subagents called inside tools cannot be statically discovered, so get_state(subgraphs=True) omits their state.
       lenses: [observability]
       notes: ["default inherited-checkpointer mode gives fresh state per call and supports interrupts", "checkpointer=True keeps its own history across calls"]
       ref: /oss/python/langchain/multi-agent/subagents.md#checkpointing-and-state-inspection
     - id: handoffs
-      name: 'Handoffs'
-      summary: 'Tools update state to hand control between agents or steps; the active agent changes across turns.'
+      name: Handoffs
+      summary: Tools update state to hand control between agents or steps; the active agent changes across turns.
       lenses: [composability]
       ref: /oss/python/langchain/multi-agent/handoffs.md
     - id: router
-      name: 'Router'
-      summary: 'Classify the request once, then dispatch to specialist agents and synthesize results.'
+      name: Router
+      summary: Classify the request once, then dispatch to specialist agents and synthesize results.
       lenses: [cost]
       ref: /oss/python/langchain/multi-agent/router.md
     - id: skills-pattern
-      name: 'Skills pattern'
-      summary: 'Load specialized prompts on demand through a load_skill tool to keep the base prompt small.'
+      name: Skills pattern
+      summary: Load specialized prompts on demand through a load_skill tool to keep the base prompt small.
       lenses: [cost, composability]
       ref: /oss/python/langchain/multi-agent/skills.md
     - id: supervisor-migration
-      name: 'langgraph-supervisor'
-      summary: 'create_supervisor package is unmaintained; migrate to the subagents-as-tools pattern.'
+      name: langgraph-supervisor
+      summary: create_supervisor package is unmaintained; migrate to the subagents-as-tools pattern.
       lenses: [best-practice]
       deprecated: package unmaintained; use the subagents pattern
       ref: /oss/python/migrate/langgraph-supervisor.md
   - id: multi-agent-tutorials
-    title: 'Multi-agent tutorials'
+    title: Multi-agent tutorials
     level: advanced
     requires: [multi-agent, mw-core]
     ref: /oss/python/langchain/multi-agent/subagents-personal-assistant.md
     entries:
     - id: tut-subagent-tools
-      name: 'Subagent wrapped as a tool'
-      summary: 'Wrap each subagent in a @tool taking a request string and return only result["messages"][-1].text; the tool docstring drives routing.'
+      name: Subagent wrapped as a tool
+      summary: Wrap each subagent in a @tool taking a request string and return only result["messages"][-1].text; the tool docstring drives routing.
       signature: 'calendar_agent.invoke({"messages": [{"role": "user", "content": request}]})["messages"][-1].text'
       lenses: [composability, cost]
       notes: ["subagent prompts must put all results in the final message, or the supervisor never sees them", "several tool calls in one model response run in parallel", "optionally return json.dumps of structured status instead of text"]
       ref: /oss/python/langchain/multi-agent/subagents-personal-assistant.md#3-wrap-sub-agents-as-tools
     - id: tut-subagent-hitl
-      name: 'HITL inside subagent tools'
-      summary: 'HITL middleware on each subagent, checkpointer only on the supervisor; parallel interrupts resume keyed by interrupt id.'
+      name: HITL inside subagent tools
+      summary: HITL middleware on each subagent, checkpointer only on the supervisor; parallel interrupts resume keyed by interrupt id.
       signature: 'stream = supervisor.stream_events(Command(resume={interrupt_.id: {"decisions": [{"type": "approve"}]}}), config, version="v3")'
       lenses: [security, reliability]
       notes: ["stream.interrupted and stream.interrupts expose pending interrupts; value['action_requests'] holds name, args, description", "edit decision: {type: edit, edited_action: {...}}", "description_prefix labels each subagent's prompt", "one resume dict can answer several concurrent interrupts"]
       ref: /oss/python/langchain/multi-agent/subagents-personal-assistant.md#6-add-human-in-the-loop-review
     - id: tut-subagent-context
-      name: 'Control subagent context flow'
+      name: Control subagent context flow
       summary: "A tool with runtime: ToolRuntime reads runtime.state[\"messages\"] to hand a subagent more than the request string."
       signature: "def schedule_event(request: str, runtime: ToolRuntime) -> str"
       lenses: [composability, cost]
       notes: ["by default the subagent sees only the request string", "e.g. include the original human message to resolve references like same time tomorrow"]
       ref: /oss/python/langchain/multi-agent/subagents-personal-assistant.md#7-advanced-control-information-flow
     - id: tut-handoff-state-machine
-      name: 'Handoff state machine'
-      summary: 'A state_schema with current_step plus a wrap_model_call that overrides system_prompt and tools per step; tools advance the step via Command.'
+      name: Handoff state machine
+      summary: A state_schema with current_step plus a wrap_model_call that overrides system_prompt and tools per step; tools advance the step via Command.
       import: langchain.agents.middleware
       signature: 'request.override(system_prompt=cfg["prompt"].format(**request.state), tools=cfg["tools"]); return Command(update={"current_step": ..., "messages": [ToolMessage(...)]})'
       lenses: [composability, reliability]
       notes: ["declare tools with ToolRuntime[None, SupportState] for typed runtime.state", "a checkpointer keeps current_step across turns (Agent Server provides one)", "STEP_CONFIG with a requires list validates prerequisite state keys", "use langchain_core.utils.uuid.uuid7 for thread ids"]
       ref: /oss/python/langchain/multi-agent/handoffs-customer-support.md#4-create-step-based-middleware
     - id: tut-handoff-go-back
-      name: 'Go-back transitions'
-      summary: 'Add tools that Command-reset current_step to an earlier step so users can correct data; avoid arbitrary step-to-step graphs.'
+      name: Go-back transitions
+      summary: Add tools that Command-reset current_step to an earlier step so users can correct data; avoid arbitrary step-to-step graphs.
       lenses: [reliability]
       notes: ["the tutorial's go_back tools omit the ToolMessage: add one with runtime.tool_call_id (see tool-return)", "pair with SummarizationMiddleware(trigger=('tokens', 4000), keep=('messages', 10)) as history grows", "if most transitions are allowed, a structured workflow may be the wrong tool"]
       ref: /oss/python/langchain/multi-agent/handoffs-customer-support.md#9-add-flexibility-go-back
     - id: tut-router-send
-      name: 'Router with Send fan-out'
-      summary: 'Classify with with_structured_output, fan out via add_conditional_edges returning list[Send], collect with a reducer.'
+      name: Router with Send fan-out
+      summary: Classify with with_structured_output, fan out via add_conditional_edges returning list[Send], collect with a reducer.
       import: langgraph.types
       signature: 'def route(state) -> list[Send]: return [Send(c["source"], {"query": c["query"]}) for c in state["classifications"]]'
       lenses: [perf, composability]
       notes: ["results: Annotated[list[AgentOutput], operator.add] merges parallel branches", "each branch gets only its small AgentInput, not router state", "synthesize node waits for all branches automatically"]
       ref: /oss/python/langchain/multi-agent/router-knowledge-base.md#4-build-the-router-workflow
     - id: tut-router-stateful
-      name: 'Stateful router via tool wrapper'
-      summary: 'Keep the router stateless and wrap workflow.invoke in a tool of a conversational agent that owns the checkpointer and memory.'
+      name: Stateful router via tool wrapper
+      summary: Keep the router stateless and wrap workflow.invoke in a tool of a conversational agent that owns the checkpointer and memory.
       lenses: [composability, reliability]
       notes: ["recommended over persisting inside the router", "stateful routers can feel inconsistent when agents have different tones: consider handoffs"]
       ref: /oss/python/langchain/multi-agent/router-knowledge-base.md#9-advanced-stateful-routers
     - id: tut-custom-workflow-node
-      name: 'Agent inside a StateGraph node'
-      summary: 'Call a create_agent agent inside any LangGraph node, mixing model, deterministic and agent nodes through shared state.'
+      name: Agent inside a StateGraph node
+      summary: Call a create_agent agent inside any LangGraph node, mixing model, deterministic and agent nodes through shared state.
       signature: 'def agent_node(state) -> dict: return {"answer": agent.invoke({"messages": [...]})["messages"][-1].content}'
       lenses: [composability]
       notes: ["docs RAG example: rewrite (structured output) -> retrieve (vector search, no LLM) -> agent", "other patterns can be embedded as nodes"]
       ref: /oss/python/langchain/multi-agent/custom-workflow.md#basic-implementation
     - id: tut-skill-middleware
-      name: 'Skill middleware with load_skill'
-      summary: 'An AgentMiddleware with class-level tools=[load_skill] appends skill descriptions to the system message in wrap_model_call.'
+      name: Skill middleware with load_skill
+      summary: An AgentMiddleware with class-level tools=[load_skill] appends skill descriptions to the system message in wrap_model_call.
       import: langchain.agents.middleware
       signature: 'request.override(system_message=SystemMessage(content=list(request.system_message.content_blocks) + [{"type": "text", "text": addendum}]))'
       lenses: [cost, composability]
       notes: ["load skills in before_agent in production so they can change per run", "skill content returns as a ToolMessage in history"]
       ref: /oss/python/langchain/multi-agent/skills-sql-assistant.md#3-build-skill-middleware
     - id: tut-skill-gated-tools
-      name: 'Gate tools on loaded skills'
-      summary: 'Track skills_loaded in custom state (AgentMiddleware[State] + state_schema); load_skill returns a Command, other tools check runtime.state.'
+      name: Gate tools on loaded skills
+      summary: Track skills_loaded in custom state (AgentMiddleware[State] + state_schema); load_skill returns a Command, other tools check runtime.state.
       signature: 'class SkillMiddleware(AgentMiddleware[CustomState]): state_schema = CustomState; tools = [load_skill, write_sql_query]'
       lenses: [reliability, security]
       notes: ["load_skill returns Command(update={'messages': [ToolMessage], 'skills_loaded': [name]})", "a gated tool returns an error string telling the model which skill to load"]
       ref: /oss/python/langchain/multi-agent/skills-sql-assistant.md#6-advanced-add-constraints-with-custom-state
     - id: tut-skill-variants
-      name: 'Skill storage and sizing'
-      summary: 'Skills can sit in memory, files or remote stores, be discovered by prompt or registry, and be loaded whole, paged or searched.'
+      name: Skill storage and sizing
+      summary: Skills can sit in memory, files or remote stores, be discovered by prompt or registry, and be loaded whole, paged or searched.
       lenses: [cost, perf]
       notes: ["under ~1K tokens: put in the system prompt and prompt-cache", "1-10K tokens: load on demand", "over ~10K tokens or 5-10% of context: paginate or search", "in-memory needs redeploy to update; remote storage does not"]
       ref: /oss/python/langchain/multi-agent/skills-sql-assistant.md#implementation-variations
-- title: 'Memory and context'
+- title: Memory and context
   sections:
   - id: memory-context
-    title: 'Memory and context'
+    title: Memory and context
     level: intermediate
     requires: [agent-build]
     ref: /oss/python/langchain/context-engineering.md
     entries:
     - id: short-term-memory
-      name: 'Short-term memory'
-      summary: 'Thread history lives in checkpointed state; trim or delete messages with RemoveMessage in before_model hooks.'
+      name: Short-term memory
+      summary: Thread history lives in checkpointed state; trim or delete messages with RemoveMessage in before_model hooks.
       lenses: [reliability, cost]
       ref: /oss/python/langchain/short-term-memory.md
     - id: long-term-memory
-      name: 'Long-term memory'
-      summary: 'Cross-thread facts go in a BaseStore passed to create_agent and read or written through ToolRuntime.store.'
+      name: Long-term memory
+      summary: Cross-thread facts go in a BaseStore passed to create_agent and read or written through ToolRuntime.store.
       signature: create_agent(..., store=store); runtime.store.put/get/search
       lenses: [composability]
       ref: /oss/python/langchain/long-term-memory.md
     - id: context-engineering
-      name: 'Context engineering'
-      summary: 'Shape what the model sees through model, tool and life-cycle context hooks.'
+      name: Context engineering
+      summary: Shape what the model sees through model, tool and life-cycle context hooks.
       lenses: [cost, best-practice]
       ref: /oss/python/langchain/context-engineering.md
     - id: guardrails
-      name: 'Guardrails'
-      summary: 'Enforce policies deterministically with before_agent/after_agent hooks, PII middleware and human approval.'
+      name: Guardrails
+      summary: Enforce policies deterministically with before_agent/after_agent hooks, PII middleware and human approval.
       signature: "@before_agent(can_jump_to=['end'])"
       lenses: [security]
       ref: /oss/python/langchain/guardrails.md
-- title: 'Testing'
+- title: Testing
   sections:
   - id: testing
-    title: 'Testing agents'
+    title: Testing agents
     level: intermediate
     requires: [agent-build]
     ref: /oss/python/langchain/test/index.md
     entries:
     - id: fake-chat-model
-      name: 'GenericFakeChatModel'
-      summary: 'Script exact model replies (text, tool calls) from an iterator so agent tests are fast, free and deterministic.'
+      name: GenericFakeChatModel
+      summary: Script exact model replies (text, tool calls) from an iterator so agent tests are fast, free and deterministic.
       import: langchain_core.language_models.fake_chat_models
       signature: GenericFakeChatModel(messages=iter([AIMessage(...), "text"]))
       lenses: [testing]
       ref: /oss/python/langchain/test/unit-testing.md#mock-chat-model
     - id: inmemory-saver
-      name: 'InMemorySaver in tests'
-      summary: 'Give the agent an in-memory checkpointer to test thread persistence, limits and interrupts.'
+      name: InMemorySaver in tests
+      summary: Give the agent an in-memory checkpointer to test thread persistence, limits and interrupts.
       import: langgraph.checkpoint.memory
       signature: create_agent(model, tools=[], checkpointer=InMemorySaver())
       lenses: [testing]
       ref: /oss/python/langchain/test/unit-testing.md#inmemorysaver-checkpointer
     - id: http-mock-transport
-      name: 'httpx MockTransport injection'
-      summary: 'Inject httpx clients with a MockTransport into ChatOpenAI to test the real provider client code offline.'
+      name: httpx MockTransport injection
+      summary: Inject httpx clients with a MockTransport into ChatOpenAI to test the real provider client code offline.
       signature: ChatOpenAI(http_client=httpx.Client(transport=...), http_async_client=httpx.AsyncClient(transport=...))
       lenses: [testing, reliability]
       ref: /oss/python/langchain/test/integration-testing.md
     - id: integration-tests
-      name: 'Integration tests'
-      summary: 'Separate live-model tests with markers, keys from env, and assertions on structure rather than content.'
+      name: Integration tests
+      summary: Separate live-model tests with markers, keys from env, and assertions on structure rather than content.
       lenses: [testing, cost]
       ref: /oss/python/langchain/test/integration-testing.md
     - id: http-record-replay
-      name: 'Record and replay HTTP'
-      summary: 'Record provider HTTP once with vcrpy/pytest-recording, then replay for cheap deterministic integration tests.'
+      name: Record and replay HTTP
+      summary: Record provider HTTP once with vcrpy/pytest-recording, then replay for cheap deterministic integration tests.
       lenses: [testing, cost]
       notes: ["scrub authorization headers", "alt: LANGSMITH_TEST_CACHE"]
       ref: /oss/python/langchain/test/integration-testing.md#record-and-replay-http-calls
     - id: agentevals
-      name: 'Trajectory evals'
-      summary: 'Score the sequence of tool calls against a reference or with an LLM judge using the agentevals package.'
+      name: Trajectory evals
+      summary: Score the sequence of tool calls against a reference or with an LLM judge using the agentevals package.
       import: agentevals.trajectory.match
       signature: create_trajectory_match_evaluator(trajectory_match_mode=...); create_trajectory_llm_as_judge(prompt, model)
       lenses: [testing, observability]
       ref: /oss/python/langchain/test/evals.md
-- title: 'Operations and frontend'
+- title: Operations and frontend
   sections:
   - id: ops
-    title: 'Tracing, Studio, deploy'
+    title: Tracing, Studio, deploy
     level: intermediate
     requires: [agent-build]
     ref: /oss/python/langchain/observability.md
     entries:
     - id: ls-tracing
-      name: 'LangSmith tracing for agents'
-      summary: 'Env vars turn on automatic tracing of agent runs; tracing_context scopes it in code.'
+      name: LangSmith tracing for agents
+      summary: Env vars turn on automatic tracing of agent runs; tracing_context scopes it in code.
       signature: LANGSMITH_TRACING=true, LANGSMITH_API_KEY, LANGSMITH_PROJECT; with langsmith.tracing_context(enabled=...)
       lenses: [observability]
       notes: ["details in langsmith outline"]
       ref: /oss/python/langchain/observability.md
     - id: studio
-      name: 'LangSmith Studio'
-      summary: 'Run langgraph dev to get a local Agent Server and Studio UI for inspecting and replaying agent runs.'
+      name: LangSmith Studio
+      summary: Run langgraph dev to get a local Agent Server and Studio UI for inspecting and replaying agent runs.
       signature: langgraph dev
       lenses: [observability, ux-a11y]
       ref: /oss/python/langchain/studio.md
     - id: deploy
-      name: 'Deployment'
-      summary: 'Ship the compiled agent graph through LangSmith Deployment or a self-hosted Agent Server via langgraph.json.'
+      name: Deployment
+      summary: Ship the compiled agent graph through LangSmith Deployment or a self-hosted Agent Server via langgraph.json.
       lenses: [reliability]
       ref: /oss/python/langchain/deploy.md
     - id: frontend-usestream
-      name: 'Frontend streaming'
-      summary: 'Frontend patterns for streaming agent runs into UIs (useStream, generative UI, assistant-ui integration).'
+      name: Frontend streaming
+      summary: Frontend patterns for streaming agent runs into UIs (useStream, generative UI, assistant-ui integration).
       lenses: [ux-a11y]
       ref: /oss/python/langchain/frontend/overview.md
-- title: 'Frontend agent contracts'
+- title: Frontend agent contracts
   sections:
   - id: fe-core
-    title: 'Frontend overview and architecture'
+    title: Frontend overview and architecture
     level: basic
     requires: [ops]
     ref: /oss/python/langchain/frontend/overview.md
     entries:
     - id: fe-architecture
-      name: 'Frontend stream architecture'
-      summary: 'A create_agent graph streams state to useStream; the hook exposes messages, toolCalls, interrupt, values and thread metadata.'
+      name: Frontend stream architecture
+      summary: A create_agent graph streams state to useStream; the hook exposes messages, toolCalls, interrupt, values and thread metadata.
       lenses: [ux-a11y, composability]
       notes: ["React, Vue and Svelte use useStream, Angular injectStream", "assistantId is the graph name from langgraph.json", "overview example gives the agent a checkpointer; Agent Server supplies one"]
       ref: /oss/python/langchain/frontend/overview.md#architecture
     - id: fe-type-inference
-      name: 'Typed stream state'
-      summary: 'Pass an interface mirroring the agent state schema to useStream so messages, toolCalls, interrupt and custom keys are typed.'
+      name: Typed stream state
+      summary: Pass an interface mirroring the agent state schema to useStream so messages, toolCalls, interrupt and custom keys are typed.
       signature: "useStream<AgentState>({apiUrl, assistantId})"
       lenses: [typing-dx]
       notes: ["extend the interface for custom state keys such as todos"]
       ref: /oss/python/langchain/frontend/overview.md#type-inference
     - id: fe-pattern-chooser
-      name: 'Choosing a frontend pattern'
-      summary: 'Map the UX need to a pattern - tool calling, HITL, queues, join/rejoin, branching, time travel, structured output, generative UI.'
+      name: Choosing a frontend pattern
+      summary: Map the UX need to a pattern - tool calling, HITL, queues, join/rejoin, branching, time travel, structured output, generative UI.
       lenses: [ux-a11y]
       ref: /oss/python/langchain/frontend/overview.md#choosing-a-frontend-pattern
     - id: fe-agent-chat-ui
-      name: 'Agent Chat UI'
-      summary: 'Open-source Next.js chat app for any LangChain agent; connect with graph ID and deployment URL to see tool calls and interrupts.'
+      name: Agent Chat UI
+      summary: Open-source Next.js chat app for any LangChain agent; connect with graph ID and deployment URL to see tool calls and interrupts.
       lenses: [observability, ux-a11y]
       notes: ["hosted at agentchat.vercel.app or scaffold with npx create-agent-chat-app", "LangSmith key is optional for a local Agent Server", "lists interrupted threads automatically"]
       ref: /oss/python/langchain/ui.md
   - id: fe-actions
-    title: 'Tool calls, headless tools and interrupts in the UI'
+    title: Tool calls, headless tools and interrupts in the UI
     level: intermediate
     requires: [fe-core, tools-define, mw-hitl]
     ref: /oss/python/langchain/frontend/tool-calling.md
     entries:
     - id: fe-tool-call-lifecycle
-      name: 'Tool-call lifecycle in the UI'
-      summary: 'toolCalls entries carry name, callId, input, output, status (running|finished|error) and error, updating in place per callId.'
+      name: Tool-call lifecycle in the UI
+      summary: toolCalls entries carry name, callId, input, output, status (running|finished|error) and error, updating in place per callId.
       lenses: [ux-a11y]
       notes: ["parallel tool calls appear as several running entries", "filter per message by matching callId to the AI message's tool_calls", "output is unknown until narrowed per card"]
       ref: /oss/python/langchain/frontend/tool-calling.md#the-assembledtoolcall-type
     - id: fe-headless-tools
-      name: 'Headless (client-executed) tools'
-      summary: 'Define server tools whose body immediately calls interrupt() with a tool payload; the client implements and resumes with the result.'
+      name: Headless (client-executed) tools
+      summary: Define server tools whose body immediately calls interrupt() with a tool payload; the client implements and resumes with the result.
       import: langgraph.types
       signature: 'interrupt({"type": "tool", "tool_call": {"id": runtime.tool_call_id, "name": name, "args": args}})'
       lenses: [security, composability]
       notes: ["tool names and arg schemas must match the frontend definitions", "results must be JSON-serializable", "needs a checkpointer", "pair sensitive client actions with human-in-the-loop"]
       ref: /oss/python/langchain/frontend/headless-tools.md#register-the-tool-on-the-agent
     - id: fe-hitl-payload
-      name: 'HITL interrupt and resume payloads'
-      summary: 'stream.interrupt holds a HITLRequest (actionRequests, reviewConfigs); resume with a HITLResponse, one decision per action.'
+      name: HITL interrupt and resume payloads
+      summary: stream.interrupt holds a HITLRequest (actionRequests, reviewConfigs); resume with a HITLResponse, one decision per action.
       signature: "stream.submit(null, {command: {resume: {decisions: [{type: 'approve'}]}}})"
       lenses: [security, ux-a11y]
       notes: ["decisions: approve, reject {message}, edit {editedAction}, respond {message}", "several actionRequests need one decision each, in order", "reject without message uses a default that tells the model not to retry"]
       ref: /oss/python/langchain/frontend/human-in-the-loop.md#the-interrupt-payload
     - id: fe-hitl-respond
-      name: 'respond versus reject'
-      summary: 'respond returns the human text as a successful tool result without running the tool; use reject, not respond, to deny an action.'
+      name: respond versus reject
+      summary: respond returns the human text as a successful tool result without running the tool; use reject, not respond, to deny an action.
       lenses: [reliability, security]
       notes: ["respond suits placeholder ask_user tools"]
       ref: /oss/python/langchain/frontend/human-in-the-loop.md#respond
     - id: fe-custom-interrupt-form
-      name: 'Custom interrupt forms'
-      summary: 'Raise interrupt() inside the tool with a typed card payload (formType, title, fields) so each tool renders its own form.'
+      name: Custom interrupt forms
+      summary: Raise interrupt() inside the tool with a typed card payload (formType, title, fields) so each tool renders its own form.
       import: langgraph.types
       signature: "interrupt(card) -> decision"
       lenses: [ux-a11y, typing-dx]
       notes: ["card arrives as stream.interrupt.value", "respond(decision, {update}) commits the card message in the same superstep so it stays on screen", "export card and decision types for the frontend"]
       ref: /oss/python/langchain/frontend/human-in-the-loop.md#custom-interrupt-forms
   - id: fe-conversations
-    title: 'Threads, queues, branching and time travel'
+    title: Threads, queues, branching and time travel
     level: advanced
     requires: [fe-core]
     ref: /oss/python/langchain/frontend/join-rejoin.md
     entries:
     - id: fe-join-rejoin
-      name: 'Join and rejoin streams'
-      summary: 'Persist threadId (onThreadId) and remount to reattach; leave with stream.disconnect(), since stop() cancels the run by default.'
+      name: Join and rejoin streams
+      summary: Persist threadId (onThreadId) and remount to reattach; leave with stream.disconnect(), since stop() cancels the run by default.
       signature: "stream.disconnect()  # alias for stop({cancel: false})"
       lenses: [reliability, ux-a11y]
       notes: ["explicit cancel: stream.stop() or client.runs.cancel", "rejoin delivers messages produced while away", "fall back to thread history on slow rejoin", "drop stale persisted thread ids"]
       ref: /oss/python/langchain/frontend/join-rejoin.md#core-concepts
     - id: fe-message-queue
-      name: 'Message queues'
-      summary: 'submit() with multitaskStrategy "enqueue" queues behind the active run; queue.entries/size/cancel/clear manage pending work.'
+      name: Message queues
+      summary: submit() with multitaskStrategy "enqueue" queues behind the active run; queue.entries/size/cancel/clear manage pending work.
       signature: 'stream.submit(values, {multitaskStrategy: "enqueue"})'
       lenses: [ux-a11y, reliability]
       notes: ["cancelling only affects entries not yet started; stream.stop() interrupts the running one", "onCreated hooks follow-up submissions", "null threadId starts a fresh thread"]
       ref: /oss/python/langchain/frontend/message-queues.md#how-it-works
     - id: fe-branching
-      name: 'Branching chat'
-      summary: 'Edit or regenerate by submitting with forkFrom {checkpointId} taken from useMessageMetadata(...).parentCheckpointId.'
+      name: Branching chat
+      summary: Edit or regenerate by submitting with forkFrom {checkpointId} taken from useMessageMetadata(...).parentCheckpointId.
       signature: "stream.submit(input, {forkFrom: {checkpointId}})"
       lenses: [ux-a11y]
       notes: ["the original path stays in thread history", "client.threads.getHistory(threadId) builds a timeline", "disable controls while stream.isLoading", "requires a persistent checkpointer"]
       ref: /oss/python/langchain/frontend/branching-chat.md#edit-a-message
     - id: fe-time-travel
-      name: 'Time travel over checkpoints'
-      summary: 'ThreadState snapshots (checkpoint, values, tasks, next) per node; resume from any with submit(null, {forkFrom}) to branch.'
+      name: Time travel over checkpoints
+      summary: ThreadState snapshots (checkpoint, values, tasks, next) per node; resume from any with submit(null, {forkFrom}) to branch.
       lenses: [observability, reliability]
       notes: ["resuming replaces the displayed path but keeps old checkpoints", "paginate large histories", "confirm before resuming from an old checkpoint", "interrupt checkpoints deserve distinct rendering"]
       ref: /oss/python/langchain/frontend/time-travel.md#how-checkpoints-work
   - id: fe-output
-    title: 'Rendering messages, reasoning and generative UI'
+    title: Rendering messages, reasoning and generative UI
     level: intermediate
     requires: [fe-core]
     ref: /oss/python/langchain/frontend/generative-ui-overview.md
     entries:
     - id: fe-markdown
-      name: 'Streamed markdown rendering'
-      summary: 'Render msg.text with react-markdown plus remark-gfm; sanitize with dompurify wherever parsed HTML is injected raw.'
+      name: Streamed markdown rendering
+      summary: Render msg.text with react-markdown plus remark-gfm; sanitize with dompurify wherever parsed HTML is injected raw.
       lenses: [security, perf]
       notes: ["react-markdown yields React elements so needs no sanitizer", "re-parsing per token is fine for chat-length text; throttle with requestAnimationFrame beyond ~50 KB", "enable GFM"]
       ref: /oss/python/langchain/frontend/markdown-messages.md
     - id: fe-reasoning
-      name: 'Reasoning content blocks'
-      summary: 'Reasoning-capable models emit reasoning and text content blocks on one AIMessage; filter contentBlocks by type, collapsed by default.'
+      name: Reasoning content blocks
+      summary: Reasoning-capable models emit reasoning and text content blocks on one AIMessage; filter contentBlocks by type, collapsed by default.
       lenses: [ux-a11y, observability]
       notes: ["standard chat models return only text blocks", "drop empty reasoning blocks", "iterate in order to keep reasoning/text interleaving"]
       ref: /oss/python/langchain/frontend/reasoning-tokens.md
     - id: fe-structured-output-ui
-      name: 'Structured output in the UI'
-      summary: 'Structured output arrives as a tool call on the last AIMessage; guard partial args while streaming, then render typed fields.'
+      name: Structured output in the UI
+      summary: Structured output arrives as a tool call on the last AIMessage; guard partial args while streaming, then render typed fields.
       lenses: [typing-dx, ux-a11y]
       notes: ["args may be partial or undefined until streaming ends: check required fields", "keep schemas flat for progressive rendering", "include a plain-text fallback field"]
       ref: /oss/python/langchain/frontend/structured-output.md#handle-partial-streaming-data
     - id: fe-genui-spectrum
-      name: 'Generative UI spectrum'
-      summary: 'Controlled (you author components), declarative (agent emits a spec over your catalog), open-ended (UI authored externally).'
+      name: Generative UI spectrum
+      summary: Controlled (you author components), declarative (agent emits a spec over your catalog), open-ended (UI authored externally).
       lenses: [best-practice, security]
       notes: ["predictability, accessibility and consistency fall left to right"]
       ref: /oss/python/langchain/frontend/generative-ui-overview.md#the-generative-ui-spectrum
     - id: fe-genui-controlled
-      name: 'Controlled generative UI'
-      summary: 'Components as tools, tool-call rendering, state rendering and reasoning; the agent only picks from components you ship.'
+      name: Controlled generative UI
+      summary: Components as tools, tool-call rendering, state rendering and reasoning; the agent only picks from components you ship.
       lenses: [best-practice, ux-a11y]
       ref: /oss/python/langchain/frontend/controlled-generative-ui.md
     - id: fe-genui-declarative
-      name: 'Declarative generative UI (json-render)'
-      summary: 'Agent returns a flat json-render spec (root plus elements) through structured output; a Zod catalog bounds the components.'
+      name: Declarative generative UI (json-render)
+      summary: Agent returns a flat json-render spec (root plus elements) through structured output; a Zod catalog bounds the components.
       lenses: [security, typing-dx]
       notes: ["render inside JSONUIProvider and pass loading while streaming", "filter incomplete elements", "keep the catalog small", "A2UI via CopilotKit is the alternative spec: dynamic or fixed schema"]
       ref: /oss/python/langchain/frontend/declarative-generative-ui.md#how-it-works
     - id: fe-genui-open-ended
-      name: 'Open-ended generative UI (MCP Apps)'
-      summary: 'MCP servers ship interactive UI the frontend hosts in a sandboxed iframe; the most experimental and least deterministic option.'
+      name: Open-ended generative UI (MCP Apps)
+      summary: MCP servers ship interactive UI the frontend hosts in a sandboxed iframe; the most experimental and least deterministic option.
       lenses: [security]
       notes: ["treat the UI as untrusted and isolate it", "see the MCP section for connecting servers"]
       ref: /oss/python/langchain/frontend/open-ended-generative-ui.md#sandboxing-and-safety
   - id: fe-integrations
-    title: 'UI library integrations'
+    title: UI library integrations
     level: intermediate
     requires: [fe-core]
     ref: /oss/python/langchain/frontend/integrations/overview.md
     entries:
     - id: fe-integrations-chooser
-      name: 'Choosing a UI library'
-      summary: 'CopilotKit, AI Elements, assistant-ui and OpenUI all work with LangChain agents; the last three connect directly to useStream.'
+      name: Choosing a UI library
+      summary: CopilotKit, AI Elements, assistant-ui and OpenUI all work with LangChain agents; the last three connect directly to useStream.
       lenses: [reuse, composability]
       ref: /oss/python/langchain/frontend/integrations/overview.md#choosing-a-library
     - id: fe-ai-elements
-      name: 'AI Elements'
-      summary: 'shadcn-registry components (Conversation, Message, Tool, Reasoning) installed as editable source and fed from stream.messages.'
+      name: AI Elements
+      summary: shadcn-registry components (Conversation, Message, Tool, Reasoning) installed as editable source and fed from stream.messages.
       lenses: [reuse, ux-a11y]
       notes: ["use MessageResponse for streamed partial tokens", "narrow with HumanMessage.isInstance / AIMessage.isInstance"]
       ref: /oss/python/langchain/frontend/integrations/ai-elements.md
     - id: fe-assistant-ui-bridge
-      name: 'assistant-ui bridge'
-      summary: 'Bridge useStream into AssistantRuntimeProvider with useExternalStoreRuntime and a toThreadMessages converter.'
+      name: assistant-ui bridge
+      summary: Bridge useStream into AssistantRuntimeProvider with useExternalStoreRuntime and a toThreadMessages converter.
       lenses: [reuse, composability]
       notes: ["memoise toThreadMessages(stream.messages)", "persist threadId with onThreadId", "branching: pair edits with useMessageMetadata and forkFrom", "see the assistant-ui outline for the react-langchain runtime"]
       ref: /oss/python/langchain/frontend/integrations/assistant-ui.md#best-practices
     - id: fe-copilotkit-backend
-      name: 'CopilotKit Python backend'
-      summary: 'Add CopilotKitMiddleware and a CopilotKitState subclass, then mount an AG-UI FastAPI bridge via langgraph.json http.app.'
+      name: CopilotKit Python backend
+      summary: Add CopilotKitMiddleware and a CopilotKitState subclass, then mount an AG-UI FastAPI bridge via langgraph.json http.app.
       import: copilotkit
       signature: "add_langgraph_fastapi_endpoint(app=app, agent=LangGraphAGUIAgent(name, description, graph=agent.copy(update={'checkpointer': MemorySaver()})), path='/')"
       lenses: [composability, reliability]
       notes: ["keep the checkpointer off the agent listed under graphs: langgraph dev refuses a listed graph that brings its own", "the bridge needs a checkpointer because it reads graph state", "a separate Node CopilotKit runtime sits between the React app and the FastAPI route", "uv add copilotkit ag-ui-langgraph fastapi uvicorn"]
       ref: /oss/python/langchain/frontend/integrations/copilotkit.md#extend-the-langgraph-deployment-with-a-custom-endpoint
     - id: fe-openui
-      name: 'OpenUI generative dashboards'
-      summary: 'Inject openuiLibrary.prompt() as the first system message of a fresh thread; the model writes openui-lang rendered by Renderer.'
+      name: OpenUI generative dashboards
+      summary: Inject openuiLibrary.prompt() as the first system message of a fresh thread; the model writes openui-lang rendered by Renderer.
       lenses: [ux-a11y, perf]
       notes: ["backend may be TypeScript or Python", "generate the prompt once at module load", "gate Renderer updates on complete statements while streaming", "share one library between server prompt and client Renderer"]
       ref: /oss/python/langchain/frontend/integrations/openui.md#best-practices
-- title: 'Migration and app tutorials'
+- title: Migration and app tutorials
   sections:
   - id: migrate-v1
-    title: 'LangChain v1 migration'
+    title: LangChain v1 migration
     level: intermediate
     requires: [agent-build, mw-core]
     ref: /oss/python/migrate/langchain-v1.md
     entries:
     - id: v1-namespace
-      name: 'Slimmed namespace and langchain-classic'
-      summary: 'langchain keeps agents, messages, tools, chat_models and embeddings; chains, retrievers, indexes and hub moved to langchain-classic.'
+      name: Slimmed namespace and langchain-classic
+      summary: langchain keeps agents, messages, tools, chat_models and embeddings; chains, retrievers, indexes and hub moved to langchain-classic.
       signature: "from langchain_classic.chains import LLMChain; from langchain_classic import hub"
       lenses: [best-practice, reuse]
       notes: ["community re-exports and CacheBackedEmbeddings also moved", "Python 3.10+ required"]
       ref: /oss/python/migrate/langchain-v1.md#simplified-package
     - id: v1-create-agent-migration
-      name: 'create_react_agent to create_agent'
-      summary: 'Import from langchain.agents, rename prompt to system_prompt, replace pre/post_model_hook with before_model/after_model middleware.'
+      name: create_react_agent to create_agent
+      summary: Import from langchain.agents, rename prompt to system_prompt, replace pre/post_model_hook with before_model/after_model middleware.
       signature: "from langchain.agents import create_agent"
       lenses: [best-practice]
       deprecated: "langgraph.prebuilt.create_react_agent; use langchain.agents.create_agent"
       notes: ["SystemMessage prompts become strings or middleware", "create_agent no longer accepts ToolNode instances or pre-bound models", "dynamic models are returned from wrap_model_call middleware"]
       ref: /oss/python/migrate/langchain-v1.md#migrate-to-create_agent
     - id: v1-state-typeddict
-      name: 'TypedDict-only agent state'
-      summary: 'create_agent state must be a TypedDict extending AgentState (no Pydantic or dataclass); prefer middleware state_schema.'
+      name: TypedDict-only agent state
+      summary: create_agent state must be a TypedDict extending AgentState (no Pydantic or dataclass); prefer middleware state_schema.
       lenses: [typing-dx]
       notes: ["state_schema on create_agent is kept for backward compatibility", "validate in middleware hooks instead of the schema"]
       ref: /oss/python/migrate/langchain-v1.md#state-type-restrictions
     - id: v1-structured-output-strategies
-      name: 'Structured output strategies'
-      summary: 'Use ToolStrategy or ProviderStrategy from langchain.agents.structured_output; prompted output is removed and runs in the main loop.'
+      name: Structured output strategies
+      summary: Use ToolStrategy or ProviderStrategy from langchain.agents.structured_output; prompted output is removed and runs in the main loop.
       import: langchain.agents.structured_output
       lenses: [reliability, cost]
       ref: /oss/python/migrate/langchain-v1.md#structured-output
     - id: v1-node-rename
-      name: 'Streaming node rename'
-      summary: 'Streamed event node name changed from "agent" to "model"; match on "model" when filtering stream chunks.'
+      name: Streaming node rename
+      summary: Streamed event node name changed from "agent" to "model"; match on "model" when filtering stream chunks.
       lenses: [observability]
       ref: /oss/python/migrate/langchain-v1.md#streaming-node-name-rename
     - id: v1-runtime-context
-      name: 'Context over config.configurable'
-      summary: 'Pass static run data via invoke/stream context= with context_schema; config["configurable"] still works for compatibility.'
+      name: Context over config.configurable
+      summary: Pass static run data via invoke/stream context= with context_schema; config["configurable"] still works for compatibility.
       signature: "agent.invoke(input, context=Ctx(...))"
       lenses: [typing-dx]
       ref: /oss/python/migrate/langchain-v1.md#runtime-context
     - id: v1-content-blocks
-      name: 'Standard content blocks'
-      summary: 'message.content_blocks gives a provider-agnostic typed view; serialize into content only via output_version="v1" or LC_OUTPUT_VERSION=v1.'
+      name: Standard content blocks
+      summary: message.content_blocks gives a provider-agnostic typed view; serialize into content only via output_version="v1" or LC_OUTPUT_VERSION=v1.
       lenses: [composability, typing-dx]
       notes: ["blocks are not serialized into content by default", "OpenAI Responses API now defaults to items in content; set output_version='v0' to restore"]
       ref: /oss/python/migrate/langchain-v1.md#standard-content
     - id: v1-breaking-changes
-      name: 'v1 breaking changes'
-      summary: 'Chat models return AIMessage, .text is a property, AIMessage.example is gone, anthropic max_tokens defaults per model.'
+      name: v1 breaking changes
+      summary: Chat models return AIMessage, .text is a property, AIMessage.example is gone, anthropic max_tokens defaults per model.
       lenses: [reliability]
       notes: ["AIMessageChunk.chunk_position is 'last' on the final chunk", "files open as utf-8 by default", "set max_tokens=1024 explicitly to keep the old anthropic default"]
       ref: /oss/python/migrate/langchain-v1.md#breaking-changes
   - id: app-tutorials
-    title: 'Application tutorials'
+    title: Application tutorials
     level: intermediate
     requires: [agent-build, tools-define]
     ref: /oss/python/langchain/sql-agent.md
     entries:
     - id: tut-sql-agent
-      name: 'SQL agent'
-      summary: 'Agent with list-tables, schema, query-checker and query tools over a database; scope DB permissions narrowly and add HITL before execution.'
+      name: SQL agent
+      summary: Agent with list-tables, schema, query-checker and query tools over a database; scope DB permissions narrowly and add HITL before execution.
       signature: "create_agent(model, tools=[sql_db_list_tables, sql_db_schema, sql_db_query_checker, sql_db_query], middleware=[HumanInTheLoopMiddleware(interrupt_on={'sql_db_query': True})], checkpointer=InMemorySaver())"
       lenses: [security, reliability]
       notes: ["the tutorial's tool wrappers are demonstration-only, not production-safe", "the system prompt tells the agent to run the checker before sql_db_query", "model-generated SQL is the injection surface: read-only role, validation"]
       ref: /oss/python/langchain/sql-agent.md
     - id: tut-semantic-search
-      name: 'Semantic search building blocks'
-      summary: 'Document, Embeddings and a VectorStore (similarity_search variants, async too) queried via as_retriever or an @chain retriever.'
+      name: Semantic search building blocks
+      summary: Document, Embeddings and a VectorStore (similarity_search variants, async too) queried via as_retriever or an @chain retriever.
       import: langchain_core.vectorstores
       signature: "InMemoryVectorStore(embeddings); store.add_documents(splits); store.as_retriever(search_type='similarity', search_kwargs={'k': 1})"
       lenses: [reuse, testing]
       notes: ["split PDFs with langchain_text_splitters.RecursiveCharacterTextSplitter", "scores are provider-specific: distances vary inversely with similarity", "DeterministicFakeEmbedding in langchain_core.embeddings suits offline tests"]
       ref: /oss/python/langchain/knowledge-base.md
     - id: tut-voice-agent
-      name: 'Voice agent sandwich'
-      summary: 'Compose STT, a text create_agent and TTS as a RunnableGenerator pipeline over a websocket, with a uuid7 thread_id and astream_events.'
+      name: Voice agent sandwich
+      summary: Compose STT, a text create_agent and TTS as a RunnableGenerator pipeline over a websocket, with a uuid7 thread_id and astream_events.
       import: langchain_core.runnables
       signature: "RunnableGenerator(stt_stream) | RunnableGenerator(agent_stream) | RunnableGenerator(tts_stream)"
       lenses: [perf, composability]
       notes: ["the alternative is a speech-to-speech model architecture", "agent has a checkpointer so turns share memory"]
       ref: /oss/python/langchain/voice-agent.md#how-do-voice-agents-work
-- title: 'Packaging and providers'
+- title: Packaging and providers
   sections:
   - id: packaging
-    title: 'Packages and provider choice'
+    title: Packages and provider choice
     level: basic
     requires: []
     ref: /oss/python/langchain/install.md
     entries:
     - id: provider-packages
-      name: 'Provider packages'
-      summary: 'Provider integrations ship as separate installs (langchain-openai, langchain-anthropic, ...) or langchain[extra].'
+      name: Provider packages
+      summary: Provider integrations ship as separate installs (langchain-openai, langchain-anthropic, ...) or langchain[extra].
       lenses: [reuse, best-practice]
       notes: ["use uv add"]
       ref: /oss/python/langchain/install.md
     - id: openrouter-litellm
-      name: 'OpenRouter and LiteLLM'
-      summary: 'Use the dedicated langchain-openrouter and langchain-litellm packages instead of the openai provider with a router base_url.'
+      name: OpenRouter and LiteLLM
+      summary: Use the dedicated langchain-openrouter and langchain-litellm packages instead of the openai provider with a router base_url.
       lenses: [composability]
       notes: ["docs prefer the dedicated packages"]
       ref: /oss/python/langchain/models.md#base-url-and-proxy-settings

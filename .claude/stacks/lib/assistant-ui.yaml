@@ -10,16 +10,16 @@ toc:
   exclude: '^https://www\.assistant-ui\.com/docs/(react-native|vue|ink)(/|\.md$|$)'
   why: 'Other renderers (React Native, Vue, Ink terminal UI) ship separate packages; this stack is the Next.js React web app on @assistant-ui/react'
 groups:
-- title: 'AI tooling'
+- title: AI tooling
   sections:
   - id: ai-docs-access
-    title: 'Docs and agent access'
+    title: Docs and agent access
     level: basic
     requires: []
     ref: /docs/llm.md
     entries:
     - id: aui-mcp-docs
-      name: 'Official docs MCP'
+      name: Official docs MCP
       summary: 'Hosted docs MCP: search and read assistant-ui pages and navigation; wire it so agents never code from memory'
       lenses:
       - best-practice
@@ -29,8 +29,8 @@ groups:
       - https://www.assistant-ui.com/mcp, Streamable HTTP; tools list_pages, get_navigation, search_docs, read_page
       ref: /docs/llm.md
     - id: aui-mcp-stdio
-      name: 'MCP stdio fallback'
-      summary: 'Local stdio build of the docs MCP for clients lacking HTTP MCP support (Zed, Claude Desktop)'
+      name: MCP stdio fallback
+      summary: Local stdio build of the docs MCP for clients lacking HTTP MCP support (Zed, Claude Desktop)
       lenses:
       - reuse
       signature: npx -y @assistant-ui/mcp-docs-server
@@ -38,8 +38,8 @@ groups:
       - only for clients without HTTP MCP (Zed, Claude Desktop)
       ref: /docs/llm.md
     - id: aui-llms-txt
-      name: 'llms.txt and per-page markdown'
-      summary: 'Docs index plus a markdown copy of every page (append .md); llms-full.txt is the whole site in one file'
+      name: llms.txt and per-page markdown
+      summary: Docs index plus a markdown copy of every page (append .md); llms-full.txt is the whole site in one file
       lenses:
       - best-practice
       - cost
@@ -48,7 +48,7 @@ groups:
       - registry docs source; fetch the narrowest .md, llms-full only for cross-page work
       ref: /llms.txt
     - id: aui-agents-md
-      name: 'Agent instructions'
+      name: Agent instructions
       summary: 'Official agent rules: identify runtime and package version first, retrieve narrowly, follow the discovery routes'
       lenses:
       - best-practice
@@ -56,8 +56,8 @@ groups:
       - identify runtime and package version before changing code
       ref: /AGENTS.md
     - id: aui-skills
-      name: 'Official agent skills'
-      summary: 'Installable per-area agent skills (setup, tools, runtime, update) published by the assistant-ui org'
+      name: Official agent skills
+      summary: Installable per-area agent skills (setup, tools, runtime, update) published by the assistant-ui org
       lenses:
       - best-practice
       - reuse
@@ -66,15 +66,15 @@ groups:
       - 19 area skills (setup, tools, runtime, update...); not in skills-lock.json
       ref: /docs/llm.md
     - id: aui-design-md
-      name: 'Design law skill'
-      summary: 'Machine-readable design law (print/sand style) for UIs built on assistant-ui elements'
+      name: Design law skill
+      summary: Machine-readable design law (print/sand style) for UIs built on assistant-ui elements
       lenses:
       - ux-a11y
       signature: /design.md
       ref: /design.md
     - id: aui-cli
-      name: 'CLI'
-      summary: 'Scaffold, add elements, run codemods and doctor checks; `upgrade` applies version migrations'
+      name: CLI
+      summary: Scaffold, add elements, run codemods and doctor checks; `upgrade` applies version migrations
       lenses:
       - reuse
       - reliability
@@ -83,8 +83,8 @@ groups:
       - '`doctor` finds duplicate/outdated pkgs; `update` moves exact pins, review the diff'
       ref: /docs/cli.md
     - id: aui-devtools
-      name: 'DevTools'
-      summary: 'Dev-only overlay inspecting thread state, model context and runtime events without console.log'
+      name: DevTools
+      summary: Dev-only overlay inspecting thread state, model context and runtime events without console.log
       lenses:
       - observability
       - testing
@@ -92,17 +92,17 @@ groups:
       notes:
       - dev-only overlay, stripped from production; new dep, scouting gate
       ref: /docs/devtools.md
-- title: 'Architecture and runtime choice'
+- title: Architecture and runtime choice
   sections:
   - id: layers
-    title: 'Layers and runtime choice'
+    title: Layers and runtime choice
     level: basic
     requires: []
     ref: /docs/architecture.md
     entries:
     - id: layer-model
-      name: 'Layer model'
-      summary: 'UI reads the runtime through AssistantRuntimeProvider; runtime talks to the backend; persistence is a separate adapter seam'
+      name: Layer model
+      summary: UI reads the runtime through AssistantRuntimeProvider; runtime talks to the backend; persistence is a separate adapter seam
       lenses:
       - best-practice
       - composability
@@ -110,7 +110,7 @@ groups:
       - UI reads runtime context, never the backend directly
       ref: /docs/architecture.md
     - id: pick-a-runtime
-      name: 'Runtime decision guide'
+      name: Runtime decision guide
       summary: 'Choose the runtime by backend: react-langchain for the LangGraph Agent Server via @langchain/react useStream'
       lenses:
       - best-practice
@@ -119,27 +119,27 @@ groups:
       - react-langchain chosen
       ref: /docs/runtimes/pick-a-runtime.md
     - id: runtime-layering
-      name: 'Runtime architecture'
-      summary: 'LocalRuntime and ExternalStoreRuntime are the two cores; protocol and framework runtimes layer on top of them'
+      name: Runtime architecture
+      summary: LocalRuntime and ExternalStoreRuntime are the two cores; protocol and framework runtimes layer on top of them
       lenses:
       - composability
       ref: /docs/runtimes/concepts/architecture.md
     - id: adapter-matrix
-      name: 'Adapters'
-      summary: 'Optional runtime slots (attachments, speech, dictation, feedback, history, suggestion, threadList) with per-runtime support'
+      name: Adapters
+      summary: Optional runtime slots (attachments, speech, dictation, feedback, history, suggestion, threadList) with per-runtime support
       lenses:
       - composability
       notes:
       - 'react-langchain: no suggestion slot, history via thread state'
       ref: /docs/runtimes/concepts/adapters.md
   - id: stability
-    title: 'Stability and deprecation policy'
+    title: Stability and deprecation policy
     level: basic
     requires: []
     ref: /docs/runtimes/concepts/stability.md
     entries:
     - id: unstable-prefix
-      name: 'unstable_ exports'
+      name: unstable_ exports
       summary: '`unstable_` exports are public but may change in any release; pin versions and wrap the call site in one place'
       lenses:
       - reliability
@@ -149,23 +149,23 @@ groups:
       - 'may change in any release: pin range, isolate call site'
       ref: /docs/runtimes/concepts/stability.md
     - id: deprecation-tiers
-      name: 'Deprecation policy'
-      summary: 'Stable APIs get over 3 months deprecation notice; beta APIs (tw-shimmer, context/runtime API) under 1 month'
+      name: Deprecation policy
+      summary: Stable APIs get over 3 months deprecation notice; beta APIs (tw-shimmer, context/runtime API) under 1 month
       lenses:
       - reliability
       ref: /docs/migrations/deprecation-policy.md
-- title: 'LangChain runtime (react-langchain)'
+- title: LangChain runtime (react-langchain)
   sections:
   - id: langchain-runtime
-    title: 'useStreamRuntime and wiring'
+    title: useStreamRuntime and wiring
     level: intermediate
     requires:
     - layers
     ref: /docs/runtimes/langchain.md
     entries:
     - id: use-stream-runtime
-      name: 'useStreamRuntime'
-      summary: 'Wraps @langchain/react useStream as an assistant-ui runtime for a LangGraph server; takes every useStream option plus its own'
+      name: useStreamRuntime
+      summary: Wraps @langchain/react useStream as an assistant-ui runtime for a LangGraph server; takes every useStream option plus its own
       lenses:
       - reuse
       - reliability
@@ -175,53 +175,53 @@ groups:
       ref: /docs/runtimes/langchain.md
       returns: AssistantRuntime for AssistantRuntimeProvider; thread.isLoading tracks history hydration, isRunning an in-flight run
       options:
-      - name: 'assistantId'
+      - name: assistantId
         type: string
         default: null
         desc: Graph or assistant id on the Agent Server (upstream useStream option).
-      - name: 'apiUrl'
+      - name: apiUrl
         type: string
         default: null
         desc: Agent Server base URL (upstream useStream option); must be absolute for the SDK client.
-      - name: 'messagesKey'
+      - name: messagesKey
         type: string
         default: '"messages"'
         desc: State key holding the messages.
-      - name: 'uiStateKey'
+      - name: uiStateKey
         type: string
         default: '"ui"'
         desc: State key holding generative UIMessage entries (data UI).
-      - name: 'adapters'
+      - name: adapters
         type: '{attachments?, speech?, dictation?, voice?, feedback?}'
         default: null
         desc: Optional assistant-ui adapters; there is no suggestion or history slot.
-      - name: 'autoCancelPendingToolCalls'
+      - name: autoCancelPendingToolCalls
         type: boolean
         default: 'true'
         desc: Sending a message while tool calls are pending submits tool messages that cancel them.
-      - name: 'unstable_allowCancellation'
+      - name: unstable_allowCancellation
         type: boolean
         default: 'true'
         desc: Routes the Cancel button to useStream().stop(); false removes the Cancel button.
-      - name: 'unstable_threadListAdapter'
+      - name: unstable_threadListAdapter
         type: RemoteThreadListAdapter
         default: null
         desc: Replaces the Cloud thread list adapter with your own (thread list backed by your server).
-      - name: 'onThreadIdChange'
+      - name: onThreadIdChange
         type: '(threadId: string | undefined) => void'
         default: null
         desc: Called when the active thread canonical id changes.
-      - name: 'cloud'
+      - name: cloud
         type: AssistantCloud
         default: null
         desc: Use Assistant Cloud for the thread list and a copy of settled messages.
-      - name: 'create / delete'
+      - name: create / delete
         type: () => Promise<{externalId}> / (threadId) => Promise<void>
         default: null
         desc: Backend thread create/delete hooks; delete is called when Cloud owns the list.
     - id: provider-config
-      name: 'Provider config'
-      summary: 'AssistantRuntimeProvider takes `config` built with AuiConfig({...}) to install the toolkit and other scopes'
+      name: Provider config
+      summary: AssistantRuntimeProvider takes `config` built with AuiConfig({...}) to install the toolkit and other scopes
       lenses:
       - best-practice
       - composability
@@ -230,8 +230,8 @@ groups:
       - AuiConfig at module scope
       ref: /docs/api-reference/tools/toolkits.md
     - id: run-error-state
-      name: 'Run error'
-      summary: 'Run failures surface as an Error in useLangChainError(); cleared on the next submit or thread switch'
+      name: Run error
+      summary: Run failures surface as an Error in useLangChainError(); cleared on the next submit or thread switch
       lenses:
       - reliability
       - ux-a11y
@@ -241,8 +241,8 @@ groups:
       ref: /docs/runtimes/langchain.md
       returns: Error | undefined from the stream root store (server message for run errors)
     - id: tool-error-status
-      name: 'Tool error status'
-      summary: 'A ToolMessage with status "error" maps to isError and an incomplete tool status for the tool renderer'
+      name: Tool error status
+      summary: A ToolMessage with status "error" maps to isError and an incomplete tool status for the tool renderer
       lenses:
       - reliability
       - ux-a11y
@@ -251,8 +251,8 @@ groups:
       - incomplete includes cancelled; not a failure
       ref: /docs/tools/tool-ui.md
     - id: cancel-stop
-      name: 'Stop button'
-      summary: 'Cancel button calls useStream().stop(), which cancels the server run; on by default via unstable_allowCancellation'
+      name: Stop button
+      summary: Cancel button calls useStream().stop(), which cancels the server run; on by default via unstable_allowCancellation
       lenses:
       - reliability
       - security
@@ -261,8 +261,8 @@ groups:
       - 'POST threads/{id}/runs/{runId}/cancel, errors swallowed: proxy must allow'
       ref: /docs/runtimes/langchain.md
     - id: fork-regenerate
-      name: 'Regenerate and edit'
-      summary: 'Regenerate and edit fork the thread from a checkpoint with submit(null, {forkFrom}) instead of mutating history'
+      name: Regenerate and edit
+      summary: Regenerate and edit fork the thread from a checkpoint with submit(null, {forkFrom}) instead of mutating history
       lenses:
       - reliability
       signature: submit(null,{forkFrom}), ActionBarPrimitive.Reload
@@ -270,8 +270,8 @@ groups:
       - fork/edit POST threads/{id}/history; proxy must allow
       ref: /docs/runtimes/langchain.md
     - id: auto-cancel-pending
-      name: 'Auto-cancel pending tools'
-      summary: 'When the user types mid tool call, pending calls are cancelled with tool messages so the next run is valid'
+      name: Auto-cancel pending tools
+      summary: When the user types mid tool call, pending calls are cancelled with tool messages so the next run is valid
       lenses:
       - reliability
       signature: autoCancelPendingToolCalls
@@ -279,13 +279,13 @@ groups:
       - typing mid tool call sends cancelling tool messages
       ref: /docs/runtimes/langchain.md
       options:
-      - name: 'autoCancelPendingToolCalls'
+      - name: autoCancelPendingToolCalls
         type: boolean
         default: 'true'
         desc: Set false to keep pending tool calls instead of cancelling them on new input.
     - id: run-config-forwarding
-      name: 'Per-run config'
-      summary: 'Message runConfig.custom (mode, model) is forwarded to submit as config.configurable, also on resumes'
+      name: Per-run config
+      summary: Message runConfig.custom (mode, model) is forwarded to submit as config.configurable, also on resumes
       lenses:
       - composability
       signature: runConfig.custom, config.configurable
@@ -293,8 +293,8 @@ groups:
       - reused for tool-result resumes and interrupt helpers
       ref: /docs/runtimes/langchain.md
     - id: interrupts-hitl
-      name: 'Interrupts'
-      summary: 'Hooks to read pending LangGraph interrupts and resume them; useLangChainRespond avoids hand-built Commands'
+      name: Interrupts
+      summary: Hooks to read pending LangGraph interrupts and resume them; useLangChainRespond avoids hand-built Commands
       lenses:
       - reliability
       - ux-a11y
@@ -304,15 +304,15 @@ groups:
       ref: /docs/runtimes/langchain.md
       returns: useLangChainInterruptState gives the current interrupt (.value); respond(payload) resumes it; respondAll resumes several in one run
     - id: raw-command-submit
-      name: 'Raw submit and command'
-      summary: 'Escape hatch to submit raw state updates or Commands when respond helpers do not fit'
+      name: Raw submit and command
+      summary: Escape hatch to submit raw state updates or Commands when respond helpers do not fit
       lenses:
       - composability
       signature: useLangChainSubmit(null,{command}), useLangChainSend, useLangChainSendCommand
       ref: /docs/runtimes/langchain.md
     - id: custom-state-keys
-      name: 'Custom state keys'
-      summary: 'Read any graph state key (todos, plan, files) reactively without rebuilding it from tool-call args'
+      name: Custom state keys
+      summary: Read any graph state key (todos, plan, files) reactively without rebuilding it from tool-call args
       lenses:
       - typing-dx
       - reuse
@@ -322,8 +322,8 @@ groups:
       ref: /docs/runtimes/langchain.md
       returns: T (or T | undefined without default), updated when the stream emits new state
     - id: stream-handle-hooks
-      name: 'Stream handle hooks'
-      summary: 'Expose the underlying useStream handle and tool calls for @langchain/react selector hooks (messages, media, metadata)'
+      name: Stream handle hooks
+      summary: Expose the underlying useStream handle and tool calls for @langchain/react selector hooks (messages, media, metadata)
       lenses:
       - composability
       signature: useLangChainStream(), useLangChainToolCalls(), useMessageMetadata, useImages
@@ -332,8 +332,8 @@ groups:
       ref: /docs/runtimes/langchain.md
       returns: 'useLangChainStream: useStream handle or undefined outside the provider; useLangChainToolCalls: root tool calls, default []'
     - id: subagent-discovery
-      name: 'Subagent discovery'
-      summary: 'Discovery maps of subagents and subgraphs seen on the run; task subagents also fill ToolCallMessagePart.messages'
+      name: Subagent discovery
+      summary: Discovery maps of subagents and subgraphs seen on the run; task subagents also fill ToolCallMessagePart.messages
       lenses:
       - observability
       - ux-a11y
@@ -343,8 +343,8 @@ groups:
       ref: /docs/runtimes/langchain.md
       returns: Map keyed by namespace of SubagentDiscoverySnapshot / SubgraphDiscoverySnapshot, to feed useMessages/useToolCalls
     - id: data-ui-generative
-      name: 'LangGraph data UI'
-      summary: 'Render backend-pushed UI messages (push_ui_message) with makeAssistantDataUI renderers keyed by name'
+      name: LangGraph data UI
+      summary: Render backend-pushed UI messages (push_ui_message) with makeAssistantDataUI renderers keyed by name
       lenses:
       - ux-a11y
       - composability
@@ -353,23 +353,23 @@ groups:
       - live path needs streamMode to include custom
       ref: /docs/runtimes/langchain.md
     - id: message-convert
-      name: 'Message conversion'
-      summary: 'Converts a LangChain BaseMessage into an assistant-ui message; only needed for custom adapters'
+      name: Message conversion
+      summary: Converts a LangChain BaseMessage into an assistant-ui message; only needed for custom adapters
       lenses:
       - reuse
       signature: convertLangChainBaseMessage
       ref: /docs/runtimes/langchain.md
-- title: 'Threads and persistence'
+- title: Threads and persistence
   sections:
   - id: thread-list
-    title: 'Thread list adapter'
+    title: Thread list adapter
     level: intermediate
     requires:
     - langchain-runtime
     ref: /docs/runtimes/concepts/threads.md
     entries:
     - id: thread-list-adapter
-      name: 'Thread adapter'
+      name: Thread adapter
       summary: 'Backs the thread list with your own database: list/initialize/rename/archive/unarchive/delete/fetch/generateTitle'
       lenses:
       - typing-dx
@@ -379,30 +379,30 @@ groups:
       - 8 required members (tsc-verified)
       ref: /docs/runtimes/concepts/threads.md
       options:
-      - name: 'list'
+      - name: list
         type: ({after?}) => Promise<{threads, nextCursor?}>
         default: null
         desc: Loads thread metadata pages; return nextCursor to enable loadMore.
-      - name: 'initialize'
+      - name: initialize
         type: (localId) => Promise<{remoteId}>
         default: null
         desc: Creates the remote thread record; safe to await many times.
-      - name: 'fetch'
+      - name: fetch
         type: (remoteId) => Promise<RemoteThreadMetadata>
         default: null
         desc: Reads one thread record (status, remoteId, title).
-      - name: 'generateTitle'
+      - name: generateTitle
         type: (remoteId, messages) => Promise<AssistantStream>
         default: null
         desc: Returns a stream whose text is the title; persisting it is the adapter job.
-      - name: 'updateCustom'
+      - name: updateCustom
         type: (remoteId, custom) => Promise<void>
         default: null
         desc: Optional; persists RemoteThreadMetadata.custom.
       returns: RemoteThreadListAdapter object; pass a stable reference
     - id: generate-title
-      name: 'generateTitle'
-      summary: 'Called after the first message; returns an assistant stream of title text (createAssistantStream from assistant-stream)'
+      name: generateTitle
+      summary: Called after the first message; returns an assistant stream of title text (createAssistantStream from assistant-stream)
       lenses:
       - reliability
       signature: generateTitle(remoteId, messages) => createAssistantStream(c => c.appendText(title))
@@ -410,8 +410,8 @@ groups:
       - runs after 1st message; not persisted for you; assistant-stream not re-exported
       ref: /docs/runtimes/concepts/threads.md
     - id: threads-search-select
-      name: 'threads.search select'
-      summary: 'Pass select to threads.search so the server returns metadata fields only, not full message history per thread'
+      name: threads.search select
+      summary: Pass select to threads.search so the server returns metadata fields only, not full message history per thread
       lenses:
       - perf
       - cost
@@ -420,8 +420,8 @@ groups:
       - server honours select; without it full values history returns
       ref: /docs/runtimes/langgraph/threads.md
     - id: stable-adapter-ref
-      name: 'Stable adapter reference'
-      summary: 'Keep the adapter object referentially stable (module scope or useMemo); a new instance reloads the list'
+      name: Stable adapter reference
+      summary: Keep the adapter object referentially stable (module scope or useMemo); a new instance reloads the list
       lenses:
       - reliability
       - perf
@@ -430,8 +430,8 @@ groups:
       - a new adapter reloads the list and cancels in-flight mutations
       ref: /docs/runtimes/concepts/threads.md
     - id: thread-list-paginate
-      name: 'List pagination'
-      summary: 'list() returns nextCursor; the UI calls aui.threads.loadMore() or renders ThreadListPrimitive.LoadMore'
+      name: List pagination
+      summary: list() returns nextCursor; the UI calls aui.threads.loadMore() or renders ThreadListPrimitive.LoadMore
       lenses:
       - perf
       - reliability
@@ -441,15 +441,15 @@ groups:
       ref: /docs/runtimes/concepts/threads.md
       returns: nextCursor enables hasMore; the runtime passes params.after back on each loadMore()
     - id: custom-metadata
-      name: 'Custom thread metadata'
-      summary: 'Per-thread app metadata stored on RemoteThreadMetadata.custom and written through updateCustom'
+      name: Custom thread metadata
+      summary: Per-thread app metadata stored on RemoteThreadMetadata.custom and written through updateCustom
       lenses:
       - composability
       signature: RemoteThreadMetadata.custom, aui.threadListItem.updateCustom
       ref: /docs/runtimes/concepts/threads.md
     - id: thread-reload
-      name: 'Reload after auth'
-      summary: 'Re-run list() after async auth resolves; reload() drops in-flight responses from superseded calls'
+      name: Reload after auth
+      summary: Re-run list() after async auth resolves; reload() drops in-flight responses from superseded calls
       lenses:
       - reliability
       signature: aui.threads.reload()
@@ -457,8 +457,8 @@ groups:
       - needed if per-user auth is added
       ref: /docs/runtimes/concepts/threads.md
     - id: selection-event
-      name: 'Selection event'
-      summary: 'Event fired when the selected thread changes; replaces threadListItem.switchedTo/switchedAway'
+      name: Selection event
+      summary: Event fired when the selected thread changes; replaces threadListItem.switchedTo/switchedAway
       lenses:
       - perf
       - reliability
@@ -467,22 +467,22 @@ groups:
       - useAuiEvent({scope:"*", event}) subscribes across all threads, not just the selected one
       ref: /docs/migrations/v0-15.md
     - id: cloud-persistence
-      name: 'Assistant Cloud'
-      summary: 'Hosted thread list, message copy and telemetry through the cloud option of the runtime hook'
+      name: Assistant Cloud
+      summary: Hosted thread list, message copy and telemetry through the cloud option of the runtime hook
       lenses:
       - cost
       signature: cloud
       ref: /docs/cloud/langgraph.md
     - id: resumable-streams
-      name: 'Resumable streams'
-      summary: 'Server-side resumable stream contexts so a client can rejoin a stream after disconnect'
+      name: Resumable streams
+      summary: Server-side resumable stream contexts so a client can rejoin a stream after disconnect
       lenses:
       - reliability
       signature: assistant-stream/resumable, createResumableStreamContext
       ref: /docs/guides/resumable-streams.md
     - id: refetch-thread
-      name: 'Refetch open thread'
-      summary: 'Re-pull the open thread server state when it changed out of band; reload() alone refreshes only list metadata'
+      name: Refetch open thread
+      summary: Re-pull the open thread server state when it changed out of band; reload() alone refreshes only list metadata
       lenses:
       - reliability
       signature: aui.threads.reloadMainThread(); useExternalStoreRuntime({onRefetchThread})
@@ -490,18 +490,18 @@ groups:
       - in-place refetch keeps composer drafts; remount path drops the rendering runtime
       - capabilities.refetchThread reports which path
       ref: /docs/runtimes/concepts/threads.md
-- title: 'Tools and tool UI'
+- title: Tools and tool UI
   sections:
   - id: tool-ui
-    title: 'Toolkits and tool renderers'
+    title: Toolkits and tool renderers
     level: intermediate
     requires:
     - langchain-runtime
     ref: /docs/tools/tool-ui.md
     entries:
     - id: define-toolkit
-      name: 'defineToolkit'
-      summary: 'Named map of tools (frontend, backend, human) with optional render; registered via Tools({toolkit}) in AuiConfig'
+      name: defineToolkit
+      summary: Named map of tools (frontend, backend, human) with optional render; registered via Tools({toolkit}) in AuiConfig
       lenses:
       - composability
       - typing-dx
@@ -510,14 +510,14 @@ groups:
       - render-only backend entries type-check
       ref: /docs/api-reference/tools/toolkits.md
       params:
-      - name: 'definition'
+      - name: definition
         type: Record<string, ToolDefinition>
         default: null
         desc: Keys are tool names; each entry has type frontend|backend|human, render, and for frontend tools parameters + execute.
       returns: Typed Toolkit; outside a "use generative" compiler it returns the object unchanged
     - id: tool-display
-      name: 'Tool display mode'
-      summary: 'Controls whether a tool call folds into the tool group (inline) or renders on its own (standalone)'
+      name: Tool display mode
+      summary: Controls whether a tool call folds into the tool group (inline) or renders on its own (standalone)
       lenses:
       - ux-a11y
       signature: 'display: "standalone" | "inline"'
@@ -525,12 +525,12 @@ groups:
       - standalone keeps delegation cards out of the folded tool group
       ref: /docs/api-reference/tools/toolkits.md
       options:
-      - name: 'display'
+      - name: display
         type: '"inline" | "standalone"'
         default: '"inline"'
         desc: standalone surfaces the call outside the chain-of-thought group; human tools are always standalone.
     - id: tool-render-props
-      name: 'Renderer props'
+      name: Renderer props
       summary: 'Props a tool renderer receives: args, argsText, result, isError and a four-state status'
       lenses:
       - typing-dx
@@ -540,7 +540,7 @@ groups:
       - 'status.type: running, requires-action, incomplete (reason cancelled or error), complete'
       ref: /docs/tools/tool-ui.md
     - id: tool-args-status
-      name: 'Tool timing'
+      name: Tool timing
       summary: 'Hooks for tool UIs: wall-clock elapsed time, and per-argument streaming-vs-complete state'
       lenses:
       - ux-a11y
@@ -551,8 +551,8 @@ groups:
       ref: /docs/api-reference/tools/status.md
       returns: 'useToolCallElapsed: ms (ticks 1s) or undefined; useToolArgsStatus: {propStatus: per-key "streaming"|"complete"}'
     - id: tool-fallback
-      name: 'ToolFallback, ToolGroup'
-      summary: 'Default renderer for tool calls without a registered UI, plus the folded ToolGroup around consecutive calls'
+      name: ToolFallback, ToolGroup
+      summary: Default renderer for tool calls without a registered UI, plus the folded ToolGroup around consecutive calls
       lenses:
       - reuse
       - ux-a11y
@@ -561,8 +561,8 @@ groups:
       - vendored; Thread uses part.toolUI ?? ToolFallback
       ref: /elements/tool-fallback.md
     - id: external-tool
-      name: 'use-generative helpers'
-      summary: 'Marks a generative toolkit entry as executed elsewhere (backend, LangGraph node) so only its renderer is built'
+      name: use-generative helpers
+      summary: Marks a generative toolkit entry as executed elsewhere (backend, LangGraph node) so only its renderer is built
       lenses:
       - security
       signature: externalTool(), humanTool(), stubTool()
@@ -570,7 +570,7 @@ groups:
       notes:
       - needs a "use generative" compiler (@assistant-ui/next or /vite)
     - id: approval-gates
-      name: 'Approval gates'
+      name: Approval gates
       summary: 'Server-side approval for tool calls: the UI answers with respondToApproval instead of executing locally'
       lenses:
       - security
@@ -578,8 +578,8 @@ groups:
       signature: respondToApproval({approved, reason?}), approval.approved
       ref: /docs/tools/tool-ui.md
     - id: generative-ui
-      name: 'present tool'
-      summary: 'Model composes UI from a shipped component vocabulary through one present tool and a JSON tree'
+      name: present tool
+      summary: Model composes UI from a shipped component vocabulary through one present tool and a JSON tree
       lenses:
       - ux-a11y
       signature: present, JSONGenerativeUI, @assistant-ui/react-generative-ui, MessagePrimitive.GenerativeUI
@@ -587,46 +587,46 @@ groups:
       - model-composed UI; new dep, scouting gate
       ref: /docs/tools/generative-ui.md
     - id: interactables
-      name: 'Interactables'
-      summary: 'Stateful UI the user and model both edit; auto-generated update_{name} tool, versions and persistence'
+      name: Interactables
+      summary: Stateful UI the user and model both edit; auto-generated update_{name} tool, versions and persistence
       lenses:
       - composability
       ref: /docs/tools/interactables.md
     - id: mcp-tools
-      name: 'MCP tools and apps'
-      summary: 'Spread MCP server tools into a toolkit and render MCP Apps (ui:// resources)'
+      name: MCP tools and apps
+      summary: Spread MCP server tools into a toolkit and render MCP Apps (ui:// resources)
       lenses:
       - security
       signature: defineMcpToolkit
       ref: /docs/tools/mcp.md
       params:
-      - name: 'definition'
+      - name: definition
         type: McpServerConfig | {server, disabled?, tools?}
         default: null
         desc: Raw config for always-on servers, or the object form to configure but not expose all tools this request.
     - id: tool-helper
-      name: 'tool()'
-      summary: 'Type-checked single tool definition with a Standard Schema (Zod) parameters; inferred args for execute'
+      name: tool()
+      summary: Type-checked single tool definition with a Standard Schema (Zod) parameters; inferred args for execute
       lenses:
       - typing-dx
       - reuse
       signature: tool({type, description, parameters, execute})
       params:
-      - name: 'type'
+      - name: type
         type: '"frontend" | "backend" | "human"'
         default: null
         desc: Where the tool executes; frontend needs execute and a renderer.
-      - name: 'parameters'
+      - name: parameters
         type: StandardSchema | JSONSchema7
         default: null
         desc: Schema of arguments the model supplies; Zod v4 input type is inferred.
-      - name: 'execute'
+      - name: execute
         type: (args) => Promise<result>
         default: null
         desc: Runs after valid args; omit for backend tools executed server-side.
       ref: /docs/api-reference/tools/toolkits.md
     - id: human-tool
-      name: 'humanTool'
+      name: humanTool
       summary: 'Marks a tool as human-in-the-loop: the agent pauses and the render UI supplies the result'
       lenses:
       - security
@@ -636,18 +636,18 @@ groups:
       - no runtime body; a "use generative" compiler must strip it
       - replaces deprecated hitl and hitlTool
       ref: /docs/api-reference/tools/toolkits.md
-- title: 'Multi-agent UI'
+- title: Multi-agent UI
   sections:
   - id: multi-agent
-    title: 'Sub-agent rendering'
+    title: Sub-agent rendering
     level: advanced
     requires:
     - tool-ui
     ref: /docs/tools/multi-agent.md
     entries:
     - id: subagent-messages
-      name: 'Nested sub-agent thread'
-      summary: 'MessagePartPrimitive.Messages renders a tool call nested messages array as a read-only recursive thread'
+      name: Nested sub-agent thread
+      summary: MessagePartPrimitive.Messages renders a tool call nested messages array as a read-only recursive thread
       lenses:
       - ux-a11y
       - composability
@@ -656,8 +656,8 @@ groups:
       - inherits the parent toolkit renderers; answerToolCall capability is false inside
       ref: /docs/tools/multi-agent.md
     - id: thread-tasks
-      name: 'Thread tasks'
-      summary: 'Derived list of delegated tasks on the thread, selectable by id for custom cards or status lists'
+      name: Thread tasks
+      summary: Derived list of delegated tasks on the thread, selectable by id for custom cards or status lists
       lenses:
       - observability
       - perf
@@ -666,8 +666,8 @@ groups:
       - identity stable across unrelated tokens; depth cap 32
       ref: /docs/tools/multi-agent.md
     - id: task-group
-      name: 'TaskGroup slot'
-      summary: 'Opt-in Thread slot that renders nested tool calls (with messages, no registered UI) as task cards'
+      name: TaskGroup slot
+      summary: Opt-in Thread slot that renders nested tool calls (with messages, no registered UI) as task cards
       lenses:
       - ux-a11y
       - reuse
@@ -676,38 +676,38 @@ groups:
       - only nested tool calls with no registered tool UI
       ref: /elements/task-card.md
     - id: readonly-thread
-      name: 'ReadonlyThreadProvider'
-      summary: 'Renders a ThreadMessage[] you already hold in a read-only thread context (replays, history views)'
+      name: ReadonlyThreadProvider
+      summary: Renders a ThreadMessage[] you already hold in a read-only thread context (replays, history views)
       lenses:
       - composability
       signature: ReadonlyThreadProvider messages={ThreadMessage[]}
       ref: /docs/tools/multi-agent.md
     - id: subagent-list
-      name: 'Subagent list'
-      summary: 'Elements listing subagents with live status for a multi-agent run'
+      name: Subagent list
+      summary: Elements listing subagents with live status for a multi-agent run
       lenses:
       - ux-a11y
       ref: /elements/subagent-list.md
     - id: react-o11y
-      name: 'react-o11y'
-      summary: 'Renders observability spans as collapsible trees, waterfalls and call timelines, complementing message views'
+      name: react-o11y
+      summary: Renders observability spans as collapsible trees, waterfalls and call timelines, complementing message views
       lenses:
       - observability
       notes:
       - new dep, scouting gate
       ref: /docs/utilities/react-o11y.md
-- title: 'Primitives and elements'
+- title: Primitives and elements
   sections:
   - id: primitives
-    title: 'Primitives and vendored elements'
+    title: Primitives and vendored elements
     level: basic
     requires:
     - layers
     ref: /docs/primitives.md
     entries:
     - id: primitive-pattern
-      name: 'Primitive pattern'
-      summary: 'Unstyled composable parts (Root, Part children) with asChild for your own elements; render functions replace the components prop'
+      name: Primitive pattern
+      summary: Unstyled composable parts (Root, Part children) with asChild for your own elements; render functions replace the components prop
       lenses:
       - composability
       - best-practice
@@ -716,8 +716,8 @@ groups:
       - stable tier; `components` prop deprecated
       ref: /docs/primitives.md
     - id: thread-primitives
-      name: 'ThreadPrimitive'
-      summary: 'Root, Viewport (owns auto-scroll), Messages, ViewportFooter, ScrollToBottom and Suggestions for the chat transcript'
+      name: ThreadPrimitive
+      summary: Root, Viewport (owns auto-scroll), Messages, ViewportFooter, ScrollToBottom and Suggestions for the chat transcript
       lenses:
       - ux-a11y
       - perf
@@ -726,8 +726,8 @@ groups:
       - Viewport owns auto-scroll
       ref: /docs/api-reference/primitives/thread.md
     - id: message-parts
-      name: 'MessagePrimitive parts'
-      summary: 'Render a message part by part; GroupedParts coalesces adjacent parts via groupBy (for example tool calls, reasoning)'
+      name: MessagePrimitive parts
+      summary: Render a message part by part; GroupedParts coalesces adjacent parts via groupBy (for example tool calls, reasoning)
       lenses:
       - composability
       signature: '<MessagePrimitive.GroupedParts groupBy={groupPartByType({"tool-call": ["group-tool"]})}>{({part, children}) => ...}'
@@ -735,8 +735,8 @@ groups:
       - groupBy/groupKey for custom groups
       ref: /docs/guides/part-grouping.md
     - id: error-primitive
-      name: 'Error primitive'
-      summary: 'Accessible role=alert error block that reads error text from message state; MessagePrimitive.Error is the bare variant'
+      name: Error primitive
+      summary: Accessible role=alert error block that reads error text from message state; MessagePrimitive.Error is the bare variant
       lenses:
       - ux-a11y
       - reliability
@@ -745,8 +745,8 @@ groups:
       - role=alert container
       ref: /docs/primitives/error.md
     - id: aui-if
-      name: 'AuiIf'
-      summary: 'Conditional render from the whole assistant state; replaces ThreadPrimitive.If/Empty and friends'
+      name: AuiIf
+      summary: Conditional render from the whole assistant state; replaces ThreadPrimitive.If/Empty and friends
       lenses:
       - composability
       signature: AuiIf condition={s => ...}
@@ -754,13 +754,13 @@ groups:
       - replaces ThreadPrimitive.If/Empty
       ref: /docs/api-reference/primitives/assistant-if.md
       params:
-      - name: 'condition'
+      - name: condition
         type: '(s: AssistantState) => boolean'
         default: null
         desc: Reads thread, message, composer, part or attachment scopes; return a boolean.
     - id: state-hooks
-      name: 'State hooks'
-      summary: 'useAui gives the client for actions, useAuiState selects one reactive value, useAuiEvent subscribes to events'
+      name: State hooks
+      summary: useAui gives the client for actions, useAuiState selects one reactive value, useAuiEvent subscribes to events
       lenses:
       - typing-dx
       - perf
@@ -770,23 +770,23 @@ groups:
       ref: /docs/api-reference/hooks/state.md
       returns: useAuiState re-renders only when the selected value changes by Object.is; returning the whole state throws
     - id: state-outside-thread
-      name: 'State outside the thread'
-      summary: 'Header, sidebar or status UI can read thread state anywhere under the provider with no second store'
+      name: State outside the thread
+      summary: Header, sidebar or status UI can read thread state anywhere under the provider with no second store
       lenses:
       - composability
       notes:
       - outside the provider, scope accessors throw
       ref: /docs/guides/state-outside-the-thread.md
     - id: thread-list-primitives
-      name: 'Thread list primitives'
-      summary: 'ThreadListPrimitive (Root, Items, ItemByIndex, New, LoadMore) and ThreadListItemPrimitive for the sidebar list'
+      name: Thread list primitives
+      summary: ThreadListPrimitive (Root, Items, ItemByIndex, New, LoadMore) and ThreadListItemPrimitive for the sidebar list
       lenses:
       - ux-a11y
       signature: ThreadListPrimitive, ThreadListItemPrimitive
       ref: /elements/thread-list.md
     - id: composer-attachments
-      name: 'Attachments'
-      summary: 'Composer attachment parts and an AttachmentAdapter for uploads, previews and validation'
+      name: Attachments
+      summary: Composer attachment parts and an AttachmentAdapter for uploads, previews and validation
       lenses:
       - ux-a11y
       - security
@@ -795,8 +795,8 @@ groups:
       - no AttachmentAdapter set; validate if added
       ref: /docs/guides/attachments.md
     - id: suggestions
-      name: 'Suggestions'
-      summary: 'Empty-state suggestion chips via ThreadPrimitive.Suggestions and a suggestion adapter on runtimes that have the slot'
+      name: Suggestions
+      summary: Empty-state suggestion chips via ThreadPrimitive.Suggestions and a suggestion adapter on runtimes that have the slot
       lenses:
       - ux-a11y
       signature: ThreadPrimitive.Suggestions, SuggestionPrimitive
@@ -804,37 +804,37 @@ groups:
       - react-langchain has no suggestion adapter slot
       ref: /docs/guides/suggestions.md
     - id: branching
-      name: 'Branching'
-      summary: 'BranchPicker walks alternate message versions created by edits and regenerations'
+      name: Branching
+      summary: BranchPicker walks alternate message versions created by edits and regenerations
       lenses:
       - ux-a11y
       signature: BranchPickerPrimitive.{Root,Previous,Number,Count,Next}, aui.message.switchToBranch
       ref: /docs/guides/branching.md
     - id: editing
-      name: 'Message editing'
-      summary: 'Inline message editing through an edit composer and ActionBarPrimitive.Edit'
+      name: Message editing
+      summary: Inline message editing through an edit composer and ActionBarPrimitive.Edit
       lenses:
       - ux-a11y
       signature: message.composer.isEditing, ActionBarPrimitive.Edit
       ref: /docs/guides/editing.md
     - id: reasoning-group
-      name: 'Reasoning group'
-      summary: 'Groups consecutive reasoning parts into a collapsible block, shown while thinking streams'
+      name: Reasoning group
+      summary: Groups consecutive reasoning parts into a collapsible block, shown while thinking streams
       lenses:
       - ux-a11y
       signature: ReasoningGroup, group-reasoning, ChainOfThoughtPrimitive
       ref: /elements/reasoning.md
     - id: stopped-run
-      name: 'Stopped run'
-      summary: 'A cancelled message keeps its partial text with status incomplete and reason cancelled; show a continue/dismiss UI'
+      name: Stopped run
+      summary: A cancelled message keeps its partial text with status incomplete and reason cancelled; show a continue/dismiss UI
       lenses:
       - ux-a11y
       - reliability
       signature: status.reason === "cancelled"
       ref: /elements/stopped-run.md
     - id: connection-state
-      name: 'Connection state'
-      summary: 'No connection field on thread state; catch the transport failure, show a banner, then resume or reload the thread'
+      name: Connection state
+      summary: No connection field on thread state; catch the transport failure, show a banner, then resume or reload the thread
       lenses:
       - reliability
       - ux-a11y
@@ -844,15 +844,15 @@ groups:
       ref: /elements/connection-state.md
       returns: reloadMainThread() re-fetches the open thread messages; resumeRun({parentId}) rejoins a run
     - id: thread-virtualization
-      name: 'Thread virtualization'
-      summary: 'Virtualize very long threads by rows (message/part/turn-end) with @tanstack/react-virtual; default kit uses content-visibility'
+      name: Thread virtualization
+      summary: Virtualize very long threads by rows (message/part/turn-end) with @tanstack/react-virtual; default kit uses content-visibility
       lenses:
       - perf
       signature: createThreadRowsSelector, ThreadPrimitive.Row
       ref: /docs/guides/virtualization.md
     - id: message-timing
-      name: 'Message timing'
-      summary: 'Experimental hook returning stream duration, time to first token and tokens per second for the current message'
+      name: Message timing
+      summary: Experimental hook returning stream duration, time to first token and tokens per second for the current message
       lenses:
       - observability
       signature: useMessageTiming()
@@ -861,8 +861,8 @@ groups:
       ref: /docs/guides/message-timing.md
       returns: '{streamStartTime, firstTokenTime?, totalStreamTime?, tokenCount?, tokensPerSecond?, totalChunks, toolCallCount} | undefined'
     - id: markdown-text
-      name: 'MarkdownText'
-      summary: 'MarkdownTextPrimitive renders a text part as markdown with remark plugins; kit wrapper in components'
+      name: MarkdownText
+      summary: MarkdownTextPrimitive renders a text part as markdown with remark plugins; kit wrapper in components
       lenses:
       - reuse
       - ux-a11y
@@ -871,29 +871,29 @@ groups:
       - renders inside a text part
       ref: /elements/markdown-text.md
     - id: streamdown
-      name: 'Streamdown'
-      summary: 'Alternative markdown renderer with math, mermaid and shiki code highlighting'
+      name: Streamdown
+      summary: Alternative markdown renderer with math, mermaid and shiki code highlighting
       lenses:
       - ux-a11y
       signature: StreamdownTextPrimitive
       ref: /docs/guides/streamdown.md
     - id: composer-extras
-      name: 'Composer extras'
+      name: Composer extras
       summary: 'Optional composer features: mentions, slash commands, dictation, speech and voice'
       lenses:
       - ux-a11y
       ref: /docs/guides/mentions.md
-- title: 'Styling utilities'
+- title: Styling utilities
   sections:
   - id: styling
-    title: 'tw-shimmer'
+    title: tw-shimmer
     level: basic
     requires: []
     ref: /docs/utilities/tw-shimmer.md
     entries:
     - id: tw-shimmer
-      name: 'tw-shimmer'
-      summary: 'Tailwind v4 CSS-only shimmer for loading text and skeletons; needs a semi-transparent text colour'
+      name: tw-shimmer
+      summary: Tailwind v4 CSS-only shimmer for loading text and skeletons; needs a semi-transparent text colour
       lenses:
       - ux-a11y
       - perf
@@ -901,17 +901,17 @@ groups:
       notes:
       - text shimmer holds still under prefers-reduced-motion; shimmer-bg keeps animating
       ref: /docs/utilities/tw-shimmer.md
-- title: 'Migrations and deprecated APIs'
+- title: Migrations and deprecated APIs
   sections:
   - id: migrations
-    title: 'Deprecated and removed APIs'
+    title: Deprecated and removed APIs
     level: intermediate
     requires: []
     ref: /docs/migrations/v0-15.md
     entries:
     - id: scope-accessor-props
-      name: 'Scope accessors as properties'
-      summary: 'aui.thread() call form is deprecated; use the property form aui.thread, which is always truthy (check .source != null)'
+      name: Scope accessors as properties
+      summary: aui.thread() call form is deprecated; use the property form aui.thread, which is always truthy (check .source != null)
       lenses:
       - best-practice
       - typing-dx
@@ -920,24 +920,24 @@ groups:
       - 'codemod: assistant-ui upgrade'
       ref: /docs/migrations/v0-15.md
     - id: legacy-context-hooks
-      name: 'Legacy context hooks'
-      summary: 'v0.12-era hooks (useThreadRuntime, useThread, useMessage...) were removed in 0.15 in favour of useAui/useAuiState'
+      name: Legacy context hooks
+      summary: v0.12-era hooks (useThreadRuntime, useThread, useMessage...) were removed in 0.15 in favour of useAui/useAuiState
       lenses:
       - best-practice
       signature: useThreadRuntime
       deprecated: removed in 0.15, use useAui/useAuiState
       ref: /docs/migrations/v0-15.md
     - id: legacy-if-components
-      name: 'Legacy If and part hooks'
-      summary: 'ThreadPrimitive.If/Empty, useMessagePartText and the components prop are replaced by AuiIf, useAuiState and render children'
+      name: Legacy If and part hooks
+      summary: ThreadPrimitive.If/Empty, useMessagePartText and the components prop are replaced by AuiIf, useAuiState and render children
       lenses:
       - best-practice
       signature: ThreadPrimitive.If, ThreadPrimitive.Empty, useMessagePartText, components
       deprecated: use AuiIf, useAuiState, children render fn
       ref: /docs/migrations/v0-15.md
     - id: legacy-tool-apis
-      name: 'Legacy tool APIs'
-      summary: 'makeAssistantTool, useAssistantTool, makeAssistantToolUI, useAssistantToolUI are deprecated for toolkits'
+      name: Legacy tool APIs
+      summary: makeAssistantTool, useAssistantTool, makeAssistantToolUI, useAssistantToolUI are deprecated for toolkits
       lenses:
       - best-practice
       - composability
@@ -947,61 +947,61 @@ groups:
       - banned by web rules
       ref: /docs/migrations/toolkit-tools.md
     - id: legacy-thread-events
-      name: 'Legacy thread events'
-      summary: 'switchedTo/switchedAway events, ToolsState.tools and the "mcp-app" group key were replaced in 0.15'
+      name: Legacy thread events
+      summary: switchedTo/switchedAway events, ToolsState.tools and the "mcp-app" group key were replaced in 0.15
       lenses:
       - best-practice
       signature: threadListItem.switchedTo, switchedAway, ToolsState.tools, "mcp-app"
       deprecated: use threads.selectionChanged, s.tools.toolUIs, standalone-tool-call
       ref: /docs/migrations/v0-15.md
     - id: react-langgraph-runtime
-      name: 'react-langgraph runtime'
-      summary: 'Older sibling runtime with a custom stream function and event handlers; heavier than react-langchain'
+      name: react-langgraph runtime
+      summary: Older sibling runtime with a custom stream function and event handlers; heavier than react-langchain
       lenses:
       - composability
       signature: '@assistant-ui/react-langgraph'
       notes:
       - only it has message queue, custom backend streams
       ref: /docs/runtimes/langgraph/overview.md
-- title: 'Other runtimes'
+- title: Other runtimes
   sections:
   - id: other-runtimes
-    title: 'Runtimes not used here'
+    title: Runtimes not used here
     level: intermediate
     requires:
     - layers
     ref: /docs/runtimes/pick-a-runtime.md
     entries:
     - id: ai-sdk-runtime
-      name: 'Vercel AI SDK runtime'
-      summary: 'useChatRuntime adapter for Vercel AI SDK backends'
+      name: Vercel AI SDK runtime
+      summary: useChatRuntime adapter for Vercel AI SDK backends
       lenses:
       - composability
       signature: useChatRuntime
       ref: /docs/runtimes/ai-sdk/v7.md
     - id: local-runtime
-      name: 'LocalRuntime and protocols'
-      summary: 'In-browser runtime driven by a ChatModelAdapter, plus DataStream and AssistantTransport protocols'
+      name: LocalRuntime and protocols
+      summary: In-browser runtime driven by a ChatModelAdapter, plus DataStream and AssistantTransport protocols
       lenses:
       - composability
       signature: useLocalRuntime, ChatModelAdapter
       ref: /docs/runtimes/custom/local-runtime.md
     - id: protocol-runtimes
-      name: 'Protocol runtimes'
+      name: Protocol runtimes
       summary: 'Runtimes for other agent protocols: A2A, AG-UI, Google ADK, Eve, OpenCode, Claude Managed Agents'
       lenses:
       - composability
       ref: /docs/runtimes/pick-a-runtime.md
-- title: 'API reference - adapters, providers, external store'
+- title: API reference - adapters, providers, external store
   sections:
   - id: api-adapters
-    title: 'Adapter interfaces'
+    title: Adapter interfaces
     level: intermediate
     requires: [layers]
     ref: /docs/api-reference/adapters.md
     entries:
     - id: api-chat-model-adapter
-      name: 'ChatModelAdapter'
+      name: ChatModelAdapter
       summary: 'LocalRuntime model adapter: run(options) returns a Promise or AsyncGenerator of ChatModelRunResult'
       lenses: [composability, typing-dx]
       signature: 'ChatModelAdapter.run(options: ChatModelRunOptions): Promise<ChatModelRunResult> | AsyncGenerator<ChatModelRunResult, void>'
@@ -1015,7 +1015,7 @@ groups:
       - 'yield cumulative content per update; CreateStartRunConfig and CreateResumeRunConfig carry parentId, sourceId, runConfig'
       ref: /docs/api-reference/adapters/model.md
     - id: api-attachment-adapter
-      name: 'AttachmentAdapter and built-ins'
+      name: AttachmentAdapter and built-ins
       summary: 'Upload lifecycle accept/add/remove/send; ships SimpleImage, SimpleText, Composite and CloudFile adapters'
       lenses: [composability, security]
       signature: 'AttachmentAdapter {accept: string; add({file}); remove(att); send(att, {signal?})}'
@@ -1024,13 +1024,13 @@ groups:
       - 'CompositeAttachmentAdapter([...]) merges adapters by accept; CloudFileAttachmentAdapter needs an AssistantCloud'
       ref: /docs/api-reference/adapters/attachments.md
     - id: api-feedback-adapter
-      name: 'FeedbackAdapter'
-      summary: 'Single submit(feedback) callback invoked by feedback action buttons or runtime actions'
+      name: FeedbackAdapter
+      summary: Single submit(feedback) callback invoked by feedback action buttons or runtime actions
       lenses: [observability]
       signature: 'FeedbackAdapter.submit(feedback: FeedbackAdapterFeedback): void'
       ref: /docs/api-reference/adapters/feedback.md
     - id: api-history-adapter
-      name: 'ThreadHistoryAdapter'
+      name: ThreadHistoryAdapter
       summary: 'Per-thread message persistence: load, append, optional update/delete/resume/withFormat/unstable_copy'
       lenses: [reliability, composability]
       signature: 'ThreadHistoryAdapter {load(): Promise<ExportedMessageRepository & {state?, unstable_resume?}>; append(item); update?(item); delete?(items); resume?(options); withFormat?(fmt)}'
@@ -1039,7 +1039,7 @@ groups:
       - withFormat is required with useAISDKRuntime/useChatRuntime; GenericThreadHistoryAdapter/MessageFormatAdapter (format, encode, decode, getId) back it
       ref: /docs/api-reference/adapters/persistence.md
     - id: api-remote-thread-list-adapter
-      name: 'RemoteThreadListAdapter'
+      name: RemoteThreadListAdapter
       summary: 'Backend thread-list contract: list, rename, archive, unarchive, delete, initialize, generateTitle, fetch'
       lenses: [reliability, composability]
       signature: 'useRemoteThreadListRuntime({adapter, runtimeHook}); RemoteThreadListAdapter {list(params?); rename; updateCustom?; archive; unarchive; delete; initialize(threadId); generateTitle(remoteId, messages): Promise<AssistantStream>; fetch(threadId); unstable_Provider?; unstable_useAdapters?}'
@@ -1048,26 +1048,26 @@ groups:
       - unstable_Provider wraps each active thread to inject per-thread history/attachments adapters; InMemoryThreadListAdapter is a no-op stub
       ref: /docs/api-reference/adapters/persistence.md
     - id: api-runtime-adapters
-      name: 'RuntimeAdapters and RuntimeAdapterProvider'
+      name: RuntimeAdapters and RuntimeAdapterProvider
       summary: 'Bundle {modelContext?, history?, attachments?, feedback?} provided to a subtree through RuntimeAdapterProvider'
       lenses: [composability]
       signature: '<RuntimeAdapterProvider adapters={RuntimeAdapters}>'
       ref: /docs/api-reference/adapters/runtime.md
     - id: api-suggestion-adapter
-      name: 'SuggestionAdapter'
+      name: SuggestionAdapter
       summary: 'generate(options) returns ThreadSuggestion[] (Promise or AsyncGenerator); createSuggestionAdapter wraps it'
       lenses: [ux-a11y]
       signature: 'createSuggestionAdapter(options): SuggestionAdapter; SuggestionAdapter.generate(options)'
       ref: /docs/api-reference/adapters/suggestions.md
   - id: api-context-providers
-    title: 'Context providers'
+    title: Context providers
     level: intermediate
     requires: [layers]
     ref: /docs/api-reference/context-providers.md
     entries:
     - id: api-runtime-provider
-      name: 'AssistantRuntimeProvider'
-      summary: 'Root provider exposing an AssistantRuntime (threads, thread, registerModelContextProvider) to all primitives and hooks'
+      name: AssistantRuntimeProvider
+      summary: Root provider exposing an AssistantRuntime (threads, thread, registerModelContextProvider) to all primitives and hooks
       lenses: [composability]
       import: '@assistant-ui/react'
       signature: '<AssistantRuntimeProvider runtime={AssistantRuntime} aui?={AssistantClient}>'
@@ -1079,7 +1079,7 @@ groups:
       - 'composer runtime: setText, setRunConfig, addAttachment (File or CreateAttachment descriptor), send, cancel, setQuote, moveQueueItem, startDictation'
       ref: /docs/api-reference/context-providers/assistant-runtime-provider.md
     - id: api-scoped-providers
-      name: 'Scoped providers'
+      name: Scoped providers
       summary: 'Lower-level providers for custom renderers: MessageProvider, ReadonlyThreadProvider, TextMessagePartProvider and *ByIndexProvider'
       lenses: [composability, testing]
       signature: 'MessageProvider{message,index,isLast?,branchNumber?,branchCount?}; ReadonlyThreadProvider{messages}; TextMessagePartProvider{text,isRunning?}; ThreadListItemRuntimeProvider{runtime}; MessageByIndexProvider{index}; PartByIndexProvider{index}'
@@ -1087,13 +1087,13 @@ groups:
       - 'useful to render stored messages outside a live thread and in unit tests'
       ref: /docs/api-reference/context-providers/scoped-providers.md
   - id: api-external-store
-    title: 'External store runtime API'
+    title: External store runtime API
     level: advanced
     requires: [layers]
     ref: /docs/api-reference/external-store.md
     entries:
     - id: api-external-store-adapter
-      name: 'ExternalStoreAdapter'
+      name: ExternalStoreAdapter
       summary: 'Options for useExternalStoreRuntime(store): host-owned messages plus onNew/onEdit/onReload/onCancel/onResume callbacks'
       lenses: [composability, typing-dx]
       signature: 'useExternalStoreRuntime<T>(store: ExternalStoreAdapter<T>)'
@@ -1113,7 +1113,7 @@ groups:
       - 'stable message ids keep rendered rows and scroll position when pages are prepended; react-langchain builds on this'
       ref: /docs/api-reference/external-store/runtime.md
     - id: api-external-thread
-      name: 'ExternalThread and queue adapter'
+      name: ExternalThread and queue adapter
       summary: 'ExternalThreadProps shape (messages, isRunning, branches, queue, adapters) and ExternalThreadQueueAdapter lanes'
       lenses: [composability]
       signature: 'ExternalThreadQueueAdapter {items, steerItems, enqueue, steer, move, edit, remove}'
@@ -1121,7 +1121,7 @@ groups:
       - '''an unanchored move into the steer lane mid-run cancels the live run and dispatches the item'''
       ref: /docs/api-reference/external-store/runtime.md
     - id: api-message-conversion
-      name: 'External message conversion'
+      name: External message conversion
       summary: 'useExternalMessageConverter, unstable_createMessageConverter, conversion cache and getExternalStoreMessages'
       lenses: [perf, typing-dx]
       signature: 'useExternalMessageConverter({callback, messages, isRunning, joinStrategy?, metadata?}); getExternalStoreMessages<T>(input): T[]; unstable_createExternalMessageConversionCache()'
@@ -1129,29 +1129,29 @@ groups:
       - keep callback and metadata referentially stable; the cache returns the same ThreadMessage for an unchanged source message
       - bindExternalStoreMessage (experimental) attaches the original message to a ThreadMessage or part
       ref: /docs/api-reference/external-store/message-conversion.md
-- title: 'API reference - model context, hooks, tools, transport, voice'
+- title: API reference - model context, hooks, tools, transport, voice
   sections:
   - id: api-model-context
-    title: 'Model context API'
+    title: Model context API
     level: intermediate
     requires: [layers]
     ref: /docs/api-reference/model-context.md
     entries:
     - id: api-use-assistant-instructions
-      name: 'useAssistantInstructions and useAssistantContext'
-      summary: 'Register system instructions or arbitrary context from a mounted component; removed on unmount'
+      name: useAssistantInstructions and useAssistantContext
+      summary: Register system instructions or arbitrary context from a mounted component; removed on unmount
       lenses: [composability]
       import: '@assistant-ui/react'
       signature: 'useAssistantInstructions(config: string | AssistantInstructionsConfig); useAssistantContext(config: AssistantContextConfig)'
       ref: /docs/api-reference/model-context/context.md
     - id: api-make-assistant-visible
-      name: 'makeAssistantVisible'
+      name: makeAssistantVisible
       summary: 'HOC exposing a component DOM to the model, with optional clickable/editable tools'
       lenses: [composability]
       signature: 'makeAssistantVisible<T>(Component: T, config?: {clickable?: boolean; editable?: boolean}): T'
       ref: /docs/api-reference/model-context/context.md
     - id: api-model-context-registry
-      name: 'ModelContextRegistry'
+      name: ModelContextRegistry
       summary: 'Imperative registry: addTool, addInstruction, addProvider each return a handle; getModelContext/subscribe feed a runtime'
       lenses: [composability, testing]
       signature: 'new ModelContextRegistry(); addTool(tool): handle; addInstruction(cfg): handle; addProvider(p): handle; getModelContext(): ModelContext; subscribe(cb): Unsubscribe'
@@ -1159,38 +1159,38 @@ groups:
       - 'mergeModelContexts(Set<ModelContextProvider>) folds providers into one ModelContext; ModelContextProvider = {getModelContext, subscribe?}'
       ref: /docs/api-reference/model-context/registry.md
     - id: api-use-inline-render
-      name: 'useInlineRender'
+      name: useInlineRender
       summary: 'Wrap a tool-UI FC so an inline renderer keeps the latest closure without re-registering'
       lenses: [perf]
       signature: 'useInlineRender(toolUI: FC<ToolCallMessagePart & {status}>)'
       ref: /docs/api-reference/model-context/context.md
   - id: api-hooks
-    title: 'Hook reference'
+    title: Hook reference
     level: intermediate
     requires: [layers]
     ref: /docs/api-reference/hooks.md
     entries:
     - id: api-runtime-hooks
-      name: 'Runtime creation hooks'
+      name: Runtime creation hooks
       summary: 'useLocalRuntime(chatModel, options?), useRemoteThreadListRuntime(options), useCloudThreadListRuntime(options)'
       lenses: [composability]
       signature: 'useLocalRuntime(chatModel: ChatModelAdapter, options?: LocalRuntimeOptions); useRemoteThreadListRuntime({adapter, runtimeHook}); useCloudThreadListRuntime(options)'
       ref: /docs/api-reference/hooks/runtimes.md
     - id: api-tool-overrides
-      name: 'useAuiToolOverrides'
+      name: useAuiToolOverrides
       summary: 'Experimental: override toolkit entries per scope so a stubTool() declaration gets a React-closing executor'
       lenses: [composability]
       signature: 'useAuiToolOverrides(overrides: AuiToolOverrides)'
       notes: ['intended for dynamic local-state tools whose contract lives in a "use generative" toolkit file with execute: stubTool()']
       ref: /docs/api-reference/hooks/model-context.md
     - id: api-message-timing-quote
-      name: 'useMessageTiming and useMessageQuote'
-      summary: 'Per-message hooks reading metadata.timing (tokensPerSecond, firstTokenTime, totalChunks) and metadata.custom.quote'
+      name: useMessageTiming and useMessageQuote
+      summary: Per-message hooks reading metadata.timing (tokensPerSecond, firstTokenTime, totalChunks) and metadata.custom.quote
       lenses: [observability, ux-a11y]
       signature: 'useMessageTiming(): MessageTiming | undefined; useMessageQuote(): QuoteInfo | undefined'
       ref: /docs/api-reference/hooks/primitives.md
     - id: api-thread-viewport
-      name: 'Thread viewport hooks'
+      name: Thread viewport hooks
       summary: 'useThreadViewport(selector?), useThreadViewportStore, useThreadViewportAutoScroll(options), useScrollLock(ref, ms)'
       lenses: [ux-a11y, perf]
       signature: 'useThreadViewport<T>(selector?: (s: ThreadViewportState) => T); useScrollLock(ref, animationDuration): () => void'
@@ -1199,13 +1199,13 @@ groups:
       - '{optional: true} option returns null outside a viewport instead of throwing'
       ref: /docs/api-reference/hooks/primitives.md
     - id: api-use-runtime-adapters
-      name: 'useRuntimeAdapters'
-      summary: 'Read the RuntimeAdapters {modelContext, history, attachments, feedback} provided to the current scope; null when absent'
+      name: useRuntimeAdapters
+      summary: Read the RuntimeAdapters {modelContext, history, attachments, feedback} provided to the current scope; null when absent
       lenses: [composability]
       signature: 'useRuntimeAdapters(): RuntimeAdapters | null'
       ref: /docs/api-reference/hooks/primitives.md
     - id: api-composer-input-hooks
-      name: 'Composer input hooks (unstable)'
+      name: Composer input hooks (unstable)
       summary: 'Headless composer input bridge, terminal-style ArrowUp history, stall detection, stable thread message ids, combobox aria props'
       lenses: [ux-a11y, typing-dx]
       signature: 'unstable_useComposerInput(); unstable_useComposerInputHistory(); unstable_useMessageStallDetection(options?); unstable_useThreadMessageIds(): readonly string[]; unstable_useTriggerPopoverAriaProps()'
@@ -1214,7 +1214,7 @@ groups:
       - 'unstable_useComposerInputHistory: ArrowUp on an empty draft recalls sent messages; spread onto ComposerPrimitive.Input'
       ref: /docs/api-reference/hooks/primitives.md
     - id: api-composer-triggers
-      name: 'Composer trigger hooks (unstable)'
+      name: Composer trigger hooks (unstable)
       summary: 'Mention and slash-command adapters for ComposerTriggerPopover plus a live async completion adapter'
       lenses: [ux-a11y, composability]
       signature: 'unstable_useMentionAdapter(options?) => {adapter, directive}; unstable_useSlashCommandAdapter({commands}) => {adapter, action}; unstable_useLiveCompletionAdapter({fetcher}) => {adapter, isLoading}'
@@ -1223,20 +1223,20 @@ groups:
       - 'unstable_useTriggerPopoverTriggers returns a live Map of registered triggers'
       ref: /docs/api-reference/hooks/composer-triggers.md
     - id: api-deprecated-part-hooks
-      name: 'Deprecated useMessagePart* hooks'
-      summary: 'useMessagePartText/Image/File/Source/Reasoning/Data replaced by useAuiState selectors that return null for non-matching parts'
+      name: Deprecated useMessagePart* hooks
+      summary: useMessagePartText/Image/File/Source/Reasoning/Data replaced by useAuiState selectors that return null for non-matching parts
       lenses: [best-practice]
       signature: 'useAuiState((s) => s.part.type === "text" ? s.part : null)'
       deprecated: 'use useAuiState to select and narrow s.part (return null for optional rendering, never throw in the selector)'
       ref: /docs/api-reference/hooks/primitives.md
   - id: api-tools
-    title: 'Tools API reference'
+    title: Tools API reference
     level: intermediate
     requires: [define-toolkit]
     ref: /docs/api-reference/tools.md
     entries:
     - id: api-tool-rendering
-      name: 'Tool and data renderers'
+      name: Tool and data renderers
       summary: 'Register renderers for tool-call parts and named data parts; deprecated makeAssistantToolUI/useAssistantToolUI still listed'
       lenses: [composability, ux-a11y]
       signature: 'useAssistantDataUI({name, render}); makeAssistantDataUI(...); makeAssistantToolUI({toolName, render, display?}); useAssistantToolUI(tool | null)'
@@ -1246,14 +1246,14 @@ groups:
       - 'toolApprovalAcceptsText(approval) says whether an approval request wants a free-form answer'
       ref: /docs/api-reference/tools/rendering.md
     - id: api-component-tools
-      name: 'Component tools (deprecated)'
+      name: Component tools (deprecated)
       summary: 'makeAssistantTool/useAssistantTool register a tool for the lifetime of a mounted component; superseded by Tools({toolkit})'
       lenses: [best-practice]
       signature: 'useAssistantTool(tool: AssistantToolProps) with {toolName, type, description, parameters, execute, render?, renderText?}'
       deprecated: 'use a toolkit registered via AuiConfig({tools: Tools({toolkit})}); pass a referentially stable tool object'
       ref: /docs/api-reference/tools/component-tools.md
     - id: api-interactables
-      name: 'Interactables (unstable)'
+      name: Interactables (unstable)
       summary: 'Model-editable state: unstable_useInteractable, unstable_interactableTool, version history and snapshot helpers'
       lenses: [composability, reliability]
       signature: 'unstable_useInteractable(name, config) => [state,...]; unstable_useInteractableState(id); unstable_useInteractableVersions({id,name}); unstable_interactableTool({description, stateSchema, render})'
@@ -1262,20 +1262,20 @@ groups:
       - 'unstable_getInteractableVersions folds create, user-edit and update versions; unstable_getInteractableSnapshots reads metadata.custom.interactables'
       ref: /docs/api-reference/tools/interactables.md
     - id: api-interactables-legacy
-      name: 'Interactables (legacy)'
+      name: Interactables (legacy)
       summary: 'useAssistantInteractable + useInteractableState with per-instance update tools'
       lenses: [best-practice]
       signature: 'useAssistantInteractable(name, config); useInteractableState(id, fallback)'
       deprecated: 'deprecated 2026-06-14, removal scheduled on/after 2026-09-14: use the unstable interactables API'
       ref: /docs/api-reference/tools/interactables-legacy.md
   - id: api-transport
-    title: 'Transport and frame API'
+    title: Transport and frame API
     level: advanced
     requires: [layers]
     ref: /docs/api-reference/transport.md
     entries:
     - id: api-assistant-transport
-      name: 'Assistant transport hooks'
+      name: Assistant transport hooks
       summary: 'useAssistantTransportRuntime plus useAssistantTransportSendCommand/State for the command-based AssistantTransport protocol'
       lenses: [composability]
       signature: 'useAssistantTransportRuntime(options: AssistantTransportOptions<T>); useAssistantTransportSendCommand(): (cmd) => void; useAssistantTransportState(): UserExternalState'
@@ -1284,41 +1284,41 @@ groups:
       - 'state is absent on a resume with resumeStateApi; the server replays from its retained snapshot'
       ref: /docs/api-reference/transport/assistant-transport.md
     - id: api-assistant-frame
-      name: 'Assistant frame bridge'
+      name: Assistant frame bridge
       summary: 'Share model context (system + tools) with an iframe: AssistantFrameHost in the parent, AssistantFrameProvider inside'
       lenses: [security, composability]
       signature: 'useAssistantFrameHost({iframeRef, targetOrigin}); AssistantFrameProvider.addModelContextProvider(provider, targetOrigin?)'
       notes: ['always pass an explicit trusted targetOrigin; FRAME_MESSAGE_CHANNEL is "assistant-ui-frame"']
       ref: /docs/api-reference/transport/frame.md
   - id: api-voice
-    title: 'Voice and dictation API'
+    title: Voice and dictation API
     level: advanced
     requires: [layers]
     ref: /docs/api-reference/voice.md
     entries:
     - id: api-voice-session
-      name: 'Realtime voice sessions'
+      name: Realtime voice sessions
       summary: 'createVoiceSession(options, setup) builds a RealtimeVoiceAdapter session; useVoiceState/useVoiceControls/useVoiceVolume read it'
       lenses: [composability]
       signature: 'createVoiceSession({abortSignal}, setup(helpers) => VoiceSessionControls); useVoiceControls(): {connect, disconnect, mute, unmute}'
       notes: ['helpers: setStatus, end, emitTranscript, emitMode, emitVolume, isDisposed; sendText? routes typed text into the session']
       ref: /docs/api-reference/voice/session.md
     - id: api-speech-dictation
-      name: 'Speech and dictation adapters'
+      name: Speech and dictation adapters
       summary: 'WebSpeechSynthesisAdapter and WebSpeechDictationAdapter(language, continuous, interimResults) implement the speak and listen contracts'
       lenses: [ux-a11y]
       signature: 'SpeechSynthesisAdapter.speak(text); DictationAdapter.listen(); WebSpeechDictationAdapter.isSupported()'
       ref: /docs/api-reference/voice/speech-dictation.md
-- title: 'API reference - generative UI, utilities, integrations'
+- title: API reference - generative UI, utilities, integrations
   sections:
   - id: api-generative-ui
-    title: 'JSON generative UI API'
+    title: JSON generative UI API
     level: advanced
     requires: [layers]
     ref: /docs/api-reference/generative-ui.md
     entries:
     - id: api-json-generative-ui
-      name: 'JSONGenerativeUI'
+      name: JSONGenerativeUI
       summary: 'Builds the present (frontend, resolves at once) and promptUser (human-in-the-loop) tools from a component library'
       lenses: [composability, security]
       signature: 'new JSONGenerativeUI({library, actions?}); .present({display?: "standalone"}); .promptUser()'
@@ -1328,7 +1328,7 @@ groups:
       notes: ['display "standalone" renders outside the chain-of-thought trace']
       ref: /docs/api-reference/generative-ui/json-generative-ui.md
     - id: api-generative-components
-      name: 'Component library'
+      name: Component library
       summary: 'defineGenerativeComponents({Name: {description, properties: zod, streamProperties?, render}}) and defaultGenerativeUILibrary'
       lenses: [security, typing-dx]
       signature: 'defineGenerativeComponents(lib): GenerativeUILibrary; GenerativeUIComponent {description, properties: ZodType, streamProperties?, render(props)}'
@@ -1338,20 +1338,20 @@ groups:
       - defineGenerativeComponents has no runtime implementation; a "use generative" compiler unwraps it
       ref: /docs/api-reference/generative-ui/components.md
     - id: api-generative-actions
-      name: 'Action registry'
+      name: Action registry
       summary: 'createActionRegistry({type: handler}) resolves model-emitted $action payloads; unknown types degrade to a dev warning'
       lenses: [security, reliability]
       signature: 'createActionRegistry(handlers: Record<string, ActionHandler>): ActionRegistry; ActionHandler(ctx: ActionDispatchContext) => unknown | Promise<unknown>'
       notes: ['for a prompt_user call with no result yet, a non-undefined handler return value becomes the tool result']
       ref: /docs/api-reference/generative-ui/actions.md
     - id: api-generative-spec
-      name: 'GenerativeUISpec and message part'
+      name: GenerativeUISpec and message part
       summary: 'Serializable node tree {root} carried by a generative-ui message part and rendered with MessagePrimitive.GenerativeUI'
       lenses: [typing-dx]
       signature: '<MessagePrimitive.GenerativeUI components={...} />; GenerativeUIMessagePart {type: "generative-ui", spec, id?, parentId?}'
       ref: /docs/api-reference/generative-ui/spec.md
     - id: api-generative-rendering
-      name: 'Rendering helpers'
+      name: Rendering helpers
       summary: 'renderGenerativeUI(node, library, context?), buildPresentParameters, generativeUIToJSX, GenerativeUIRenderError'
       lenses: [security, testing]
       signature: 'renderGenerativeUI(node, library, context?); buildPresentParameters(library); generativeUIToJSX(node, {escape?, pretty?})'
@@ -1360,7 +1360,7 @@ groups:
       - 'generativeUIToJSX({escape: true}) output is safe to paste back into JSX'
       ref: /docs/api-reference/generative-ui/rendering.md
     - id: api-generative-slack
-      name: 'Slack Block Kit conversion'
+      name: Slack Block Kit conversion
       summary: 'toSlackBlocks(node, {surface}), fromSlackBlocks and decodeBlockAction turn button payloads back into $action'
       lenses: [composability]
       signature: 'toSlackBlocks(node, {surface?: "message" | "modal"}): {blocks, warnings}; decodeBlockAction(action, stateValues?)'
@@ -1368,70 +1368,70 @@ groups:
       - 'warnings carry code clamped, dropped or fallback; the Slack shape is lossy so fromSlackBlocks cannot recover Badge vs Caption'
       ref: /docs/api-reference/generative-ui/slack.md
     - id: api-generative-teams
-      name: 'Microsoft Teams conversion'
+      name: Microsoft Teams conversion
       summary: 'toAdaptiveCard, toTeamsAttachments (Carousel becomes one attachment per Card) and decodeSubmitData for Action.Submit'
       lenses: [composability]
       signature: 'toAdaptiveCard(node): {card, warnings}; toTeamsAttachments(node); decodeSubmitData(value)'
       ref: /docs/api-reference/generative-ui/teams.md
     - id: api-generative-a2ui
-      name: 'A2UI conversion'
+      name: A2UI conversion
       summary: 'applyA2uiOperations(state, ops) folds A2UI v0.9 surface operations; convertSurfaceToUISpec turns a surface into a generative UI spec'
       lenses: [composability]
       signature: 'applyA2uiOperations(state: A2uiState, operations: unknown): {state, warnings}; convertSurfaceToUISpec(surface, {keepUnknownComponents?})'
       ref: /docs/api-reference/generative-ui/a2ui.md
     - id: api-generative-tokens
-      name: 'Vocabulary tokens'
+      name: Vocabulary tokens
       summary: 'Shared token arrays (TEXT_SIZES, COLORS, BUTTON_STYLES, ALERT_TONES, ALIGNS, JUSTIFIES, WEIGHTS, ICON_NAMES) for the default vocabulary'
       lenses: [typing-dx]
       ref: /docs/api-reference/generative-ui/tokens.md
   - id: api-utilities
-    title: 'Miscellaneous utilities'
+    title: Miscellaneous utilities
     level: intermediate
     requires: [layers]
     ref: /docs/api-reference/utilities.md
     entries:
     - id: api-aui-config
-      name: 'AuiConfig'
+      name: AuiConfig
       summary: 'Builds the plain-data config for the provider config prop, mapping scopes (thread, threads, tools, suggestions...) to client elements'
       lenses: [composability]
       signature: 'AuiConfig({threads?, tools?, suggestions?, thread?, message?, ...})'
       notes: ['configs are plain data, safe to hoist or recreate per render; Derived({source, query}) derives a scope from another']
       ref: /docs/api-reference/utilities/miscellaneous.md
     - id: api-message-queue
-      name: 'createMessageQueue'
+      name: createMessageQueue
       summary: 'Message queue controller from a driver; backs the queue adapter that lets the composer stay usable mid-run'
       lenses: [reliability, ux-a11y]
       signature: 'createMessageQueue(driver: MessageQueueDriver): MessageQueueController'
       ref: /docs/api-reference/utilities/miscellaneous.md
     - id: api-thread-rows
-      name: 'createThreadRowsSelector'
+      name: createThreadRowsSelector
       summary: 'useAuiState selector flattening a thread into stable rows (groupBy part type) for virtualized lists'
       lenses: [perf]
       signature: 'createThreadRowsSelector({groupBy?: groupPartByType({reasoning: [...]})}) => (state) => readonly ThreadRow[]'
       notes: ['returns the same array for the same thread state']
       ref: /docs/api-reference/utilities/miscellaneous.md
     - id: api-message-not-sent
-      name: 'MessageNotSentError'
+      name: MessageNotSentError
       summary: 'Thrown from onNew when a send never reached the backend so the composer restores the draft; isMessageNotSentError guards it'
       lenses: [reliability]
       signature: 'throw new MessageNotSentError(message?); isMessageNotSentError(e)'
       ref: /docs/api-reference/utilities/miscellaneous.md
     - id: api-webmcp
-      name: 'WebMCP provider'
-      summary: 'Publishes frontend tools from the model context to a WebMCP-capable browser so the user''s own browser agent can call them'
+      name: WebMCP provider
+      summary: Publishes frontend tools from the model context to a WebMCP-capable browser so the user's own browser agent can call them
       lenses: [security, composability]
       signature: 'unstable_useWebMcpProvider({filter?}) => {status}; unstable_defaultWebMcpFilter(name, tool)'
       notes: ['status is "unsupported" when the page has no document.modelContext; the default filter keeps enabled frontend tools with a client execute']
       ref: /docs/api-reference/utilities/miscellaneous.md
     - id: api-misc-helpers
-      name: 'Smaller helpers'
+      name: Smaller helpers
       summary: 'useSmooth, createSimpleTitleAdapter, fromThreadMessageLike, generateId, DevToolsHooks, directive formatter, in-memory lists'
       lenses: [reuse]
       signature: 'useSmooth(text, running); createSimpleTitleAdapter(); fromThreadMessageLike(msg, id, status); generateId()'
       notes: ['defaultDirectiveFormatter writes :type[label]{name=id}; RemoteThreadList is the AuiConfig threads entry backed by a RemoteThreadListAdapter']
       ref: /docs/api-reference/utilities/miscellaneous.md
   - id: api-integrations
-    title: 'Integration package APIs'
+    title: Integration package APIs
     level: intermediate
     requires: [layers]
     ref: /docs/api-reference/integrations.md
@@ -1458,7 +1458,7 @@ groups:
       signature: 'useEveAgentRuntime(...); toEveInputResponse(response, inputRequest?); getEveMessageContent(message)'
       ref: /docs/api-reference/integrations/eve.md
     - id: api-assistant-cloud-package
-      name: 'assistant-cloud client'
+      name: assistant-cloud client
       summary: 'AssistantCloud(config) client with threads, messages, runs, events, scores, files; CloudAPIError carries status and code'
       lenses: [observability, security]
       signature: 'new AssistantCloud({baseUrl, anonymous: true} | {baseUrl, authToken} | api key server-side)'
@@ -1467,34 +1467,34 @@ groups:
       - 'CloudRunReporter, CloudEngagementReporter, CloudMessagePersistence, createRunReport are the building blocks for custom integrations'
       ref: /docs/api-reference/integrations/assistant-cloud.md
     - id: api-cloud-ai-sdk-format
-      name: 'assistant-cloud/ai-sdk'
+      name: assistant-cloud/ai-sdk
       summary: 'AI SDK v6 message format adapter and extractAISDKRunTelemetry, typed against UIMessage without loading the ai runtime'
       lenses: [observability, typing-dx]
       signature: 'aiSDKV6FormatAdapter; extractAISDKRunTelemetry(messages)'
       ref: /docs/api-reference/integrations/assistant-cloud-ai-sdk.md
     - id: api-cloud-telemetry
-      name: 'assistant-cloud/telemetry'
+      name: assistant-cloud/telemetry
       summary: 'OTLP exporter and span processor sending GenAI spans to Assistant Cloud; assistantCloudTraceMetadata hands the trace id to the browser'
       lenses: [observability]
       signature: 'createAssistantCloudSpanProcessor(); createAssistantCloudTraceExporter(); assistantCloudTraceMetadata(): {traceId?}'
       notes: ['telemetry entry needs optional peers @opentelemetry/api, sdk-trace-base, exporter-trace-otlp-http']
       ref: /docs/api-reference/integrations/assistant-cloud-telemetry.md
-- title: 'API reference - runtime state objects'
+- title: API reference - runtime state objects
   sections:
   - id: api-runtime-state
-    title: 'Runtime and state shapes behind useAui and useAuiState'
+    title: Runtime and state shapes behind useAui and useAuiState
     level: intermediate
     requires: [layers]
     ref: /docs/api-reference/runtimes.md
     entries:
     - id: api-assistant-runtime
-      name: 'AssistantRuntime'
+      name: AssistantRuntime
       summary: 'Top-level runtime from useAui(): threads, thread (= threads.main) and registerModelContextProvider'
       lenses: [composability]
       signature: 'AssistantRuntime {threads: ThreadListRuntime; thread: ThreadRuntime; registerModelContextProvider(p): Unsubscribe}'
       ref: /docs/api-reference/runtimes/assistant-runtime.md
     - id: api-thread-runtime
-      name: 'ThreadRuntime and ThreadRuntimeState'
+      name: ThreadRuntime and ThreadRuntimeState
       summary: 'Thread actions (append, startRun, cancelRun, reset, export/import) and state (isRunning, isLoading, hasEarlier, messages)'
       lenses: [reliability, typing-dx]
       signature: 'useAui().thread.{append,cancelRun,startRun,resumeRun,loadEarlier,reset,export,import}; useAuiState(s => s.thread.{isRunning,isLoading,isDisabled,hasEarlier,isLoadingEarlier,capabilities,messages,suggestions,extras})'
@@ -1503,7 +1503,7 @@ groups:
       - 'threadId and metadata on ThreadRuntimeState are deprecated: use the threadListItem scope'
       ref: /docs/api-reference/runtimes/thread-runtime.md
     - id: api-composer-runtime
-      name: 'ComposerRuntime and state'
+      name: ComposerRuntime and state
       summary: 'Composer actions (setText, send, cancel, addAttachment, setRunConfig, setQuote, queue moves) and state (canSend, canCancel, queue)'
       lenses: [ux-a11y, typing-dx]
       signature: 'useAui().composer.{setText,send,cancel,addAttachment,clearAttachments,setRunConfig,setQuote,moveQueueItem,removeQueueItem}; useAuiState(s => s.composer.{canSend,canCancel,isEmpty,text,attachments,queue,submission,inTransit})'
@@ -1513,61 +1513,61 @@ groups:
       - 'addAttachment takes a File (goes through AttachmentAdapter) or a CreateAttachment descriptor for external sources'
       ref: /docs/api-reference/runtimes/composer-runtime.md
     - id: api-message-runtime
-      name: 'MessageRuntime and state'
+      name: MessageRuntime and state
       summary: 'Message actions (reload, delete, switchToBranch, submitFeedback) and state (status, metadata, index, isLast, branchCount)'
       lenses: [typing-dx]
       signature: 'useAui().message.{reload(config?),delete,switchToBranch({position|branchId}),submitFeedback({type,comment?}),getMessagePartByToolCallId(id)}'
       ref: /docs/api-reference/runtimes/message-runtime.md
     - id: api-message-part-runtime
-      name: 'MessagePartRuntime and part state'
+      name: MessagePartRuntime and part state
       summary: 'Tool-part actions addToolResult, resumeToolCall, respondToToolApproval; EnrichedPartState adds toolUI and dataRendererUI'
       lenses: [reliability]
       signature: 'useAui().part.{addToolResult(result|ToolResponse), resumeToolCall(payload), respondToToolApproval(response)}'
       notes: ['the children render function is also invoked once with a synthetic empty running text part when the message has no parts yet']
       ref: /docs/api-reference/runtimes/message-part-runtime.md
     - id: api-thread-list-runtime
-      name: 'ThreadListRuntime and state'
+      name: ThreadListRuntime and state
       summary: 'switchToThread, switchToNewThread, reload, reloadMainThread, loadMore; state mainThreadId, threadIds, isLoading, loadError, hasMore'
       lenses: [reliability]
       signature: 'useAui().threads.{switchToThread(id,{unarchive?}),switchToNewThread,reload,reloadMainThread,loadMore,unstable_subscribeThreadEvents}'
       notes: ['loadError holds the last failed list load and clears when a later load starts']
       ref: /docs/api-reference/runtimes/thread-list-runtime.md
     - id: api-thread-list-item-runtime
-      name: 'ThreadListItemRuntime and state'
+      name: ThreadListItemRuntime and state
       summary: 'initialize, generateTitle, switchTo, rename, updateCustom, archive, delete, detach; state status, title, remoteId, isRunning'
       lenses: [reliability]
       signature: 'useAui().threadListItem.{initialize,generateTitle,switchTo,rename,updateCustom,archive,unarchive,delete,detach}'
       notes: ['isRunning stays true for a run that continues after the user switches threads']
       ref: /docs/api-reference/runtimes/thread-list-item-runtime.md
     - id: api-attachment-runtime
-      name: 'AttachmentRuntime and state'
+      name: AttachmentRuntime and state
       summary: 'Attachment remove(); state id, type, name, contentType, file, content, status, source (thread-composer or message)'
       lenses: [typing-dx]
       signature: 'useAui().attachment.remove(); useAuiState(s => s.attachment)'
       ref: /docs/api-reference/runtimes/attachment-runtime.md
     - id: api-queue-state
-      name: 'QueueItemState'
+      name: QueueItemState
       summary: 'Queued composer message {id, parts, prompt}; prompt is deprecated for text parts'
       lenses: [typing-dx]
       signature: 'QueueItemState {id: string; parts: readonly (FileMessagePart | TextMessagePart)[]}'
       deprecated: 'prompt removal after 2026-11-05: derive from the text parts'
       ref: /docs/api-reference/runtimes/queue-state.md
-- title: 'Primitives reference'
+- title: Primitives reference
   sections:
   - id: primitives-ref
-    title: 'Primitive parts and props'
+    title: Primitive parts and props
     level: basic
     requires: [primitive-pattern]
     ref: /docs/api-reference/primitives.md
     entries:
     - id: prim-composition
-      name: 'asChild composition'
-      summary: 'Every part forwards props, merges classes and chains handlers; asChild or render swaps the element while keeping behavior'
+      name: asChild composition
+      summary: Every part forwards props, merges classes and chains handlers; asChild or render swaps the element while keeping behavior
       lenses: [composability, ux-a11y]
       signature: '<ActionBarPrimitive.Copy asChild><MyButton /></ActionBarPrimitive.Copy>'
       ref: /docs/api-reference/primitives/composition.md
     - id: prim-action-bar
-      name: 'ActionBarPrimitive'
+      name: ActionBarPrimitive
       summary: 'Copy, Reload, Edit, Speak, StopSpeaking, Feedback buttons that self-disable by runtime capability; Root handles auto-hide'
       lenses: [ux-a11y]
       signature: '<ActionBarPrimitive.Root hideWhenRunning autohide="never|not-last|always" autohideFloat="never|single-branch|always">'
@@ -1581,7 +1581,7 @@ groups:
       - 'ActionBarMorePrimitive (Root, Trigger, Content, Item, Separator) is a Radix dropdown for secondary actions'
       ref: /docs/api-reference/primitives/action-bar.md
     - id: prim-assistant-modal
-      name: 'AssistantModalPrimitive'
+      name: AssistantModalPrimitive
       summary: 'Radix-Popover floating chat: Root, Trigger, Anchor, Content; opens on run start by default'
       lenses: [ux-a11y]
       signature: '<AssistantModalPrimitive.Root unstable_openOnRunStart><Anchor><Trigger/></Anchor><Content/></Root>'
@@ -1589,27 +1589,27 @@ groups:
       - 'Content positions against Anchor, not Trigger; its dismiss prop is spelled dissmissOnInteractOutside (sic) and defaults to false'
       ref: /docs/api-reference/primitives/assistant-modal.md
     - id: prim-attachment
-      name: 'AttachmentPrimitive'
+      name: AttachmentPrimitive
       summary: 'Root, unstable_Thumb, Name, Remove for composer (removable) and message (read-only) attachments; iterate with children render fn'
       lenses: [ux-a11y]
       signature: '<ComposerPrimitive.Attachments>{({attachment}) => <AttachmentPrimitive.Root>...</AttachmentPrimitive.Root>}</ComposerPrimitive.Attachments>'
       notes: ['the components prop is deprecated: use the children render function']
       ref: /docs/api-reference/primitives/attachment.md
     - id: prim-branch-picker
-      name: 'BranchPickerPrimitive'
+      name: BranchPickerPrimitive
       summary: 'Root (hideWhenSingleBranch), Previous, Next, Number, Count; buttons auto-disable at boundaries and while running'
       lenses: [ux-a11y]
       signature: '<BranchPickerPrimitive.Root hideWhenSingleBranch>'
       ref: /docs/api-reference/primitives/branch-picker.md
     - id: prim-chain-of-thought
-      name: 'ChainOfThoughtPrimitive (legacy) and GroupedParts'
+      name: ChainOfThoughtPrimitive (legacy) and GroupedParts
       summary: 'Accordion Root/AccordionTrigger/Parts is legacy; new code groups reasoning and tool parts with MessagePrimitive.GroupedParts'
       lenses: [best-practice, ux-a11y]
       signature: '<ChainOfThoughtPrimitive.Root><AccordionTrigger/><Parts>{({part}) => ...}</Parts></Root>'
       deprecated: 'Parts components prop and the components.ChainOfThought path: use GroupedParts with a children render function'
       ref: /docs/api-reference/primitives/chain-of-thought.md
     - id: prim-composer
-      name: 'ComposerPrimitive parts'
+      name: ComposerPrimitive parts
       summary: 'Root (form), Input (textarea), Send, Cancel, AddAttachment, AttachmentDropzone, Dictate, Quote, Queue, TriggerPopover'
       lenses: [ux-a11y, typing-dx]
       signature: '<ComposerPrimitive.Input submitMode="enter|ctrlEnter|none" cancelOnEscape addAttachmentOnPaste />'
@@ -1625,7 +1625,7 @@ groups:
       - 'TriggerPopoverRoot groups TriggerPopover declarations keyed by char; Categories, CategoryItem, Items, Item, Back render the menu'
       ref: /docs/api-reference/primitives/composer.md
     - id: prim-message
-      name: 'MessagePrimitive parts'
+      name: MessagePrimitive parts
       summary: 'Root, Parts (children render fn), PartByIndex, Attachments, Quote, Error, GroupedParts, GenerativeUI and If conditions'
       lenses: [composability, typing-dx]
       signature: '<MessagePrimitive.Parts>{({part}) => ...}</MessagePrimitive.Parts>; <MessagePrimitive.If assistant hasBranches last ...>'
@@ -1639,7 +1639,7 @@ groups:
       - 'groupPartByType({reasoning: ["group-reasoning"]}) builds a groupBy; "tool-call:<name>" beats "tool-call"; "standalone-tool-call" renders outside the trace'
       ref: /docs/api-reference/primitives/message.md
     - id: prim-message-part
-      name: 'MessagePartPrimitive'
+      name: MessagePartPrimitive
       summary: 'Text (smooth streaming, data-status), Image, InProgress and Messages for part-level rendering'
       lenses: [perf, ux-a11y]
       signature: '<MessagePartPrimitive.Text smooth component="span" />'
@@ -1647,13 +1647,13 @@ groups:
       - {name: smooth, type: 'boolean | SmoothOptions', default: 'true', desc: Smooth text streaming animation.}
       ref: /docs/api-reference/primitives/message-part.md
     - id: prim-queue-item
-      name: 'QueueItemPrimitive'
+      name: QueueItemPrimitive
       summary: 'Text, Steer and Remove parts for pending queued messages rendered via ComposerPrimitive.Queue'
       lenses: [ux-a11y]
       signature: '<ComposerPrimitive.Queue>{({queueItem}) => <QueueItemPrimitive.Text/>}</ComposerPrimitive.Queue>'
       ref: /docs/api-reference/primitives/queue-item.md
     - id: prim-selection-toolbar
-      name: 'SelectionToolbarPrimitive'
+      name: SelectionToolbarPrimitive
       summary: 'Floating Root plus Quote button that copies selected message text into the composer as a quote'
       lenses: [ux-a11y]
       signature: '<SelectionToolbarPrimitive.Root><SelectionToolbarPrimitive.Quote/></SelectionToolbarPrimitive.Root>'
@@ -1662,7 +1662,7 @@ groups:
       - 'mark quotable regions with data-aui-quote-selectable; data-aui-quote-selectable="false" excludes a subtree or a whole message'
       ref: /docs/api-reference/primitives/selection-toolbar.md
     - id: prim-suggestion
-      name: 'SuggestionPrimitive'
+      name: SuggestionPrimitive
       summary: 'Title, Description and Trigger (send, clearComposer) rendered via ThreadPrimitive.Suggestions or ThreadPrimitive.Suggestion'
       lenses: [ux-a11y]
       signature: '<SuggestionPrimitive.Trigger send clearComposer />'
@@ -1673,7 +1673,7 @@ groups:
       - 'static suggestions flow through the suggestions scope; dynamic ones through thread.suggestions (SuggestionAdapter or ExternalStore suggestions)'
       ref: /docs/api-reference/primitives/suggestion.md
     - id: prim-thread-list-parts
-      name: 'ThreadListItemPrimitive and More menu'
+      name: ThreadListItemPrimitive and More menu
       summary: 'Root (data-active, aria-current), Trigger, Title (fallback), Archive, Unarchive, Delete plus a Radix ThreadListItemMore dropdown'
       lenses: [ux-a11y]
       signature: '<ThreadListItemMorePrimitive.Root sharedFocusGroup>'
@@ -1682,19 +1682,19 @@ groups:
       - 'Archive/Unarchive/Delete do not self-disable and throw if the runtime lacks the action: render only supported ones'
       ref: /docs/api-reference/primitives/thread-list-item.md
     - id: prim-action-bar-more
-      name: 'ActionBarMorePrimitive'
+      name: ActionBarMorePrimitive
       summary: 'Radix dropdown (Root, Trigger, Content, Item, Separator) grouping secondary message actions inside ActionBarPrimitive'
       lenses: [ux-a11y]
       signature: '<ActionBarMorePrimitive.Root><Trigger/><Content><Item/></Content></Root>'
       ref: /docs/api-reference/primitives/action-bar-more.md
     - id: prim-error
-      name: 'ErrorPrimitive'
+      name: ErrorPrimitive
       summary: 'Root and Message parts for rendering runtime, thread and message failures'
       lenses: [reliability, ux-a11y]
       signature: '<ErrorPrimitive.Root><ErrorPrimitive.Message/></ErrorPrimitive.Root>'
       ref: /docs/api-reference/primitives/error.md
     - id: prim-thread-list-parts-list
-      name: 'ThreadListPrimitive and ThreadListItemMore'
+      name: ThreadListPrimitive and ThreadListItemMore
       summary: 'ThreadListPrimitive Root, New (data-active on a fresh thread), Items (archived prop); ThreadListItemMore Radix menu with sharedFocusGroup'
       lenses: [ux-a11y]
       signature: '<ThreadListPrimitive.Items archived>{({threadListItem}) => ...}</ThreadListPrimitive.Items>'
@@ -1702,25 +1702,25 @@ groups:
       - 'ThreadListItemMorePrimitive Root/Trigger/Content/Item; sharedFocusGroup joins its trigger and open menu to the list focus group'
       ref: /docs/api-reference/primitives/thread-list-item-more.md
     - id: prim-thread-list-nav
-      name: 'ThreadListPrimitive navigation and a11y'
+      name: ThreadListPrimitive navigation and a11y
       summary: 'Three namespaces (ThreadList, ThreadListItem, ThreadListItemMore); native tab stops plus arrow keys; aria-current on the active row'
       lenses: [ux-a11y]
       signature: '<ThreadListPrimitive.Root><ThreadListPrimitive.New/><ThreadListPrimitive.Items>...'
       ref: /docs/api-reference/primitives/thread-list.md
     - id: api-context-tree
-      name: 'Context tree overview'
+      name: Context tree overview
       summary: 'Which primitives and runtime accessors exist in each scope: assistant, thread, composer, message, part, attachment, threadListItem'
       lenses: [composability]
       signature: 'useAui().{thread,composer,message,part,attachment,threadListItem}; useAuiState(s => s.message.isCopied / isHovering)'
       ref: /docs/api-reference/overview.md
   - id: primitive-guides
-    title: 'Primitive guides'
+    title: Primitive guides
     level: basic
     requires: [primitive-pattern]
     ref: /docs/primitives/thread.md
     entries:
     - id: guide-action-bar
-      name: 'ActionBar guide'
+      name: ActionBar guide
       summary: 'Auto-hide (never, not-last, always), floating, automatic disabling and data-copied/data-submitted feedback state'
       lenses: [ux-a11y]
       signature: '<ActionBarPrimitive.Root autohide="not-last" autohideFloat="single-branch">'
@@ -1728,65 +1728,65 @@ groups:
       - 'an auto-hidden bar is not rendered until the message is hovered; single-branch floats only when the message has no alternatives'
       ref: /docs/primitives/action-bar.md
     - id: guide-assistant-modal
-      name: 'AssistantModal guide'
+      name: AssistantModal guide
       summary: 'Radix Popover architecture: anchor vs trigger, auto-open on run start, dismiss behavior, data-state animations, custom portal container'
       lenses: [ux-a11y]
       notes: ['shadcn AssistantModal element wraps these primitives with animations']
       ref: /docs/primitives/assistant-modal.md
     - id: guide-attachment
-      name: 'Attachment guide'
+      name: Attachment guide
       summary: 'Two contexts (composer pending removable, message read-only), iterator via children render function, Name renders bare text'
       lenses: [ux-a11y]
       ref: /docs/primitives/attachment.md
     - id: guide-branch-picker
-      name: 'BranchPicker guide'
+      name: BranchPicker guide
       summary: 'Previous/Next disable at boundaries, Number and Count render raw text, hideWhenSingleBranch; usually sits beside ActionBar in the footer'
       lenses: [ux-a11y]
       ref: /docs/primitives/branch-picker.md
     - id: guide-chain-of-thought
-      name: 'ChainOfThought guide'
+      name: ChainOfThought guide
       summary: 'Recommended GroupedParts path; legacy accordion keeps collapsed state via AuiIf; deprecated components.Reasoning/tools.Fallback/Layout'
       lenses: [best-practice, ux-a11y]
       deprecated: 'components.ChainOfThought path: use MessagePrimitive.GroupedParts'
       ref: /docs/primitives/chain-of-thought.md
     - id: guide-composer
-      name: 'Composer guide'
+      name: Composer guide
       summary: 'Root form/Input textarea/Send; new-message vs edit mode follows context; trigger popovers for @ mentions and / commands'
       lenses: [ux-a11y]
       notes: ['see the Mentions and Slash Commands guides for trigger popover wiring']
       ref: /docs/primitives/composer.md
     - id: guide-message
-      name: 'Message guide'
+      name: Message guide
       summary: 'Parts pipeline via children render fn, part kinds, tool resolution order (deprecated components path), hover state'
       lenses: [composability]
       notes:
       - 'legacy components prop resolves tool calls as tools.Override, registered Tools({toolkit}), tools.by_name, tools.Fallback'
       ref: /docs/primitives/message.md
     - id: guide-selection-toolbar
-      name: 'SelectionToolbar guide'
+      name: SelectionToolbar guide
       summary: 'Portal-positioned toolbar; single-message validation via data-message-id; Quote calls composer.setQuote; hides on scroll or collapse'
       lenses: [ux-a11y]
       ref: /docs/primitives/selection-toolbar.md
     - id: guide-suggestion
-      name: 'Suggestion guide'
+      name: Suggestion guide
       summary: 'Static suggestions scope vs runtime thread.suggestions; send vs populate; ThreadPrimitive.Suggestion for ad-hoc prompts'
       lenses: [ux-a11y]
       ref: /docs/primitives/suggestion.md
     - id: guide-thread-list
-      name: 'ThreadList guide'
+      name: ThreadList guide
       summary: 'Three namespaces, data-active on New and current row, keyboard navigation, archived Items, composing Archive asChild with menu Item'
       lenses: [ux-a11y]
       ref: /docs/primitives/thread-list.md
-- title: 'Runtimes - custom, AI SDK, protocols'
+- title: Runtimes - custom, AI SDK, protocols
   sections:
   - id: runtimes-custom
-    title: 'Custom runtime paths'
+    title: Custom runtime paths
     level: advanced
     requires: [layers]
     ref: /docs/runtimes/custom/overview.md
     entries:
     - id: rt-custom-paths
-      name: 'Four custom runtime paths'
+      name: Four custom runtime paths
       summary: 'LocalRuntime (ChatModelAdapter.run), ExternalStoreRuntime (own messages), DataStream (wire protocol), AssistantTransport (state snapshots)'
       lenses: [composability]
       signature: 'useLocalRuntime | useExternalStoreRuntime | useDataStreamRuntime | useAssistantTransportRuntime'
@@ -1794,7 +1794,7 @@ groups:
       - 'use a framework adapter when one fits the backend; ExternalStore if message state already lives in redux/zustand/tanstack-query'
       ref: /docs/runtimes/custom/overview.md
     - id: rt-external-store
-      name: 'ExternalStoreRuntime guide'
+      name: ExternalStoreRuntime guide
       summary: 'Capability-based UI: onNew required; setMessages enables branching, onEdit edit, onReload regenerate, onCancel stop, queue queuing'
       lenses: [composability, typing-dx]
       signature: 'useExternalStoreRuntime<T>({messages, convertMessage, onNew, setMessages?, onEdit?, onReload?, onCancel?, onAddToolResult?})'
@@ -1804,7 +1804,7 @@ groups:
       - 'convertMessage inline or useExternalMessageConverter with a join strategy; getExternalStoreMessages recovers originals'
       ref: /docs/runtimes/custom/external-store.md
     - id: rt-data-stream
-      name: 'Data stream runtime'
+      name: Data stream runtime
       summary: 'useDataStreamRuntime({api}) consumes ui-message-stream (AI SDK v5+) or data-stream v1; protocol auto-detected from response headers'
       lenses: [composability]
       signature: 'useDataStreamRuntime({api, protocol?, initialMessages?, onFinish?, onError?, headers?, body?})'
@@ -1813,7 +1813,7 @@ groups:
       notes: ['backend side: createAssistantStreamResponse from assistant-stream or toUIMessageStreamResponse()']
       ref: /docs/runtimes/custom/data-stream.md
     - id: rt-assistant-transport
-      name: 'AssistantTransport protocol'
+      name: AssistantTransport protocol
       summary: 'Backend streams full agent state snapshots; UI is a stateless view; frontend queues commands (add-message, add-tool-result, custom)'
       lenses: [composability, reliability]
       signature: 'useAssistantTransportRuntime({api, protocol?, converter, ...}); stream ops set and append-text over data-stream or assistant-transport SSE'
@@ -1822,44 +1822,44 @@ groups:
       - 'protocol defaults to "data-stream"; "assistant-transport" selects the AssistantTransportEncoder SSE encoding'
       ref: /docs/runtimes/custom/assistant-transport.md
   - id: runtimes-ai-sdk
-    title: 'Vercel AI SDK runtime'
+    title: Vercel AI SDK runtime
     level: intermediate
     requires: [layers]
     ref: /docs/runtimes/ai-sdk/overview.md
     entries:
     - id: rt-ai-sdk-versions
-      name: 'AI SDK version matrix'
+      name: AI SDK version matrix
       summary: 'ai@7 uses @assistant-ui/ai-sdk (current); ai@6/5 pin react-ai-sdk 1.3.40/1.1.21; ai@4 uses react-data-stream'
       lenses: [reliability]
       signature: 'useChatRuntime (recommended, adds cloud threads + AssistantChatTransport) vs useAISDKRuntime (bring your own useChat)'
       ref: /docs/runtimes/ai-sdk/overview.md
     - id: rt-ai-sdk-legacy
-      name: 'Legacy AI SDK v4/v5/v6 pages'
+      name: Legacy AI SDK v4/v5/v6 pages
       summary: 'Reference for projects not on ai@7; no new features; v6 made convertToModelMessages async'
       lenses: [best-practice]
       deprecated: 'migrate to @assistant-ui/ai-sdk on ai@^7'
       notes: ['v4 path is useDataStreamRuntime plus toDataStreamResponse(); v5/v6 use useChatRuntime from @assistant-ui/react-ai-sdk']
       ref: /docs/runtimes/ai-sdk/v6-legacy.md
     - id: rt-ai-sdk-v5-legacy
-      name: 'AI SDK v5 legacy'
-      summary: 'Pin @assistant-ui/react-ai-sdk@1.1.21 with ai@^5; convertToModelMessages is synchronous'
+      name: AI SDK v5 legacy
+      summary: Pin @assistant-ui/react-ai-sdk@1.1.21 with ai@^5; convertToModelMessages is synchronous
       lenses: [best-practice]
       deprecated: 'plan migration to v7'
       ref: /docs/runtimes/ai-sdk/v5-legacy.md
     - id: rt-ai-sdk-v4-legacy
-      name: 'AI SDK v4 legacy'
+      name: AI SDK v4 legacy
       summary: 'ai@^4 plugs into react-data-stream; toDataStreamResponse() header x-vercel-ai-data-stream: v1 is auto-detected'
       lenses: [best-practice]
       deprecated: 'plan migration to v7'
       ref: /docs/runtimes/ai-sdk/v4-legacy.md
   - id: runtimes-protocols
-    title: 'Protocol and agent runtimes'
+    title: Protocol and agent runtimes
     level: advanced
     requires: [layers]
     ref: /docs/runtimes/pick-a-runtime.md
     entries:
     - id: rt-a2a
-      name: 'A2A runtime'
+      name: A2A runtime
       summary: 'useA2ARuntime({baseUrl | client}) for A2A v1.0 servers; A2UI operation parts are folded into surfaces and restored from history'
       lenses: [composability]
       signature: 'new A2AClient({baseUrl, basePath?, headers?, tenant?, extensions?, fetchOptions?}); useA2ARuntime({client})'
@@ -1868,17 +1868,17 @@ groups:
       - 'client methods: sendMessage, streamMessage, getTask, listTasks, cancelTask, subscribeToTask, getAgentCard, push-notification config CRUD'
       ref: /docs/runtimes/a2a/overview.md
     - id: rt-a2a-quickstart
-      name: 'A2A quickstart'
+      name: A2A quickstart
       summary: 'useA2ARuntime({baseUrl}) in a provider plus a Thread'
       lenses: [reuse]
       ref: /docs/runtimes/a2a/quickstart.md
     - id: rt-a2a-hooks
-      name: 'A2A client and hooks'
+      name: A2A client and hooks
       summary: 'A2AClient options and methods, useA2ARuntime options, task states, artifacts, structured errors'
       lenses: [typing-dx]
       ref: /docs/runtimes/a2a/client-and-hooks.md
     - id: rt-ag-ui
-      name: 'AG-UI runtime'
+      name: AG-UI runtime
       summary: 'useAgUiRuntime({agent: HttpAgent}) maps AG-UI events, thinking/reasoning, STATE_SNAPSHOT/DELTA and subagent runs'
       lenses: [composability]
       signature: 'useAgUiRuntime({agent, showThinking?, autoCancelPendingToolCalls?, resumeTranscript?, onError?, onCancel?, unstable_enableMessageQueue?, adapters?})'
@@ -1890,89 +1890,89 @@ groups:
       notes: ['a2ui-surface activity becomes a present tool part; mcp-apps attaches to its tool call; other activities become data parts agui-activity/<type>']
       ref: /docs/runtimes/ag-ui/runtime-options.md
     - id: rt-ag-ui-overview
-      name: 'AG-UI overview and quickstart'
+      name: AG-UI overview and quickstart
       summary: 'Install react-ag-ui and @ag-ui/client; create HttpAgent in useMemo and pass it to useAgUiRuntime'
       lenses: [reuse]
       signature: 'const agent = useMemo(() => new HttpAgent({url}), []); useAgUiRuntime({agent})'
       ref: /docs/runtimes/ag-ui/overview.md
     - id: rt-ag-ui-quickstart
-      name: 'AG-UI quickstart'
-      summary: 'Minimal provider wiring against an AG-UI endpoint'
+      name: AG-UI quickstart
+      summary: Minimal provider wiring against an AG-UI endpoint
       lenses: [reuse]
       ref: /docs/runtimes/ag-ui/quickstart.md
     - id: rt-ag-ui-state
-      name: 'AG-UI agent state hooks'
+      name: AG-UI agent state hooks
       summary: 'useAgUiState mirrors agent state; useAgUiSetState stages an optimistic update sent as state on the next run'
       lenses: [reliability, composability]
       signature: 'useAgUiState(); useAgUiSetState()'
       notes: ['optimistic and local first: not a live channel into a run already in progress']
       ref: /docs/runtimes/ag-ui/agent-state.md
     - id: rt-claude-managed-agents
-      name: 'Claude Managed Agents'
+      name: Claude Managed Agents
       summary: 'useExternalStoreRuntime over a pure fold of the session event log plus useRemoteThreadListRuntime where thread id = session id'
       lenses: [composability, reliability]
       signature: 'useExternalStoreRuntime({messages, convertMessage: m => m}); RemoteThreadListAdapter over sessions.list/create/update/archive'
       notes: ['replaying stored sessions and tailing live SSE run through the same fold, so both render identical messages']
       ref: /docs/runtimes/claude-managed-agents.md
     - id: rt-eve
-      name: 'Eve runtime'
+      name: Eve runtime
       summary: 'useEveAgentRuntime wraps Eve useEveAgent; withEve() and withAui() in next.config; runConfig.custom becomes Eve clientContext'
       lenses: [composability]
       signature: 'useEveAgentRuntime(); withAui(withEve(nextConfig)); makeAssistantDataUI<EveAuthorizationData>({name: "authorization"})'
       ref: /docs/runtimes/eve/overview.md
     - id: rt-eve-quickstart
-      name: 'Eve quickstart'
+      name: Eve quickstart
       summary: 'Template (create-assistant-ui -t eve), Eve CLI (eve registry add; eve add @assistant-ui/eve-chat) or manual setup'
       lenses: [reuse]
       notes: ['the Eve CLI writes registry files without editing CSS: add @import "tw-shimmer" and data-open/data-closed custom variants yourself']
       ref: /docs/runtimes/eve/quickstart.md
     - id: rt-google-adk
-      name: 'Google ADK runtime'
+      name: Google ADK runtime
       summary: 'useAdkRuntime for ADK JS/Python agents with multi-agent author tracking, HITL confirmations and grounding metadata'
       lenses: [composability]
       signature: 'useAdkRuntime(...); createAdkStream({api, appName?, userId?, headers?}); createAdkSessionAdapter(...)'
       notes: ['expects camelCase JSON from ADK JS and ADK Python']
       ref: /docs/runtimes/google-adk/overview.md
     - id: rt-google-adk-quickstart
-      name: 'Google ADK quickstart'
+      name: Google ADK quickstart
       summary: 'createAdkApiRoute server helper plus client useAdkRuntime setup'
       lenses: [reuse]
       ref: /docs/runtimes/google-adk/quickstart.md
     - id: rt-google-adk-api
-      name: 'Google ADK API'
+      name: Google ADK API
       summary: 'createAdkStream proxy vs direct mode, session adapter backing the thread list, AdkEventAccumulator, message editing'
       lenses: [composability]
       ref: /docs/runtimes/google-adk/api.md
     - id: rt-google-adk-hooks
-      name: 'Google ADK hooks'
+      name: Google ADK hooks
       summary: 'useAdkToolConfirmations/ConfirmTool, useAdkAuthRequests/SubmitAuth, useAdkSubmitInput, artifacts, escalation, agent and session state'
       lenses: [reliability, security]
       ref: /docs/runtimes/google-adk/hooks.md
     - id: rt-opencode
-      name: 'OpenCode runtime'
+      name: OpenCode runtime
       summary: 'useOpenCodeRuntime over a local OpenCode server (:4096): sessions as threads, fork/revert, permission and question flows'
       lenses: [composability]
       signature: 'useOpenCodeRuntime(...)'
       notes: ['task tool calls load child sessions eagerly; empty messages on a task part means the child session has not loaded yet']
       ref: /docs/runtimes/opencode/overview.md
     - id: rt-opencode-quickstart
-      name: 'OpenCode quickstart'
-      summary: 'Minimal useOpenCodeRuntime setup against a local OpenCode server'
+      name: OpenCode quickstart
+      summary: Minimal useOpenCodeRuntime setup against a local OpenCode server
       lenses: [reuse]
       ref: /docs/runtimes/opencode/quickstart.md
     - id: rt-opencode-hooks
-      name: 'OpenCode hooks'
+      name: OpenCode hooks
       summary: 'useOpenCodePermissions {pending, reply}, useOpenCodeQuestions and useOpenCodeRuntimeExtras (replyToQuestion, rejectQuestion)'
       lenses: [security, reliability]
       ref: /docs/runtimes/opencode/hooks.md
   - id: runtimes-langgraph-legacy
-    title: 'react-langgraph runtime (sibling of react-langchain)'
+    title: react-langgraph runtime (sibling of react-langchain)
     level: intermediate
     requires: [layers]
     ref: /docs/runtimes/langgraph/overview.md
     entries:
     - id: lg-quickstart
-      name: 'react-langgraph quickstart'
+      name: react-langgraph quickstart
       summary: 'useLangGraphRuntime with unstable_createLangGraphStream, create and load; same-origin /api proxy in production'
       lenses: [reuse, security]
       signature: 'useLangGraphRuntime({stream, create, load, unstable_allowCancellation})'
@@ -1981,7 +1981,7 @@ groups:
       - 'the template path uses useStreamRuntime from react-langchain; this manual path is the older runtime'
       ref: /docs/runtimes/langgraph/quickstart.md
     - id: lg-agent-state
-      name: 'LangGraph agent state hooks'
+      name: LangGraph agent state hooks
       summary: 'useLangGraphState mirrors graph values; useLangGraphSetState stages an update merged into the next run input'
       lenses: [reliability]
       signature: 'useLangGraphState(); useLangGraphSetState()'
@@ -1990,7 +1990,7 @@ groups:
       - 'a custom stream callback must forward config.state into its run input itself'
       ref: /docs/runtimes/langgraph/agent-state.md
     - id: lg-generative-ui
-      name: 'LangGraph generative UI'
+      name: LangGraph generative UI
       summary: 'push_ui_message / typedUi().push() events over the custom stream channel become data parts rendered by makeAssistantDataUI or uiComponents'
       lenses: [composability]
       signature: 'useLangGraphRuntime({uiStateKey}); makeAssistantDataUI({name, render})'
@@ -1999,34 +1999,34 @@ groups:
       - 'uiStateKey only affects the values stream path; the custom channel carries each event individually'
       ref: /docs/runtimes/langgraph/generative-ui.md
     - id: lg-interrupts
-      name: 'LangGraph interrupts and checkpoint editing'
+      name: LangGraph interrupts and checkpoint editing
       summary: 'load returns interrupts with messages to restore them on thread switch; getCheckpointId enables edit and regenerate via server forks'
       lenses: [reliability]
       signature: 'useLangGraphRuntime({getCheckpointId, load: () => ({messages, interrupts})})'
       notes: ['the resolved checkpointId reaches stream as config.checkpointId; a custom stream callback must forward it as checkpoint: {checkpoint_id}']
       ref: /docs/runtimes/langgraph/interrupts.md
     - id: lg-streaming
-      name: 'LangGraph streaming helpers'
+      name: LangGraph streaming helpers
       summary: 'LangGraphMessageAccumulator, convertLangChainMessages, eventHandlers, message metadata hook, message queue, per-run config'
       lenses: [composability]
       signature: 'useLangGraphRuntime({eventHandlers, unstable_enableMessageQueue}); useLangGraphMessageMetadata()'
       notes: ['a message sent mid-run steers by default; runConfig is posted as the SDK run config']
       ref: /docs/runtimes/langgraph/streaming.md
-- title: 'Tools - generative UI, MCP, backend wiring'
+- title: Tools - generative UI, MCP, backend wiring
   sections:
   - id: tools-guides
-    title: 'Tool guides beyond the toolkit basics'
+    title: Tool guides beyond the toolkit basics
     level: intermediate
     requires: [define-toolkit]
     ref: /docs/tools.md
     entries:
     - id: tools-render-chooser
-      name: 'Choosing how model output becomes UI'
+      name: Choosing how model output becomes UI
       summary: 'Tool UI (model calls a known tool), Interactables (two-way state), present tool (composed vocabulary), LangGraph data UI, OpenUI'
       lenses: [best-practice, composability]
       ref: /docs/tools.md
     - id: tools-backend-wiring
-      name: 'Backend tool wiring (AI SDK)'
+      name: Backend tool wiring (AI SDK)
       summary: 'AISDKToolkit({toolkit}).tools() merges server-build tools with uploaded frontend tools; use frontendTools without the generative build'
       lenses: [composability, reliability]
       signature: 'new AISDKToolkit({toolkit}).tools(); frontendTools(tools ?? {}); convertToModelMessages(messages, {tools})'
@@ -2036,14 +2036,14 @@ groups:
       - 'multi-step: useChatRuntime sendAutomaticallyWhen lastAssistantMessageIsCompleteWithToolCalls'
       ref: /docs/tools/backend.md
     - id: tools-dynamic
-      name: 'Dynamic tools (stubTool + override)'
+      name: Dynamic tools (stubTool + override)
       summary: 'Declare the contract with execute: stubTool() in the toolkit; supply the real executor via useAuiToolOverrides in the state-owning component'
       lenses: [composability]
       signature: 'defineToolkit({manage_tasks: {description, parameters, execute: stubTool(), render}}); useAuiToolOverrides({manage_tasks: {execute}})'
       notes: ['an override registers above toolkit defaults and supplies only execute; return a useful payload such as a new id']
       ref: /docs/tools/dynamic-tools.md
     - id: tools-mcp-apps
-      name: 'MCP Apps renderer'
+      name: MCP Apps renderer
       summary: 'McpAppRenderer({host: McpAppsRemoteHost({url})}) renders ui:// MCP widgets in sandboxed iframes over a JSON-RPC bridge'
       lenses: [security, composability]
       signature: 'Tools + McpAppRenderer({host, handlers?: {requestDisplayMode, updateModelContext}}); host route receives {method, params}'
@@ -2052,14 +2052,14 @@ groups:
       - 'key the host resource with withKey (from @assistant-ui/tap) when account or workspace identity changes'
       ref: /docs/tools/mcp-apps.md
     - id: tools-user-managed-mcp
-      name: 'User-managed MCP'
+      name: User-managed MCP
       summary: 'react-mcp: McpManagerResource({connectors}) with defineConnector presets or user-added servers; OAuth PKCE, bearer or none'
       lenses: [security]
       signature: 'AuiConfig({mcp: McpManagerResource({connectors})}); defineConnector({id, name, url, auth: {type: "oauth"|"none"|bearer}})'
       notes: ['connected tools register as frontend tools automatically']
       ref: /docs/tools/user-managed-mcp.md
     - id: tools-webmcp
-      name: 'WebMCP publishing'
+      name: WebMCP publishing
       summary: 'unstable_useWebMcpProvider publishes frontend tools with execute to document.modelContext; your filter replaces the default predicate'
       lenses: [security]
       signature: 'unstable_useWebMcpProvider({filter?}) => {status: "unsupported"|"active", registeredToolNames}'
@@ -2068,7 +2068,7 @@ groups:
       - 'Chrome origin trial covers 149-156 and ends 2026-11-17; locally use chrome://flags/#enable-webmcp-testing'
       ref: /docs/tools/webmcp.md
     - id: tools-generative-primitive
-      name: 'MessagePrimitive.GenerativeUI wiring'
+      name: MessagePrimitive.GenerativeUI wiring
       summary: 'Render a generative-ui message part from a JSON spec against a component allowlist; unknown names throw GenerativeUIRenderError'
       lenses: [security]
       signature: '<MessagePrimitive.GenerativeUI components={{Card, ...}} />'
@@ -2077,66 +2077,66 @@ groups:
       - 'the allowlist limits which components render, not the props they receive'
       ref: /docs/tools/generative-ui-primitive.md
     - id: tools-a2ui
-      name: 'A2UI surfaces'
+      name: A2UI surfaces
       summary: 'ACTIVITY_SNAPSHOT a2ui-surface or A2A parts become tool-call parts a2ui:<surfaceId>; Button actions go out via useAgUiSendA2uiAction'
       lenses: [composability]
       signature: 'JSONGenerativeUI({library: defaultGenerativeUILibrary, actions}); useAgUiSendA2uiAction()'
       notes: ['the a2ui: tool-call id prefix is reserved and excluded from history sent back to the agent']
       ref: /docs/tools/a2ui.md
     - id: tools-generative-slack
-      name: 'Generative UI to Slack'
+      name: Generative UI to Slack
       summary: 'toSlackBlocks never throws and returns {blocks, warnings}; subpath @assistant-ui/react-generative-ui/slack is React-free'
       lenses: [composability]
       signature: 'toSlackBlocks(tree, {surface: "modal"})'
       ref: /docs/tools/generative-ui-slack.md
     - id: tools-generative-teams
-      name: 'Generative UI to Teams'
+      name: Generative UI to Teams
       summary: 'toAdaptiveCard stamps schema 1.5 (Teams mobile caps at 1.2); toTeamsAttachments for carousels; subpath is React-free'
       lenses: [composability]
       signature: 'toAdaptiveCard(tree): {card, warnings}'
       ref: /docs/tools/generative-ui-teams.md
     - id: tools-openui
-      name: 'OpenUI integration'
+      name: OpenUI integration
       summary: 'Third-party @openuidev/assistant-ui: openuiIntegration bundles toolkit and instructions from one OpenUI component library'
       lenses: [composability]
       signature: 'npm i @openuidev/assistant-ui @openuidev/react-ui @openuidev/react-lang @openuidev/react-headless zustand@^4.5.5'
       notes: ['peers require Zustand 4 and AI SDK 6 or 7; import the layered stylesheet once']
       ref: /docs/tools/openui.md
-- title: 'Copilot helpers, Store and Tap'
+- title: Copilot helpers, Store and Tap
   sections:
   - id: copilots
-    title: 'Model context helpers for components'
+    title: Model context helpers for components
     level: intermediate
     requires: [layers]
     ref: /docs/copilots/model-context.md
     entries:
     - id: cop-model-context
-      name: 'Model context concepts'
+      name: Model context concepts
       summary: 'useAssistantInstructions registers a static string; useAssistantContext takes a callback evaluated at each read; tools via toolkits'
       lenses: [composability]
       signature: 'useAssistantInstructions(string | {instruction, disabled?}); useAssistantContext({getContext})'
       ref: /docs/copilots/model-context.md
     - id: cop-instructions
-      name: 'useAssistantInstructions'
+      name: useAssistantInstructions
       summary: 'Registers system instructions, cleans up on unmount, updates when the text changes, no-op when disabled'
       lenses: [composability]
       signature: 'useAssistantInstructions(config: string | AssistantInstructionsConfig)'
       ref: /docs/copilots/use-assistant-instructions.md
     - id: cop-make-visible
-      name: 'makeAssistantVisible guide'
+      name: makeAssistantVisible guide
       summary: 'HOC sends the outermost readable component HTML as system context; clickable adds a click tool, editable an edit tool for input/textarea'
       lenses: [composability]
       signature: 'makeAssistantVisible(Component, {clickable?, editable?})'
       notes: ['nested readable components contribute only the outermost HTML; refs and props are forwarded']
       ref: /docs/copilots/make-assistant-visible.md
     - id: cop-assistant-frame
-      name: 'Assistant Frame guide'
+      name: Assistant Frame guide
       summary: 'Iframe provides tools and instructions via AssistantFrameProvider + ModelContextRegistry; parent consumes with useAssistantFrameHost'
       lenses: [security, composability]
       signature: 'AssistantFrameProvider.addModelContextProvider(registry); useAssistantFrameHost({iframeRef, targetOrigin})'
       ref: /docs/copilots/assistant-frame.md
     - id: cop-motivation
-      name: 'Intelligent components'
+      name: Intelligent components
       summary: 'Banking example adding intelligence to a component with readable HTML, instructions and tools'
       lenses: [best-practice]
       ref: /docs/copilots/motivation.md
@@ -2147,67 +2147,67 @@ groups:
     ref: /docs/store/quickstart.md
     entries:
     - id: store-why
-      name: 'Why Store'
+      name: Why Store
       summary: 'Store provides Tap resource state deep in a tree without prop drilling: AuiProvider creates it, useAuiState selects with re-render on change'
       lenses: [composability]
       ref: /docs/store/why-store.md
     - id: store-quickstart
-      name: 'Store quickstart'
+      name: Store quickstart
       summary: 'Augment ScopeRegistry, define a Tap resource returning ClientOutput<scope>, mount with AuiProvider and read with useAuiState'
       lenses: [typing-dx]
       signature: 'npm i @assistant-ui/store @assistant-ui/tap; declare module "@assistant-ui/store" { interface ScopeRegistry {...} }'
       ref: /docs/store/quickstart.md
     - id: store-scopes
-      name: 'Scopes'
+      name: Scopes
       summary: 'Named independent units of state; ScopeRegistry is a type-level module augmentation that other packages can extend'
       lenses: [typing-dx, composability]
       signature: 'AuiConfig({thread: ThreadResource()}); <AuiProvider config={config}>'
       ref: /docs/store/scopes.md
     - id: store-methods
-      name: 'Scope methods'
+      name: Scope methods
       summary: 'Functions returned by the resource become methods on useAui().<scope>; ClientOutput ties the resource to the registry type'
       lenses: [typing-dx]
       signature: 'const aui = useAui(); aui.counter.increment()'
       ref: /docs/store/methods.md
     - id: store-state
-      name: 'Scope state'
+      name: Scope state
       summary: 'getState() returns a memoized object; reference equality drives useAuiState((s) => s.scope.x) re-renders, AuiIf and subscribe'
       lenses: [perf, typing-dx]
       signature: 'useAuiState<T>(selector: (s: AssistantState) => T): T'
       notes: ['build the state object with useMemo so an unchanged state keeps its reference']
       ref: /docs/store/state.md
     - id: store-events
-      name: 'Typed events'
+      name: Typed events
       summary: 'Declare scope.event payloads in ScopeRegistry, emit with useAssistantEmit in a resource, listen via useAuiEvent; delivered by microtask'
       lenses: [reliability, typing-dx]
       signature: 'useAssistantEmit(); useAuiEvent("counter.changed", cb)'
       ref: /docs/store/events.md
     - id: store-meta
-      name: 'Scope meta'
+      name: Scope meta
       summary: 'Accessors expose source ("root" | parent scope | null), query and name; these names are reserved for scope methods'
       lenses: [typing-dx]
       signature: 'aui.thread.source; aui.thread.query; aui.thread.name'
       ref: /docs/store/meta.md
     - id: store-child-scopes
-      name: 'Child scopes'
+      name: Child scopes
       summary: 'Parent resource manages items with useClientLookup; Derived({source, query}) resolves one child scope by index or key'
       lenses: [composability]
       signature: 'useClientLookup; useClientResource; useClientList; Derived({source: "todoList", query: {index}, get: (aui) => aui.todoList().todo(query)})'
       ref: /docs/store/child-scopes.md
     - id: store-sibling-scopes
-      name: 'Sibling scopes'
+      name: Sibling scopes
       summary: 'useAssistantClientRef gives a resource a ref to the whole client once all scopes mount, so siblings can call each other'
       lenses: [composability]
       signature: 'const clientRef = useAssistantClientRef(); clientRef.current.modelContext()'
       ref: /docs/store/sibling-scopes.md
     - id: store-rendering-lists
-      name: 'Rendering lists'
+      name: Rendering lists
       summary: 'Subscribe to list length, useMemo the element array, wrap each item with RenderChildrenWithAccessor so item state re-renders only the item'
       lenses: [perf]
       signature: 'RenderChildrenWithAccessor'
       ref: /docs/store/rendering-lists.md
     - id: store-api
-      name: 'Store API surface'
+      name: Store API surface
       summary: 'useAui, AuiConfig (branded), useAuiState, useAuiEvent, AuiProvider, AuiIf, Derived, transform-scope helpers and types'
       lenses: [typing-dx]
       signature: '<AuiProvider extends={aui} config={config}>; attachTransformScopes; forwardTransformScopes; getClientId'
@@ -2220,74 +2220,74 @@ groups:
     ref: /docs/tap.md
     entries:
     - id: tap-overview
-      name: 'Tap resources'
+      name: Tap resources
       summary: 'State management on React Hooks: wrap a use-prefixed hook with resource(); calling the factory yields an inert ResourceElement'
       lenses: [composability]
       import: '@assistant-ui/tap'
       signature: 'resource(hook): Resource; useResource(element)'
       ref: /docs/tap.md
     - id: tap-motivation
-      name: 'Tap motivation'
+      name: Tap motivation
       summary: 'Resource elements are values forming a typed declarative config tree (AuiConfig({threads, tools})) with a React-like render/mount lifecycle'
       lenses: [composability]
       ref: /docs/tap/motivation.md
     - id: tap-quickstart
-      name: 'Tap quickstart'
+      name: Tap quickstart
       summary: 'npm i @assistant-ui/tap; resource(useCounter); useResource(Counter({initialValue}))'
       lenses: [reuse]
       ref: /docs/tap/quickstart.md
     - id: tap-resources
-      name: 'Resources'
+      name: Resources
       summary: 'A resource renders with inputs, keeps hook state, mounts effects and cleans up; its return value is its public API'
       lenses: [composability]
       ref: /docs/tap/resources.md
     - id: tap-composition
-      name: 'Resource composition'
+      name: Resource composition
       summary: 'useResource and useResources let a parent read child output; pass a ResourceElement as config to swap implementations'
       lenses: [composability, testing]
       ref: /docs/tap/composition.md
     - id: tap-context
-      name: 'Tap context'
+      name: Tap context
       summary: 'createContext from React, read with use(), provide with useContextProvider across resource boundaries'
       lenses: [composability]
       signature: 'useContextProvider(Context, value, () => useResource(...))'
       ref: /docs/tap/context.md
     - id: tap-differences
-      name: 'Differences from React'
+      name: Differences from React
       summary: 'Effects run in call order (not children-first), the whole tree re-renders from the root, useLayoutEffect behaves like useEffect'
       lenses: [best-practice, reliability]
       ref: /docs/tap/differences-from-react.md
     - id: tap-lifecycle
-      name: 'Tap lifecycle'
+      name: Tap lifecycle
       summary: 'Render (no side effects) then commit (changed effects, previous cleanup first); effect and cleanup order is FIFO in call order'
       lenses: [reliability]
       ref: /docs/tap/lifecycle.md
     - id: tap-trees
-      name: 'Trees and re-renders'
+      name: Trees and re-renders
       summary: 'useResource/useResources do not form scheduling boundaries; useTapRoot creates a new root with its own scheduler'
       lenses: [perf]
       signature: 'useTapRoot(...); useTapHost(...)'
       ref: /docs/tap/trees-and-rerenders.md
     - id: tap-outside-react
-      name: 'Tap outside React'
+      name: Tap outside React
       summary: 'createTapRoot(cb, {mountOnSubscribe?}) hosts a tree imperatively returning {getValue, subscribe, unmount}; flushTapSync forces delivery'
       lenses: [testing]
       signature: 'createTapRoot(function Root() { return useResource(Counter({initialValue: 0})) })'
       ref: /docs/tap/outside-react.md
     - id: tap-api
-      name: 'Tap API surface'
+      name: Tap API surface
       summary: 'resource, withKey, useResource(s), useTapRoot, useTapHost, createTapRoot, flushTapSync, useContextProvider, Resource types'
       lenses: [typing-dx]
       signature: 'resource<R, A>(hook: (...args: A) => R): Resource<R, A>; withKey(key, element)'
       ref: /docs/tap/api-reference.md
   - id: heat-graph
-    title: 'heat-graph'
+    title: heat-graph
     level: basic
     requires: []
     ref: /docs/utilities/heat-graph.md
     entries:
     - id: heat-graph-lib
-      name: 'heat-graph'
+      name: heat-graph
       summary: 'Headless Radix-style activity heatmap with Popper tooltip and custom bucketing; shadcn item @assistant-ui/heat-graph or npm heat-graph'
       lenses: [ux-a11y, reuse]
       signature: 'npx shadcn@latest add @assistant-ui/heat-graph; npm install heat-graph'

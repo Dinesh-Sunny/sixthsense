@@ -12,7 +12,7 @@ toc:
 - index: 'https://tenacity.readthedocs.io/en/latest/'
   match: '^https://tenacity\.readthedocs\.io/'
 groups:
-- title: 'arq job workers'
+- title: AI tooling
   sections:
   - id: aq-worker
     title: 'Worker settings and job lifecycle'
@@ -22,7 +22,7 @@ groups:
     entries:
     - id: aq-simple-or-arq
       name: 'When asyncio is enough'
-      summary: 'for a hackathon slice use `asyncio.TaskGroup` plus `asyncio.Semaphore(n)`; move to arq when jobs must survive restarts, retry later or run on several pods'
+      summary: 'for a hackathon slice use `asyncio.TaskGroup` plus `asyncio.Semaphore(n)`; move to arq when jobs must survive restarts, retry later or...'
       lenses: [best-practice]
       notes: ['TaskGroup and Semaphore are stdlib, so they fit the no-pip app/ rule', 'arq needs Redis and a pip install, so keep it in pipeline/ only']
       ref: https://arq-docs.helpmanual.io/
@@ -165,7 +165,7 @@ groups:
     entries:
     - id: tn-async-retrying
       name: 'AsyncRetrying'
-      summary: '`async for attempt in AsyncRetrying(stop=..., wait=..., retry=...): with attempt: await call()` retries a block; `@retry` also works on async functions'
+      summary: '`async for attempt in AsyncRetrying(stop=..., wait=..., retry=...): with attempt: await call()` retries a block; `@retry` also works on...'
       lenses: [best-practice]
       import: tenacity
       signature: 'AsyncRetrying(sleep=asyncio.sleep, **kwargs)'

@@ -22,16 +22,16 @@ toc:
   why: 'categories/ are bare category titles; sections/Top Level.md is a one-line heading whose options (files, include, exclude, extends, references) have their own pages'
   base: 'https://github.com/microsoft/TypeScript-Website/tree/v2'
 groups:
-- title: 'AI tooling'
+- title: AI tooling
   sections:
   - id: wtl-ai-tooling
-    title: 'Agent entry points for ESLint, Prettier, TypeScript'
+    title: Agent entry points for ESLint, Prettier, TypeScript
     level: basic
     requires: []
     ref: /use/mcp
     entries:
     - id: wtl-eslint-mcp
-      name: 'ESLint MCP server'
+      name: ESLint MCP server
       summary: '`@eslint/mcp` (also `eslint --mcp`) lets an agent lint files through MCP; official, from the ESLint CLI'
       lenses: [reuse, reliability]
       signature: npx @eslint/mcp@<pinned>, eslint --mcp
@@ -40,29 +40,29 @@ groups:
         'docs only show editor setup (VS Code, Cursor, Windsurf), no Claude Code recipe']
       ref: /use/mcp
     - id: wtl-prettier-llms
-      name: 'Prettier llms.txt'
-      summary: 'ToC-only index of prettier.io docs pages (titles, no descriptions); fetch the pages themselves'
+      name: Prettier llms.txt
+      summary: ToC-only index of prettier.io docs pages (titles, no descriptions); fetch the pages themselves
       lenses: [reuse]
       notes: ['no per-page .md: prettier.io/docs/options.md is 404, so read the HTML page and strip tags',
         'no official MCP or skill found in the docs (checked 2026-10-05)']
       ref: prettier:/llms.txt
     - id: wtl-no-llms-eslint-ts
-      name: 'ESLint and TypeScript have no llms.txt'
-      summary: 'eslint.org/llms.txt and typescriptlang.org/llms.txt both 404 (2026-10-05); use the pages and the source repos'
+      name: ESLint and TypeScript have no llms.txt
+      summary: eslint.org/llms.txt and typescriptlang.org/llms.txt both 404 (2026-10-05); use the pages and the source repos
       lenses: [reuse]
       notes: ['typescriptlang.org/tsconfig renders client-side: read options/*.md in the TypeScript-Website repo (v2 branch) instead',
         'ESLint doc pages are 1:1 with eslint/docs/src; every version has its own base (/docs/v9.x, /docs/latest = v10)']
       ref: ts-site:/options
-- title: 'ESLint configuration (flat config)'
+- title: ESLint configuration (flat config)
   sections:
   - id: es-config
-    title: 'Config file and config objects'
+    title: Config file and config objects
     level: basic
     requires: []
     ref: /use/configure/configuration-files
     entries:
     - id: es-config-file
-      name: 'Config file names and lookup'
+      name: Config file names and lookup
       summary: 'eslint.config.{js,mjs,cjs,ts,mts,cts} at the project root exporting an array; v9 searches up from the cwd'
       lenses: [best-practice]
       signature: eslint.config.mjs
@@ -71,15 +71,15 @@ groups:
         '-c/--config skips the search and resolves patterns from the cwd']
       ref: /use/configure/configuration-files
     - id: es-define-config
-      name: 'defineConfig'
-      summary: 'Typed helper that builds the config array and enables the `extends` key per object'
+      name: defineConfig
+      summary: Typed helper that builds the config array and enables the `extends` key per object
       lenses: [typing-dx, composability]
       import: eslint/config
       signature: defineConfig([...configObjects])
       returns: Flat config array to `export default`; nested arrays are flattened and `extends` is resolved
       ref: /use/configure/configuration-files
     - id: es-config-object
-      name: 'Config object keys'
+      name: Config object keys
       summary: 'name, basePath, files, ignores, extends, languageOptions, linterOptions, processor, plugins, rules, settings'
       lenses: [best-practice]
       options:
@@ -91,16 +91,16 @@ groups:
         'name is optional but shows up in errors and the config inspector']
       ref: /use/configure/configuration-files
     - id: es-files-ignores
-      name: 'files and ignores semantics'
-      summary: 'Objects without `files` apply to every file matched by any other object; `ignores` alone is global'
+      name: files and ignores semantics
+      summary: Objects without `files` apply to every file matched by any other object; `ignores` alone is global
       lenses: [best-practice, reliability]
       notes: ['non-global ignores match only files: "dir/" ignores nothing, use "dir/**"',
         'always pair `ignores` with `files` unless you mean "everything except"',
         'negated ignores without `files` do not cause new files to be linted']
       ref: /use/configure/configuration-files
     - id: es-global-ignores
-      name: 'globalIgnores'
-      summary: 'Explicit helper for global ignore patterns (directories allowed); applies to every config object'
+      name: globalIgnores
+      summary: Explicit helper for global ignore patterns (directories allowed); applies to every config object
       lenses: [best-practice, reuse]
       import: eslint/config
       signature: globalIgnores(patterns, name?)
@@ -110,15 +110,15 @@ groups:
         'a pattern like .config only matches next to the config file; use **/.config/ for any depth']
       ref: /use/configure/ignore
     - id: es-cascade
-      name: 'Cascading and overriding'
-      summary: 'Matching objects merge in order, later wins; a rule given options replaces the old options wholesale'
+      name: Cascading and overriding
+      summary: Matching objects merge in order, later wins; a rule given options replaces the old options wholesale
       lenses: [best-practice, reliability]
       notes: ['severity-only override keeps earlier options: ["error","never"] then "warn" gives ["warn","never"]',
         'two overlapping blocks that both set options for one rule key: the later options fully replace the earlier ones',
         'languageOptions.globals merge across matching objects']
       ref: /use/configure/configuration-files
     - id: es-extends
-      name: 'Extending configs'
+      name: Extending configs
       summary: '`extends` inherits plugin/shareable/predefined configs inside one object, scoped by that object''s `files`'
       lenses: [composability, reuse]
       notes: ['set `files` next to `extends`; omitting it can apply the extended config to every file',
@@ -133,13 +133,13 @@ groups:
       notes: ['v10 adds no-unassigned-vars, no-useless-assignment, preserve-caught-error to eslint:recommended']
       ref: /use/configure/configuration-files
     - id: es-config-naming
-      name: 'Config object names'
-      summary: 'Scope names with `plugin/` prefix and extra `/` levels so errors and the inspector identify the object'
+      name: Config object names
+      summary: Scope names with `plugin/` prefix and extra `/` levels so errors and the inspector identify the object
       lenses: [observability]
       ref: /use/configure/configuration-files
     - id: es-ts-config-file
-      name: 'TypeScript config files'
-      summary: 'eslint.config.ts needs jiti >= 2.0 (not auto-installed) or native Node type stripping behind a flag'
+      name: TypeScript config files
+      summary: eslint.config.ts needs jiti >= 2.0 (not auto-installed) or native Node type stripping behind a flag
       lenses: [typing-dx]
       signature: eslint --flag unstable_native_nodejs_ts_config
       notes: ['native path needs Node >= 22.10 plus --experimental-strip-types',
@@ -147,28 +147,28 @@ groups:
         'precedence js > mjs > cjs > ts > mts > cts; v10 needs jiti >= 2.2.0']
       ref: /use/configure/configuration-files
   - id: es-rules
-    title: 'Rules, severities, inline config'
+    title: Rules, severities, inline config
     level: basic
     requires: [es-config]
     ref: /use/configure/rules
     entries:
     - id: es-rule-severity
-      name: 'Rule severities and options'
+      name: Rule severities and options
       summary: '"off"|"warn"|"error" (0|1|2) or [severity, ...options]; plugin rules are prefixed `plugin/`'
       lenses: [best-practice]
       signature: 'rules: { name: ["error", options] }'
       ref: /use/configure/rules
     - id: es-inline-config
-      name: 'Inline config and disable comments'
-      summary: 'Config comments beat file config; `noInlineConfig` turns them off, disable directives stay scoped'
+      name: Inline config and disable comments
+      summary: Config comments beat file config; `noInlineConfig` turns them off, disable directives stay scoped
       lenses: [best-practice, security]
       options:
       - {name: linterOptions.noInlineConfig, type: boolean, default: null, desc: 'Ignore /* eslint rule: ... */ comments (guard rails cannot be overridden inline)'}
       notes: ['/* eslint-disable */ is separate from inline config; use reportUnusedDisableDirectives to prune it']
       ref: /use/configure/rules
     - id: es-unused-directives
-      name: 'reportUnusedDisableDirectives / reportUnusedInlineConfigs'
-      summary: 'Severity strings under `linterOptions` that report stale disable and inline-config comments'
+      name: reportUnusedDisableDirectives / reportUnusedInlineConfigs
+      summary: Severity strings under `linterOptions` that report stale disable and inline-config comments
       lenses: [best-practice, reliability]
       options:
       - {name: linterOptions.reportUnusedDisableDirectives, type: 'off|warn|error', default: 'warn', desc: 'true=warn, false=off for legacy; CLI --report-unused-disable-directives-severity overrides'}
@@ -176,13 +176,13 @@ groups:
       notes: ['with --max-warnings 0 the default warn level already fails CI on stale disables']
       ref: /use/configure/configuration-files
   - id: es-restrict
-    title: 'Enforcing architecture with core rules'
+    title: Enforcing architecture with core rules
     level: intermediate
     requires: [es-rules]
     ref: /rules/no-restricted-imports
     entries:
     - id: es-no-restricted-imports
-      name: 'no-restricted-imports'
+      name: no-restricted-imports
       summary: 'Ban modules or named bindings (choke points, deprecated APIs); `paths` exact, `patterns` gitignore-style'
       lenses: [best-practice, composability, security]
       signature: 'no-restricted-imports: ["error", { paths: [{ name, message, importNames }], patterns }]'
@@ -195,13 +195,13 @@ groups:
         'a custom message is appended to the default message']
       ref: /rules/no-restricted-imports
     - id: es-no-restricted-globals
-      name: 'no-restricted-globals'
-      summary: 'Ban global identifiers (e.g. `process`, `event`) with per-name messages'
+      name: no-restricted-globals
+      summary: Ban global identifiers (e.g. `process`, `event`) with per-name messages
       lenses: [best-practice, security]
       signature: 'no-restricted-globals: ["error", { name, message }]'
       ref: /rules/no-restricted-globals
     - id: es-no-restricted-syntax
-      name: 'no-restricted-syntax'
+      name: no-restricted-syntax
       summary: 'Ban any syntax by ESTree node type or AST selector, with custom messages (e.g. `export const runtime`)'
       lenses: [best-practice, composability]
       signature: 'no-restricted-syntax: ["error", { selector, message }]'
@@ -209,25 +209,25 @@ groups:
         'one rule key per file: split overlapping blocks by files/ignores or merge the selector lists, since options replace']
       ref: /rules/no-restricted-syntax
   - id: es-configure-overview
-    title: 'Configure ESLint overview'
+    title: Configure ESLint overview
     level: basic
     requires: [es-config]
     ref: /use/configure
     entries:
     - id: es-configure-index
-      name: 'Ways to configure ESLint'
+      name: Ways to configure ESLint
       summary: 'Two mechanisms: configuration comments in a file, or a config file (eslint.config.js or -c); options are globals, rules, plugins'
       lenses: [best-practice]
       notes: ['page index: config files, language options, rules, plugins, parser, ignore files']
       ref: /use/configure
   - id: es-language-options
-    title: 'Language options, globals and parsers'
+    title: Language options, globals and parsers
     level: basic
     requires: [es-config]
     ref: /use/configure/language-options
     entries:
     - id: es-language-options-keys
-      name: 'languageOptions ecmaVersion / sourceType'
+      name: languageOptions ecmaVersion / sourceType
       summary: 'Defaults ecmaVersion "latest" and sourceType "module"; sourceType also accepts commonjs and script'
       lenses: [best-practice, reliability]
       signature: 'languageOptions: { ecmaVersion: "latest", sourceType: "module" }'
@@ -236,14 +236,14 @@ groups:
       - {name: sourceType, type: '"module" | "commonjs" | "script"', default: '"module"', desc: 'module is invalid for ecmaVersion 3 or 5; commonjs is non-strict with function scope'}
       ref: /use/configure/language-options
     - id: es-parser-options-builtin
-      name: 'Espree parserOptions'
+      name: Espree parserOptions
       summary: 'Built-in parser options, all false by default: allowReserved, ecmaFeatures.{globalReturn,impliedStrict,jsx}'
       lenses: [best-practice]
       signature: 'languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } }'
       notes: ['JSX syntax support is not React support: use eslint-plugin-react for React semantics']
       ref: /use/configure/language-options
     - id: es-globals
-      name: 'languageOptions.globals'
+      name: languageOptions.globals
       summary: 'Declare globals as "readonly"/"writable"/"off"; ESLint has no predefined environments, spread the `globals` package'
       lenses: [best-practice, reliability]
       signature: 'languageOptions: { globals: { ...globals.browser, MY_VAR: "readonly" } }'
@@ -252,7 +252,7 @@ groups:
         'ecmaVersion enables the standard built-in globals automatically']
       ref: /use/configure/language-options
     - id: es-parser
-      name: 'Custom parser'
+      name: Custom parser
       summary: 'Set `languageOptions.parser` to a parser object (default Espree); `parserOptions` are parser-specific'
       lenses: [typing-dx, composability]
       signature: 'languageOptions: { parser: babelParser, parserOptions: {...} }'
@@ -260,26 +260,26 @@ groups:
         'third-party parsers (@babel/eslint-parser, @typescript-eslint/parser, Esprima) are not guaranteed compatible; ESLint does not fix their bugs']
       ref: /use/configure/parser
   - id: es-plugins-config
-    title: 'Plugins in a config file'
+    title: Plugins in a config file
     level: intermediate
     requires: [es-config]
     ref: /use/configure/plugins
     entries:
     - id: es-plugins-key
-      name: 'plugins key and rule prefixes'
+      name: plugins key and rule prefixes
       summary: 'plugins is an object of namespace to plugin object; rules are referenced as `namespace/rule`, any namespace string works'
       lenses: [composability, best-practice]
       signature: 'plugins: { example }, rules: { "example/rule1": "warn" }'
       notes: ['convention: npm package name without the eslint-plugin- prefix']
       ref: /use/configure/plugins
     - id: es-local-virtual-plugin
-      name: 'Local and virtual plugins'
+      name: Local and virtual plugins
       summary: 'Import a plugin object from a file, or define one inline as `{ rules: { "my-rule": rule } }`; no npm publish needed'
       lenses: [composability, reuse]
       signature: 'plugins: { local: { rules: { "my-rule": myRule } } }'
       ref: /use/configure/plugins
     - id: es-processor-language
-      name: 'processor and language keys'
+      name: processor and language keys
       summary: '`processor: "ns/name"` lints code extracted from other files; `language: "ns/lang"` lints non-JS languages (e.g. json/jsonc)'
       lenses: [composability]
       signature: 'processor: "markdown/markdown", language: "json/jsonc"'
@@ -287,26 +287,26 @@ groups:
         'with `language` set, languageOptions become language-specific']
       ref: /use/configure/plugins
   - id: es-combine-configs
-    title: 'Combine configs'
+    title: Combine configs
     level: intermediate
     requires: [es-config]
     ref: /use/configure/combine-configs
     entries:
     - id: es-combine-extends-subset
-      name: 'Apply a config object or array to a subset of files'
+      name: Apply a config object or array to a subset of files
       summary: 'Wrap an imported config in `{ files, extends: [...] }` to scope it; local `rules` in the same object override it'
       lenses: [composability, best-practice]
       signature: '{ files: ["**/*.js"], extends: [exampleConfigs], rules: {...} }'
       notes: ['a single config object needs its plugin registered in the same object, then `extends: ["js/recommended"]`']
       ref: /use/configure/combine-configs
   - id: es-debug-config
-    title: 'Debug a configuration'
+    title: Debug a configuration
     level: intermediate
     requires: [es-config]
     ref: /use/configure/debug
     entries:
     - id: es-debug-flags
-      name: '--debug, --print-config, --inspect-config'
+      name: --debug, --print-config, --inspect-config
       summary: '--debug shows which config file loads, --print-config <file> prints the calculated config, --inspect-config opens the config inspector'
       lenses: [reliability, best-practice]
       signature: npx eslint --print-config file.js
@@ -314,7 +314,7 @@ groups:
         '--inspect-config installs and starts @eslint/config-inspector, which also lists deprecated rules']
       ref: /use/configure/debug
   - id: es-flat-migration
-    title: 'eslintrc to flat config migration'
+    title: eslintrc to flat config migration
     level: advanced
     requires: [es-config]
     ref: /use/configure/migration-guide
@@ -326,14 +326,14 @@ groups:
       signature: npx @eslint/migrate-config .eslintrc.json
       ref: /use/configure/migration-guide
     - id: es-flat-compat
-      name: 'FlatCompat'
+      name: FlatCompat
       summary: 'Use eslintrc-format shareable configs in a flat config via `compat.extends()` from @eslint/eslintrc'
       lenses: [composability]
       import: '@eslint/eslintrc'
       signature: new FlatCompat({ baseDirectory }).extends("eslint-config-my-config")
       ref: /use/configure/migration-guide
     - id: es-flat-differences
-      name: 'Flat vs eslintrc differences'
+      name: Flat vs eslintrc differences
       summary: 'Plugins/parsers are imported objects; overrides become files globs; .eslintignore, package.json config and eslint-env are gone'
       lenses: [best-practice, reliability]
       notes: ['ignore patterns move to a config object with only `ignores`; `temp.js` there matches only the config directory, use `**/temp.js`',
@@ -342,16 +342,16 @@ groups:
         'eslint-env comments are no longer recognized; remove them',
         'processors are never auto-attached by extension anymore; set them explicitly']
       ref: /use/configure/migration-guide
-- title: 'ESLint CLI and Node API'
+- title: ESLint CLI and Node API
   sections:
   - id: es-cli
-    title: 'Running ESLint in CI, hooks and agents'
+    title: Running ESLint in CI, hooks and agents
     level: basic
     requires: [es-config]
     ref: /use/command-line-interface
     entries:
     - id: es-cli-run
-      name: 'CLI basics and exit codes'
+      name: CLI basics and exit codes
       summary: '`eslint [file|dir|glob]*`; exit 0 clean, 1 lint errors or too many warnings, 2 config or internal failure'
       lenses: [reliability]
       signature: eslint [options] [file|dir|glob]*
@@ -359,7 +359,7 @@ groups:
         '--exit-on-fatal-error exits 2 on parse errors instead of reporting them as rule violations']
       ref: /use/command-line-interface
     - id: es-max-warnings
-      name: '--max-warnings / --quiet'
+      name: --max-warnings / --quiet
       summary: '`--max-warnings 0` makes warnings fail the run; `--quiet` hides warnings but still runs those rules'
       lenses: [best-practice, reliability]
       signature: eslint --max-warnings <n>
@@ -368,22 +368,22 @@ groups:
       - {name: --quiet, type: flag, default: 'false', desc: 'Report errors only; with --max-warnings warn-level rules still count toward the threshold'}
       ref: /use/command-line-interface
     - id: es-no-warn-ignored
-      name: '--no-warn-ignored'
-      summary: 'Silences "File ignored" warnings when an ignored path is passed explicitly (edit hooks, lint-staged)'
+      name: --no-warn-ignored
+      summary: Silences "File ignored" warnings when an ignored path is passed explicitly (edit hooks, lint-staged)
       lenses: [reliability, ux-a11y]
       signature: eslint --no-warn-ignored <file>
       notes: ['pair with --max-warnings 0, otherwise the ignored-file warning turns into exit 1']
       ref: /use/command-line-interface
     - id: es-fix
-      name: '--fix and --fix-type'
-      summary: 'Apply autofixes; `--fix-type` limits to problem, suggestion, layout or directive fixes; `--fix-dry-run` previews'
+      name: --fix and --fix-type
+      summary: Apply autofixes; `--fix-type` limits to problem, suggestion, layout or directive fixes; `--fix-dry-run` previews
       lenses: [reuse, best-practice]
       signature: eslint --fix [--fix-type <types>]
       notes: ['autofixed files are not written to the cache until a later run needs no fix']
       ref: /use/command-line-interface
     - id: es-cache
-      name: '--cache'
-      summary: 'Lint only changed files; cache in `.eslintcache`, strategy `metadata` (fast) or `content` (stable across git clones)'
+      name: --cache
+      summary: Lint only changed files; cache in `.eslintcache`, strategy `metadata` (fast) or `content` (stable across git clones)
       lenses: [perf]
       signature: eslint --cache [--cache-location <path>] [--cache-strategy content]
       options:
@@ -392,15 +392,15 @@ groups:
       notes: ['running without --cache deletes the cache file; set --cache-location to control when it is deleted']
       ref: /use/command-line-interface
     - id: es-concurrency
-      name: '--concurrency'
-      summary: 'Lint with worker threads; `auto` picks a thread count, default `off`'
+      name: --concurrency
+      summary: Lint with worker threads; `auto` picks a thread count, default `off`
       lenses: [perf]
       signature: eslint --concurrency auto
       options:
       - {name: --concurrency, type: 'int|auto|off', default: 'off', desc: 'Worker threads used to lint files; off lints in the main thread, auto picks a count'}
       ref: /use/command-line-interface
     - id: es-inspect-config
-      name: '--inspect-config / --print-config'
+      name: --inspect-config / --print-config
       summary: '`--inspect-config` opens the config inspector UI; `--print-config <file>` prints the resolved config for one file'
       lenses: [observability, best-practice]
       signature: eslint --print-config <file>
@@ -408,13 +408,13 @@ groups:
         'print-config lints nothing: use it to confirm which rule options win after overlapping blocks']
       ref: /use/command-line-interface
     - id: es-stats
-      name: '--stats / formatters'
-      summary: 'Adds per-rule timing and parse/fix times to results; combine with `-f json` or a custom formatter'
+      name: --stats / formatters
+      summary: Adds per-rule timing and parse/fix times to results; combine with `-f json` or a custom formatter
       lenses: [observability, perf]
       signature: eslint --stats -f json
       ref: /use/command-line-interface
     - id: es-suppressions
-      name: 'Bulk suppressions'
+      name: Bulk suppressions
       summary: '`--suppress-all` / `--suppress-rule` record existing errors in eslint-suppressions.json so only new ones fail'
       lenses: [best-practice, reliability]
       signature: eslint --fix --suppress-rule <rule>; --prune-suppressions
@@ -423,7 +423,7 @@ groups:
         '--suppressions-location must be passed on every run, not only when suppressing']
       ref: /use/suppressions
     - id: es-flags
-      name: 'Feature flags'
+      name: Feature flags
       summary: '`--flag` / ESLINT_FLAGS opt into experimental or next-major behavior; unstable_ may change, v##_ ships in the next major'
       lenses: [reliability]
       signature: eslint --flag <name>
@@ -431,23 +431,23 @@ groups:
         'v##_ flags are removed in the next major and then throw: drop them when upgrading']
       ref: /flags/
     - id: es-node-api
-      name: 'Node API (ESLint class)'
+      name: Node API (ESLint class)
       summary: 'Programmatic linting: `new ESLint(options)`, `lintFiles`, `lintText`, `loadFormatter`, `ESLint.outputFixes`'
       lenses: [composability, testing]
       import: eslint
       signature: new ESLint({ overrideConfigFile, fix, cache, concurrency, stats })
       returns: LintResult[] with messages, fix info and optional stats; formatter output via loadFormatter
       ref: /integrate/nodejs-api
-- title: 'Extending ESLint'
+- title: Extending ESLint
   sections:
   - id: es-extend
-    title: 'Custom rules, plugins, shareable configs'
+    title: Custom rules, plugins, shareable configs
     level: advanced
     requires: [es-config]
     ref: /extend/custom-rules
     entries:
     - id: es-custom-rules
-      name: 'Custom rules'
+      name: Custom rules
       summary: 'Rule module `{ meta, create(context) }`; declare `meta.schema`, `messageId`s, `fixable`, `hasSuggestions`'
       lenses: [composability, best-practice]
       signature: 'export default { meta: { type, schema, messages }, create(context) { return visitors } }'
@@ -459,40 +459,40 @@ groups:
         'v10 removes context.getFilename/getSourceCode etc.: use context.filename, context.sourceCode']
       ref: /extend/custom-rules
     - id: es-plugins
-      name: 'Local plugins'
+      name: Local plugins
       summary: 'A plugin object `{ meta, rules, configs, processors }` registered under `plugins` for a custom rule namespace'
       lenses: [composability, reuse]
       signature: 'plugins: { local: { rules: { "my-rule": rule } } }'
       ref: /extend/plugins
     - id: es-rule-tester
-      name: 'RuleTester'
-      summary: 'Unit-test custom rules with valid/invalid cases, `messageId`, expected `output` and suggestions'
+      name: RuleTester
+      summary: Unit-test custom rules with valid/invalid cases, `messageId`, expected `output` and suggestions
       lenses: [testing]
       import: eslint
       signature: new RuleTester().run(name, rule, { valid, invalid })
       notes: ['v10 rejects the `type` property in invalid-case errors and `errors`/`output` in valid cases']
       ref: /integrate/nodejs-api
-- title: 'ESLint onboarding, concepts and troubleshooting'
+- title: ESLint onboarding, concepts and troubleshooting
   sections:
   - id: es-use-guide
-    title: 'Using ESLint as an end user'
+    title: Using ESLint as an end user
     level: basic
     requires: []
     ref: /use
     entries:
     - id: es-use-map
-      name: 'End-user guide map'
+      name: End-user guide map
       summary: 'Index of the use/ guide: getting started, core concepts, configure, CLI, rules, formatters, integrations, rule deprecation, migrating'
       lenses: [reuse]
       ref: /use
   - id: es-getting-started
-    title: 'Getting started'
+    title: Getting started
     level: basic
     requires: []
     ref: /use/getting-started
     entries:
     - id: es-init-config
-      name: 'npm init @eslint/config'
+      name: npm init @eslint/config
       summary: 'Interactive scaffold that writes eslint.config.js/.mjs; also `--config <shared-config-package>`'
       lenses: [reuse]
       signature: pnpm create @eslint/config@latest
@@ -500,42 +500,42 @@ groups:
         'prerequisite Node ^18.18.0, ^20.9.0 or >=21.1.0 (v9 docs)']
       ref: /use/getting-started
     - id: es-manual-setup
-      name: 'Manual setup and pnpm .npmrc'
+      name: Manual setup and pnpm .npmrc
       summary: 'Install eslint and @eslint/js, add a config with `extends: ["js/recommended"]`; pnpm needs .npmrc auto-install-peers and node-linker=hoisted'
       lenses: [reliability]
       notes: ['global install is not recommended; plugins and shared configs must still be local',
         'severities: "off"/0, "warn"/1 (exit code unaffected), "error"/2 (exit code 1)']
       ref: /use/getting-started
   - id: es-core-concepts
-    title: 'Core concepts'
+    title: Core concepts
     level: basic
     requires: []
     ref: /use/core-concepts
     entries:
     - id: es-concept-fixes-suggestions
-      name: 'Rule fixes vs suggestions'
+      name: Rule fixes vs suggestions
       summary: 'Fixes are safe and applied by --fix or editors; suggestions may change logic, are editor-only and never applied by the CLI'
       lenses: [best-practice, reliability]
       notes: ['rules page marks fixes with a wrench and suggestions with a lightbulb']
       ref: /use/core-concepts
     - id: es-concept-building-blocks
-      name: 'Rules, configs, plugins, parsers, processors'
+      name: Rules, configs, plugins, parsers, processors
       summary: 'Rules are the core unit; plugins ship rules, configs, processors, languages; Espree is the default parser; processors extract JS'
       lenses: [composability]
       ref: /use/core-concepts
     - id: es-glossary
-      name: 'Glossary'
+      name: Glossary
       summary: 'Definitions: config array/object, flat config, legacy config, override, parser, plugin, processor, selector, severity, violation'
       lenses: [reuse]
       ref: /use/core-concepts/glossary
   - id: es-formatters
-    title: 'Formatters'
+    title: Formatters
     level: basic
     requires: []
     ref: /use/formatters
     entries:
     - id: es-formatter-builtin
-      name: 'Built-in formatters'
+      name: Built-in formatters
       summary: 'html, json, json-with-metadata and stylish, chosen with `--format`/`-f`; third-party formatters are also supported'
       lenses: [observability, reuse]
       signature: eslint --format json
@@ -543,70 +543,70 @@ groups:
         'v9 ships only these four built-in formatters']
       ref: /use/formatters
   - id: es-integrations
-    title: 'Integrations'
+    title: Integrations
     level: basic
     requires: []
     ref: /use/integrations
     entries:
     - id: es-integrations-list
-      name: 'Editor, build tool and VCS integrations'
+      name: Editor, build tool and VCS integrations
       summary: 'Community list (editors, webpack/rollup/grunt, git pre-commit hooks, Mega-Linter); not maintained by the ESLint team'
       lenses: [reuse]
       notes: ['curated wider list: awesome-eslint on GitHub']
       ref: /use/integrations
   - id: es-troubleshooting
-    title: 'Troubleshooting'
+    title: Troubleshooting
     level: intermediate
     requires: [es-cli]
     ref: /use/troubleshooting
     entries:
     - id: es-circular-fixes
-      name: 'Circular fixes detected'
+      name: Circular fixes detected
       summary: '--fix warns ESLintCircularFixesWarning when two fixable rules undo each other across passes; remove or reconfigure one'
       lenses: [reliability]
       notes: ['find the pair by applying one rule fix in an editor and seeing which new problem appears']
       ref: /use/troubleshooting/circular-fixes
     - id: es-v9-rule-api-errors
-      name: 'context.getScope is not a function'
+      name: context.getScope is not a function
       summary: 'A plugin rule still uses the pre-v9 rules API (context.getScope, getAncestors, ...); upgrade the plugin or patch with compat utilities'
       lenses: [reliability]
       notes: ['those methods moved from context to sourceCode in v9; report to the plugin if latest still fails']
       ref: /use/troubleshooting/v9-rule-api-changes
-- title: 'ESLint versions'
+- title: ESLint versions
   sections:
   - id: es-versions
-    title: 'v9 lifecycle and the v10 migration'
+    title: v9 lifecycle and the v10 migration
     level: advanced
     requires: [es-config]
     ref: /use/migrate-to-9.0.0
     entries:
     - id: es-v9-eol
-      name: 'ESLint v9 end of life'
-      summary: 'v9.x reached end-of-life on 2026-08-06; the v9 docs banner says upgrade or buy long-term support'
+      name: ESLint v9 end of life
+      summary: v9.x reached end-of-life on 2026-08-06; the v9 docs banner says upgrade or buy long-term support
       lenses: [security, reliability]
       notes: ['latest tag is 10.12.0, `maintenance` tag 9.39.5 (npm, 2026-10-05)',
         'eslint-config-next 16.3.8 peers eslint >=9.0.0 and typescript-eslint 8.71.0 peers eslint ^8.57 || ^9 || ^10']
       ref: /versions/
     - id: es-v10-migrate
-      name: 'Migrate to v10'
-      summary: 'Node >= 20.19/22.13/24, from-file config lookup default, eslintrc removed, JSX references tracked, new recommended rules'
+      name: Migrate to v10
+      summary: Node >= 20.19/22.13/24, from-file config lookup default, eslintrc removed, JSX references tracked, new recommended rules
       lenses: [reliability, best-practice]
       signature: npx codemod @eslint/v9-to-v10
       notes: ['remove --flag v10_config_lookup_from_file; it now throws',
         'new JSX reference tracking can surface no-unused-vars/no-undef reports in .tsx',
         'eslint-env comments are errors; jiti < 2.2.0 unsupported; radix always/as-needed options deprecated']
       ref: eslint-latest:/use/migrate-to-10.0.0
-- title: 'Prettier configuration'
+- title: Prettier configuration
   sections:
   - id: pr-config
-    title: 'Config files, options, overrides, plugins'
+    title: Config files, options, overrides, plugins
     level: basic
     requires: []
     ref: prettier:/docs/configuration
     entries:
     - id: pr-config-file
-      name: 'Config file resolution'
-      summary: 'Nearest .prettierrc*, prettier.config.* or package.json "prettier" key above the file; no global config by design'
+      name: Config file resolution
+      summary: Nearest .prettierrc*, prettier.config.* or package.json "prettier" key above the file; no global config by design
       lenses: [best-practice, reliability]
       signature: .prettierrc | prettier.config.mjs | package.json#prettier
       notes: ['.ts/.mts config needs Node >= 22.6 (and --experimental-strip-types before 24.3)',
@@ -614,7 +614,7 @@ groups:
         'JSON schema for editors: https://www.schemastore.org/prettierrc.json']
       ref: prettier:/docs/configuration
     - id: pr-options
-      name: 'Formatting options'
+      name: Formatting options
       summary: 'Few options by design; v3 defaults: printWidth 80, tabWidth 2, semi true, double quotes, trailingComma "all", LF'
       lenses: [best-practice]
       options:
@@ -629,14 +629,14 @@ groups:
       notes: ['deprecated: jsxBracketSameLine (use bracketSameLine)']
       ref: prettier:/docs/options
     - id: pr-overrides
-      name: 'overrides'
-      summary: 'Per-glob options in config (`files`, `excludeFiles`, `options`); the only place to set `parser` safely'
+      name: overrides
+      summary: Per-glob options in config (`files`, `excludeFiles`, `options`); the only place to set `parser` safely
       lenses: [composability, best-practice]
       signature: 'overrides: [{ files, excludeFiles, options }]'
       notes: ['never put `parser` at top level: it disables extension-based parser inference for every file']
       ref: prettier:/docs/configuration
     - id: pr-plugins
-      name: 'Plugins'
+      name: Plugins
       summary: '`plugins` array of module names, paths or imported plugin objects; strings go through `import()`'
       lenses: [composability, reuse]
       signature: 'plugins: ["prettier-plugin-x"]'
@@ -644,38 +644,38 @@ groups:
         'custom parsers option was removed in v3: use the plugin API']
       ref: prettier:/docs/plugins
     - id: pr-editorconfig
-      name: '.editorconfig support'
-      summary: 'indent_style, indent_size/tab_width, max_line_length and end_of_line map to Prettier options unless .prettierrc sets them'
+      name: .editorconfig support
+      summary: indent_style, indent_size/tab_width, max_line_length and end_of_line map to Prettier options unless .prettierrc sets them
       lenses: [reuse]
       notes: ['lookup stops at the project root; disable with --no-editorconfig']
       ref: prettier:/docs/configuration
   - id: pr-ignore
-    title: 'Ignoring files and code'
+    title: Ignoring files and code
     level: basic
     requires: []
     ref: prettier:/docs/ignore
     entries:
     - id: pr-prettierignore
-      name: '.prettierignore'
-      summary: 'gitignore-syntax file at the project root; Prettier also follows ./.gitignore, VCS dirs and node_modules by default'
+      name: .prettierignore
+      summary: gitignore-syntax file at the project root; Prettier also follows ./.gitignore, VCS dirs and node_modules by default
       lenses: [best-practice, reliability]
       notes: ['--ignore-path overrides the default list instead of adding: repeat it to keep .gitignore and .prettierignore',
         'lets `prettier --write .` run safely and tells editors what to skip']
       ref: prettier:/docs/ignore
     - id: pr-ignore-comments
-      name: 'prettier-ignore comments'
+      name: prettier-ignore comments
       summary: '`// prettier-ignore` skips the next AST node; markdown/YAML/HTML variants and range ignore for generated content'
       lenses: [best-practice]
       signature: // prettier-ignore
       ref: prettier:/docs/ignore
   - id: pr-cli
-    title: 'CLI, API, CI and hooks'
+    title: CLI, API, CI and hooks
     level: intermediate
     requires: [pr-config]
     ref: prettier:/docs/cli
     entries:
     - id: pr-cli-write-check
-      name: '--write / --check / --list-different'
+      name: --write / --check / --list-different
       summary: '`--write` formats in place; `--check` prints a summary and exits 1 if unformatted; `-l` lists files only'
       lenses: [reliability, testing]
       signature: prettier --check .
@@ -687,8 +687,8 @@ groups:
         '--find-config-path then --config <file> skips repeated config lookup when formatting many files singly']
       ref: prettier:/docs/cli
     - id: pr-cli-cache
-      name: '--cache'
-      summary: 'Format only changed files; cache in node_modules/.cache/prettier, key by metadata or content'
+      name: --cache
+      summary: Format only changed files; cache in node_modules/.cache/prettier, key by metadata or content
       lenses: [perf]
       signature: prettier --write --cache --cache-strategy content .
       options:
@@ -697,54 +697,54 @@ groups:
       notes: ['plugin versions and implementations are not cache keys: delete the cache after upgrading plugins']
       ref: prettier:/docs/cli
     - id: pr-api
-      name: 'Node API'
-      summary: 'Async `format`, `check`, `resolveConfig`, `getFileInfo`, `getSupportInfo` for tools and tests; `@prettier/sync` for sync'
+      name: Node API
+      summary: Async `format`, `check`, `resolveConfig`, `getFileInfo`, `getSupportInfo` for tools and tests; `@prettier/sync` for sync
       lenses: [composability, testing]
       import: prettier
       signature: await prettier.format(source, { filepath })
       returns: Formatted string; check returns Promise<boolean>; getFileInfo gives { ignored, inferredParser }
       ref: prettier:/docs/api
     - id: pr-ci-exact-version
-      name: 'CI check and exact version'
-      summary: 'Pin Prettier exactly (`--save-exact`) and run `prettier --check .` in CI; even patches can change output'
+      name: CI check and exact version
+      summary: Pin Prettier exactly (`--save-exact`) and run `prettier --check .` in CI; even patches can change output
       lenses: [reliability, best-practice]
       signature: pnpm add -D -E prettier@3.9.9
       notes: ['also add .prettierrc and .prettierignore so editors and CI agree']
       ref: prettier:/docs/install
     - id: pr-precommit
-      name: 'Pre-commit hooks'
-      summary: 'lint-staged, pretty-quick, git-format-staged or lefthook run `prettier --write --ignore-unknown` on staged files'
+      name: Pre-commit hooks
+      summary: lint-staged, pretty-quick, git-format-staged or lefthook run `prettier --write --ignore-unknown` on staged files
       lenses: [reliability]
       notes: ['with ESLint, run eslint --fix before Prettier in lint-staged']
       ref: prettier:/docs/precommit
     - id: pr-linters
-      name: 'Prettier with linters'
-      summary: 'Prettier formats, ESLint finds bugs; disable conflicting ESLint rules via eslint-config-prettier, skip eslint-plugin-prettier'
+      name: Prettier with linters
+      summary: Prettier formats, ESLint finds bugs; disable conflicting ESLint rules via eslint-config-prettier, skip eslint-plugin-prettier
       lenses: [best-practice, perf]
       notes: ['Prettier docs call prettier-as-lint-rule plugins slower, noisy and an extra layer that can break']
       ref: prettier:/docs/integrating-with-linters
-- title: 'Prettier concepts, sharing and integrations'
+- title: Prettier concepts, sharing and integrations
   sections:
   - id: pr-overview
-    title: 'What Prettier is'
+    title: What Prettier is
     level: basic
     requires: []
     ref: prettier:/docs
     entries:
     - id: pr-what-is
-      name: 'What is Prettier'
+      name: What is Prettier
       summary: 'Opinionated formatter that reprints the parsed AST by print width; handles JS/TS/JSX, CSS family, HTML, Vue, JSON, Markdown, YAML, GraphQL'
       lenses: [best-practice]
       notes: ['some original styling is preserved when practical: empty lines and multi-line objects']
       ref: prettier:/docs
     - id: pr-vs-linters
-      name: 'Prettier vs linters'
+      name: Prettier vs linters
       summary: 'Prettier replaces formatting lint rules (max-len, spacing) but does nothing for code-quality rules (no-unused-vars): use both'
       lenses: [best-practice, composability]
       notes: ['it is not rule-based: no per-rule enable/disable, it reprints the whole program']
       ref: prettier:/docs/comparison
     - id: pr-rationale
-      name: 'Rationale (what it formats and how)'
+      name: Rationale (what it formats and how)
       summary: 'Strings use fewer-escapes quote, blank lines collapse to one, multi-line objects preserved, long imports/test titles may exceed width'
       lenses: [best-practice]
       notes: ['printWidth is a guideline, not a hard limit',
@@ -755,25 +755,25 @@ groups:
         'non-standard syntax support is best-effort and may change in any release']
       ref: prettier:/docs/rationale
     - id: pr-option-philosophy
-      name: 'Option philosophy'
+      name: Option philosophy
       summary: 'The option set is frozen: new option requests, and requests to preserve input formatting, are closed without discussion'
       lenses: [best-practice]
       notes: ['arrowParens, jsxSingleQuote, bracketSameLine and bracketSpacing are called historical artifacts, not a model to copy']
       ref: prettier:/docs/option-philosophy
     - id: pr-technical-details
-      name: 'Printer internals'
+      name: Printer internals
       summary: 'Wadler-style printer: AST to an intermediate document that is measured to decide line breaks; parser doc-explorer shows the IR'
       lenses: [reuse]
       notes: ['playground option parser=doc-explorer exposes the intermediate representation']
       ref: prettier:/docs/technical-details
   - id: pr-sharing
-    title: 'Shareable configs'
+    title: Shareable configs
     level: intermediate
     requires: [pr-config]
     ref: prettier:/docs/sharing-configurations
     entries:
     - id: pr-shared-config
-      name: 'Create, use and extend a shared config'
+      name: Create, use and extend a shared config
       summary: 'An npm package exporting a Prettier config object; reference it as a string in package.json "prettier" or .prettierrc, extend by spreading'
       lenses: [composability, reuse]
       signature: 'import shared from "@scope/prettier-config"; export default { ...shared, semi: false }'
@@ -781,13 +781,13 @@ groups:
         'extending needs a prettier.config.mjs that spreads the imported object']
       ref: prettier:/docs/sharing-configurations
   - id: pr-env
-    title: 'Browser, CI, editors and related tools'
+    title: Browser, CI, editors and related tools
     level: intermediate
     requires: [pr-cli]
     ref: prettier:/docs/browser
     entries:
     - id: pr-browser
-      name: 'Standalone build (browser)'
+      name: Standalone build (browser)
       summary: '`prettier/standalone` has no Node deps and no config, ignore files, CLI or automatic plugin loading: pass `parser` and `plugins` explicitly'
       lenses: [composability]
       import: prettier/standalone
@@ -796,52 +796,52 @@ groups:
         'ESM build standalone.mjs since 3.0; plugins live under prettier/plugins/*']
       ref: prettier:/docs/browser
     - id: pr-ci-autofix
-      name: 'Autofix on CI'
+      name: Autofix on CI
       summary: 'GitHub Actions recipe: pinned Prettier, `prettier . --write` then autofix-ci/action commits the result'
       lenses: [reliability]
       notes: ['requires the autofix.ci GitHub App and a pinned Prettier version']
       ref: prettier:/docs/ci
     - id: pr-editors
-      name: 'Editor integration'
+      name: Editor integration
       summary: 'Run from the editor (VS Code, Emacs, Vim, Helix, Sublime, JetBrains); install Prettier locally per project to match its version'
       lenses: [ux-a11y, reliability]
       ref: prettier:/docs/editors
     - id: pr-watch
-      name: 'Watching for changes'
+      name: Watching for changes
       summary: 'No built-in watcher: `onchange "**/*" -- prettier --write --ignore-unknown {{changed}}`'
       lenses: [reuse]
       signature: npx onchange "**/*" -- npx prettier --write --ignore-unknown {{changed}}
       ref: prettier:/docs/watching-files
     - id: pr-related
-      name: 'Related projects'
+      name: Related projects
       summary: 'eslint-config-prettier (disable conflicting rules), eslint-plugin-prettier, pretty-quick, parallel-prettier, prettier_d, MegaLinter'
       lenses: [composability, reuse]
       notes: ['eslint-config-prettier turns off ESLint rules that conflict; eslint-plugin-prettier reports diffs as ESLint issues']
       ref: prettier:/docs/related-projects
-- title: 'TypeScript compiler options'
+- title: TypeScript compiler options
   sections:
   - id: ts-tsconfig
-    title: 'tsconfig strictness and module settings'
+    title: tsconfig strictness and module settings
     level: basic
     requires: []
     ref: typescript:/tsconfig/
     entries:
     - id: ts-strict
-      name: 'strict'
-      summary: 'Enables the strict family (noImplicitAny, strictNullChecks, ...); new TS versions may add checks under it'
+      name: strict
+      summary: Enables the strict family (noImplicitAny, strictNullChecks, ...); new TS versions may add checks under it
       lenses: [typing-dx, reliability]
       signature: '"strict": true'
       notes: ['TS 7 makes strict true by default; individual family flags can still be turned off']
       ref: ts-site:/options/strict
     - id: ts-no-unchecked-indexed-access
-      name: 'noUncheckedIndexedAccess'
-      summary: 'Adds `undefined` to index-signature and array element reads, forcing a check before use'
+      name: noUncheckedIndexedAccess
+      summary: Adds `undefined` to index-signature and array element reads, forcing a check before use
       lenses: [typing-dx, reliability]
       signature: '"noUncheckedIndexedAccess": true'
       since: '4.1'
       ref: ts-site:/options/noUncheckedIndexedAccess
     - id: ts-exact-optional
-      name: 'exactOptionalPropertyTypes'
+      name: exactOptionalPropertyTypes
       summary: '`prop?: T` no longer accepts an explicit `undefined`; absent and undefined become different'
       lenses: [typing-dx]
       signature: '"exactOptionalPropertyTypes": true'
@@ -849,881 +849,881 @@ groups:
       notes: ['not part of `strict`: the docs list it separately as a recommended extra']
       ref: ts-site:/options/exactOptionalPropertyTypes
     - id: ts-no-property-access-index
-      name: 'noPropertyAccessFromIndexSignature'
-      summary: 'Forces bracket access for keys that come only from an index signature, keeping known and dynamic keys distinct'
+      name: noPropertyAccessFromIndexSignature
+      summary: Forces bracket access for keys that come only from an index signature, keeping known and dynamic keys distinct
       lenses: [typing-dx]
       since: '4.2'
       ref: ts-site:/options/noPropertyAccessFromIndexSignature
     - id: ts-no-implicit-override
-      name: 'noImplicitOverride'
-      summary: 'Requires the `override` keyword on subclass methods that override a base member'
+      name: noImplicitOverride
+      summary: Requires the `override` keyword on subclass methods that override a base member
       lenses: [typing-dx, reliability]
       since: '4.3'
       ref: ts-site:/options/noImplicitOverride
     - id: ts-module-resolution
-      name: 'moduleResolution'
+      name: moduleResolution
       summary: '`bundler` for Vite/webpack/Next (exports and imports honored, no extensions needed); node16/nodenext for Node'
       lenses: [best-practice]
       signature: '"module": "esnext", "moduleResolution": "bundler"'
       notes: ['node10 (old "node") is deprecated in TS 6 and removed in 7; classic is removed']
       ref: ts-site:/options/moduleResolution
     - id: ts-isolated-modules
-      name: 'isolatedModules'
+      name: isolatedModules
       summary: 'Flags code a single-file transpiler (SWC, Babel) cannot compile: const enums, non-module namespaces, re-exported types'
       lenses: [best-practice, reliability]
       signature: '"isolatedModules": true'
       notes: ['does not change emit or checking, it only adds errors']
       ref: ts-site:/options/isolatedModules
     - id: ts-verbatim-module-syntax
-      name: 'verbatimModuleSyntax'
-      summary: 'Keeps imports and exports without `type` exactly as written and drops only `import type`; replaces importsNotUsedAsValues'
+      name: verbatimModuleSyntax
+      summary: Keeps imports and exports without `type` exactly as written and drops only `import type`; replaces importsNotUsedAsValues
       lenses: [best-practice, perf]
       signature: '"verbatimModuleSyntax": true'
       since: '5.0'
       notes: ['ESM import/export is never rewritten to require: it errors instead, so CJS output needs `import x = require()` syntax']
       ref: ts-site:/options/verbatimModuleSyntax
     - id: ts-side-effect-imports
-      name: 'noUncheckedSideEffectImports'
-      summary: 'Errors when `import "x"` resolves to nothing instead of silently ignoring it; default true in TS 7'
+      name: noUncheckedSideEffectImports
+      summary: Errors when `import "x"` resolves to nothing instead of silently ignoring it; default true in TS 7
       lenses: [reliability]
       notes: ['without it a typo in `import "./x.css"` is silently ignored; bundler-loaded assets are the common case']
       ref: ts-site:/options/noUncheckedSideEffectImports
     - id: ts-erasable-syntax-only
-      name: 'erasableSyntaxOnly'
-      summary: 'Errors on enums, runtime namespaces and parameter properties so Node can run .ts via type stripping'
+      name: erasableSyntaxOnly
+      summary: Errors on enums, runtime namespaces and parameter properties so Node can run .ts via type stripping
       lenses: [best-practice]
       ref: ts-site:/options/erasableSyntaxOnly
     - id: ts-types
-      name: 'types'
-      summary: 'Restricts which `@types/*` packages enter the global scope; default `[]` from TS 6, all visible before'
+      name: types
+      summary: Restricts which `@types/*` packages enter the global scope; default `[]` from TS 6, all visible before
       lenses: [reliability, perf]
       signature: '"types": ["node"]'
       notes: ['upgrading from 5.x to 6 drops implicit globals such as Node types unless listed here']
       ref: ts-site:/options/types
     - id: ts-paths
-      name: 'paths'
-      summary: 'Alias mapping used by the type checker only; the bundler must replicate it; works without baseUrl'
+      name: paths
+      summary: Alias mapping used by the type checker only; the bundler must replicate it; works without baseUrl
       lenses: [best-practice]
       signature: '"paths": { "@/*": ["./*"] }'
       notes: ['baseUrl is deprecated in TS 6 and removed in 7; paths resolve relative to the tsconfig']
       ref: ts-site:/options/paths
     - id: ts-jsx
-      name: 'jsx'
+      name: jsx
       summary: '`react-jsx` uses the automatic runtime (no React import); `preserve` leaves JSX for Next/Babel to compile'
       lenses: [best-practice]
       signature: '"jsx": "react-jsx"'
       ref: ts-site:/options/jsx
     - id: ts-skip-lib-check
-      name: 'skipLibCheck'
-      summary: 'Skips type checking of .d.ts files; faster, but hides conflicts between duplicate type packages'
+      name: skipLibCheck
+      summary: Skips type checking of .d.ts files; faster, but hides conflicts between duplicate type packages
       lenses: [perf]
       signature: '"skipLibCheck": true'
       ref: ts-site:/options/skipLibCheck
     - id: ts-incremental
-      name: 'incremental / tsBuildInfoFile'
-      summary: 'Persists the project graph in a .tsbuildinfo file so later `tsc` runs are faster; safe to delete'
+      name: incremental / tsBuildInfoFile
+      summary: Persists the project graph in a .tsbuildinfo file so later `tsc` runs are faster; safe to delete
       lenses: [perf]
       signature: '"incremental": true, "tsBuildInfoFile": ".cache/tsbuildinfo"'
       notes: ['default location is <config name>.tsbuildInfo next to the config (or under outDir), so gitignore *.tsbuildinfo']
       ref: ts-site:/options/incremental
     - id: ts-no-emit
-      name: 'noEmit'
-      summary: 'Type-check only; the usual setting when a bundler or framework compiles the code'
+      name: noEmit
+      summary: Type-check only; the usual setting when a bundler or framework compiles the code
       lenses: [best-practice]
       signature: tsc --noEmit
       ref: ts-site:/options/noEmit
   - id: ts-tsconfig-reference-map
-    title: 'tsconfig reference structure and CLI'
+    title: tsconfig reference structure and CLI
     level: basic
     requires: []
     ref: ts-site:/intro
     entries:
     - id: ts-reference-intro
-      name: 'TSConfig reference intro'
+      name: TSConfig reference intro
       summary: 'tsconfig.json or jsconfig.json marks a project root; the reference has root fields, compilerOptions, watchOptions, typeAcquisition'
       lenses: [best-practice, reuse]
       signature: tsc --init
       notes: ['bootstrap with `tsc --init` or a centralized base from github.com/tsconfig/bases']
       ref: ts-site:/intro
     - id: ts-cli-help
-      name: 'tsc --help'
-      summary: 'Prints local help for the TypeScript CLI'
+      name: tsc --help
+      summary: Prints local help for the TypeScript CLI
       lenses: [reuse]
       signature: tsc --help
       ref: ts-site:/cli/help
     - id: ts-jsconfig-type-acquisition
-      name: 'jsconfig.json typeAcquisition examples'
+      name: jsconfig.json typeAcquisition examples
       summary: 'Turn type acquisition off with `typeAcquisition.enable: false`, or add definitions with `include: ["jquery"]`'
       lenses: [composability]
       ref: ts-site:/sections/typeAcquisition
   - id: ts-type-checking
-    title: 'Type-checking flags'
+    title: Type-checking flags
     level: intermediate
     requires: [ts-tsconfig]
     ref: ts-site:/sections/compilerOptions
     entries:
     - id: ts-no-implicit-any
-      name: 'noImplicitAny'
+      name: noImplicitAny
       summary: 'Error on expressions and declarations whose type would silently fall back to `any`'
       lenses: [typing-dx, reliability]
       signature: '"noImplicitAny": true'
       notes: ['part of the `strict` family']
       ref: ts-site:/options/noImplicitAny
     - id: ts-strict-null-checks
-      name: 'strictNullChecks'
+      name: strictNullChecks
       summary: 'Take `null` and `undefined` into account; when false they are effectively ignored by the language'
       lenses: [typing-dx, reliability]
       signature: '"strictNullChecks": true'
       notes: ['part of the `strict` family']
       ref: ts-site:/options/strictNullChecks
     - id: ts-strict-function-types
-      name: 'strictFunctionTypes'
+      name: strictFunctionTypes
       summary: 'Check function parameters and return values for subtype compatibility on assignment'
       lenses: [typing-dx]
       signature: '"strictFunctionTypes": true'
       ref: ts-site:/options/strictFunctionTypes
     - id: ts-strict-bind-call-apply
-      name: 'strictBindCallApply'
+      name: strictBindCallApply
       summary: 'Check that arguments to `bind`, `call` and `apply` match the original function'
       lenses: [typing-dx]
       signature: '"strictBindCallApply": true'
       ref: ts-site:/options/strictBindCallApply
     - id: ts-strict-property-initialization
-      name: 'strictPropertyInitialization'
+      name: strictPropertyInitialization
       summary: 'Error on class properties that are declared but not set in the constructor'
       lenses: [typing-dx, reliability]
       signature: '"strictPropertyInitialization": true'
       ref: ts-site:/options/strictPropertyInitialization
     - id: ts-strict-builtin-iterator-return
-      name: 'strictBuiltinIteratorReturn'
+      name: strictBuiltinIteratorReturn
       summary: 'Built-in iterators get a `TReturn` of `undefined` instead of `any`'
       lenses: [typing-dx]
       signature: '"strictBuiltinIteratorReturn": true'
       ref: ts-site:/options/strictBuiltinIteratorReturn
     - id: ts-no-implicit-this
-      name: 'noImplicitThis'
+      name: noImplicitThis
       summary: 'Error when `this` has an implied `any` type'
       lenses: [typing-dx]
       signature: '"noImplicitThis": true'
       ref: ts-site:/options/noImplicitThis
     - id: ts-use-unknown-in-catch-variables
-      name: 'useUnknownInCatchVariables'
+      name: useUnknownInCatchVariables
       summary: 'Type catch clause variables as `unknown` instead of `any`, forcing a narrowing check'
       lenses: [typing-dx, reliability]
       signature: '"useUnknownInCatchVariables": true'
       notes: ['TypeScript 4.0 added the ability to change the catch variable type']
       ref: ts-site:/options/useUnknownInCatchVariables
     - id: ts-always-strict
-      name: 'alwaysStrict'
+      name: alwaysStrict
       summary: 'Parse files in ECMAScript strict mode and emit "use strict" for each source file'
       lenses: [reliability]
       signature: '"alwaysStrict": true'
       ref: ts-site:/options/alwaysStrict
     - id: ts-no-implicit-returns
-      name: 'noImplicitReturns'
+      name: noImplicitReturns
       summary: 'Error when not every code path in a function returns a value'
       lenses: [reliability]
       signature: '"noImplicitReturns": true'
       ref: ts-site:/options/noImplicitReturns
     - id: ts-no-fallthrough-cases-in-switch
-      name: 'noFallthroughCasesInSwitch'
+      name: noFallthroughCasesInSwitch
       summary: 'Error on non-empty switch cases that lack `break`, `return` or `throw`'
       lenses: [reliability]
       signature: '"noFallthroughCasesInSwitch": true'
       ref: ts-site:/options/noFallthroughCasesInSwitch
     - id: ts-no-unused-locals
-      name: 'noUnusedLocals'
+      name: noUnusedLocals
       summary: 'Error on local variables that are never read'
       lenses: [best-practice]
       signature: '"noUnusedLocals": true'
       ref: ts-site:/options/noUnusedLocals
     - id: ts-no-unused-parameters
-      name: 'noUnusedParameters'
+      name: noUnusedParameters
       summary: 'Error on function parameters that are never read; names starting with `_` are exempt'
       lenses: [best-practice]
       signature: '"noUnusedParameters": true'
       ref: ts-site:/options/noUnusedParameters
     - id: ts-allow-unreachable-code
-      name: 'allowUnreachableCode'
+      name: allowUnreachableCode
       summary: 'undefined (default) shows editor suggestions, true ignores unreachable code, false raises compile errors'
       lenses: [reliability]
       signature: '"allowUnreachableCode": false'
       notes: ['only provably unreachable code is reported']
       ref: ts-site:/options/allowUnreachableCode
     - id: ts-allow-unused-labels
-      name: 'allowUnusedLabels'
+      name: allowUnusedLabels
       summary: 'undefined (default) shows editor suggestions, true ignores unused labels, false raises compile errors'
       lenses: [reliability]
       signature: '"allowUnusedLabels": false'
       ref: ts-site:/options/allowUnusedLabels
     - id: ts-no-strict-generic-checks
-      name: 'noStrictGenericChecks'
+      name: noStrictGenericChecks
       summary: 'Disable the strict unification check of type parameters when comparing generic function signatures'
       lenses: [typing-dx]
       ref: ts-site:/options/noStrictGenericChecks
     - id: ts-suppress-excess-property-errors
-      name: 'suppressExcessPropertyErrors'
+      name: suppressExcessPropertyErrors
       summary: 'Disable excess property errors on object literals; added to ease migration from older TypeScript'
       lenses: [typing-dx]
       ref: ts-site:/options/suppressExcessPropertyErrors
     - id: ts-suppress-implicit-any-index-errors
-      name: 'suppressImplicitAnyIndexErrors'
+      name: suppressImplicitAnyIndexErrors
       summary: 'Suppress noImplicitAny errors when indexing objects that lack index signatures'
       lenses: [typing-dx]
       ref: ts-site:/options/suppressImplicitAnyIndexErrors
     - id: ts-check-js
-      name: 'checkJs'
+      name: checkJs
       summary: 'Report type errors in JavaScript files; equivalent to `// @ts-check` in every included file'
       lenses: [typing-dx]
       signature: '"allowJs": true, "checkJs": true'
       notes: ['works together with allowJs']
       ref: ts-site:/options/checkJs
     - id: ts-no-check
-      name: 'noCheck'
+      name: noCheck
       summary: 'Disable full type checking; only critical parse and emit errors are reported'
       lenses: [perf]
       signature: '"noCheck": true'
       ref: ts-site:/options/noCheck
   - id: ts-module-resolution-opts
-    title: 'Modules, imports and JavaScript interop'
+    title: Modules, imports and JavaScript interop
     level: intermediate
     requires: [ts-tsconfig]
     ref: ts-site:/sections/compilerOptions
     entries:
     - id: ts-module
-      name: 'module'
+      name: module
       summary: 'Module system of the generated code; `nodenext` for modern Node, `preserve` or `esnext` for bundled code'
       lenses: [best-practice]
       signature: '"module": "esnext"'
       notes: ['changing module affects moduleResolution']
       ref: ts-site:/options/module
     - id: ts-module-detection
-      name: 'moduleDetection'
+      name: moduleDetection
       summary: 'How a file is classified as script or module: auto (default; checks package.json type and JSX files), legacy, force'
       lenses: [reliability]
       signature: '"moduleDetection": "force"'
       notes: ['force treats every non-declaration file as a module']
       ref: ts-site:/options/moduleDetection
     - id: ts-module-suffixes
-      name: 'moduleSuffixes'
+      name: moduleSuffixes
       summary: 'File-name suffixes to try when resolving a module, e.g. `.ios` before the bare name'
       lenses: [composability]
       signature: '"moduleSuffixes": [".ios", ""]'
       ref: ts-site:/options/moduleSuffixes
     - id: ts-base-url
-      name: 'baseUrl'
+      name: baseUrl
       summary: 'Base directory for bare module specifiers; designed for AMD loaders and no longer required with `paths`'
       lenses: [best-practice]
       signature: '"baseUrl": "./"'
       notes: ['has higher priority than node_modules lookups', 'not required to use `paths` since TypeScript 4.1']
       ref: ts-site:/options/baseUrl
     - id: ts-root-dirs
-      name: 'rootDirs'
+      name: rootDirs
       summary: 'Treat several folders as one virtual root when resolving relative imports'
       lenses: [composability]
       signature: '"rootDirs": ["src", "generated"]'
       ref: ts-site:/options/rootDirs
     - id: ts-type-roots
-      name: 'typeRoots'
+      name: typeRoots
       summary: 'Folders that act like node_modules/@types; setting it replaces the default visible @types packages'
       lenses: [composability]
       signature: '"typeRoots": ["./typings"]'
       ref: ts-site:/options/typeRoots
     - id: ts-custom-conditions
-      name: 'customConditions'
+      name: customConditions
       summary: 'Extra conditions tried when resolving package.json `exports` and `imports`, on top of resolver defaults'
       lenses: [composability]
       signature: '"customConditions": ["my-condition"]'
       ref: ts-site:/options/customConditions
     - id: ts-resolve-package-json-exports
-      name: 'resolvePackageJsonExports'
+      name: resolvePackageJsonExports
       summary: 'Consult the package.json `exports` field for packages in node_modules; defaults true for node16, nodenext, bundler'
       lenses: [composability]
       signature: '"resolvePackageJsonExports": true'
       ref: ts-site:/options/resolvePackageJsonExports
     - id: ts-resolve-package-json-imports
-      name: 'resolvePackageJsonImports'
+      name: resolvePackageJsonImports
       summary: 'Consult the package.json `imports` field when resolving specifiers that start with `#`'
       lenses: [composability]
       signature: '"resolvePackageJsonImports": true'
       ref: ts-site:/options/resolvePackageJsonImports
     - id: ts-resolve-json-module
-      name: 'resolveJsonModule'
+      name: resolveJsonModule
       summary: 'Allow importing .json files, typed from the static JSON shape'
       lenses: [typing-dx]
       signature: '"resolveJsonModule": true'
       ref: ts-site:/options/resolveJsonModule
     - id: ts-allow-arbitrary-extensions
-      name: 'allowArbitraryExtensions'
+      name: allowArbitraryExtensions
       summary: 'Import paths with unknown extensions resolve to a `{basename}.d.{ext}.ts` declaration file (TypeScript 5.0)'
       lenses: [typing-dx]
       signature: '"allowArbitraryExtensions": true'
       notes: ['useful for CSS or asset imports under a bundler']
       ref: ts-site:/options/allowArbitraryExtensions
     - id: ts-allow-importing-ts-extensions
-      name: 'allowImportingTsExtensions'
+      name: allowImportingTsExtensions
       summary: 'Allow imports ending in .ts/.mts/.tsx; only valid with noEmit or emitDeclarationOnly'
       lenses: [composability]
       signature: '"allowImportingTsExtensions": true'
       ref: ts-site:/options/allowImportingTsExtensions
     - id: ts-rewrite-relative-import-extensions
-      name: 'rewriteRelativeImportExtensions'
+      name: rewriteRelativeImportExtensions
       summary: 'Rewrite .ts/.tsx/.mts/.cts extensions in relative import paths to their JavaScript equivalents on emit'
       lenses: [composability]
       signature: '"rewriteRelativeImportExtensions": true'
       ref: ts-site:/options/rewriteRelativeImportExtensions
     - id: ts-allow-synthetic-default-imports
-      name: 'allowSyntheticDefaultImports'
+      name: allowSyntheticDefaultImports
       summary: 'Allow `import x from y` when the module has no default export (type-level only)'
       lenses: [typing-dx]
       signature: '"allowSyntheticDefaultImports": true'
       notes: ['esModuleInterop enables it']
       ref: ts-site:/options/allowSyntheticDefaultImports
     - id: ts-es-module-interop
-      name: 'esModuleInterop'
+      name: esModuleInterop
       summary: 'Emit helpers so CommonJS modules import like ES modules; also enables allowSyntheticDefaultImports'
       lenses: [reliability]
       signature: '"esModuleInterop": true'
       ref: ts-site:/options/esModuleInterop
     - id: ts-allow-umd-global-access
-      name: 'allowUmdGlobalAccess'
+      name: allowUmdGlobalAccess
       summary: 'Allow accessing UMD exports as globals from inside module files'
       lenses: [typing-dx]
       ref: ts-site:/options/allowUmdGlobalAccess
     - id: ts-preserve-symlinks
-      name: 'preserveSymlinks'
+      name: preserveSymlinks
       summary: 'Do not resolve symlinks to their real path; mirrors the Node.js flag and opposes webpack behavior'
       lenses: [composability]
       ref: ts-site:/options/preserveSymlinks
     - id: ts-no-resolve
-      name: 'noResolve'
+      name: noResolve
       summary: 'Stop imports, requires and `<reference>` directives from adding more files to the program'
       lenses: [perf]
       ref: ts-site:/options/noResolve
     - id: ts-force-consistent-casing-in-file-names
-      name: 'forceConsistentCasingInFileNames'
+      name: forceConsistentCasingInFileNames
       summary: 'Error when an import differs from the real file name only by case, for mixed case-sensitive file systems'
       lenses: [reliability]
       signature: '"forceConsistentCasingInFileNames": true'
       ref: ts-site:/options/forceConsistentCasingInFileNames
     - id: ts-allow-js
-      name: 'allowJs'
+      name: allowJs
       summary: 'Allow importing JavaScript files; a way to adopt TypeScript incrementally in JS projects'
       lenses: [composability]
       signature: '"allowJs": true'
       notes: ['with declaration and emitDeclarationOnly it can generate declarations for JS']
       ref: ts-site:/options/allowJs
     - id: ts-max-node-module-js-depth
-      name: 'maxNodeModuleJsDepth'
+      name: maxNodeModuleJsDepth
       summary: 'Maximum folder depth under node_modules searched for JavaScript files; only used with allowJs'
       lenses: [perf]
       ref: ts-site:/options/maxNodeModuleJsDepth
     - id: ts-imports-not-used-as-values
-      name: 'importsNotUsedAsValues'
+      name: importsNotUsedAsValues
       summary: 'Emit and checking behavior for imports that are only used as types'
       lenses: [typing-dx]
       notes: ['values remove (default), preserve, error']
       deprecated: 'deprecated in favor of verbatimModuleSyntax'
       ref: ts-site:/options/importsNotUsedAsValues
     - id: ts-preserve-value-imports
-      name: 'preserveValueImports'
+      name: preserveValueImports
       summary: 'Keep unused imported values in the JavaScript output that TypeScript would otherwise remove'
       lenses: [typing-dx]
       deprecated: 'deprecated in favor of verbatimModuleSyntax'
       ref: ts-site:/options/preserveValueImports
   - id: ts-emit-and-language
-    title: 'Language target, emit and declarations'
+    title: Language target, emit and declarations
     level: intermediate
     requires: [ts-tsconfig]
     ref: ts-site:/sections/compilerOptions
     entries:
     - id: ts-target
-      name: 'target'
+      name: target
       summary: 'JavaScript version for emitted code; also sets the default `lib`, and decides which syntax is downleveled'
       lenses: [best-practice]
       signature: '"target": "ES2022"'
       notes: ['mix target and lib as needed']
       ref: ts-site:/options/target
     - id: ts-lib
-      name: 'lib'
+      name: lib
       summary: 'Bundled declaration files describing the runtime environment, e.g. drop `dom` for non-browser code'
       lenses: [best-practice]
       signature: '"lib": ["dom", "dom.iterable", "esnext"]'
       ref: ts-site:/options/lib
     - id: ts-lib-replacement
-      name: 'libReplacement'
+      name: libReplacement
       summary: 'Control substituting default lib files with @typescript/lib-* packages; disable to skip those lookups'
       lenses: [perf]
       signature: '"libReplacement": false'
       ref: ts-site:/options/libReplacement
     - id: ts-no-lib
-      name: 'noLib'
+      name: noLib
       summary: 'Disable all library files including lib.d.ts; `lib` is then ignored and you must supply core interfaces'
       lenses: [composability]
       ref: ts-site:/options/noLib
     - id: ts-use-define-for-class-fields
-      name: 'useDefineForClassFields'
+      name: useDefineForClassFields
       summary: 'Emit ECMAScript-standard class field semantics instead of the older TypeScript behavior'
       lenses: [reliability]
       signature: '"useDefineForClassFields": true'
       ref: ts-site:/options/useDefineForClassFields
     - id: ts-experimental-decorators
-      name: 'experimentalDecorators'
+      name: experimentalDecorators
       summary: 'Enable the pre-standard TC39 stage 2 decorators implementation'
       lenses: [composability]
       signature: '"experimentalDecorators": true'
       ref: ts-site:/options/experimentalDecorators
     - id: ts-emit-decorator-metadata
-      name: 'emitDecoratorMetadata'
+      name: emitDecoratorMetadata
       summary: 'Emit design-type metadata for decorated declarations, for use with reflect-metadata'
       lenses: [composability]
       signature: '"emitDecoratorMetadata": true'
       ref: ts-site:/options/emitDecoratorMetadata
     - id: ts-out-dir
-      name: 'outDir'
+      name: outDir
       summary: 'Directory for emitted files; source directory structure is preserved'
       lenses: [composability]
       signature: '"outDir": "dist"'
       ref: ts-site:/options/outDir
     - id: ts-out-file
-      name: 'outFile'
+      name: outFile
       summary: 'Bundle global-script output (and .d.ts if declaration is on) into a single file'
       lenses: [composability]
       notes: ['only works with module none, system or amd']
       ref: ts-site:/options/outFile
     - id: ts-out
-      name: 'out'
+      name: out
       summary: 'Old name for outFile with unpredictable output location'
       lenses: [composability]
       deprecated: 'use outFile instead'
       ref: ts-site:/options/out
     - id: ts-root-dir
-      name: 'rootDir'
+      name: rootDir
       summary: 'Root of the input tree for output layout; default is the longest common path of non-declaration inputs'
       lenses: [composability]
       signature: '"rootDir": "src"'
       notes: ['with composite the default is the tsconfig directory']
       ref: ts-site:/options/rootDir
     - id: ts-declaration
-      name: 'declaration'
+      name: declaration
       summary: 'Generate .d.ts files describing each module external API'
       lenses: [typing-dx, composability]
       signature: '"declaration": true'
       notes: ['composite defaults it to true']
       ref: ts-site:/options/declaration
     - id: ts-declaration-dir
-      name: 'declarationDir'
+      name: declarationDir
       summary: 'Directory for emitted declaration files, separate from outDir'
       lenses: [composability]
       signature: '"declarationDir": "types"'
       ref: ts-site:/options/declarationDir
     - id: ts-declaration-map
-      name: 'declarationMap'
+      name: declarationMap
       summary: 'Emit source maps for .d.ts so editors can go to the original .ts source'
       lenses: [typing-dx]
       signature: '"declarationMap": true'
       ref: ts-site:/options/declarationMap
     - id: ts-emit-declaration-only
-      name: 'emitDeclarationOnly'
+      name: emitDeclarationOnly
       summary: 'Emit only .d.ts files and no JavaScript, for use with another transpiler'
       lenses: [composability]
       signature: '"emitDeclarationOnly": true'
       ref: ts-site:/options/emitDeclarationOnly
     - id: ts-isolated-declarations
-      name: 'isolatedDeclarations'
+      name: isolatedDeclarations
       summary: 'Require enough annotation on exports for other tools to generate declarations without type checking (5.5)'
       lenses: [perf, composability]
       signature: '"isolatedDeclarations": true'
       ref: ts-site:/options/isolatedDeclarations
     - id: ts-source-map
-      name: 'sourceMap'
+      name: sourceMap
       summary: 'Emit .js.map files for emitted JavaScript'
       lenses: [observability]
       signature: '"sourceMap": true'
       ref: ts-site:/options/sourceMap
     - id: ts-inline-source-map
-      name: 'inlineSourceMap'
+      name: inlineSourceMap
       summary: 'Embed the source map in the emitted .js instead of a separate file'
       lenses: [observability]
       signature: '"inlineSourceMap": true'
       ref: ts-site:/options/inlineSourceMap
     - id: ts-inline-sources
-      name: 'inlineSources'
+      name: inlineSources
       summary: 'Include original source text in the source map `sourcesContent`'
       lenses: [observability]
       signature: '"inlineSources": true'
       ref: ts-site:/options/inlineSources
     - id: ts-map-root
-      name: 'mapRoot'
+      name: mapRoot
       summary: 'Location the debugger should use to find map files instead of generated locations'
       lenses: [observability]
       ref: ts-site:/options/mapRoot
     - id: ts-source-root
-      name: 'sourceRoot'
+      name: sourceRoot
       summary: 'Root path for debuggers to find the reference source code'
       lenses: [observability]
       ref: ts-site:/options/sourceRoot
     - id: ts-remove-comments
-      name: 'removeComments'
+      name: removeComments
       summary: 'Strip comments from the emitted JavaScript'
       lenses: [perf]
       signature: '"removeComments": true'
       ref: ts-site:/options/removeComments
     - id: ts-no-emit-on-error
-      name: 'noEmitOnError'
+      name: noEmitOnError
       summary: 'Do not emit output files if any type errors were reported'
       lenses: [reliability]
       signature: '"noEmitOnError": true'
       ref: ts-site:/options/noEmitOnError
     - id: ts-no-emit-helpers
-      name: 'noEmitHelpers'
+      name: noEmitHelpers
       summary: 'Do not emit helper functions like `__extends`; you then provide them in global scope'
       lenses: [perf]
       ref: ts-site:/options/noEmitHelpers
     - id: ts-import-helpers
-      name: 'importHelpers'
+      name: importHelpers
       summary: 'Import downlevel helper functions from tslib once instead of inlining them per file'
       lenses: [perf]
       signature: '"importHelpers": true'
       notes: ['tslib must be importable at runtime']
       ref: ts-site:/options/importHelpers
     - id: ts-downlevel-iteration
-      name: 'downlevelIteration'
+      name: downlevelIteration
       summary: 'Emit more compliant but verbose and slower code for iteration when targeting older JavaScript'
       lenses: [reliability]
       signature: '"downlevelIteration": true'
       ref: ts-site:/options/downlevelIteration
     - id: ts-emit-bom
-      name: 'emitBOM'
+      name: emitBOM
       summary: 'Emit a UTF-8 byte order mark at the start of output files'
       lenses: [composability]
       ref: ts-site:/options/emitBOM
     - id: ts-new-line
-      name: 'newLine'
+      name: newLine
       summary: 'End-of-line sequence for emitted files: CRLF or LF'
       lenses: [composability]
       signature: '"newLine": "lf"'
       ref: ts-site:/options/newLine
     - id: ts-preserve-const-enums
-      name: 'preserveConstEnums'
+      name: preserveConstEnums
       summary: 'Keep `const enum` declarations in the emitted code instead of erasing them'
       lenses: [composability]
       ref: ts-site:/options/preserveConstEnums
     - id: ts-strip-internal
-      name: 'stripInternal'
+      name: stripInternal
       summary: 'Do not emit declarations for code whose JSDoc has `@internal`; compiler-internal, use at own risk'
       lenses: [composability]
       ref: ts-site:/options/stripInternal
     - id: ts-no-implicit-use-strict
-      name: 'noImplicitUseStrict'
+      name: noImplicitUseStrict
       summary: 'Do not add "use strict" prologues to modules emitted for non-ES6 targets'
       lenses: [composability]
       ref: ts-site:/options/noImplicitUseStrict
     - id: ts-ts-build-info-file
-      name: 'tsBuildInfoFile'
+      name: tsBuildInfoFile
       summary: 'Path of the .tsbuildinfo file used for incremental builds'
       lenses: [perf]
       notes: ['default is <outFile>.tsbuildinfo, or <tsconfig name>.tsbuildinfo next to the config']
       ref: ts-site:/options/tsBuildInfoFile
     - id: ts-jsx-factory
-      name: 'jsxFactory'
+      name: jsxFactory
       summary: 'Factory function for the classic JSX runtime, e.g. `h` or `preact.h`'
       lenses: [composability]
       signature: '"jsxFactory": "h"'
       ref: ts-site:/options/jsxFactory
     - id: ts-jsx-fragment-factory
-      name: 'jsxFragmentFactory'
+      name: jsxFragmentFactory
       summary: 'Fragment reference for the classic JSX runtime, used with jsxFactory'
       lenses: [composability]
       signature: '"jsxFragmentFactory": "Fragment"'
       ref: ts-site:/options/jsxFragmentFactory
     - id: ts-jsx-import-source
-      name: 'jsxImportSource'
+      name: jsxImportSource
       summary: 'Module specifier for the jsx/jsxs factory when jsx is react-jsx or react-jsxdev'
       lenses: [composability]
       signature: '"jsxImportSource": "preact"'
       notes: ['the docs example also sets `"types": ["preact"]`']
       ref: ts-site:/options/jsxImportSource
     - id: ts-react-namespace
-      name: 'reactNamespace'
+      name: reactNamespace
       summary: 'Object whose createElement is called for classic React JSX'
       lenses: [composability]
       deprecated: 'use jsxFactory instead'
       ref: ts-site:/options/reactNamespace
     - id: ts-keyof-strings-only
-      name: 'keyofStringsOnly'
+      name: keyofStringsOnly
       summary: 'Make `keyof` return only strings instead of string, number or symbol; legacy option'
       lenses: [typing-dx]
       deprecated: 'legacy option kept for old code'
       ref: ts-site:/options/keyofStringsOnly
     - id: ts-skip-default-lib-check
-      name: 'skipDefaultLibCheck'
+      name: skipDefaultLibCheck
       summary: 'Skip type checking of the default library .d.ts files'
       lenses: [perf]
       deprecated: 'use skipLibCheck instead'
       ref: ts-site:/options/skipDefaultLibCheck
     - id: ts-charset
-      name: 'charset'
+      name: charset
       summary: 'Old option for the text encoding used when reading files'
       lenses: [composability]
       deprecated: 'no longer supported; TypeScript assumes UTF-8'
       ref: ts-site:/options/charset
   - id: ts-project-config
-    title: 'Project files, inheritance and references'
+    title: Project files, inheritance and references
     level: intermediate
     requires: [ts-tsconfig]
     ref: ts-site:/sections/Top%20Level
     entries:
     - id: ts-files
-      name: 'files'
+      name: files
       summary: 'Explicit file allowlist, no globs; an error occurs if any file is missing'
       lenses: [composability]
       signature: '"files": ["src/index.ts"]'
       ref: ts-site:/options/files
     - id: ts-include
-      name: 'include'
+      name: include
       summary: 'Glob patterns of files to include, relative to the tsconfig; a final segment without extension is a directory'
       lenses: [composability]
       signature: '"include": ["src/**/*"]'
       notes: ['`*`, `?` and `**/` wildcards are supported']
       ref: ts-site:/options/include
     - id: ts-exclude
-      name: 'exclude'
+      name: exclude
       summary: 'Filters what `include` finds; a file can still enter via imports, types, reference directives or files'
       lenses: [composability]
       signature: '"exclude": ["node_modules"]'
       notes: ['not a way to keep a file out of the program']
       ref: ts-site:/options/exclude
     - id: ts-extends
-      name: 'extends'
+      name: extends
       summary: 'Inherit from one or more base configs; files/include/exclude from the child overwrite the base, references are not inherited'
       lenses: [composability, reuse]
       signature: '"extends": "./tsconfig.base.json"'
       notes: ['relative paths resolve relative to the file they came from', 'circular extends is not allowed']
       ref: ts-site:/options/extends
     - id: ts-references
-      name: 'references'
+      name: references
       summary: 'Project references: split a program into smaller projects for faster builds and editor use'
       lenses: [composability, perf]
       signature: '"references": [{ "path": "../core" }]'
       ref: ts-site:/options/references
     - id: ts-composite
-      name: 'composite'
+      name: composite
       summary: 'Constraints that let build tools tell quickly whether a project is built; required for referenced projects'
       lenses: [perf, composability]
       signature: '"composite": true'
       notes: ['rootDir defaults to the tsconfig directory, declaration to true, all files must be matched by include/files']
       ref: ts-site:/options/composite
     - id: ts-plugins
-      name: 'plugins'
+      name: plugins
       summary: 'Language service plugins that run inside the editor to add information (not at compile time)'
       lenses: [composability]
       signature: '"plugins": [{ "name": "next" }]'
       ref: ts-site:/options/plugins
     - id: ts-disable-solution-searching
-      name: 'disableSolutionSearching'
+      name: disableSolutionSearching
       summary: 'Opt a composite project out of multi-project reference checking when editing'
       lenses: [perf]
       ref: ts-site:/options/disableSolutionSearching
     - id: ts-disable-source-of-project-reference-redirect
-      name: 'disableSourceOfProjectReferenceRedirect'
+      name: disableSourceOfProjectReferenceRedirect
       summary: 'Prefer declaration files over source files when referencing composite projects in the editor'
       lenses: [perf]
       ref: ts-site:/options/disableSourceOfProjectReferenceRedirect
     - id: ts-disable-referenced-project-load
-      name: 'disableReferencedProjectLoad'
+      name: disableReferencedProjectLoad
       summary: 'Reduce the number of projects TypeScript loads automatically in multi-project programs'
       lenses: [perf]
       ref: ts-site:/options/disableReferencedProjectLoad
     - id: ts-disable-size-limit
-      name: 'disableSizeLimit'
+      name: disableSizeLimit
       summary: 'Remove the 20mb cap on total JavaScript source size in the language server'
       lenses: [perf]
       ref: ts-site:/options/disableSizeLimit
     - id: ts-assume-changes-only-affect-direct-dependencies
-      name: 'assumeChangesOnlyAffectDirectDependencies'
+      name: assumeChangesOnlyAffectDirectDependencies
       summary: 'In incremental watch mode, assume edits only affect files that directly depend on the changed file'
       lenses: [perf]
       notes: ['faster but can miss errors in transitive dependents']
       ref: ts-site:/options/assumeChangesOnlyAffectDirectDependencies
   - id: ts-diagnostics-opts
-    title: 'Diagnostics and output'
+    title: Diagnostics and output
     level: intermediate
     requires: [ts-tsconfig]
     ref: ts-site:/sections/compilerOptions
     entries:
     - id: ts-diagnostics
-      name: 'diagnostics'
+      name: diagnostics
       summary: 'Print compiler performance information after building; a subset of extendedDiagnostics'
       lenses: [observability]
       ref: ts-site:/options/diagnostics
     - id: ts-extended-diagnostics
-      name: 'extendedDiagnostics'
+      name: extendedDiagnostics
       summary: 'Print detailed compiler timing to see where compilation spends its time'
       lenses: [observability, perf]
       ref: ts-site:/options/extendedDiagnostics
     - id: ts-explain-files
-      name: 'explainFiles'
+      name: explainFiles
       summary: 'Print each file in the program and the reason it was included'
       lenses: [observability]
       ref: ts-site:/options/explainFiles
     - id: ts-list-files
-      name: 'listFiles'
+      name: listFiles
       summary: 'Print the names of all files in the compilation'
       lenses: [observability]
       notes: ['explainFiles gives the same list with reasons']
       ref: ts-site:/options/listFiles
     - id: ts-list-emitted-files
-      name: 'listEmittedFiles'
+      name: listEmittedFiles
       summary: 'Print the names of emitted files after compilation'
       lenses: [observability]
       ref: ts-site:/options/listEmittedFiles
     - id: ts-trace-resolution
-      name: 'traceResolution'
+      name: traceResolution
       summary: 'Log the paths tried by moduleResolution, to debug why a module is or is not found'
       lenses: [observability]
       ref: ts-site:/options/traceResolution
     - id: ts-generate-cpu-profile
-      name: 'generateCpuProfile'
+      name: generateCpuProfile
       summary: 'Emit a v8 CPU profile of the compiler run; CLI only'
       lenses: [observability, perf]
       notes: ['CLI only']
       ref: ts-site:/options/generateCpuProfile
     - id: ts-generate-trace
-      name: 'generateTrace'
+      name: generateTrace
       summary: 'Generate an event trace and a list of types for diagnosing slow builds'
       lenses: [observability, perf]
       ref: ts-site:/options/generateTrace
     - id: ts-locale
-      name: 'locale'
+      name: locale
       summary: 'Language of compiler messages; set via host environment or the CLI flag, not tsconfig; does not affect emit'
       lenses: [composability]
       signature: 'tsc --locale ru'
       ref: ts-site:/options/locale
     - id: ts-pretty
-      name: 'pretty'
+      name: pretty
       summary: 'Colorize and add context to compiler errors; on by default'
       lenses: [observability]
       signature: '"pretty": false'
       ref: ts-site:/options/pretty
     - id: ts-no-error-truncation
-      name: 'noErrorTruncation'
+      name: noErrorTruncation
       summary: 'Do not truncate types in error messages'
       lenses: [observability]
       ref: ts-site:/options/noErrorTruncation
     - id: ts-preserve-watch-output
-      name: 'preserveWatchOutput'
+      name: preserveWatchOutput
       summary: 'Keep old console output in watch mode instead of clearing the screen on each change'
       lenses: [observability]
       ref: ts-site:/options/preserveWatchOutput
   - id: ts-watch-build-acquisition
-    title: 'Watch, build and type acquisition options'
+    title: Watch, build and type acquisition options
     level: advanced
     requires: [ts-tsconfig]
     ref: ts-site:/sections/watchOptions
     entries:
     - id: ts-watch-file
-      name: 'watchFile'
+      name: watchFile
       summary: 'Strategy for watching individual files: polling intervals or native file-system events'
       lenses: [perf]
       signature: '"watchOptions": { "watchFile": "useFsEvents" }'
       notes: ['default is useFsEvents; polling strategies are the alternatives']
       ref: ts-site:/options/watchFile
     - id: ts-watch-directory
-      name: 'watchDirectory'
+      name: watchDirectory
       summary: 'Strategy for watching directory trees on systems without native recursive watching'
       lenses: [perf]
       signature: '"watchOptions": { "watchDirectory": "useFsEvents" }'
       notes: ['default is useFsEvents']
       ref: ts-site:/options/watchDirectory
     - id: ts-fallback-polling
-      name: 'fallbackPolling'
+      name: fallbackPolling
       summary: 'Polling strategy used when the system runs out of native file watchers'
       lenses: [perf]
       ref: ts-site:/options/fallbackPolling
     - id: ts-synchronous-watch-directory
-      name: 'synchronousWatchDirectory'
+      name: synchronousWatchDirectory
       summary: 'Update directory watcher state synchronously on platforms without native recursive watching'
       lenses: [perf]
       ref: ts-site:/options/synchronousWatchDirectory
     - id: ts-exclude-directories
-      name: 'excludeDirectories'
+      name: excludeDirectories
       summary: 'Directories removed from watch mode; cuts open file watchers, useful on Linux'
       lenses: [perf]
       signature: '"watchOptions": { "excludeDirectories": ["**/node_modules"] }'
       ref: ts-site:/options/excludeDirectories
     - id: ts-exclude-files
-      name: 'excludeFiles'
+      name: excludeFiles
       summary: 'Specific files removed from watch mode processing'
       lenses: [perf]
       ref: ts-site:/options/excludeFiles
     - id: ts-type-acquisition
-      name: 'typeAcquisition'
+      name: typeAcquisition
       summary: 'Options for automatic download of @types declarations in JavaScript projects (jsconfig.json); off for TypeScript projects'
       lenses: [composability]
       signature: '"typeAcquisition": { "enable": false }'
       ref: ts-site:/options/typeAcquisition
     - id: ts-type-acquisition-enable
-      name: 'typeAcquisition.enable'
+      name: typeAcquisition.enable
       summary: 'Turn automatic type acquisition for JavaScript projects on or off'
       lenses: [composability]
       signature: '"typeAcquisition": { "enable": false }'
       ref: ts-site:/options/enable
     - id: ts-type-acquisition-include
-      name: 'typeAcquisition.include'
+      name: typeAcquisition.include
       summary: 'Modules to acquire types for when inference misses a global dependency'
       lenses: [composability]
       signature: '"typeAcquisition": { "include": ["jquery"] }'
       ref: ts-site:/options/typeAcquisition/include
     - id: ts-type-acquisition-exclude
-      name: 'typeAcquisition.exclude'
+      name: typeAcquisition.exclude
       summary: 'Modules to exclude from type acquisition'
       lenses: [composability]
       ref: ts-site:/options/typeAcquisition/exclude
     - id: ts-disable-filename-based-type-acquisition
-      name: 'disableFilenameBasedTypeAcquisition'
+      name: disableFilenameBasedTypeAcquisition
       summary: 'Stop inferring type acquisition from file names (for example jquery.js)'
       lenses: [composability]
       ref: ts-site:/options/disableFilenameBasedTypeAcquisition
     - id: ts-clean
-      name: 'clean'
+      name: clean
       summary: 'Delete the outputs of all projects'
       lenses: [composability]
       notes: ['a build-mode option (section Build Options)']
       ref: ts-site:/options/clean
     - id: ts-force
-      name: 'force'
+      name: force
       summary: 'Build all projects, including those that appear to be up to date'
       lenses: [composability]
       notes: ['a build-mode option (section Build Options)']
       ref: ts-site:/options/force
     - id: ts-verbose
-      name: 'verbose'
+      name: verbose
       summary: 'Enable verbose logging'
       lenses: [observability]
       notes: ['a build-mode option (section Build Options)']
       ref: ts-site:/options/verbose
     - id: ts-stop-build-on-errors
-      name: 'stopBuildOnErrors'
+      name: stopBuildOnErrors
       summary: 'Build mode: skip building downstream projects when an upstream project has errors'
       lenses: [reliability]
       notes: ['a build-mode option (section Build Options)']
       ref: ts-site:/options/stopBuildOnErrors
   - id: ts-versions
-    title: 'TypeScript releases and the native compiler'
+    title: TypeScript releases and the native compiler
     level: advanced
     requires: [ts-tsconfig]
     ref: ts-blog:/announcing-typescript-7-0/
     entries:
     - id: ts-5-9
-      name: 'TypeScript 5.9 highlights'
-      summary: 'Minimal `tsc --init`, `import defer`, `--module node20`, expandable hovers, DOM API summaries, faster type checking'
+      name: TypeScript 5.9 highlights
+      summary: Minimal `tsc --init`, `import defer`, `--module node20`, expandable hovers, DOM API summaries, faster type checking
       lenses: [typing-dx]
       since: '5.9'
       ref: typescript:/docs/handbook/release-notes/typescript-5-9.html
     - id: ts-6-0
-      name: 'TypeScript 6.0 transition release'
-      summary: 'Last JS-based compiler; changes defaults (types [], rootDir ./) and deprecates target es5, baseUrl, node10 resolution'
+      name: TypeScript 6.0 transition release
+      summary: Last JS-based compiler; changes defaults (types [], rootDir ./) and deprecates target es5, baseUrl, node10 resolution
       lenses: [reliability, best-practice]
       since: '6.0'
       signature: '"ignoreDeprecations": "6.0"'
@@ -1732,8 +1732,8 @@ groups:
         'passing files on the command line while a tsconfig.json exists is now an error']
       ref: typescript:/docs/handbook/release-notes/typescript-6-0.html
     - id: ts-7-native
-      name: 'TypeScript 7.0 native compiler'
-      summary: 'Go port installed as `typescript`; about 8-12x faster builds; no stable programmatic API until 7.1'
+      name: TypeScript 7.0 native compiler
+      summary: Go port installed as `typescript`; about 8-12x faster builds; no stable programmatic API until 7.1
       lenses: [perf, reliability]
       since: '7.0'
       signature: npm i -D typescript; npm i -D typescript@npm:@typescript/typescript6
@@ -1742,7 +1742,7 @@ groups:
         'defaults: strict true, module esnext, types [], rootDir ./, noUncheckedSideEffectImports true; --checkers N tunes parallelism',
         'removed: target es5, downlevelIteration, baseUrl, node10/classic resolution, amd/umd/systemjs']
       ref: ts-blog:/announcing-typescript-7-0/
-- title: 'Node typings'
+- title: Node typings
   sections:
   - id: tn-types
     title: '@types/node versioning'
@@ -1752,7 +1752,7 @@ groups:
     entries:
     - id: tn-major-alignment
       name: '@types/node tracks Node majors'
-      summary: 'Each @types/node major mirrors a Node major (v24 types come from DefinitelyTyped types/node/v24); match your minimum runtime'
+      summary: Each @types/node major mirrors a Node major (v24 types come from DefinitelyTyped types/node/v24); match your minimum runtime
       lenses: [reliability, typing-dx]
       signature: pnpm add -D @types/node@^22
       notes: ['npm `latest` is 26.x (2026-10-05) while 22.x/24.x lines keep receiving updates',

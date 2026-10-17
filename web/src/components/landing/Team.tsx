@@ -22,7 +22,7 @@ function Portrait({ name, photo }: { name: string; photo: string }) {
       <span
         role="img"
         aria-label={`Portrait of ${name}`}
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-200 ease-out group-hover/team:scale-[1.03]"
+        className="absolute inset-0 bg-cover bg-top transition-transform duration-200 ease-out group-hover/team:scale-[1.03]"
         style={{ backgroundImage: `url(${assetUrl(photo)})` }}
       />
     </div>
@@ -33,28 +33,30 @@ export function Team({ actions }: { actions?: React.ReactNode }) {
   return (
     <section aria-labelledby="team-h" className="mx-auto max-w-[1200px] px-4 py-12 md:px-10 md:py-16 lg:px-[80px]">
       <Reveal>
-        <h2 id="team-h" className={cn("mb-8 font-serif text-[36px] leading-[1.08] md:text-[44px]", rise)}>
+        <h2 id="team-h" className={cn("mb-8 text-center font-serif text-[36px] leading-[1.08] md:text-[44px]", rise)}>
           Team
         </h2>
-        <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:max-w-[760px]">
+        <ul className="mx-auto grid max-w-[760px] grid-cols-1 gap-8 sm:grid-cols-2">
           {TEAM.map((t, n) => (
-            <li key={t.name} className={cn("group/team flex flex-col gap-3", rise)} style={stagger(n + 1)}>
+            <li key={t.name} className={cn("group/team flex flex-col items-center gap-3 text-center", rise)} style={stagger(n + 1)}>
               <Portrait name={t.name} photo={t.photo} />
               <div className="font-serif text-[32px] leading-tight">{t.name}</div>
               <p className="text-body-sm text-ink-muted">{t.role}</p>
-              <a
-                href={t.linkedin}
-                target={t.linkedin === "#" ? undefined : "_blank"}
-                rel="noreferrer"
-                className="link-grow self-start pb-0.5 text-body-sm font-medium text-ink"
-              >
-                LinkedIn →
-              </a>
+              {t.linkedin && (
+                <a
+                  href={t.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="link-grow pb-0.5 text-body-sm font-medium text-ink"
+                >
+                  LinkedIn →
+                </a>
+              )}
             </li>
           ))}
         </ul>
         {actions && (
-          <div className={cn("mt-10 flex flex-wrap items-center gap-3", rise)} style={stagger(TEAM.length + 1)}>
+          <div className={cn("mt-10 flex flex-wrap items-center justify-center gap-3", rise)} style={stagger(TEAM.length + 1)}>
             {actions}
           </div>
         )}

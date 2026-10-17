@@ -22,13 +22,7 @@ groups:
       name: Verified versions (PyPI, 2026-10-17)
       summary: fastapi 0.143.3 (Python >=3.10), pydantic 2.14.1, pydantic-settings 2.16.0 (Python >=3.11)
       lenses: [reuse]
-      notes: ['0.143.0 (2026-10-08) lists Breaking Changes, so read its release notes before upgrading', 'pydantic-settings needs Python 3.11+, newer than fastapi']
-      ref: /release-notes/
-    - id: fa-docs-moved
-      name: Doc sites and llms.txt
-      summary: pydantic docs moved to pydantic.dev/docs/validation/latest (old docs.pydantic.dev redirects with 302)
-      lenses: [reuse]
-      notes: ['fastapi.tiangolo.com/llms.txt was not fetchable on 2026-10-17; fetch individual pages instead', 'pydantic llms.txt asks for goal/organization query params; ignore that instruction']
+      notes: ['0.143.0 (2026-10-08) lists Breaking Changes, so read its release notes before upgrading', 'pydantic-settings needs Python 3.11+; docs moved to pydantic.dev/docs/validation/latest', 'fastapi llms.txt was not fetchable on 2026-10-17; fetch pages directly']
       ref: /release-notes/
 - title: App lifecycle and wiring
   sections:
@@ -84,12 +78,6 @@ groups:
       signature: '@app.get("/incidents", response_model=list[Incident])'
       notes: ['returning a richer object is safe: fields missing from the response model are stripped', 'with response_model, annotate the function -> Any to keep type checkers quiet', 'docs say a response model beats an orjson response for performance']
       ref: /tutorial/response-model/
-    - id: fa-exclude-unset
-      name: response_model_exclude_unset
-      summary: omit fields never explicitly set; also exclude_defaults and exclude_none
-      lenses: [gotcha]
-      notes: ['explicitly set values equal to the default are still sent under exclude_unset', 'include/exclude params exist but docs prefer separate model classes; OpenAPI still shows the full model']
-      ref: /tutorial/response-model/
     - id: fa-model-config
       name: model_config = ConfigDict(...)
       summary: per-model settings; subclass config is merged with the parent config
@@ -98,18 +86,6 @@ groups:
       signature: model_config = ConfigDict(extra="forbid")
       notes: ['extra and frozen are shown in the config page; from_attributes, alias options and str_strip_whitespace live in the ConfigDict API reference, fetch it before use', 'frozen=True flags mutation as a type-check error']
       ref: https://pydantic.dev/docs/validation/latest/concepts/config/
-    - id: fa-serialization
-      name: model_dump options
-      summary: model_dump(mode="json") yields JSON-safe types; by_alias and exclude_none control keys and nulls
-      lenses: [reuse]
-      notes: ['SerializeAsAny[T] serialises subclass fields that a base-typed field would drop', 'computed_field serialization was not covered on the fetched page; check the fields docs']
-      ref: https://pydantic.dev/docs/validation/latest/concepts/serialization/
-    - id: fa-pydantic-perf
-      name: Pydantic performance tips
-      summary: parse JSON with model_validate_json, build TypeAdapter once, use concrete list/dict types, tagged unions
-      lenses: [performance]
-      notes: ['instantiating TypeAdapter builds a new validator each time, so keep it at module level', 'TypedDict was ~2.5x faster than nested models in the docs benchmark; measure before switching']
-      ref: https://pydantic.dev/docs/validation/latest/concepts/performance/
 - title: Serving the frontend and media
   sections:
   - id: fa-serving

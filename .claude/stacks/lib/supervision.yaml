@@ -105,7 +105,7 @@ groups:
       ref: trackers:/guides/track/
     - id: sv-bytetrack-params
       name: ByteTrackTracker constructor
-      summary: 'defaults lost_track_buffer=30, frame_rate=30.0, track_activation_threshold=0.7, minimum_consecutive_frames=2, minimum_iou_threshold=0.1, high_conf_det_threshold=0.6'
+      summary: 'defaults: lost_track_buffer 30, frame_rate 30.0, activation 0.7, min consecutive frames 2, min IoU 0.1, high-conf 0.6'
       lenses: [reliability]
       signature: ByteTrackTracker(lost_track_buffer=30, frame_rate=30.0, ...)
       notes: ['lost_track_buffer is in frames at 30 fps and is scaled by frame_rate; our 30 fps clips keep the default (1 s of memory)', 'activation 0.7 drops most low-confidence YOLO boxes; lower to ~0.4 for CCTV and re-check ID churn', 'the guide page spells the IoU argument min_iou_threshold, the API page minimum_iou_threshold; confirm with help(ByteTrackTracker)']

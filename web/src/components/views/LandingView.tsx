@@ -180,7 +180,6 @@ export function LandingView() {
 
   return (
     <div className="bg-ground">
-      {/* Hero: the sky follows live London weather. */}
       {/* The hero keeps the bright daytime sky at every hour; live weather shows in the pill only. */}
       <section className={cn("wx-clear", "sky-wash relative flex flex-col items-center px-4 pt-5 pb-12 md:px-10 md:pb-16")}>
         {wx === "rain" && <div aria-hidden className="rain-streaks pointer-events-none absolute inset-0" />}
@@ -190,10 +189,6 @@ export function LandingView() {
           </span>
           <WeatherPill />
           <div className="flex-1" />
-          <span className="glass hidden h-8 items-center rounded-full px-3.5 text-[13px] font-medium lg:inline-flex">
-            Built at the VAST Builders Challenge
-          </span>
-          <div className="hidden flex-1 lg:block" />
           <Button asChild size="sm" variant="glass" className="hidden sm:inline-flex">
             <Link href="/dashboard">Open the live map</Link>
           </Button>

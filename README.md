@@ -1,310 +1,274 @@
 <div align="center">
 
-# 👁️ SixthSense
+# SixthSense
 
 ### Every London bus, a second pair of eyes.
 
-**A video agent for London's bus network: it warns before a close call, checks what really happened, files the report and turns the pattern into driver coaching.**
+**SixthSense watches bus camera footage, warns about close calls, and checks the next clip to see if it was right.**
 
 [![VAST Builders Challenge](https://img.shields.io/badge/VAST-Builders%20Challenge%20London%202026-1f4fff)](https://github.com/vast-data/vast-builders-challenge)
-[![NVIDIA Cosmos](https://img.shields.io/badge/NVIDIA-Cosmos3--Reason%20%7C%20Embed1-76b900)](https://www.nvidia.com/en-us/ai/cosmos/)
-[![YOLO11](https://img.shields.io/badge/Ultralytics-YOLO11-0b23a9)](https://docs.ultralytics.com/models/yolo11/)
+[![NVIDIA Cosmos](https://img.shields.io/badge/NVIDIA-Cosmos3--Reason-76b900)](https://www.nvidia.com/en-us/ai/cosmos/)
 [![CoreWeave](https://img.shields.io/badge/CoreWeave-GPUs-2741e7)](https://coreweave.com/)
 [![W&B Weave](https://img.shields.io/badge/W%26B-Inference%20%2B%20Weave-ffbe00)](https://wandb.ai/site/weave/)
-[![Python](https://img.shields.io/badge/Python-3.12%20FastAPI-3776ab)](#-run-it)
 
-[Demo](#-demo) · [How it works](#-how-it-works) · [CAMP stack](#-built-on-the-camp-stack) · [Results](#-results) · [Run it](#-run-it) · [For judges](#-for-the-judges)
+[Try it](#try-it) · [How it works](#how-it-works) · [Results](#results) · [Run it](#run-it) · [Team](#team)
 
 </div>
 
 ---
 
-## ⚡ TL;DR
+## The problem
 
-London has **25,000 bus drivers**, and TfL's Vision Zero goal is that **no one is killed on or by a London bus by 2030** ([TfL, 2018](https://tfl.gov.uk/info-for/media/press-releases/2018/october/london-s-bus-network-to-meet-new-world-leading-bus-safety-standard)). Buses already carry cameras, but the footage is usually pulled only *after* something goes wrong.
+London has 25,000 bus drivers, and TfL's goal is that no one is killed on or by a London bus by 2030 ([TfL, 2018](https://tfl.gov.uk/info-for/media/press-releases/2018/october/london-s-bus-network-to-meet-new-world-leading-bus-safety-standard)).
 
-SixthSense gives a bus safety team one live map of every London bus and an agent loop on top of the camera footage:
+Buses already carry cameras. But the footage is usually pulled only after something goes wrong. Nobody has time to watch it all, so the near misses that come before a crash, and the patterns behind them, go unseen. Safety teams often learn about a risky junction or habit only after someone is hurt.
 
-| | Agent | What it does |
-|---|---|---|
-| 👀 **Watch** | Watcher | searches every new clip for risky moments (cyclists on the nearside, people stepping out, tight pull-outs) |
-| ⚠️ **Pre-incident** | Checker + Forecaster | YOLO boxes confirm two road users are really closing in; Cosmos3-Reason predicts the next seconds, says why and suggests a fix |
-| 📣 **Act** | Dispatcher | a calm nudge to the driver and a pin on the control room map |
-| ✅ **Post-incident** | Grader + Reporter | reads the *next* clip, grades its own forecast, and files the near-miss report when it came true |
-| 🎓 **Coach** | Coach | weekly coaching from the driver's own clips: supportive, never a league table |
+Most camera footage is never watched. The few seconds that matter deserve a second look.
 
-Most video AI demos *claim* they are accurate. **SixthSense measures it, on the day, with no hand labels.**
+## What SixthSense does
 
-> **Honest about today.** Bus positions are **live TfL open data** (estimated at each bus's next stop). The camera clips are the hackathon's San Francisco and New York footage, used as a **labelled stand-in** for bus cameras, and pairing an incident to a live bus is a stand-in too. Every forecast, check and score is from our real run on VAST.
+SixthSense helps a bus safety team see which buses had a close call, what happened, and what to do about it.
 
----
+| Step | What happens |
+|---|---|
+| **Watch** | Searches every clip for 8 kinds of bus hazard, like a cyclist on the nearside or a pedestrian stepping out. |
+| **Check** | Confirms two road users are really getting closer, and drops false alarms before anyone sees them. |
+| **Predict** | Says what happens in the next few seconds, why, and what the driver should do. |
+| **Grade itself** | Watches the next clip and marks the prediction: came true, partly, or didn't happen. |
+| **Report and coach** | A prediction that came true becomes a near-miss report. Patterns on a route become driver coaching. |
 
-## 🎬 Demo
+Most video AI demos say they are accurate. SixthSense measures it on the day, with no hand labels.
 
-> 📹 **Demo video:** _added after the live run (link here)_ · 🌐 **Live app:** [homepage](https://team-43-app.thecosmoslabs.com/app/) · [dashboard](https://team-43-app.thecosmoslabs.com/app/dashboard/) (lab access needed; it may go offline after the event)
-
-<!-- screenshot: docs/screenshot.png added after the live run -->
-
-**The 60-second story**
-1. **Live map**: every London bus moving on a Mapbox map, fed by TfL open data over Socket.IO. Pick route 18, follow a bus.
-2. **Needs a look**: a bus pulses red. Open it: the camera clip, the forecast (*"the pedestrian will complete crossing the street"* after a car cut in close), why, and the fix.
-3. **What the agents did**: spotted → driver nudged → pinned on the map → checked the next clip: ✅ **came true** → near-miss report filed.
-4. **Reports** and **Coaching**: the report writes itself; the weekly coaching card is built from the driver's own clips.
-5. The header shows how many forecasts came true today, every step traced in W&B Weave.
+> **What's live and what's a stand-in.** Bus positions are live TfL open data, placed at each bus's next stop. The camera clips are the hackathon footage from San Francisco and New York, standing in for bus cameras, and matching an incident to a live bus is a stand-in too. Every prediction, check and score you see comes from our real run on VAST.
 
 ---
 
-## 🧩 The problem
+## Try it
 
-| Pain | Today | With SixthSense |
-|---|---|---|
-| Bus camera footage | Pulled only after an incident | Watched continuously by an agent |
-| "Search" tools | Find what *already* happened | Predict what happens **next** |
-| AI hallucination | Model says an event happened; nobody checks | **YOLO boxes verify** every flagged moment |
-| Trust | Vendors quote accuracy from a lab | The agent **grades itself** on your own footage |
+- **Live app:** [homepage](https://team-43-app.thecosmoslabs.com/app/) · [live map](https://team-43-app.thecosmoslabs.com/app/dashboard/) (needs lab access, and may go offline after the event)
+- **Traces:** [every model call in W&B Weave](https://wandb.ai/vastdata/team-43/weave)
+- **Demo video:** _link coming_
+
+A 60-second walk through:
+
+1. **Live map.** Every London bus is tracked from TfL open data. Only the buses with a reported incident are drawn, numbered by priority, each with its route.
+2. **Open #1.** See the hazard and the place, like *"Pedestrian stepping out · Route 34 near Walthamstow Market"*. Play the clip, read the prediction and the advice for the driver.
+3. **Act.** Nudge the driver, open the report, or follow the bus.
+4. **The report.** Before, prediction, what happened, outcome. Sign it off or send it to the garage.
+5. **Coaching.** Each route gets one card: the most common hazard and one habit to try.
 
 ---
 
-## 🧠 How it works
+## How it works
 
 ```mermaid
 flowchart LR
-    A[🎥 Camera footage<br/>already indexed on VAST] --> B[1 · WATCH<br/>saved hazard searches<br/>VSS hybrid search]
-    B --> C{2 · VERIFY<br/>YOLO11 boxes:<br/>is the gap closing?}
-    C -- no --> X[🗑️ rejected<br/>no hallucinated events]
-    C -- yes --> D[3 · FORESEE<br/>Cosmos3-Reason on the clip<br/>what next · why · fix · risk]
-    D --> E[4 · SELF-CHECK<br/>read the NEXT clip<br/>LLM judge: came true?]
-    E --> F[(5 · STORE<br/>incidents + accuracy)]
-    F --> G[6 · ACT<br/>dashboard · alerts · Discord]
-    D -.trace.-> W[📊 W&B Weave]
+    A[Camera footage<br/>indexed on VAST] --> B[1 · Watch<br/>8 hazard searches<br/>VSS on VastDB]
+    B --> C{2 · Check<br/>YOLO11 boxes + tracker:<br/>are they closing in?}
+    C -- no --> X[Dropped<br/>false alarm]
+    C -- yes --> D[3 · Predict<br/>Cosmos3-Reason:<br/>next · why · fix · risk]
+    D --> E[4 · Grade itself<br/>read the next clip<br/>judge on W&B inference]
+    E --> F[(5 · Save<br/>VastDB tables)]
+    F --> G[6 · Act<br/>live map · reports · coaching]
+    T[TfL open data] --> G
+    D -.trace.-> W[W&B Weave]
     E -.trace.-> W
 ```
 
-| # | Step | What it does | Code | Powered by |
-|---|---|---|---|---|
-| 1 | **Watch** | Runs saved hazard queries per camera ("truck cutting in close", "sudden hard braking") | `pipeline.py · watch` | VSS search over **VastDB** (Cosmos Embed1 256-d vectors) |
-| 2 | **Verify** | Measures how fast the gap between two vehicle boxes shrinks; rejects anything that isn't really closing | `tracking.py` | **YOLO11** boxes + supervision/trackers ByteTrack |
-| 3 | **Foresee** | Sends the clip to the reasoning model with a strict JSON prompt | `pipeline.py · foresee` | **NVIDIA Cosmos3-Reason** on **CoreWeave** |
-| 4 | **Self-check** | Finds the next segment of the same video and asks a judge if the forecast came true | `pipeline.py · selfcheck` | **W&B serverless inference** (Llama-3.3-70B) |
-| 5 | **Store** | Writes incidents + per-mode accuracy | `store.py` | **VastDB** tables `incidents` + `runs` |
-| 6 | **Act** | Cards, risk badges, "came true" pills, alerts, ask-the-footage box | `web/` + `main.py` | Next.js static export + FastAPI on **VAST K8s** |
+| Step | What it does | Built with |
+|---|---|---|
+| Watch | Runs 8 bus hazard searches across the city and street cameras, taking results from each in turn and skipping near-duplicates. | VSS hybrid search over **VastDB** |
+| Check | Tracks each road user frame by frame and measures the gap between pairs in car lengths. A clip passes only if a pair really closes in. | **YOLO11** boxes, supervision and a ByteTrack tracker |
+| Predict | Treats the clip as a London bus front camera and returns a hazard type, what happens next, why, a fix for the driver, and a risk score. | **NVIDIA Cosmos3-Reason** on **CoreWeave** |
+| Grade itself | Finds the next clip of the same video and asks a judge whether the prediction came true, with evidence. | A model on **W&B inference**, traced in **Weave** |
+| Save | Stores incidents and runs. | **VastDB** tables `incidents` and `runs` |
+| Act | Shows the live map, the report inbox and coaching. Polls TfL for every bus route and pushes positions to the browser. | FastAPI, Socket.IO, Next.js, Mapbox GL |
 
 <details>
-<summary><b>🔍 Step 2 in detail - tracking-lite closing-gap score</b></summary>
+<summary><b>The gap check, in detail</b></summary>
 
-Each 5-second segment carries YOLO11 boxes for all 150 frames. SixthSense:
+Each 5-second clip carries YOLO11 boxes for all 150 frames. SixthSense:
 
-1. **Tracks** each road user frame to frame (greedy IoU matching, same label only) - a tiny multi-object tracker in ~40 lines.
-2. For every pair that includes **at least one vehicle**, measures centre distance in **car lengths** (distance / average box diagonal), smoothed to remove ID jitter.
-3. Keeps pairs that end up within **1.5 car lengths**, and scores how much they closed in:
+1. Tracks each road user with ByteTrack, one tracker per clip.
+2. For every pair that includes at least one vehicle, measures the distance between them in car lengths, smoothed to remove jitter.
+3. Keeps pairs that end up close and closed in fast enough.
 
 ```
-d(t)     = centre distance / mean box diagonal        # "car lengths"
-score    = (d(start) - d(min)) / d(start)
-verified = score >= 0.30 and d(min) <= 1.5
-note     = "a pedestrian and a car closed from 4.1 to 0.9 car lengths in 4.9s"
+gap(t)   = centre distance / average box size     # in car lengths
+score    = (gap(start) - gap(min)) / gap(start)
+note     = "a car and a pedestrian closed from 1.7 to 0.5 car lengths in 1.4s"
 ```
 
-This is a **closing-gap score**, not time-to-collision: 2D boxes don't give true speed or distance, so we don't pretend they do.
+This is a 2D closing-gap score, not time to collision. Flat boxes don't give true speed or distance, so we don't claim they do.
 </details>
 
 <details>
-<summary><b>🔮 Step 3 in detail - the forecast prompt</b></summary>
+<summary><b>The prediction prompt, in short</b></summary>
 
 ```text
-You are a road-safety analyst watching highway CCTV. Look only at what is visible in this clip.
-Answer in JSON only:
-{"type", "what_happens", "what_next" (next 5-10 s), "why", "fix", "risk": 1-5}
-If nothing risky is happening, set risk to 1 and what_next to "nothing notable".
+You are a London bus safety analyst. Treat this camera as the front camera of a London bus.
+Look only at what is visible. Answer in JSON:
+type (one of 8 bus hazards), what_happens, what_next, why, fix (advice to the bus driver), risk 1-5.
+Name the specific road users, colours, sides and distances. One sentence each.
 Never invent people, vehicles or events you cannot see.
 ```
 </details>
 
 <details>
-<summary><b>✅ Step 4 in detail - self-check with no hand labels</b></summary>
+<summary><b>How it grades itself</b></summary>
 
 ```mermaid
 sequenceDiagram
     participant S as SixthSense
     participant V as VSS / VastDB
     participant C as Cosmos3-Reason
-    participant J as W&B LLM judge
-    S->>V: segment N (flagged + verified)
-    S->>C: clip N → "what happens next?"
-    C-->>S: "sedan brakes hard within 3 s"
-    S->>V: segment N+1 of the same video
-    V-->>S: description of what really happened
-    S->>J: forecast vs reality
-    J-->>S: came_true = yes · evidence = "brake lights, sedan slows"
+    participant J as Judge on W&B
+    S->>V: clip N (checked by boxes)
+    S->>C: what happens next?
+    C-->>S: "the pedestrian keeps crossing"
+    S->>V: clip N+1 of the same video
+    V-->>S: what really happened
+    S->>J: prediction vs what happened
+    J-->>S: came true, with evidence
 ```
 
-`accuracy = (yes + 0.5 × partly) / checked`. Forecasts with no next segment are marked `unknown` and left out.
+`accuracy = (came true + 0.5 × partly) / checked`. Predictions with no next clip are marked unknown and left out.
 </details>
 
 ---
 
-## 🏕️ Built on the CAMP stack
+## Results
 
-The Builders Challenge maps to VAST's **CAMP** stack. SixthSense uses every layer:
+Only numbers from today's live runs (17 Oct 2026). Nothing is estimated.
 
-| Layer | Provider | How SixthSense uses it |
-|---|---|---|
-| **C** - Coding agent | Cursor (+ Claude Code) | Built the whole app on the day from the challenge's `.cursor/skills` |
-| **A** - Agent runtime | **VAST** | The agent and the app run on the team's VAST Kubernetes namespace; ingest runs as VAST DataEngine functions |
-| **M** - Model services | **CoreWeave + NVIDIA** | Cosmos3-Reason (forecast), Cosmos Embed1 (search vectors), YOLO11 (verification) on CoreWeave GPUs; W&B inference for the judge |
-| **P** - Platform | **VAST AI OS** | Video in VAST S3, segments + vectors + detections in **VastDB**, one index across every camera |
+| Run | Cameras | Clips | Passed the gap check | Graded | Came true |
+|---|---|---|---|---|---|
+| **Bus safety** | 8 hazard searches over the city and street cameras | 10 | 7 (3 false alarms dropped) | 7 | **4 of 7** |
+| City | 6 New York and San Francisco intersections | 10 | 9 | 8 | **5 of 8** |
+| City, earlier run | same | 10 | 7 | 6 | 4 of 6 |
+| Highway | I-24 Nashville | 10 | 0 | 0 | - |
+| Street | one street, two days | 10 | 0 | 0 | - |
 
----
+Across both city runs, 9 of 14 graded predictions came true. The bus run found three kinds of hazard: pedestrian stepping out, blocked lane, and vehicle cutting in.
 
-## 📊 Results
+Highway and street raised no warnings: no clip had a pair closing in fast enough to pass the gap check. SixthSense stays quiet rather than guessing.
 
-> Only numbers from today's real run go here. Nothing is estimated in advance.
-
-| Mode | Camera | Candidates | Verified | Checked | Came true | Accuracy |
-|---|---|---|---|---|---|---|
-| 🚌 Bus safety | 8 hazard searches over the city + street cams | 10 | 7 | 7 | **4** | **4 of 7 (57%)** |
-| 🚦 City | NYC + SF intersection cams (6) | 10 | 9 | 8 | **5** | **5 of 8 (63%)** |
-| 🛣️ Road | `i24_cam-1` (Nashville I-24 highway) | 10 | 0 | 0 | - | - |
-| 🏘️ Street | `neighborhood_cam-1` (2 days) | 10 | 0 | 0 | - | - |
-
-Latest live run, 17 Oct 2026, 10 clips per mode. An earlier 10-clip city run scored 4 of 6, so across both city runs 9 of 14 checked forecasts came true. The bus safety run searches for 8 bus hazards (cyclist on the nearside, pedestrian stepping out, vehicle cutting in, car pulling out, blocked lane and more) and labels each one; 3 of its 10 candidates were ruled out by the box check. Results are stored in VastDB (schema `sixthsense`, tables `incidents` + `runs`).
-Road and Street raised no warnings: no clip showed a vehicle pair closing in fast enough to pass the box check. That is the filter doing its job - SixthSense stays quiet rather than guessing.
-
-Every forecast and grade is traced in Weave: [wandb.ai/vastdata/team-43/weave](https://wandb.ai/vastdata/team-43/weave)
-
----
-
-## 🎥 The footage
-
-One VastDB index, **3,537 five-second segments from 612 videos across 13 cameras**, pre-processed by the VAST DataEngine pipeline (Cosmos3-Reason captions, Cosmos Embed1 vectors, YOLO11 boxes for every frame).
-
-| Mode | Cameras | Why it's here |
-|---|---|---|
-| 🛣️ Road | `i24_cam-1` - Nashville I-24, overhead multi-cam | lane changes, cut-ins, braking at speed |
-| 🚦 City | `nyc_streets_cam-1/2`, `sf_streets_cam-1/2/4/5` | pedestrians, cyclists and turning cars sharing space |
-| 🏘️ Street | `neighborhood_cam-1` - two full days | repeat visits, day-over-day patterns |
-
-## 🗂️ Example output
+### A real incident, unedited
 
 ```json
 {
-  "camera_id": "sf_streets_cam-4",
-  "type": "close cut-in",
+  "camera_id": "sf_streets_cam-1",
+  "type": "Pedestrian stepping out",
   "verified": true,
-  "verify_note": "a car and a pedestrian closed from 2.6 to 0.5 car lengths in 2.1s",
-  "what_happens": "A white sedan cuts in close to a pedestrian crossing the street, creating a near-miss.",
-  "what_next": "The white sedan will continue moving forward, and the pedestrian will complete crossing the street.",
-  "why": "The driver of the white sedan failed to yield to the pedestrian, resulting in a dangerous close pass.",
-  "fix": "Implement stricter enforcement of right-of-way rules and increase pedestrian awareness campaigns.",
-  "risk": 4,
+  "verify_note": "a car and a pedestrian closed from 1.7 to 0.5 car lengths in 1.4s",
+  "what_happens": "A pedestrian on a scooter steps out from the right side of the road into the crosswalk, moving towards the left side of the frame.",
+  "what_next": "The pedestrian continues to cross the road, moving further into the crosswalk.",
+  "why": "The pedestrian is crossing the road at the crosswalk, likely following the traffic signal.",
+  "fix": "The bus should slow down and stop to allow the pedestrian to cross safely.",
+  "risk": 3,
   "came_true": "yes",
-  "came_true_evidence": "The white sedan continues moving forward along the road, and the pedestrian with the stroller finishes crossing the street.",
-  "trace_url": "https://wandb.ai/vastdata/team-43/r/call/01a149b0-31b3-7164-8fe0-97f5435d109c"
+  "came_true_evidence": "The pedestrian is seen advancing through the crosswalk, moving steadily toward the other side of the street."
 }
 ```
-<sub>A real incident from the live city run, unedited. A miss looks the same with `"came_true": "no"` and the evidence saying what really happened.</sub>
 
 ---
 
-## 🚀 Run it
+## Built on the CAMP stack
 
-On the challenge lab VM (credentials and endpoints are already in `/config/<team>.config`):
+| Layer | Provider | How SixthSense uses it |
+|---|---|---|
+| **C** · Coding agent | Claude Code | Planned, built, tested and deployed the app on the day, using the challenge's VSS skills. |
+| **A** · Agent runtime | **VAST** | The agent and the app run in the team's Kubernetes namespace on VAST. |
+| **M** · Model services | **CoreWeave + NVIDIA + W&B** | Cosmos3-Reason predicts, YOLO11 boxes check, Cosmos Embed1 powers search, and a model on W&B inference grades. |
+| **P** · Platform | **VAST AI OS** | Video in VAST S3. Clips, vectors, detections and our own incidents and runs live in **VastDB**. |
+
+The footage: one VastDB index of 3,537 five-second clips from 612 videos across 13 cameras, already processed by the VAST DataEngine pipeline.
+
+---
+
+## Run it
+
+On the challenge lab VM. Credentials come from `/config/<team>.config` and are never printed.
 
 ```bash
 git clone https://github.com/Dinesh-Sunny/sixthsense && cd sixthsense
 
-# Build and publish: web static export + backend source go to an orphan `dist` branch
-./scripts/release.sh                      # prints DIST_SHA=<40-hex>
-
-# On the lab VM (credentials come from /config/<team>.config, never printed)
-bash deploy.sh <DIST_SHA>                 # second deployment `sixthsense-v1` at /v1
-bash deploy.sh --cutover                  # point /app at it (old app kept)
-bash deploy.sh --rollback                 # instant way back
+./scripts/release.sh                      # builds the web app, pushes a dist branch, prints DIST_SHA
+bash deploy.sh <DIST_SHA>                 # starts the sixthsense-v1 deployment
+bash deploy.sh --cutover                  # points /app at it
+bash deploy.sh --rollback                 # goes back to the previous app
 
 # Inside the pod
-sixthsense probe                          # every API: ok / fail, no secrets
-sixthsense run --mode city --limit 10     # watch → verify → foresee → self-check → VastDB
+sixthsense probe                          # checks every service: ok or fail
+sixthsense run --mode bus --limit 10      # watch, check, predict, grade, save
 ```
 
 Local development:
 
 ```bash
 cd backend && uv sync && uv run pytest -q && uv run ruff check
-uv run uvicorn sixthsense.main:create_app --factory --port 8080
+uv run uvicorn sixthsense.main:create_asgi --factory --port 8080
 cd ../web && pnpm install && pnpm dev     # NEXT_PUBLIC_API_ORIGIN=http://localhost:8080
 ```
 
-The pod has no image build: an init container fetches the `dist` commit from codeload by SHA, installs `uv`, and runs `uv sync --locked`. The old stdlib app (`pipeline/`, `app/`) stays in the repo as the rollback.
+There is no image build. When the pod starts, it downloads the `dist` commit by its SHA, installs `uv`, and runs `uv sync --locked`. The Mapbox token and other keys come from a Kubernetes secret, never from git.
 
----
-
-## 🏗️ Project structure
+### Project structure
 
 ```
 sixthsense/
-├── backend/                 # uv package, FastAPI + async pipeline
-│   ├── src/sixthsense/
-│   │   ├── main.py          # create_app factory, lifespan clients, /api/*, /healthz, /readyz, static mount
-│   │   ├── contracts.py     # pydantic models shared with the web types
-│   │   ├── pipeline.py      # watch → verify → foresee → self-check
-│   │   ├── tracking.py      # supervision + trackers ByteTrack: closing-gap per vehicle pair
-│   │   ├── store.py         # VastDB tables (incidents, runs) with a JSON fallback
-│   │   ├── clients/         # httpx (VSS auth, retries), Cosmos + W&B via AsyncOpenAI
-│   │   ├── tracing.py       # Weave, media stripped before upload
-│   │   ├── weather.py       # Open-Meteo, cached, drives the page atmosphere
-│   │   └── cli.py           # `sixthsense run | probe`
-│   └── tests/               # 69 tests, mocked transports, no network
-├── web/                     # Next.js 16 static export, React 19, shadcn, TanStack Query
-│   └── src/{app,components,lib/api}
+├── backend/src/sixthsense/
+│   ├── main.py        # FastAPI app, Socket.IO, API routes, health checks, serves the web app
+│   ├── pipeline.py    # watch, check, predict, grade
+│   ├── modes.py       # bus, city, road and street searches and prompts
+│   ├── tracking.py    # ByteTrack and the gap check
+│   ├── tfl.py         # live London buses from TfL open data
+│   ├── store.py       # VastDB tables, with a JSON fallback
+│   ├── clients/       # VSS, Cosmos and W&B clients
+│   └── cli.py         # sixthsense run | probe
+├── backend/tests/     # 76 tests, no network
+├── web/               # Next.js 16 static app: homepage, live map, reports, coaching
 ├── deploy.sh · deploy/bootstrap.py · scripts/release.sh
-├── pipeline/ · app/         # v0 stdlib version, kept as rollback
-├── AGENTS.md · CLAUDE.md · .claude/   # AI coding setup used to build it
-└── docs/                    # design system, wireframes, knowledge
+└── docs/              # design system and wireframes
 ```
 
 ---
 
-## 🧭 Design decisions
+## Design decisions
 
 | Decision | Why |
 |---|---|
-| **Predict, then grade** | A forecast you can check beats a caption you have to trust |
-| **YOLO before Cosmos** | Cheap boxes filter out hallucinated events before the expensive reasoning call |
-| **One engine, mode = config** | Road and Street differ only in queries and prompts - new cameras are a config change |
-| **Libraries, not hand-rolled code** | FastAPI, httpx, tenacity, supervision + trackers, vastdb, openai, weave - each used for what it does best |
-| **No image registry** | A `dist` branch pinned by SHA + `uv sync --locked`: reproducible pods without building images |
-| **Blue/green on one Ingress** | New version at `/v1`, then `/app` cuts over; rollback is one command |
-| **Privacy first** | Vehicles and behaviour only - no faces, no identities |
-| **Honest numbers** | Fixture data is labelled; results are only from the live run |
+| Predict, then grade | A prediction you can check is worth more than a caption you have to trust. |
+| Boxes before the big model | A cheap gap check drops false alarms before the expensive call. |
+| Show only buses that need a look | Six thousand dots tell you nothing. Seven numbered buses tell you where to start. |
+| One engine, many modes | Bus, city, road and street differ only in searches and prompts. |
+| Coaching, not a league table | Drivers see their own clips first. |
+| Honest numbers | Stand-ins are labelled. Every number is from a real run. |
 
-## ⚠️ Limits (honest)
-- Closing-gap is a 2D proxy, not true speed or distance.
-- "Came true" is judged from the next segment's description, so it inherits that description's quality.
-- Street mode matches lookalike vehicles by description ("a dark van matching this"), not by identity.
-- The box check and the forecast can name different objects (boxes say "pedestrian", Cosmos says "SUV"); they are not yet reconciled.
-- 10 clips per mode is a small sample: 9 of 14 is a signal, not a benchmark.
+## Limits
 
-## 🛣️ Next
-- [ ] Re-ingest with a SixthSense-tuned prompt and measure accuracy before/after in Weave
-- [x] Store incidents in a VastDB table next to `vss-collection`
-- [ ] Multi-camera tracking across the I-24 scenes
-- [ ] Real-time mode on live streams
+- The gap check works on flat boxes, so it is a proxy, not true speed or distance.
+- "Came true" is judged from the next clip's description, so it is only as good as that description.
+- The clips are not from London buses yet, and the incident-to-bus match is a stand-in.
+- 10 clips per run is a small sample. 9 of 14 is a signal, not a benchmark.
+
+## Next
+
+- Connect real bus front cameras.
+- Tune the ingest prompt for bus hazards and measure before and after in Weave.
+- Send nudges to the driver's cab and reports to the garage's system.
 
 ---
 
-## 🏆 For the judges
+## Team
 
-| You care about | Where to look |
+| | |
 |---|---|
-| **VAST** - data + platform | One VastDB index across cameras, VSS search, segments, K8s runtime → `pipeline/vss.py`, `deploy.sh` |
-| **NVIDIA** - Cosmos | Cosmos3-Reason used for *cause and forecast*, not captions → `foresee`, prompt above |
-| **W&B** - agents + evals | Every step is a Weave op; self-measured accuracy → `models.py`, `selfcheck` |
-| **Builders** - skills | Built from the challenge's `.cursor/skills` APIs |
+| **Dinesh Sunny** | Product and AI agents. Built the agent loop, the app and the story. · [LinkedIn](https://www.linkedin.com/in/dinesh-potluru-a967866a/) · [GitHub](https://github.com/Dinesh-Sunny) |
+| **Denesh Ashok** | London buses expertise and the live fleet map. |
 
-## 👥 Team
-**Dinesh Sunny** - full-stack developer, CTO at PiAcademy · [GitHub](https://github.com/Dinesh-Sunny)
+## Thanks
 
-## 🙏 Thanks
-VAST Data, NVIDIA, CoreWeave, Weights & Biases, Cursor and tokens& for the stack, the footage and the day.
+VAST Data, NVIDIA, CoreWeave, Weights & Biases and tokens& for the stack, the footage and the day. Bus data powered by TfL Open Data. Weather by Open-Meteo.
 
 <div align="center"><sub>Every London bus, a second pair of eyes.</sub></div>

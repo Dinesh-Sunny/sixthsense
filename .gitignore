@@ -24,3 +24,8 @@ __pycache__/
 fixtures/*.mp4
 fixtures/probe.json
 fixtures/search_*.json
+
+# --- backend (uv) ---
+.ruff_cache/
+.pytest_cache/
+backend/data/

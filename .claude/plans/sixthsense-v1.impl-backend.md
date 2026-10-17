@@ -1,6 +1,9 @@
-# sixthsense-v1 backend implementation status
-- [x] scaffold: backend/ uv package `sixthsense`, deps pinned, opencv-python/matplotlib/av excluded (lock has headless only)
-- [x] settings, contracts, clients (http/vss/models), tracing, store (Json+Vast), weather, main, runner
-- [x] tracking (HIGH_CONF_DET=0.4 needed: trackers 2.6.1 only births tracks from boxes >= high_conf_det_threshold), pipeline, cli (run/probe)
-- [x] tests (69 passing, socket-guarded) + ruff clean
-- [ ] deploy/bootstrap.py, deploy.sh (<sha>, sixthsense-v1, /v1, --cutover/--rollback), scripts/release.sh
+# sixthsense-v1 backend implementation status (13:4x)
+- [x] scaffold: backend/ uv package `sixthsense` (py3.12), deps pinned; opencv-python/matplotlib/av excluded (lock has headless only)
+- [x] settings, contracts, clients (http: VSSAuth async_auth_flow + retry; vss models; models: AsyncOpenAI Cosmos/W&B + YOLO), tracing (drop_media client-level, key-gated, weave.thread), store (JsonStore + VastStore behind CapacityLimiter(1), runs table, latest run per mode, Sample seed), weather (Open-Meteo + clock fallback), main (lifespan, /api, health, static mount last), runner (single-flight, cooldown, RUNS_ENABLED)
+- [x] tracking: per-class-group ByteTrackTracker, at-least-one-vehicle pairs, gap_series. FINDING: trackers 2.6.1 births tracks only from boxes >= high_conf_det_threshold (default 0.6), so HIGH_CONF_DET=0.4 is set alongside TRACK_ACTIVATION=0.4
+- [x] pipeline async port (gather + Semaphore, asyncio.timeout per step), cli `sixthsense run|probe`
+- [x] tests: 69 passing (socket guard, MockTransport), ruff clean, `uv lock --check` ok
+- [x] deploy/bootstrap.py (codeload by SHA, uv via pip --target, uv sync --locked --no-dev --no-editable, uvicorn --factory), deploy.sh <sha> + --cutover/--rollback, deploy/legacy.sh (old script), scripts/release.sh (DRY_RUN=1 supported)
+- Verified locally: dist tree -> `uv sync --locked --no-dev --no-editable` with py3.12 -> imports cv2/trackers/vastdb/weave OK; uvicorn serves web/out + /api. Venv is ~770 MB (not 372).
+- Not done: golden check old vs new closing_gap on real road detections (needs VM data); EvaluationLogger (tier 2); OpenAPI snapshot (deferred, d2); VastStore has no unit test (probe covers it live); AGENTS.md dist-branch note; live probe/run on VM.

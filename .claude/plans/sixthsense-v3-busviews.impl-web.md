@@ -1,0 +1,6 @@
+# sixthsense-v3 bus views - web status
+- types.ts: Mode adds bus_front, bus_nearside (camera_view left to the backend; web reads it via viewOf() and falls back to the mode).
+- lib/incident.ts: VIEW_MODES, VIEW_LABEL, STAND_IN_NOTE, viewOf, useDataModes (bus_front + bus_nearside; fallback bus, then city), inModes. Map, reports, coaching and landing numbers use only these modes.
+- Clips: ViewLabel pill ("Front camera" / "Nearside camera") + StandInNote ("Stand-in footage: a car dashcam and a bike camera, not a London bus.") on the report page and bus drawer; small view tag on report-row thumbnails. Reports filter: All views / Front camera / Nearside camera.
+- Landing: ClipFrame shows a still from the real incident clip (<video> via /api/clip at #t=1), static JPG only without an incident or on error. Hero + step 3 use front incidents, step 2 + coaching fan use nearside. Step 2 creative = one box in the lane zone growing toward the bottom ("closing on us"), counter from the verify_note growth ("grew 1.8x in 1.2 s") or hidden. Live results merge the front + nearside runs into one "Bus safety run" row.
+- lint + build green; headless check with a mock API (bus view incidents, metrics, pairings) at 1280 and 360px; clip 404 in the mock exercised the fallback frames.

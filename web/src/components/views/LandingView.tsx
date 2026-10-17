@@ -21,7 +21,7 @@ import { incidentsOptions, metricsOptions, readyOptions, weatherOptions } from "
 import type { Incident, ModeMetrics } from "@/lib/api/types";
 import { BUS_COPY, COPY, MODE_INFO, STORE_LABEL, riskLabel, riskTone, scoreLine } from "@/lib/copy";
 import { hazardOf, useDataModes } from "@/lib/incident";
-import { assetUrl, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 const GITHUB_URL = "https://github.com/Dinesh-Sunny/sixthsense";
 
@@ -42,7 +42,7 @@ const STEPS = [
   },
   {
     title: "It rules out\nfalse alarms",
-    body: "Before anyone is bothered, it tracks every car and person frame by frame. If two of them aren't really closing in, the moment is dropped.",
+    body: "Before anyone is bothered, it tracks every person, bike and vehicle frame by frame. If nothing is really closing on the bus, the moment is dropped.",
     plain: "Under the hood: YOLO11 boxes and a tracker measure the gap in car lengths.",
   },
   {

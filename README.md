@@ -11,7 +11,7 @@
 [![YOLO11](https://img.shields.io/badge/Ultralytics-YOLO11-0b23a9)](https://docs.ultralytics.com/models/yolo11/)
 [![CoreWeave](https://img.shields.io/badge/CoreWeave-GPUs-2741e7)](https://coreweave.com/)
 [![W&B Weave](https://img.shields.io/badge/W%26B-Inference%20%2B%20Weave-ffbe00)](https://wandb.ai/site/weave/)
-[![Python](https://img.shields.io/badge/Python-3.12%20stdlib-3776ab)](#-run-it)
+[![Python](https://img.shields.io/badge/Python-3.12%20FastAPI-3776ab)](#-run-it)
 
 [Demo](#-demo) · [How it works](#-how-it-works) · [CAMP stack](#-built-on-the-camp-stack) · [Results](#-results) · [Run it](#-run-it) · [For judges](#-for-the-judges)
 
@@ -80,12 +80,12 @@ flowchart LR
 
 | # | Step | What it does | Code | Powered by |
 |---|---|---|---|---|
-| 1 | **Watch** | Runs saved hazard queries per camera ("truck cutting in close", "sudden hard braking") | `pipeline/run.py · watch` | VSS search over **VastDB** (Cosmos Embed1 256-d vectors) |
-| 2 | **Verify** | Measures how fast the gap between two vehicle boxes shrinks; rejects anything that isn't really closing | `run.py · verify` | **YOLO11** detections sidecar / `/v1/infer` |
-| 3 | **Foresee** | Sends the clip to the reasoning model with a strict JSON prompt | `run.py · foresee` | **NVIDIA Cosmos3-Reason** on **CoreWeave** |
-| 4 | **Self-check** | Finds the next segment of the same video and asks a judge if the forecast came true | `run.py · selfcheck` | **W&B serverless inference** (Llama-3.3-70B) |
-| 5 | **Store** | Writes incidents + per-mode accuracy | `run.py · run` | JSON, VastDB-ready |
-| 6 | **Act** | Cards, risk badges, "came true" pills, alerts, ask-the-footage box | `app/` | Python stdlib server on **VAST K8s** |
+| 1 | **Watch** | Runs saved hazard queries per camera ("truck cutting in close", "sudden hard braking") | `pipeline.py · watch` | VSS search over **VastDB** (Cosmos Embed1 256-d vectors) |
+| 2 | **Verify** | Measures how fast the gap between two vehicle boxes shrinks; rejects anything that isn't really closing | `tracking.py` | **YOLO11** boxes + supervision/trackers ByteTrack |
+| 3 | **Foresee** | Sends the clip to the reasoning model with a strict JSON prompt | `pipeline.py · foresee` | **NVIDIA Cosmos3-Reason** on **CoreWeave** |
+| 4 | **Self-check** | Finds the next segment of the same video and asks a judge if the forecast came true | `pipeline.py · selfcheck` | **W&B serverless inference** (Llama-3.3-70B) |
+| 5 | **Store** | Writes incidents + per-mode accuracy | `store.py` | **VastDB** tables `incidents` + `runs` |
+| 6 | **Act** | Cards, risk badges, "came true" pills, alerts, ask-the-footage box | `web/` + `main.py` | Next.js static export + FastAPI on **VAST K8s** |
 
 <details>
 <summary><b>🔍 Step 2 in detail - tracking-lite closing-gap score</b></summary>
@@ -160,11 +160,14 @@ The Builders Challenge maps to VAST's **CAMP** stack. SixthSense uses every laye
 
 | Mode | Camera | Candidates | Verified | Checked | Came true | Accuracy |
 |---|---|---|---|---|---|---|
-| 🛣️ Road | `i24_cam-1` (Nashville I-24 highway) | _pending_ | _pending_ | _pending_ | _pending_ | _pending_ |
-| 🚦 City | NYC + SF intersection cams (6) | _pending_ | _pending_ | _pending_ | _pending_ | _pending_ |
-| 🏘️ Street | `neighborhood_cam-1` (2 days) | _pending_ | _pending_ | _pending_ | _pending_ | _pending_ |
+| 🚦 City | NYC + SF intersection cams (6) | 10 | 7 | 6 | **4** | **4 of 6 (67%)** |
+| 🛣️ Road | `i24_cam-1` (Nashville I-24 highway) | 10 | 0 | 0 | - | - |
+| 🏘️ Street | `neighborhood_cam-1` (2 days) | 10 | 0 | 0 | - | - |
 
-Weave trace: _link added after the run_
+Live run, 17 Oct 2026, 10 clips per mode, stored in VastDB (schema `sixthsense`, tables `incidents` + `runs`).
+Road and Street raised no warnings: no clip showed a vehicle pair closing in fast enough to pass the box check. That is the filter doing its job - SixthSense stays quiet rather than guessing.
+
+Every forecast and grade is traced in Weave: [wandb.ai/vastdata/team-43/weave](https://wandb.ai/vastdata/team-43/weave)
 
 ---
 
@@ -182,20 +185,21 @@ One VastDB index, **3,537 five-second segments from 612 videos across 13 cameras
 
 ```json
 {
-  "camera_id": "i24_cam-1",
+  "camera_id": "sf_streets_cam-4",
   "type": "close cut-in",
   "verified": true,
-  "verify_note": "closest gap 0.8% of frame width, shrank 48% over 12 frames",
-  "what_happens": "A white truck moves into the middle lane with little space in front of a sedan.",
-  "what_next": "The sedan brakes hard within 3 seconds.",
-  "why": "The truck changes lane without a gap, at the same speed as the sedan.",
-  "fix": "Lane-change warning before the merge; following-distance camera here.",
+  "verify_note": "a car and a pedestrian closed from 2.6 to 0.5 car lengths in 2.1s",
+  "what_happens": "A white sedan cuts in close to a pedestrian crossing the street, creating a near-miss.",
+  "what_next": "The white sedan will continue moving forward, and the pedestrian will complete crossing the street.",
+  "why": "The driver of the white sedan failed to yield to the pedestrian, resulting in a dangerous close pass.",
+  "fix": "Implement stricter enforcement of right-of-way rules and increase pedestrian awareness campaigns.",
   "risk": 4,
   "came_true": "yes",
-  "came_true_evidence": "the sedan slows sharply and brake lights show"
+  "came_true_evidence": "The white sedan continues moving forward along the road, and the pedestrian with the stroller finishes crossing the street.",
+  "trace_url": "https://wandb.ai/vastdata/team-43/r/call/01a149b0-31b3-7164-8fe0-97f5435d109c"
 }
 ```
-<sub>Shape of a real incident. Values above are illustrative until the live run replaces them.</sub>
+<sub>A real incident from the live city run, unedited. A miss looks the same with `"came_true": "no"` and the evidence saying what really happened.</sub>
 
 ---
 
@@ -206,21 +210,28 @@ On the challenge lab VM (credentials and endpoints are already in `/config/<team
 ```bash
 git clone https://github.com/Dinesh-Sunny/sixthsense && cd sixthsense
 
-python3 pipeline/probe.py                         # 1. check every API, save real JSON shapes
-python3 pipeline/run.py --mode road   --limit 12  # 2. watch → verify → foresee → self-check
-python3 pipeline/run.py --mode street --limit 12
-PORT=8080 python3 app/main.py                     # 3. local preview
-bash deploy.sh                                    # 4. ship to K8s → workshop.thecosmoslabs.com → App
+# Build and publish: web static export + backend source go to an orphan `dist` branch
+./scripts/release.sh                      # prints DIST_SHA=<40-hex>
+
+# On the lab VM (credentials come from /config/<team>.config, never printed)
+bash deploy.sh <DIST_SHA>                 # second deployment `sixthsense-v1` at /v1
+bash deploy.sh --cutover                  # point /app at it (old app kept)
+bash deploy.sh --rollback                 # instant way back
+
+# Inside the pod
+sixthsense probe                          # every API: ok / fail, no secrets
+sixthsense run --mode city --limit 10     # watch → verify → foresee → self-check → VastDB
 ```
 
-| Flag | Values | Use when |
-|---|---|---|
-| `VERIFY_MODE` | `boxes` (default) · `cosmos` | no per-frame boxes → ask Cosmos a strict yes/no |
-| `FORESEE_VIA` | `direct` (default) · `text` | Cosmos can't take the clip → reason over the stored description |
-| `LLM_MODEL` | any W&B inference model id | picks the self-check judge (falls back to Cosmos) |
-| `DISCORD_WEBHOOK_URL` | webhook URL | alerts also post to Discord |
+Local development:
 
-No dependencies: the app and pipeline use the Python standard library. `pip install weave` turns on tracing.
+```bash
+cd backend && uv sync && uv run pytest -q && uv run ruff check
+uv run uvicorn sixthsense.main:create_app --factory --port 8080
+cd ../web && pnpm install && pnpm dev     # NEXT_PUBLIC_API_ORIGIN=http://localhost:8080
+```
+
+The pod has no image build: an init container fetches the `dist` commit from codeload by SHA, installs `uv`, and runs `uv sync --locked`. The old stdlib app (`pipeline/`, `app/`) stays in the repo as the rollback.
 
 ---
 
@@ -228,19 +239,24 @@ No dependencies: the app and pipeline use the Python standard library. `pip inst
 
 ```
 sixthsense/
-├── pipeline/
-│   ├── vss.py        # VSS backend client: login, search, segments, detections, stream
-│   ├── models.py     # Cosmos3-Reason + YOLO11 (direct), W&B inference, Weave ops
-│   ├── modes.py      # one engine, mode = config (road / street queries)
-│   ├── run.py        # watch → verify → foresee → self-check → store
-│   └── probe.py      # live smoke test, records real API shapes
-├── app/
-│   ├── main.py       # stdlib server: /api/*, /clip proxy (Range), /api/ask
-│   ├── index.html    # the dashboard
-│   └── incidents.json, metrics.json
-├── deploy.sh         # ConfigMap + Secret + Deployment + Ingress /app
+├── backend/                 # uv package, FastAPI + async pipeline
+│   ├── src/sixthsense/
+│   │   ├── main.py          # create_app factory, lifespan clients, /api/*, /healthz, /readyz, static mount
+│   │   ├── contracts.py     # pydantic models shared with the web types
+│   │   ├── pipeline.py      # watch → verify → foresee → self-check
+│   │   ├── tracking.py      # supervision + trackers ByteTrack: closing-gap per vehicle pair
+│   │   ├── store.py         # VastDB tables (incidents, runs) with a JSON fallback
+│   │   ├── clients/         # httpx (VSS auth, retries), Cosmos + W&B via AsyncOpenAI
+│   │   ├── tracing.py       # Weave, media stripped before upload
+│   │   ├── weather.py       # Open-Meteo, cached, drives the page atmosphere
+│   │   └── cli.py           # `sixthsense run | probe`
+│   └── tests/               # 69 tests, mocked transports, no network
+├── web/                     # Next.js 16 static export, React 19, shadcn, TanStack Query
+│   └── src/{app,components,lib/api}
+├── deploy.sh · deploy/bootstrap.py · scripts/release.sh
+├── pipeline/ · app/         # v0 stdlib version, kept as rollback
 ├── AGENTS.md · CLAUDE.md · .claude/   # AI coding setup used to build it
-└── docs/
+└── docs/                    # design system, wireframes, knowledge
 ```
 
 ---
@@ -252,7 +268,9 @@ sixthsense/
 | **Predict, then grade** | A forecast you can check beats a caption you have to trust |
 | **YOLO before Cosmos** | Cheap boxes filter out hallucinated events before the expensive reasoning call |
 | **One engine, mode = config** | Road and Street differ only in queries and prompts - new cameras are a config change |
-| **Stdlib only** | The app ships as a Kubernetes ConfigMap: no image build, no registry, starts in a second |
+| **Libraries, not hand-rolled code** | FastAPI, httpx, tenacity, supervision + trackers, vastdb, openai, weave - each used for what it does best |
+| **No image registry** | A `dist` branch pinned by SHA + `uv sync --locked`: reproducible pods without building images |
+| **Blue/green on one Ingress** | New version at `/v1`, then `/app` cuts over; rollback is one command |
 | **Privacy first** | Vehicles and behaviour only - no faces, no identities |
 | **Honest numbers** | Fixture data is labelled; results are only from the live run |
 
@@ -260,10 +278,12 @@ sixthsense/
 - Closing-gap is a 2D proxy, not true speed or distance.
 - "Came true" is judged from the next segment's description, so it inherits that description's quality.
 - Street mode matches lookalike vehicles by description ("a dark van matching this"), not by identity.
+- The box check and the forecast can name different objects (boxes say "pedestrian", Cosmos says "SUV"); they are not yet reconciled.
+- 10 clips per mode is a small sample: 4 of 6 is a signal, not a benchmark.
 
 ## 🛣️ Next
 - [ ] Re-ingest with a SixthSense-tuned prompt and measure accuracy before/after in Weave
-- [ ] Store incidents in a VastDB table next to `vss-collection`
+- [x] Store incidents in a VastDB table next to `vss-collection`
 - [ ] Multi-camera tracking across the I-24 scenes
 - [ ] Real-time mode on live streams
 

@@ -14,9 +14,10 @@ from typing import Any
 from . import tracing
 from .main import Resources, open_resources
 from .modes import CLI_LIMIT_MAX, MODE_NAMES, MODES
-from .pipeline import Forecast, execute_run
+from .pipeline import Candidate, Forecast, execute_run, watch
 from .settings import get_settings
 from .store import VastStore
+from .tracking import EgoDiag, ego_diagnostics
 
 
 def shape(x: Any, depth: int = 0) -> Any:
@@ -107,6 +108,62 @@ async def run(mode: str, limit: int) -> int:
     return 0
 
 
+def _hazard_for(mode: str, query: str) -> str:
+    cfg = MODES[mode]  # type: ignore[index]
+    types = cfg.get("hazard_types", ())
+    queries = cfg["queries"]
+    # the bus-view query lists are written in the same order as their hazard sets
+    return types[queries.index(query)] if len(types) == len(queries) and query in queries else query
+
+
+def _diag_line(n: int, hazard: str, cand: Candidate, d: EgoDiag | None, note: str = "") -> str:
+    head = f"[{n:02d}] {hazard[:26]:<26} | {cand.hit.source.rsplit('/', 1)[-1][-34:]:<34}"
+    if d is None:
+        return f"{head} | {note}"
+    ttc = "-" if d.ttc_s is None else f"{d.ttc_s:.1f}s"
+    return (
+        f"{head} | {d.label:<10} h {d.start_h:5.1%}->{d.end_h:5.1%} area0 {d.start_area:5.1%}"
+        f" | growth {d.growth:4.2f}x {d.span_s:4.2f}s {d.span_frames:3d}fr/{d.frames:3d}"
+        f" | conf {d.mean_conf:.2f} | ttc {ttc:>6} | lane {'yes' if d.in_lane else 'no '} | {d.reason}"
+    )
+
+
+async def gate_debug(mode: str, limit: int) -> int:
+    """Search + detections only (no model calls): show why each candidate passes or fails the ego gate."""
+    settings = get_settings()
+    cfg = MODES[mode]  # type: ignore[index]
+    if cfg["verify"] != "ego":
+        print(f"{mode} uses the {cfg['verify']} check, not the ego gate")
+        return 2
+    async with open_resources(settings) as res:
+        cands = (await watch(res.deps, mode, settings.per_query))[:limit]  # type: ignore[arg-type]
+        sem = asyncio.Semaphore(settings.gpu_concurrency)
+
+        async def one(c: Candidate) -> Any:
+            async with sem:
+                try:
+                    return await res.vss.detections(c.hit.source)
+                except Exception as e:  # noqa: BLE001 - report and keep going
+                    return e
+
+        dets = await asyncio.gather(*(one(c) for c in cands))
+    reasons: dict[str, int] = {}
+    for n, (c, det) in enumerate(zip(cands, dets, strict=True), 1):
+        hazard = _hazard_for(mode, c.query)
+        if isinstance(det, Exception) or det is None or not det.frames:
+            why = f"detections error ({type(det).__name__})" if isinstance(det, Exception) else "no detections"
+            print(_diag_line(n, hazard, c, None, why))
+            reasons[why] = reasons.get(why, 0) + 1
+            continue
+        diags = ego_diagnostics(det, cfg["classes"], cfg["view"])
+        top = diags[0] if diags else None
+        print(_diag_line(n, hazard, c, top, "" if top else "no tracks"))
+        key = (top.reason.split(" ")[0] if top else "no tracks")
+        reasons[key] = reasons.get(key, 0) + 1
+    print("summary: " + ", ".join(f"{k} {v}" for k, v in sorted(reasons.items(), key=lambda kv: -kv[1])))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="sixthsense")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -114,10 +171,15 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--mode", default="road", choices=MODE_NAMES)
     r.add_argument("--limit", type=int, default=3, choices=range(1, CLI_LIMIT_MAX + 1), metavar="N")
     sub.add_parser("probe", help="check every upstream; prints shapes and ok/fail, never values")
+    g = sub.add_parser("gate-debug", help="ego gate numbers per candidate (search + detections, no models)")
+    g.add_argument("--mode", default="bus_front", choices=[m for m in MODE_NAMES if MODES[m]["verify"] == "ego"])
+    g.add_argument("--limit", type=int, default=40, choices=range(1, CLI_LIMIT_MAX + 1), metavar="N")
     a = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     if a.cmd == "run":
         return asyncio.run(run(a.mode, a.limit))
+    if a.cmd == "gate-debug":
+        return asyncio.run(gate_debug(a.mode, a.limit))
     return asyncio.run(probe())
 
 

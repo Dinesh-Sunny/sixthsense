@@ -258,52 +258,117 @@ def _trailing_median(values: list[float], n: int) -> list[float]:
     return [float(np.median(values[max(0, i - n + 1) : i + 1])) for i in range(len(values))]
 
 
-def _usable(track: _Track, wh: tuple[float, float]) -> bool:
-    ts = sorted(track.points)
-    first = track.points[ts[0]].xyxy
-    start_area = (first[2] - first[0]) * (first[3] - first[1]) / (wh[0] * wh[1])
-    mean_conf = sum(p.conf for p in track.points.values()) / len(track.points)
-    return start_area >= EGO_MIN_START_AREA and mean_conf >= EGO_MIN_MEAN_CONF
+@dataclass
+class EgoDiag:
+    """Why one track passed or failed the ego gate (for `sixthsense gate-debug`)."""
+
+    label: str
+    frames: int
+    mean_conf: float
+    start_h: float  # first box height, fraction of frame height
+    end_h: float  # last box height (trailing median), fraction of frame height
+    start_area: float  # first box area, fraction of frame area
+    in_lane: bool  # any point inside the lane zone
+    growth: float = 1.0
+    span_s: float = 0.0
+    span_frames: int = 0
+    ttc_s: float | None = None
+    reason: str = "pass"
+    hit: _EgoHit | None = None
+
+    @property
+    def stage(self) -> int:
+        """How far through the gate it got (for picking the most interesting track)."""
+        return _STAGES.index(self.reason.split(" ")[0]) if self.reason.split(" ")[0] in _STAGES else 0
 
 
-def _ego_track(track: _Track, wh: tuple[float, float], view: CameraView) -> _EgoHit | None:
-    """Best growth of one track while it is in the lane zone.
+# gate order: earlier entries reject first; "pass" is the last stage
+_STAGES = ("small", "unsure", "out-of-lane", "short", "growth", "far", "pass")
+
+
+def _diagnose(track: _Track, wh: tuple[float, float], view: CameraView) -> EgoDiag:
+    """Run the ego gate on one track and record every number the decision used.
 
     Scale expansion is the classic time-to-contact cue: if a box grows by s over dt, contact is
     about dt / (s - 1) away at constant closing speed (no depth or speed needed). Heights are a
     trailing median, so one jittery box can never produce a 13x "growth".
     """
     ts = sorted(track.points)
-    raw = [float(track.points[t].xyxy[3] - track.points[t].xyxy[1]) for t in ts]
+    pts = [track.points[t] for t in ts]
+    raw = [float(p.xyxy[3] - p.xyxy[1]) for p in pts]
     heights = _trailing_median(raw, EGO_MEDIAN_FRAMES)
-    best: _EgoHit | None = None
+    first = pts[0].xyxy
+    zone = [_in_zone(p, wh, view) for p in pts]
+    d = EgoDiag(
+        label=track.label,
+        frames=len(pts),
+        mean_conf=sum(p.conf for p in pts) / len(pts),
+        start_h=raw[0] / wh[1],
+        end_h=heights[-1] / wh[1],
+        start_area=float((first[2] - first[0]) * (first[3] - first[1])) / (wh[0] * wh[1]),
+        in_lane=any(zone),
+    )
+    if d.start_area < EGO_MIN_START_AREA:
+        d.reason = f"small start {d.start_area:.1%} < {EGO_MIN_START_AREA:.1%}"
+        return d
+    if d.mean_conf < EGO_MIN_MEAN_CONF:
+        d.reason = f"unsure conf {d.mean_conf:.2f} < {EGO_MIN_MEAN_CONF}"
+        return d
+    if not d.in_lane:
+        d.reason = "out-of-lane"
+        return d
+    best: tuple[int, float, int, float, float | None, _EgoHit | None] | None = None  # rank, growth, ...
     i = k = 0
     for j, tj in enumerate(ts):
         while tj - ts[i] > EGO_WINDOW_S:
             i += 1
         while k < j and tj - ts[k + 1] >= EGO_TTC_SPAN_S:
             k += 1
-        if not _in_zone(track.points[tj], wh, view) or heights[j] <= 0:
+        if not zone[j] or heights[j] <= 0:
             continue
         # baseline = smallest box at least EGO_MIN_SPAN_S and EGO_MIN_FRAMES before now
         early = [m for m in range(i, j + 1) if tj - ts[m] >= EGO_MIN_SPAN_S and j - m + 1 >= EGO_MIN_FRAMES]
-        if not early:
-            continue
-        m0 = min(early, key=lambda m: heights[m])
-        if heights[m0] <= 0:
-            continue
-        growth = heights[j] / heights[m0]
+        m0 = min(early or range(i, j + 1), key=lambda m: heights[m])
+        growth = heights[j] / heights[m0] if heights[m0] > 0 else 1.0
+        span_s, span_frames = tj - ts[m0], j - m0 + 1
         ttc = None
-        scale, dt = (heights[j] / heights[k], tj - ts[k]) if heights[k] > 0 else (0.0, 0.0)
-        # A shorter span turns 1-2 px of box jitter into a fake "seconds to contact".
-        if k < j and scale >= EGO_TTC_MIN_SCALE and dt >= EGO_TTC_SPAN_S:
-            ttc = dt / (scale - 1)
+        if k < j and heights[k] > 0:
+            scale, dt = heights[j] / heights[k], tj - ts[k]
+            # A shorter span turns 1-2 px of box jitter into a fake "seconds to contact".
+            if scale >= EGO_TTC_MIN_SCALE and dt >= EGO_TTC_SPAN_S:
+                ttc = dt / (scale - 1)
         height_frac = heights[j] / wh[1]
         close = (ttc is not None and ttc <= EGO_TTC_MAX_S) or height_frac >= EGO_NEAR_HEIGHT
-        hit = _EgoHit(growth, tj - ts[m0], ttc, height_frac, growth >= EGO_GROWTH_MIN and close)
-        if best is None or (hit.passed, hit.growth) > (best.passed, best.growth):
-            best = hit
-    return best
+        if not early:
+            rank = 3
+        elif growth < EGO_GROWTH_MIN:
+            rank = 4
+        elif not close:
+            rank = 5
+        else:
+            rank = 6
+        hit = _EgoHit(growth, span_s, ttc, height_frac, rank == 6)
+        if best is None or (rank, growth) > (best[0], best[1]):
+            best = (rank, growth, span_frames, span_s, ttc, hit)
+    if best is None:  # in-lane points all had zero height
+        d.reason = "out-of-lane"
+        return d
+    rank, d.growth, d.span_frames, d.span_s, d.ttc_s, d.hit = best
+    if rank == 3:
+        d.reason = f"short span {d.span_s:.2f} s / {d.span_frames} frames < {EGO_MIN_SPAN_S} s / {EGO_MIN_FRAMES}"
+    elif rank == 4:
+        d.reason = f"growth {d.growth:.2f}x < {EGO_GROWTH_MIN}x"
+    elif rank == 5:
+        ttc = "none" if d.ttc_s is None else f"{d.ttc_s:.1f} s"
+        d.reason = f"far ttc {ttc} > {EGO_TTC_MAX_S} s and height {d.hit.height_frac:.0%} < {EGO_NEAR_HEIGHT:.0%}"
+    return d
+
+
+def ego_diagnostics(det: DetectionsResp, classes: frozenset[str], view: CameraView) -> list[EgoDiag]:
+    """Every track of one clip through the ego gate, most promising first."""
+    wh = _frame_wh(det)
+    diags = [_diagnose(t, wh, view) for t in _tracks(_drop_camera_boxes(det, wh, view), classes)]
+    return sorted(diags, key=lambda d: (d.stage, d.growth), reverse=True)
 
 
 def _users(n: int) -> str:
@@ -333,28 +398,23 @@ def closing_on_us(
     """
     if det is None or not det.frames:
         return None
-    wh = _frame_wh(det)
-    tracks = [t for t in _tracks(_drop_camera_boxes(det, wh, view), classes) if _usable(t, wh)]
-    best: tuple[_Track, _EgoHit] | None = None
+    diags = ego_diagnostics(det, classes, view)
+    usable = [d for d in diags if d.stage >= _STAGES.index("out-of-lane")]
     passing: dict[str, tuple[float, str]] = {}
-    for tr in tracks:
-        hit = _ego_track(tr, wh, view)
-        if hit is None:
-            continue
-        if hit.passed and (tr.label not in passing or hit.score > passing[tr.label][0]):
-            passing[tr.label] = (hit.score, _ego_note(tr.label, hit, view))
-        if best is None or (hit.passed, hit.growth) > (best[1].passed, best[1].growth):
-            best = (tr, hit)
-    if best is None:
-        return GapResult(0.0, f"{_users(len(tracks))} tracked, none in the lane {_WHERE[view]}", passed=False)
-    tr, hit = best
-    if not hit.passed:
+    for d in diags:
+        if d.reason == "pass" and d.hit and (d.label not in passing or d.hit.score > passing[d.label][0]):
+            passing[d.label] = (d.hit.score, _ego_note(d.label, d.hit, view))
+    lane = [d for d in usable if d.hit is not None]
+    if not lane:
+        return GapResult(0.0, f"{_users(len(usable))} tracked, none in the lane {_WHERE[view]}", passed=False)
+    top = lane[0]  # diagnostics are sorted: passing first, then furthest through the gate
+    if top.reason != "pass" or top.hit is None:
         return GapResult(
-            round(max(0.0, hit.growth - 1), 2),
-            f"{_users(len(tracks))} tracked, none closing on us fast enough",
+            round(max(0.0, top.growth - 1), 2),
+            f"{_users(len(usable))} tracked, none closing on us fast enough",
             passed=False,
         )
-    return GapResult(hit.score, _ego_note(tr.label, hit, view), passed=True, passing=passing)
+    return GapResult(top.hit.score, _ego_note(top.label, top.hit, view), passed=True, passing=passing)
 
 
 def hazard_match(passing: dict[str, tuple[float, str]], wanted: frozenset[str]) -> tuple[float, str] | None:

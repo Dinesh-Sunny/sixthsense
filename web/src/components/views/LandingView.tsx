@@ -24,7 +24,7 @@ const GITHUB_URL = "https://github.com/Dinesh-Sunny/sixthsense";
 const FRAMES = {
   hero: { src: "/landing/f0.jpg", alt: "A San Francisco crossing seen from a street camera, people on the zebra crossing" },
   watch: { src: "/landing/f3.jpg", alt: "A city intersection seen from above, cars and people waiting to cross" },
-  ruleOut: { src: "/landing/f6.jpg", alt: "The I-24 highway in Nashville from an overhead camera" },
+  ruleOut: { src: "/landing/f3.jpg", alt: "A city intersection from above, cars and people waiting to cross" },
   predict: { src: "/landing/f1.jpg", alt: "A New York crossing with pedestrians and a cyclist" },
 };
 
@@ -139,8 +139,8 @@ export function LandingView() {
   const wx = weather.data?.wx ?? "clear";
   const m = metrics.isSuccess ? metrics.data : undefined;
   const top = topIncident([city.data, road.data, street.data]);
-  const gapSource = topIncident([road.data, city.data]);
-  const gap = gapSource && gapSummary(gapSource.gap_series) ? gapSource : undefined;
+  // City footage only (the frame is a city crossing): riskiest live city moment that has a measured gap.
+  const gap = topIncident([(city.data ?? []).filter((i) => gapSummary(i.gap_series) !== null)]);
   const score = bestScore(m);
   const ran = m?.filter((x) => x.candidates > 0) ?? [];
   const totalWatched = ran.reduce((a, x) => a + x.candidates, 0);
